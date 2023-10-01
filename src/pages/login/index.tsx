@@ -98,7 +98,7 @@ function CreateAccountForm() {
   }
   return (
     <form
-      className="w-full rounded-3xl bg-secbuttn px-5 py-10"
+      className="h-[452px] w-full rounded-3xl bg-secbuttn px-5 py-10"
       onSubmit={(e) => {
         e.preventDefault();
       }}
