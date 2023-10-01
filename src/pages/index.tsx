@@ -15,6 +15,7 @@ import { useState } from "react";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Menu from "~/features/menu";
 import MultiStep from "~/features/multi-step";
+import Table from "~/features/table";
 import { ThemeBoxHovery } from "~/features/theme-box";
 import {
   createUserSchema,
@@ -27,9 +28,9 @@ import InputError from "~/ui/forms/input-error";
 import PasswordField from "~/ui/forms/password-field";
 import TextField from "~/ui/forms/text-field";
 import withLabel from "~/ui/forms/with-label";
-
+import { useMemo } from "react";
 import { api } from "~/utils/api";
-
+import { Card, Title, BarChart, Subtitle, DonutChart } from "@tremor/react";
 const menu = [
   {
     value: "خانه",
@@ -44,8 +45,27 @@ const menu = [
     link: "/dashboard",
   },
 ];
+
+const chartdata = [
+  {
+    name: "Amphibians",
+    "Number of threatened species": 2488,
+  },
+  {
+    name: "Birds",
+    "Number of threatened species": 1445,
+  },
+  {
+    name: "Crustaceans",
+    "Number of threatened species": 743,
+  },
+];
+
+const dataFormatter = (number: number) => {
+  return "$ " + Intl.NumberFormat("us").format(number).toString();
+};
+
 export default function Home() {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   // const users = api.example.getAll.useQuery();
 
   return (
@@ -67,11 +87,146 @@ export default function Home() {
           </div>
         </Container>
 
-        <ThemeBoxHovery />
+        {/* <div className="grid max-h-screen w-11/12 grid-cols-4 grid-rows-3 gap-4">
+          <div className="bg-red-300">1</div>
+          <div className="bg-red-300">2</div>
+          <div className="bg-red-300">3</div>
+          <div className="col-start-1 row-start-2  bg-green-300">4</div>
+          <div className="col-start-2 row-start-2  bg-green-300">5</div>
+          <div className="col-start-3 row-start-2  bg-green-300">6</div>
+          <div className="col-span-3 col-start-1 row-start-3  overflow-hidden ">
+            <div className=" w-full "></div>
+          </div>
+          <div className="col-start-4 row-span-3 row-start-1"></div>
+        </div> */}
+        <Container>
+          <DeposTable />
+        </Container>
+        <div className=" pt-9">
+          <ThemeBoxHovery />
+        </div>
       </div>
     </>
   );
 }
+
+function DeposTable() {
+  const depo = api.depo.getAll.useInfiniteQuery(
+    {
+      limit: 50,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  );
+
+  const columns =
+    useMemo(
+      () => [
+        {
+          Header: "#",
+          accessor: "number",
+          Cell: ({ row }) => {
+            return (
+              <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary  ">
+                {row.index + 1}
+              </div>
+            );
+          },
+        },
+        {
+          Header: "نام سرویس",
+          accessor: "ServiceName",
+        },
+        {
+          Header: "شهر",
+          accessor: "CityName",
+        },
+
+        {
+          Header: "نوع سند",
+          accessor: "DocumentType",
+        },
+        {
+          Header: "تعداد بلاتکلیف",
+          accessor: "DepoCount",
+        },
+        {
+          Header: "تعداد ورودی",
+          accessor: "EntryCount",
+        },
+        {
+          Header: "تعداد رسیدگی شده",
+          accessor: "Capicity",
+        },
+        {
+          Header: "مدت زمان اتمام دپو",
+          accessor: "MyDepoCompletionTime",
+          Cell: ({ row }) => {
+            const data = row.original;
+            var result = data.DepoCount / (data.Capicity - data.EntryCount);
+            if (result <= 0)
+              return (
+                <span className="text-red-400">دپو در حال افزایش است</span>
+              );
+            return result;
+          },
+        },
+      ],
+      [],
+    ) || [];
+  const flatDepos: any = useMemo(() => {
+    return depo.data?.pages.map((page) => page).flat(1) || [];
+  }, [depo]);
+  if (depo.isLoading) return <UsersSkeleton />;
+
+  return (
+    <>
+      <div className="w-full" dir="rtl">
+        <Table data={flatDepos} columns={columns} />
+        <BarChart
+          dir="rtl"
+          data={flatDepos.map((depo) => {
+            return {
+              name: depo.ServiceName,
+              "تعداد بلاتکلیف": depo.DepoCount,
+              "تعداد ورودی": depo.EntryCount,
+              "تعداد رسیدگی": depo.Capicity,
+            };
+          })}
+          index="name"
+          //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+          categories={["تعداد بلاتکلیف", "تعداد ورودی", "تعداد رسیدگی"]}
+          colors={["blue", "red", "green"]}
+          // valueFormatter={dataFormatter}
+          yAxisWidth={48}
+        />
+      </div>
+    </>
+  );
+}
+
+function UsersSkeleton() {
+  return (
+    <>
+      {[...Array(11).keys()].map((i) => {
+        return (
+          <>
+            <span
+              key={i}
+              className="inline-block h-12 w-full animate-pulse rounded-xl bg-accent opacity-30"
+              style={{
+                animationDelay: `${i * 5}`,
+                animationDuration: "1s",
+              }}
+            />
+          </>
+        );
+      })}
+    </>
+  );
+}
+
 function AuthShowcase() {
   const { data: sessionData } = useSession();
 
@@ -87,7 +242,7 @@ function AuthShowcase() {
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         <span className="pt-1">
-          {sessionData ? sessionData.user.username : "ورود"}
+          {sessionData ? sessionData.user?.username : "ورود"}
         </span>
         <span>
           <UserCog2 />

@@ -67,6 +67,12 @@ export const authOptions: NextAuthOptions = {
           }
           return undefined;
         } else {
+          // await db.user.create({
+          //   data: {
+          //     username: credentials.username,
+          //     password: hashPassword(credentials.password),
+          //   },
+          // });
           return undefined;
         }
       },

@@ -1,6 +1,5 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["multiSchema"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -31,6 +30,8 @@ model Role {
     name        String
     permissions String
     users       User[]
+
+    @@map("roles")
 }
 
 model Session {
@@ -39,6 +40,8 @@ model Session {
     userId       String
     expires      DateTime
     users        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
 }
 
 model Verification_token {
@@ -48,4 +51,5 @@ model Verification_token {
     expires    DateTime
 
     @@unique([identifier, token])
+    @@map("verification_tokens")
 }
