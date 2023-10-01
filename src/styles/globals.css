@@ -1,3 +1,236 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.theme-light-1 {
+  --primary: 29, 13, 7;
+  --secondary: 250, 239, 235;
+  --primbuttn: 104, 187, 217;
+  --secbuttn: 244, 219, 210;
+  --accent: 44, 140, 175;
+}
+
+/* .theme-light-2 {
+  --primary: 36, 34, 27;
+  --secondary: 228, 220, 201;
+  --primbuttn: 36, 34, 27;
+  --secbuttn: 228, 230, 201;
+  --accent: 36, 34, 27;
+} */
+.theme-light-2 {
+  --primary: 247, 244, 242;
+  --secondary: 222, 207, 206;
+  --primbuttn: 236, 228, 223;
+  --secbuttn: 10, 7, 6;
+  --accent: 161, 120, 94;
+}
+
+.theme-light-3 {
+  --primary: 0, 0, 0;
+  --secondary: 237, 248, 243;
+  --primbuttn: 29, 70, 73;
+  --secbuttn: 215, 225, 239;
+  --accent: 29, 47, 73;
+}
+
+.theme-light-4 {
+  --primary: 8, 12, 10;
+  --secondary: 225, 234, 228;
+  --primbuttn: 61, 87, 71;
+  --secbuttn: 195, 213, 202;
+  --accent: 85, 119, 97;
+}
+
+.theme-dark-1 {
+  --primary: 244, 246, 245;
+  --secondary: 4, 6, 5;
+  --primbuttn: 75, 113, 100;
+  /* --primbuttn: 141, 165, 163; */
+  --secbuttn: 16, 18, 20;
+  --accent: 190, 255, 255;
+}
+
+.theme-dark-2 {
+  --primary: 217, 242, 240;
+  --secondary: 0, 0, 0;
+  --primbuttn: 198, 88, 97;
+  --secbuttn: 9, 27, 25;
+  --accent: 198, 88, 97;
+}
+.theme-dark-3 {
+  --primary: 251, 251, 249;
+  --secondary: 9, 10, 6;
+  --primbuttn: 150, 186, 135;
+  --secbuttn: 19, 32, 22;
+  --accent: 80, 139, 93;
+}
+
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  @font-face {
+    font-family: "Iransans";
+    src:
+      local("Iransans"),
+      url("/fonts/IRANSansWeb(FaNum)_Medium.woff") format("woff");
+    font-weight: 400;
+    font-display: swap;
+    font-style: normal;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+p,
+a,
+label,
+input,
+button,
+li,
+div {
+  font-family: "Iransans";
+}
+
+.rtl {
+  direction: rtl;
+}
+
+.ltr {
+  direction: ltr;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: rgb(var(--accent));
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+#__next {
+  @apply bg-secondary;
+}
+*::selection {
+  background: rgb(var(--accent));
+  color: rgb(var(--secondary));
+}
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #bababaac transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 3px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #bababaac;
+  border-radius: 10px;
+  border: 3px solid transparent;
+  transition: opacity 0.5s 0.5s ease-out;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #000000;
+}
+
+/* time picker */
+
+.react-ios-time-picker {
+  margin-bottom: 50px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 11px 15px #0005;
+}
+
+.react-ios-time-picker-transition {
+  animation: fade-in 150ms ease-out;
+}
+
+@keyframes fade-in {
+  0% {
+    transform: translateY(150px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.react-ios-time-picker-fast {
+  transition: transform 700ms cubic-bezier(0.13, 0.67, 0.01, 0.94);
+}
+
+.react-ios-time-picker-slow {
+  transition: transform 600ms cubic-bezier(0.13, 0.67, 0.01, 0.94);
+}
+
+.react-ios-time-picker-top-shadow {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background: #0009;
+  background: linear-gradient(180deg, #0009 0%, #1c1c1c 100%);
+}
+
+.react-ios-time-picker-bottom-shadow {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: #0009;
+  background: linear-gradient(0deg, #0009 0%, hsla(0, 0%, 11%, 1) 100%);
+}
+
+.trackline {
+  flex: 1 1 0%;
+  position: relative;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0,
+    var(--primary) 25%,
+    var(--accent) 50%,
+    var(--primary) 75%,
+    var(--primary) 100%
+  );
+}
+
+.Onboarding_BranchTableLine__FC_bw,
+.Onboarding_TrackBranchLine__UTQSQ {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: Onboarding_dash__rRBdq 0.75s 0.15s forwards;
+  @apply stroke-primary;
+}
+
+@keyframes Onboarding_dash__rRBdq {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}

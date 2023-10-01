@@ -2,13 +2,16 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
-  type DefaultSession,
   type NextAuthOptions,
+  type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
 
-import { env } from "~/env.mjs";
 import { db } from "~/server/db";
+
+import CredentialsProvider from "next-auth/providers/credentials";
+
+import type { User } from "@prisma/client";
+import { createHash } from "crypto";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -18,11 +21,7 @@ import { db } from "~/server/db";
  */
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    user: DefaultSession["user"] & {
-      id: string;
-      // ...other properties
-      // role: UserRole;
-    };
+    user: User;
   }
 
   // interface User {
@@ -37,31 +36,63 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
-  },
   adapter: PrismaAdapter(db),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    CredentialsProvider({
+      // The name to display on the sign in form (e.g. "Sign in with...")
+      name: "Credentials",
+      // `credentials` is used to generate a form on the sign in page.
+      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+      //@ts-ignore
+      async authorize(credentials, req) {
+        // Add logic here to look up the user from the credentials supplied
+
+        const user = await db.user.findFirst({
+          where: {
+            username: credentials.username,
+          },
+        });
+
+        if (user) {
+          if (
+            compareHashPassword(credentials.password, user.password).success
+          ) {
+            return user;
+          }
+          return undefined;
+        } else {
+          return undefined;
+        }
+      },
     }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
   ],
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {
+    session: async ({ session, token }: { session: any; token: any }) => {
+      const user = await db.user.findUnique({
+        where: { username: token.user.username },
+      });
+      session.user = user;
+      return session;
+    },
+    jwt: async ({ token, user }: any) => {
+      user && (token.user = user);
+
+      delete token.user.password;
+      return token;
+    },
+  },
+  pages: {
+    signIn: "/login", // this will allow us to use our own login page
+  },
 };
 
 /**
@@ -75,3 +106,14 @@ export const getServerAuthSession = (ctx: {
 }) => {
   return getServerSession(ctx.req, ctx.res, authOptions);
 };
+
+function hashPassword(password: string) {
+  return createHash("sha256").update(password).digest("hex");
+}
+
+function compareHashPassword(password: string, hashedPassword: string) {
+  if (hashPassword(password) === hashedPassword) {
+    return { success: true, message: "Password matched" };
+  }
+  return { success: false, message: "Password not matched" };
+}
