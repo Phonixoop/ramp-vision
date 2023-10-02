@@ -1,36 +1,21 @@
-import { useFormik } from "formik";
-import {
-  CheckCheckIcon,
-  CheckIcon,
-  KeySquareIcon,
-  Loader2Icon,
-  UserCog2,
-  UserIcon,
-} from "lucide-react";
+import { UserCog2 } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { toFormikValidationSchema } from "zod-formik-adapter";
+
 import Menu from "~/features/menu";
-import MultiStep from "~/features/multi-step";
+
 import Table from "~/features/table";
+
 import { ThemeBoxHovery } from "~/features/theme-box";
-import {
-  createUserSchema,
-  userLoginSchema,
-} from "~/server/validations/user.validation";
+
 import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 import { Container } from "~/ui/containers";
-import InputError from "~/ui/forms/input-error";
-import PasswordField from "~/ui/forms/password-field";
-import TextField from "~/ui/forms/text-field";
-import withLabel from "~/ui/forms/with-label";
+
 import { useMemo } from "react";
 import { api } from "~/utils/api";
-import { Card, Title, BarChart, Subtitle, DonutChart } from "@tremor/react";
+import { Title, BarChart, AreaChart } from "@tremor/react";
+
 const menu = [
   {
     value: "خانه",
@@ -113,13 +98,15 @@ export default function Home() {
 function DeposTable() {
   const depo = api.depo.getAll.useInfiniteQuery(
     {
-      limit: 50,
+      filter: {},
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     },
   );
-
+  const flatDepos: any = useMemo(() => {
+    return depo.data?.pages.map((page) => page).flat(1) || [];
+  }, [depo]);
   const columns =
     useMemo(
       () => [
@@ -128,36 +115,83 @@ function DeposTable() {
           accessor: "number",
           Cell: ({ row }) => {
             return (
-              <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary  ">
+              <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary">
                 {row.index + 1}
+              </div>
+            );
+          },
+          Filter: "",
+        },
+        {
+          Header: "نام سرویس",
+          accessor: "ServiceName",
+          Filter: ({ column }) => {
+            const { filterValue, setFilter } = column;
+            const unique = [...new Set(flatDepos.map((a) => a.ServiceName))];
+
+            return (
+              <div className="flex w-full flex-col items-center justify-center ">
+                {unique.map((item: string) => {
+                  return (
+                    <span
+                      className={`w-full p-2 text-center ${
+                        item === filterValue ? "text-green-400" : ""
+                      }`}
+                      onClick={(e) => {
+                        setFilter(item);
+                      }}
+                    >
+                      {item}
+                    </span>
+                  );
+                })}
               </div>
             );
           },
         },
         {
-          Header: "نام سرویس",
-          accessor: "ServiceName",
-        },
-        {
           Header: "شهر",
           accessor: "CityName",
+          Filter: (data) => {
+            const unique = [...new Set(flatDepos.map((a) => a.CityName))];
+            return (
+              <div className="flex w-full flex-col items-center justify-center">
+                {unique.map((item: string) => {
+                  return <span className="w-full p-2 text-center">{item}</span>;
+                })}
+              </div>
+            );
+          },
         },
 
         {
           Header: "نوع سند",
           accessor: "DocumentType",
+          Filter: (data) => {
+            const unique = [...new Set(flatDepos.map((a) => a.DocumentType))];
+            return (
+              <div className="flex w-full flex-col items-center justify-center ">
+                {unique.map((item: string) => {
+                  return <span className="w-full p-2 text-center">{item}</span>;
+                })}
+              </div>
+            );
+          },
         },
         {
           Header: "تعداد بلاتکلیف",
           accessor: "DepoCount",
+          Filter: "filter",
         },
         {
           Header: "تعداد ورودی",
           accessor: "EntryCount",
+          Filter: "filter",
         },
         {
           Header: "تعداد رسیدگی شده",
           accessor: "Capicity",
+          Filter: "filter",
         },
         {
           Header: "مدت زمان اتمام دپو",
@@ -171,36 +205,70 @@ function DeposTable() {
               );
             return result;
           },
+          Filter: "filter",
+        },
+        {
+          Header: "تاریخ",
+          accessor: "Start_Date",
+          Filter: "filter",
         },
       ],
       [],
     ) || [];
-  const flatDepos: any = useMemo(() => {
-    return depo.data?.pages.map((page) => page).flat(1) || [];
-  }, [depo]);
+
   if (depo.isLoading) return <UsersSkeleton />;
 
   return (
     <>
-      <div className="w-full" dir="rtl">
-        <Table data={flatDepos} columns={columns} />
-        <BarChart
-          dir="rtl"
-          data={flatDepos.map((depo) => {
-            return {
-              name: depo.ServiceName,
-              "تعداد بلاتکلیف": depo.DepoCount,
-              "تعداد ورودی": depo.EntryCount,
-              "تعداد رسیدگی": depo.Capicity,
-            };
-          })}
-          index="name"
-          //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
-          categories={["تعداد بلاتکلیف", "تعداد ورودی", "تعداد رسیدگی"]}
-          colors={["blue", "red", "green"]}
-          // valueFormatter={dataFormatter}
-          yAxisWidth={48}
-        />
+      <div
+        className="flex  w-full flex-col items-center justify-center gap-5"
+        dir="rtl"
+      >
+        <div className="flex w-full items-center justify-between gap-5">
+          <div className="w-full rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+            <Title>نمودار دپو</Title>
+            <BarChart
+              dir="rtl"
+              data={flatDepos.map((depo) => {
+                return {
+                  name: depo.ServiceName,
+                  "تعداد بلاتکلیف": depo.DepoCount,
+                  "تعداد ورودی": depo.EntryCount,
+                  "تعداد رسیدگی": depo.Capicity,
+                };
+              })}
+              index="name"
+              //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+              categories={["تعداد بلاتکلیف", "تعداد ورودی", "تعداد رسیدگی"]}
+              colors={["blue", "red", "green"]}
+              // valueFormatter={dataFormatter}
+              yAxisWidth={48}
+            />
+          </div>
+          <div className="w-full rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+            <Title>نمودار زمانی </Title>
+            <AreaChart
+              data={flatDepos.map((depo) => {
+                return {
+                  date: depo.Start_Date,
+                  name: depo.ServiceName,
+                  "تعداد بلاتکلیف": depo.DepoCount,
+                  "تعداد ورودی": depo.EntryCount,
+                  "تعداد رسیدگی": depo.Capicity,
+                };
+              })}
+              index="date"
+              //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+              categories={["تعداد بلاتکلیف", "تعداد ورودی", "تعداد رسیدگی"]}
+              colors={["blue", "red", "green"]}
+              // valueFormatter={dataFormatter}
+            />
+          </div>
+        </div>
+
+        <div className="h-fit max-h-[42rem] w-full overflow-hidden overflow-y-auto rounded-lg  border border-accent/30 bg-secondary   2xl:p-5">
+          <Table data={flatDepos} columns={columns} />
+        </div>
       </div>
     </>
   );

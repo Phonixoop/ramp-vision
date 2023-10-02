@@ -1,4 +1,4 @@
-import { useTable, useSortBy } from "react-table";
+import { useTable, useSortBy, useFilters } from "react-table";
 
 export default function Table({
   columns = [],
@@ -6,7 +6,7 @@ export default function Table({
   clickedRowIndex = "",
   onClick = (cell) => {},
 }) {
-  const tableInstance = useTable({ columns, data }, useSortBy);
+  const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
 
@@ -14,6 +14,20 @@ export default function Table({
     <>
       <div className="flex h-full w-full items-stretch justify-center">
         <div className="w-full overflow-auto rounded-[20px] md:w-9/12">
+          <div className="flex w-full flex-row  ">
+            {headerGroups.map((headerGroup) => {
+              return headerGroup.headers.map((column) => {
+                if (column["Filter"])
+                  return (
+                    <div className="flex w-full items-center justify-center text-center">
+                      {" "}
+                      {column.render("Filter")}
+                    </div>
+                  );
+              });
+            })}
+          </div>
+
           <table {...getTableProps()} className=" w-full text-center">
             <thead>
               {
@@ -33,7 +47,7 @@ export default function Table({
                         headerGroup.headers.map((column) => {
                           const { key, ...restHeaderProps } =
                             column.getHeaderProps(
-                              column.getSortByToggleProps()
+                              column.getSortByToggleProps(),
                             );
                           return (
                             <th
