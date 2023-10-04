@@ -2,7 +2,10 @@ import { twMerge } from "tailwind-merge";
 
 export function Container({ children, className = "", rtl = false }) {
   return (
-    <div className={twMerge("sm:w-11/12 ", className)} dir={rtl ? "rtl" : ""}>
+    <div
+      className={twMerge("w-full p-1 sm:w-11/12 sm:p-0 ", className)}
+      dir={rtl ? "rtl" : ""}
+    >
       {children}
     </div>
   );

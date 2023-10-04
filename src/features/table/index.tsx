@@ -13,14 +13,13 @@ export default function Table({
   return (
     <>
       <div className="flex h-full w-full items-stretch justify-center">
-        <div className="w-full overflow-auto rounded-[20px] md:w-9/12">
-          <div className="flex w-full flex-row  ">
+        <div className="w-full overflow-auto rounded-[20px] px-10 md:w-9/12">
+          <div className="flex w-full flex-row  py-10">
             {headerGroups.map((headerGroup) => {
               return headerGroup.headers.map((column) => {
                 if (column["Filter"])
                   return (
                     <div className="flex w-full items-center justify-center text-center">
-                      {" "}
                       {column.render("Filter")}
                     </div>
                   );
@@ -28,7 +27,10 @@ export default function Table({
             })}
           </div>
 
-          <table {...getTableProps()} className=" w-full text-center">
+          <table
+            {...getTableProps()}
+            className="h-fit max-h-[42rem] w-full overflow-hidden overflow-y-auto  text-center "
+          >
             <thead>
               {
                 // Loop over the header rows

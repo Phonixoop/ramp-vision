@@ -15,6 +15,8 @@ import { Container } from "~/ui/containers";
 import { useMemo } from "react";
 import { api } from "~/utils/api";
 import { Title, BarChart, AreaChart } from "@tremor/react";
+import CheckboxList, { SelectControlled } from "~/features/checkbox-list";
+import MultiBox from "~/ui/multi-box";
 
 const menu = [
   {
@@ -84,6 +86,7 @@ export default function Home() {
           </div>
           <div className="col-start-4 row-span-3 row-start-1"></div>
         </div> */}
+
         <Container>
           <DeposTable />
         </Container>
@@ -130,22 +133,29 @@ function DeposTable() {
             const unique = [...new Set(flatDepos.map((a) => a.ServiceName))];
 
             return (
-              <div className="flex w-full flex-col items-center justify-center ">
-                {unique.map((item: string) => {
-                  return (
-                    <span
-                      className={`w-full p-2 text-center ${
-                        item === filterValue ? "text-green-400" : ""
-                      }`}
-                      onClick={(e) => {
-                        setFilter(item);
-                      }}
-                    >
-                      {item}
-                    </span>
-                  );
-                })}
-              </div>
+              <>
+                <SelectControlled
+                  list={unique}
+                  value={filterValue}
+                  onChange={setFilter}
+                />
+              </>
+              // <div className="flex w-full flex-col items-center justify-center ">
+              //   {unique.map((item: string) => {
+              //     return (
+              //       <span
+              //         className={`w-full p-2 text-center ${
+              //           item === filterValue ? "text-green-400" : ""
+              //         }`}
+              //         onClick={(e) => {
+              //           setFilter(item);
+              //         }}
+              //       >
+              //         {item}
+              //       </span>
+              //     );
+              //   })}
+              // </div>
             );
           },
         },
@@ -224,8 +234,8 @@ function DeposTable() {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
-        <div className="flex w-full items-center justify-between gap-5">
-          <div className="w-full rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+        <div className="flex w-full items-center justify-between gap-5 laptopMax:flex-col">
+          <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
             <Title>نمودار دپو</Title>
             <BarChart
               dir="rtl"
@@ -245,7 +255,7 @@ function DeposTable() {
               yAxisWidth={48}
             />
           </div>
-          <div className="w-full rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+          <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
             <Title>نمودار زمانی </Title>
             <AreaChart
               data={flatDepos.map((depo) => {
@@ -266,7 +276,7 @@ function DeposTable() {
           </div>
         </div>
 
-        <div className="h-fit max-h-[42rem] w-full overflow-hidden overflow-y-auto rounded-lg  border border-accent/30 bg-secondary   2xl:p-5">
+        <div className="w-full  rounded-lg border  border-accent/30 bg-secondary text-center ">
           <Table data={flatDepos} columns={columns} />
         </div>
       </div>
