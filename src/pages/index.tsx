@@ -12,12 +12,20 @@ import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 import { Container } from "~/ui/containers";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { api } from "~/utils/api";
 import { Title, BarChart, AreaChart } from "@tremor/react";
-import CheckboxList, { SelectControlled } from "~/features/checkbox-list";
+import CheckboxList, {
+  SelectColumnFilter,
+  SelectControlled,
+} from "~/features/checkbox-list";
 import MultiBox from "~/ui/multi-box";
-
+import moment from "jalali-moment";
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import DatePanel from "react-multi-date-picker/plugins/date_panel";
+import { en } from "~/utils/util";
 const menu = [
   {
     value: "خانه",
@@ -51,10 +59,16 @@ const chartdata = [
 const dataFormatter = (number: number) => {
   return "$ " + Intl.NumberFormat("us").format(number).toString();
 };
-
+function filterColumn(rows, id, filterValue) {
+  return rows.filter((row) => {
+    const rowValue = row.values[id];
+    // console.log(rowValue, filterValue);
+    return filterValue.includes(rowValue);
+  });
+}
 export default function Home() {
   // const users = api.example.getAll.useQuery();
-
+  const { data: sessionData } = useSession();
   return (
     <>
       <Head>
@@ -63,12 +77,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <BlurBackground />
-      <div className="flex min-h-screen w-full flex-col items-center justify-between bg-secondary transition-colors duration-1000 ">
+      <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000 ">
         <Container
           className="flex  flex-col items-center justify-between py-5"
           rtl={true}
         >
-          <div className="flex items-center  justify-center gap-4 ">
+          <div className="flex items-center justify-center gap-4 py-5 ">
             <AuthShowcase />
             <Menu rootPath="/" list={menu} />
           </div>
@@ -88,7 +102,7 @@ export default function Home() {
         </div> */}
 
         <Container>
-          <DeposTable />
+          <DeposTable sessionData={sessionData} />
         </Container>
         <div className=" pt-9">
           <ThemeBoxHovery />
@@ -98,18 +112,33 @@ export default function Home() {
   );
 }
 
-function DeposTable() {
-  const depo = api.depo.getAll.useInfiniteQuery(
+function DeposTable({ sessionData }) {
+  const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
+    enabled: sessionData?.user !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  const [filters, setDataFilters] = useState({
+    CityName: initialFilters.data?.Cities.map((a) => a.CityName),
+    DocumentType: undefined,
+    ServiceName: undefined,
+    Start_Date: [
+      moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+    ],
+  });
+  const depo = api.depo.getAll.useQuery(
     {
-      filter: {},
+      filter: filters,
     },
     {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
+      refetchOnWindowFocus: false,
     },
   );
-  const flatDepos: any = useMemo(() => {
-    return depo.data?.pages.map((page) => page).flat(1) || [];
-  }, [depo]);
+
+  // const depo.data: any = useMemo(() => {
+  //   return depo.data?.pages.map((page) => page).flat(1) || [];
+  // }, [depo]);
   const columns =
     useMemo(
       () => [
@@ -128,48 +157,42 @@ function DeposTable() {
         {
           Header: "نام سرویس",
           accessor: "ServiceName",
+          filter: filterColumn,
           Filter: ({ column }) => {
-            const { filterValue, setFilter } = column;
-            const unique = [...new Set(flatDepos.map((a) => a.ServiceName))];
-
             return (
-              <>
-                <SelectControlled
-                  list={unique}
-                  value={filterValue}
-                  onChange={setFilter}
-                />
-              </>
-              // <div className="flex w-full flex-col items-center justify-center ">
-              //   {unique.map((item: string) => {
-              //     return (
-              //       <span
-              //         className={`w-full p-2 text-center ${
-              //           item === filterValue ? "text-green-400" : ""
-              //         }`}
-              //         onClick={(e) => {
-              //           setFilter(item);
-              //         }}
-              //       >
-              //         {item}
-              //       </span>
-              //     );
-              //   })}
-              // </div>
+              <SelectColumnFilter
+                column={column}
+                data={depo.data}
+                onChange={(filter) => {
+                  // setDataFilters((prev) => {
+                  //   return {
+                  //     ...prev,
+                  //     [filter.id]: filter.values,
+                  //   };
+                  // });
+                }}
+              />
             );
           },
         },
         {
           Header: "شهر",
           accessor: "CityName",
-          Filter: (data) => {
-            const unique = [...new Set(flatDepos.map((a) => a.CityName))];
+          filter: filterColumn,
+          Filter: ({ column }) => {
             return (
-              <div className="flex w-full flex-col items-center justify-center">
-                {unique.map((item: string) => {
-                  return <span className="w-full p-2 text-center">{item}</span>;
-                })}
-              </div>
+              <SelectColumnFilter
+                column={column}
+                data={initialFilters.data?.Cities}
+                onChange={(filter) => {
+                  // setDataFilters((prev) => {
+                  //   return {
+                  //     ...prev,
+                  //     [filter.id]: filter.values,
+                  //   };
+                  // });
+                }}
+              />
             );
           },
         },
@@ -177,31 +200,35 @@ function DeposTable() {
         {
           Header: "نوع سند",
           accessor: "DocumentType",
-          Filter: (data) => {
-            const unique = [...new Set(flatDepos.map((a) => a.DocumentType))];
+          filter: filterColumn,
+          Filter: ({ column }) => {
             return (
-              <div className="flex w-full flex-col items-center justify-center ">
-                {unique.map((item: string) => {
-                  return <span className="w-full p-2 text-center">{item}</span>;
-                })}
-              </div>
+              <SelectColumnFilter
+                column={column}
+                data={depo.data}
+                onChange={(filter) => {
+                  // setDataFilters((prev) => {
+                  //   return {
+                  //     ...prev,
+                  //     [filter.id]: filter.values,
+                  //   };
+                  // });
+                }}
+              />
             );
           },
         },
         {
           Header: "تعداد بلاتکلیف",
           accessor: "DepoCount",
-          Filter: "filter",
         },
         {
           Header: "تعداد ورودی",
           accessor: "EntryCount",
-          Filter: "filter",
         },
         {
           Header: "تعداد رسیدگی شده",
           accessor: "Capicity",
-          Filter: "filter",
         },
         {
           Header: "مدت زمان اتمام دپو",
@@ -215,18 +242,53 @@ function DeposTable() {
               );
             return result;
           },
-          Filter: "filter",
         },
         {
           Header: "تاریخ",
           accessor: "Start_Date",
-          Filter: "filter",
+          filter: filterColumn,
+          Filter: ({ column }) => {
+            return (
+              // <SelectColumnFilter
+              //   column={column}
+              //   data={depo.data}
+              //   onChange={(filter) => {
+              //     setDataFilters((prev) => {
+              //       return {
+              //         ...prev,
+              //         [filter.id]: filter.values,
+              //       };
+              //     });
+              //   }}
+              // />
+              <>
+                <DatePicker
+                  multiple
+                  value={filters.Start_Date}
+                  calendar={persian}
+                  locale={persian_fa}
+                  plugins={[<DatePanel />]}
+                  onChange={(date) => {
+                    //@ts-ignore
+                    if (!date) return;
+                    if (Array.isArray(date) && date.length <= 0) return;
+                    setDataFilters((prev) => {
+                      return {
+                        ...prev,
+                        Start_Date: Array.isArray(date)
+                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
+                          : [en(date.format("YYYY/MM/DD"))],
+                      };
+                    });
+                  }}
+                />
+              </>
+            );
+          },
         },
       ],
-      [],
+      [depo.data],
     ) || [];
-
-  if (depo.isLoading) return <UsersSkeleton />;
 
   return (
     <>
@@ -239,7 +301,7 @@ function DeposTable() {
             <Title>نمودار دپو</Title>
             <BarChart
               dir="rtl"
-              data={flatDepos.map((depo) => {
+              data={(depo.data ?? []).map((depo) => {
                 return {
                   name: depo.ServiceName,
                   "تعداد بلاتکلیف": depo.DepoCount,
@@ -258,7 +320,7 @@ function DeposTable() {
           <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
             <Title>نمودار زمانی </Title>
             <AreaChart
-              data={flatDepos.map((depo) => {
+              data={(depo.data ?? []).map((depo) => {
                 return {
                   date: depo.Start_Date,
                   name: depo.ServiceName,
@@ -277,7 +339,11 @@ function DeposTable() {
         </div>
 
         <div className="w-full  rounded-lg border  border-accent/30 bg-secondary text-center ">
-          <Table data={flatDepos} columns={columns} />
+          <Table
+            isLoading={depo.isLoading}
+            data={depo.data ?? []}
+            columns={columns}
+          />
         </div>
       </div>
     </>

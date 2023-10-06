@@ -1,5 +1,6 @@
-import { Select, SelectItem } from "@tremor/react";
+import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import React, { useState } from "react";
+import { api } from "~/utils/api";
 
 export default function CheckboxList({ checkboxes, onCheckboxChange }) {
   const handleCheckboxChange = (id) => {
@@ -24,18 +25,46 @@ export default function CheckboxList({ checkboxes, onCheckboxChange }) {
   );
 }
 
-export function SelectControlled({ list = [], value, onChange }) {
+export function SelectControlled({ list = [], value, onChange, title }) {
   return (
-    <div className="mx-auto max-w-sm space-y-6">
-      <Select value={value} onValueChange={onChange}>
+    <div className="min-w-[20rem] max-w-md px-2 sm:w-fit sm:px-0 ">
+      <MultiSelect
+        className="min-w-full"
+        placeholder={title}
+        placeholderSearch="جستجو..."
+        defaultValue={list}
+        value={value}
+        onValueChange={onChange}
+      >
         {list.map((item) => {
           return (
-            <SelectItem key={item} value={item}>
-              {item}
-            </SelectItem>
+            <MultiSelectItem key={item} value={item}>
+              <span className="px-2">{item}</span>
+            </MultiSelectItem>
           );
         })}
-      </Select>
+      </MultiSelect>
     </div>
+  );
+}
+
+export function SelectColumnFilter({ column, data, onChange }) {
+  if (!data || data.length === 0) return "";
+  const { filterValue, setFilter } = column;
+  const unique = [...new Set(data.map((a) => a[column.id]))];
+
+  return (
+    <SelectControlled
+      title={column.Header}
+      list={unique}
+      value={filterValue}
+      onChange={(values) => {
+        setFilter(values);
+        onChange({
+          id: column.id,
+          values: values,
+        });
+      }}
+    />
   );
 }

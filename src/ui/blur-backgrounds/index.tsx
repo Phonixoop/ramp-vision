@@ -3,7 +3,7 @@ import React from "react";
 export default function BlurBackground() {
   return (
     <div
-      className=" pointer-events-none absolute inset-x-0 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+      className="pointer-events-none absolute inset-x-0 transform-gpu overflow-hidden blur-3xl sm:-top-80"
       aria-hidden="true"
     >
       <div

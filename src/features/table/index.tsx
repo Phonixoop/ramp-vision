@@ -1,6 +1,9 @@
+import { Loader2Icon, LoaderIcon } from "lucide-react";
 import { useTable, useSortBy, useFilters } from "react-table";
+import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 
 export default function Table({
+  isLoading = false,
   columns = [],
   data = [],
   clickedRowIndex = "",
@@ -12,24 +15,25 @@ export default function Table({
 
   return (
     <>
-      <div className="flex h-full w-full items-stretch justify-center">
-        <div className="w-full overflow-auto rounded-[20px] px-10 md:w-9/12">
-          <div className="flex w-full flex-row  py-10">
-            {headerGroups.map((headerGroup) => {
-              return headerGroup.headers.map((column) => {
-                if (column["Filter"])
-                  return (
-                    <div className="flex w-full items-center justify-center text-center">
-                      {column.render("Filter")}
-                    </div>
-                  );
-              });
-            })}
+      <div className="flex w-full flex-row  justify-center py-10 ">
+        <div className="flex w-full flex-wrap gap-5 sm:w-11/12">
+          {headerGroups.map((headerGroup) => {
+            return headerGroup.headers.map((column) => {
+              if (column["Filter"]) return <>{column.render("Filter")}</>;
+            });
+          })}
+        </div>
+      </div>
+      <div className="relative flex h-[30rem] w-full items-stretch justify-center">
+        {isLoading && (
+          <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
+            <Loader2Icon className="h-12 w-12 animate-spin" />
           </div>
-
+        )}
+        <div className=" w-full overflow-auto rounded-[20px]  sm:w-11/12">
           <table
             {...getTableProps()}
-            className="h-fit max-h-[42rem] w-full overflow-hidden overflow-y-auto  text-center "
+            className="  w-full overflow-hidden overflow-y-auto  text-center "
           >
             <thead>
               {
