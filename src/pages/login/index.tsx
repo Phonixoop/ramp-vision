@@ -103,7 +103,7 @@ function CreateAccountForm() {
         e.preventDefault();
       }}
     >
-      <h2 className="w-full py-5 text-center text-accent">ثبت نام | ورود</h2>
+      <h2 className="w-full py-5 text-center text-accent">ورود</h2>
       <MultiStep
         loadingStep={2}
         isLoading={isLoading}

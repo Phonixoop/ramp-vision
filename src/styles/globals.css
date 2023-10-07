@@ -234,3 +234,15 @@ input[type="number"] {
     stroke-dashoffset: 0;
   }
 }
+
+.rmdp-container {
+  max-height: none !important;
+  border: none !important;
+}
+
+.rmdp-container > input {
+  height: 100% !important;
+  border-color: transparent !important;
+  border-radius: 7px !important;
+  background-color: rgb(var(--secbuttn));
+}

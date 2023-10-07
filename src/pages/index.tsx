@@ -25,7 +25,7 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
-import { en } from "~/utils/util";
+import { en, processDataForChart } from "~/utils/util";
 const menu = [
   {
     value: "خانه",
@@ -152,7 +152,32 @@ function DeposTable({ sessionData }) {
               </div>
             );
           },
-          Filter: "",
+          Filter: () => {
+            return (
+              <>
+                <DatePicker
+                  multiple
+                  value={filters.Start_Date}
+                  calendar={persian}
+                  locale={persian_fa}
+                  plugins={[<DatePanel />]}
+                  onChange={(date) => {
+                    //@ts-ignore
+                    if (!date) return;
+                    if (Array.isArray(date) && date.length <= 0) return;
+                    setDataFilters((prev) => {
+                      return {
+                        ...prev,
+                        Start_Date: Array.isArray(date)
+                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
+                          : [en(date.format("YYYY/MM/DD"))],
+                      };
+                    });
+                  }}
+                />
+              </>
+            );
+          },
         },
         {
           Header: "نام سرویس",
@@ -248,42 +273,7 @@ function DeposTable({ sessionData }) {
           accessor: "Start_Date",
           filter: filterColumn,
           Filter: ({ column }) => {
-            return (
-              // <SelectColumnFilter
-              //   column={column}
-              //   data={depo.data}
-              //   onChange={(filter) => {
-              //     setDataFilters((prev) => {
-              //       return {
-              //         ...prev,
-              //         [filter.id]: filter.values,
-              //       };
-              //     });
-              //   }}
-              // />
-              <>
-                <DatePicker
-                  multiple
-                  value={filters.Start_Date}
-                  calendar={persian}
-                  locale={persian_fa}
-                  plugins={[<DatePanel />]}
-                  onChange={(date) => {
-                    //@ts-ignore
-                    if (!date) return;
-                    if (Array.isArray(date) && date.length <= 0) return;
-                    setDataFilters((prev) => {
-                      return {
-                        ...prev,
-                        Start_Date: Array.isArray(date)
-                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                          : [en(date.format("YYYY/MM/DD"))],
-                      };
-                    });
-                  }}
-                />
-              </>
-            );
+            return <></>;
           },
         },
       ],
@@ -296,53 +286,80 @@ function DeposTable({ sessionData }) {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
-        <div className="flex w-full items-center justify-between gap-5 laptopMax:flex-col">
-          <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
-            <Title>نمودار دپو</Title>
-            <BarChart
-              dir="rtl"
-              data={(depo.data ?? []).map((depo) => {
-                return {
-                  name: depo.ServiceName,
-                  "تعداد بلاتکلیف": depo.DepoCount,
-                  "تعداد ورودی": depo.EntryCount,
-                  "تعداد رسیدگی": depo.Capicity,
-                };
-              })}
-              index="name"
-              //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
-              categories={["تعداد بلاتکلیف", "تعداد ورودی", "تعداد رسیدگی"]}
-              colors={["blue", "red", "green"]}
-              // valueFormatter={dataFormatter}
-              yAxisWidth={48}
-            />
-          </div>
-          <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
-            <Title>نمودار زمانی </Title>
-            <AreaChart
-              data={(depo.data ?? []).map((depo) => {
-                return {
-                  date: depo.Start_Date,
-                  name: depo.ServiceName,
-                  "تعداد بلاتکلیف": depo.DepoCount,
-                  "تعداد ورودی": depo.EntryCount,
-                  "تعداد رسیدگی": depo.Capicity,
-                };
-              })}
-              index="date"
-              //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
-              categories={["تعداد بلاتکلیف", "تعداد ورودی", "تعداد رسیدگی"]}
-              colors={["blue", "red", "green"]}
-              // valueFormatter={dataFormatter}
-            />
-          </div>
-        </div>
-
-        <div className="w-full  rounded-lg border  border-accent/30 bg-secondary text-center ">
+        <div className="w-full  rounded-lg border  border-accent/30 bg-secondary py-5 text-center ">
           <Table
             isLoading={depo.isLoading}
             data={depo.data ?? []}
             columns={columns}
+            renderChild={(rows) => {
+              const flatRows = rows.map((row) => row.original);
+              const dateDate = processDataForChart(flatRows, "Start_Date", [
+                "DepoCount",
+                "EntryCount",
+                "Capicity",
+              ]);
+              const serviceData = processDataForChart(flatRows, "ServiceName", [
+                "DepoCount",
+                "EntryCount",
+                "Capicity",
+              ]);
+              console.log(serviceData);
+              return (
+                <>
+                  <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
+                    <div className="flex w-11/12  items-center justify-between gap-5 laptopMax:flex-col">
+                      <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+                        <Title>نمودار دپو</Title>
+                        <BarChart
+                          dir="rtl"
+                          data={(serviceData ?? []).map((row) => {
+                            return {
+                              name: row.key,
+                              "تعداد بلاتکلیف": row.DepoCount,
+                              "تعداد ورودی": row.EntryCount,
+                              "تعداد رسیدگی": row.Capicity,
+                            };
+                          })}
+                          index="name"
+                          //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+                          categories={[
+                            "تعداد بلاتکلیف",
+                            "تعداد ورودی",
+                            "تعداد رسیدگی",
+                          ]}
+                          colors={["blue", "red", "green"]}
+                          // valueFormatter={dataFormatter}
+                          yAxisWidth={48}
+                        />
+                      </div>
+                      <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+                        <Title>نمودار زمانی </Title>
+                        <AreaChart
+                          data={(dateDate ?? []).map((row) => {
+                            return {
+                              date: moment(row.key, "YYYY/MM/DD").format("M/D"),
+
+                              "تعداد بلاتکلیف": row.DepoCount,
+                              "تعداد ورودی": row.EntryCount,
+                              "تعداد رسیدگی": row.Capicity,
+                            };
+                          })}
+                          index="date"
+                          //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+                          categories={[
+                            "تعداد بلاتکلیف",
+                            "تعداد ورودی",
+                            "تعداد رسیدگی",
+                          ]}
+                          colors={["blue", "red", "green"]}
+                          // valueFormatter={dataFormatter}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              );
+            }}
           />
         </div>
       </div>

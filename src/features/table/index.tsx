@@ -1,4 +1,5 @@
-import { Loader2Icon, LoaderIcon } from "lucide-react";
+import { AreaChart } from "@tremor/react";
+import { ArrowUpFromDotIcon, Loader2Icon, LoaderIcon } from "lucide-react";
 import { useTable, useSortBy, useFilters } from "react-table";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 
@@ -8,6 +9,7 @@ export default function Table({
   data = [],
   clickedRowIndex = "",
   onClick = (cell) => {},
+  renderChild = (rows) => {},
 }) {
   const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -15,6 +17,7 @@ export default function Table({
 
   return (
     <>
+      {renderChild(rows)}
       <div className="flex w-full flex-row  justify-center py-10 ">
         <div className="flex w-full flex-wrap gap-5 sm:w-11/12">
           {headerGroups.map((headerGroup) => {
@@ -33,7 +36,7 @@ export default function Table({
         <div className=" w-full overflow-auto rounded-[20px]  sm:w-11/12">
           <table
             {...getTableProps()}
-            className="  w-full overflow-hidden overflow-y-auto  text-center "
+            className=" w-full overflow-hidden overflow-y-auto  text-center "
           >
             <thead>
               {
@@ -53,25 +56,37 @@ export default function Table({
                         headerGroup.headers.map((column) => {
                           const { key, ...restHeaderProps } =
                             column.getHeaderProps(
+                              //@ts-ignore
                               column.getSortByToggleProps(),
                             );
+                          //@ts-ignore
+                          const isSorted = column.isSorted;
+                          //@ts-ignore
+                          const isSortedDesc = column.isSortedDesc;
                           return (
                             <th
                               key={key}
                               {...restHeaderProps}
-                              className="bg-secondary px-6 py-3 text-center text-xs font-black  leading-4 tracking-wider text-accent"
+                              className="sticky top-0 bg-accent/20 px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-accent backdrop-blur-md"
                             >
-                              <div className="select-none text-center">
+                              <div className="flex select-none items-center justify-center gap-3 text-center ">
                                 {
                                   // Render the header
                                   column.render("Header")
                                 }
 
-                                {column.isSorted
-                                  ? column.isSortedDesc
-                                    ? "🔻"
-                                    : "🔺"
-                                  : ""}
+                                <ArrowUpFromDotIcon
+                                  className={`${
+                                    isSorted && isSortedDesc
+                                      ? "rotate-180"
+                                      : "rotate-0"
+                                  } 
+                                    
+                                    ${
+                                      !isSorted ? "translate-y-12 scale-0" : ""
+                                    } 
+                                    transition-transform duration-500`}
+                                />
                               </div>
                             </th>
                           );
