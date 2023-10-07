@@ -150,7 +150,8 @@ export default {
           },
           content: {
             subtle: "#9ca3af", // gray-400
-            DEFAULT: "#6b7280", // gray-500
+            //@ts-ignore
+            DEFAULT: withOpacity("--primary"), // gray-500
             emphasis: "#374151", // gray-700
             strong: "#111827", // gray-900
             inverted: "#ffffff", // white
@@ -167,9 +168,12 @@ export default {
             inverted: "#030712", // gray-950
           },
           background: {
-            muted: "#131A2B", // custom
-            subtle: "#1f2937", // gray-800
-            DEFAULT: "#111827", // gray-900
+            //@ts-ignore
+            muted: withOpacity("--secondary"), // custom
+            //@ts-ignore
+            subtle: withOpacity("--secbuttn"), // gray-800
+            //@ts-ignore
+            DEFAULT: withOpacity("--secondary"), // gray-900
             emphasis: "#d1d5db", // gray-300
           },
           border: {
@@ -180,7 +184,8 @@ export default {
           },
           content: {
             subtle: "#4b5563", // gray-600
-            DEFAULT: "#6b7280", // gray-500
+            //@ts-ignore
+            DEFAULT: withOpacity("--primary"), // gray-500
             emphasis: "#e5e7eb", // gray-200
             strong: "#f9fafb", // gray-50
             inverted: "#000000", // black

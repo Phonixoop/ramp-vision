@@ -12,9 +12,9 @@ import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 import { Container } from "~/ui/containers";
 
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { api } from "~/utils/api";
-import { Title, BarChart, AreaChart } from "@tremor/react";
+import { Title, BarChart, AreaChart, DonutChart } from "@tremor/react";
 import CheckboxList, {
   SelectColumnFilter,
   SelectControlled,
@@ -25,7 +25,13 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
-import { en, processDataForChart } from "~/utils/util";
+import {
+  calculateDepoCompleteTime,
+  en,
+  getServiceNameColor,
+  processDataForChart,
+  processDepoCompleteTimeData,
+} from "~/utils/util";
 const menu = [
   {
     value: "خانه",
@@ -111,8 +117,36 @@ export default function Home() {
     </>
   );
 }
-
+const cities = [
+  {
+    name: "New York",
+    sales: 9800,
+  },
+  {
+    name: "London",
+    sales: 4567,
+  },
+  {
+    name: "Hong Kong",
+    sales: 3908,
+  },
+  {
+    name: "San Francisco",
+    sales: 2400,
+  },
+  {
+    name: "Singapore",
+    sales: 1908,
+  },
+  {
+    name: "Zurich",
+    sales: 1398,
+  },
+];
 function DeposTable({ sessionData }) {
+  // const [selectedDates, setSelectedDates] = useState<string[]>([
+  //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+  // ]);
   const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
     refetchOnWindowFocus: false,
@@ -126,9 +160,11 @@ function DeposTable({ sessionData }) {
       moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
     ],
   });
+
+  const deferredFilter = useDeferredValue(filters);
   const depo = api.depo.getAll.useQuery(
     {
-      filter: filters,
+      filter: deferredFilter,
     },
     {
       enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
@@ -157,7 +193,7 @@ function DeposTable({ sessionData }) {
               <>
                 <DatePicker
                   multiple
-                  value={filters.Start_Date}
+                  value={deferredFilter.Start_Date}
                   calendar={persian}
                   locale={persian_fa}
                   plugins={[<DatePanel />]}
@@ -165,14 +201,16 @@ function DeposTable({ sessionData }) {
                     //@ts-ignore
                     if (!date) return;
                     if (Array.isArray(date) && date.length <= 0) return;
+                    const dates = Array.isArray(date)
+                      ? date.map((a) => en(a.format("YYYY/MM/DD")))
+                      : [en(date.format("YYYY/MM/DD"))];
                     setDataFilters((prev) => {
                       return {
                         ...prev,
-                        Start_Date: Array.isArray(date)
-                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                          : [en(date.format("YYYY/MM/DD"))],
+                        Start_Date: dates,
                       };
                     });
+                    // setSelectedDates((prevState) => dates);
                   }}
                 />
               </>
@@ -260,7 +298,7 @@ function DeposTable({ sessionData }) {
           accessor: "MyDepoCompletionTime",
           Cell: ({ row }) => {
             const data = row.original;
-            var result = data.DepoCount / (data.Capicity - data.EntryCount);
+            var result = calculateDepoCompleteTime(data);
             if (result <= 0)
               return (
                 <span className="text-red-400">دپو در حال افزایش است</span>
@@ -286,7 +324,7 @@ function DeposTable({ sessionData }) {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
-        <div className="w-full  rounded-lg border  border-accent/30 bg-secondary py-5 text-center ">
+        <div className="w-full  rounded-lg  bg-secondary py-5 text-center ">
           <Table
             isLoading={depo.isLoading}
             data={depo.data ?? []}
@@ -303,57 +341,93 @@ function DeposTable({ sessionData }) {
                 "EntryCount",
                 "Capicity",
               ]);
-              console.log(serviceData);
+              const depoCompletionTime = processDepoCompleteTimeData(flatRows);
+              console.log({ depoCompletionTime });
               return (
                 <>
-                  <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                    <div className="flex w-11/12  items-center justify-between gap-5 laptopMax:flex-col">
-                      <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
-                        <Title>نمودار دپو</Title>
-                        <BarChart
-                          dir="rtl"
-                          data={(serviceData ?? []).map((row) => {
-                            return {
-                              name: row.key,
-                              "تعداد بلاتکلیف": row.DepoCount,
-                              "تعداد ورودی": row.EntryCount,
-                              "تعداد رسیدگی": row.Capicity,
-                            };
-                          })}
-                          index="name"
-                          //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
-                          categories={[
-                            "تعداد بلاتکلیف",
-                            "تعداد ورودی",
-                            "تعداد رسیدگی",
-                          ]}
-                          colors={["blue", "red", "green"]}
-                          // valueFormatter={dataFormatter}
-                          yAxisWidth={48}
-                        />
-                      </div>
-                      <div className="flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
-                        <Title>نمودار زمانی </Title>
-                        <AreaChart
-                          data={(dateDate ?? []).map((row) => {
-                            return {
-                              date: moment(row.key, "YYYY/MM/DD").format("M/D"),
+                  <div className="flex w-full flex-col items-center justify-center gap-5">
+                    <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
+                      <div className="flex w-11/12  items-stretch justify-between gap-5 laptopMax:flex-col">
+                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+                          <Title>نمودار دپو</Title>
+                          <BarChart
+                            showAnimation={true}
+                            dir="rtl"
+                            data={(serviceData ?? []).map((row) => {
+                              return {
+                                name: row.key,
+                                "تعداد بلاتکلیف": row.DepoCount,
+                                "تعداد ورودی": row.EntryCount,
+                                "تعداد رسیدگی": row.Capicity,
+                              };
+                            })}
+                            index="name"
+                            showXAxis={false}
+                            //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+                            categories={[
+                              "تعداد بلاتکلیف",
+                              "تعداد ورودی",
+                              "تعداد رسیدگی",
+                            ]}
+                            colors={["blue", "red", "green"]}
+                            // valueFormatter={dataFormatter}
+                            yAxisWidth={48}
+                          />
+                        </div>
+                        <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+                          <Title>نمودار زمانی </Title>
+                          <AreaChart
+                            dir="rtl"
+                            showAnimation={true}
+                            data={(dateDate ?? []).map((row) => {
+                              return {
+                                date: moment(row.key, "YYYY/MM/DD").format(
+                                  "M/D",
+                                ),
 
-                              "تعداد بلاتکلیف": row.DepoCount,
-                              "تعداد ورودی": row.EntryCount,
-                              "تعداد رسیدگی": row.Capicity,
-                            };
+                                "تعداد بلاتکلیف": row.DepoCount,
+                                "تعداد ورودی": row.EntryCount,
+                                "تعداد رسیدگی": row.Capicity,
+                              };
+                            })}
+                            index="date"
+                            //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+                            categories={[
+                              "تعداد بلاتکلیف",
+                              "تعداد ورودی",
+                              "تعداد رسیدگی",
+                            ]}
+                            colors={["blue", "red", "green"]}
+                            // valueFormatter={dataFormatter}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
+                      <div className="flex w-11/12  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
+                        <Title>زمان اتمام دپو | به روز</Title>
+                        <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
+                          {depoCompletionTime.map((t) => {
+                            return (
+                              <>
+                                <div
+                                  dir="ltr"
+                                  className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/10 bg-secondary/50 p-5"
+                                >
+                                  <Title>{t.ServiceName}</Title>
+                                  <DonutChart
+                                    data={[t]}
+                                    category={"DepoCompleteTime"}
+                                    index="ServiceName"
+                                    colors={[
+                                      getServiceNameColor(t.ServiceName),
+                                    ]}
+                                  />
+                                </div>
+                              </>
+                            );
                           })}
-                          index="date"
-                          //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
-                          categories={[
-                            "تعداد بلاتکلیف",
-                            "تعداد ورودی",
-                            "تعداد رسیدگی",
-                          ]}
-                          colors={["blue", "red", "green"]}
-                          // valueFormatter={dataFormatter}
-                        />
+                        </div>
                       </div>
                     </div>
                   </div>
