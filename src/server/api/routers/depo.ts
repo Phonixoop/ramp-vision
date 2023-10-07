@@ -8,6 +8,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import moment from "jalali-moment";
+import { calculateDepoCompleteTime, getDatesForLastMonth } from "~/utils/util";
 
 const config = {
   user: "admin",
@@ -51,7 +52,7 @@ export const depoRouter = createTRPCRouter({
         const query = `SELECT DISTINCT * FROM RAMP_Daily.dbo.depos 
         ${whereClause}
         `;
-        console.log(query);
+
         const result = await sql.query(query);
 
         return result.recordsets[0];
@@ -67,7 +68,7 @@ export const depoRouter = createTRPCRouter({
 
       const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.users WHERE CityName is not NULL
       `;
-      console.log(queryCities);
+
       const resultOfCities = await sql.query(queryCities);
 
       // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
@@ -77,7 +78,7 @@ export const depoRouter = createTRPCRouter({
       const result = {
         Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
       };
-      console.log(result);
+
       return result;
       // Respond with the fetched data
     } catch (error) {
@@ -85,6 +86,74 @@ export const depoRouter = createTRPCRouter({
       return error;
     }
   }),
+  get30DaysTrack: protectedProcedure
+    .input(
+      z.object({
+        filter: z.object({
+          CityName: z.array(z.string()).nullish(),
+        }),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        // Connect to SQL Server
+        const days = getDatesForLastMonth();
+        const whereClause = generateWhereClause({
+          CityName: input.filter.CityName,
+          Start_Date: days,
+        });
+        const queryDaysOfMonth = `SELECT 
+        Start_Date, 
+        SUM(DepoCount) AS DepoCount, 
+        SUM(EntryCount) AS EntryCount, 
+        SUM(Capicity) AS Capicity FROM RAMP_Daily.dbo.depos 
+        ${whereClause}
+        GROUP BY Start_Date ORDER BY Start_Date
+        `;
+        console.log(queryDaysOfMonth);
+        const resultDays = await sql.query(queryDaysOfMonth);
+
+        // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
+        // console.log(queryDocumentTypes);
+        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+
+        const result = {
+          date: moment().locale("fa").format("MMMM"),
+          tracker: [],
+          performance: 0,
+        };
+        let performance = 0;
+        resultDays.recordsets[0].map((d) => {
+          const DepoCompleteTime = calculateDepoCompleteTime(d);
+
+          if (DepoCompleteTime <= 0)
+            result.tracker.push({
+              color: "rose",
+              tooltip: d.Start_Date,
+            });
+          else if (DepoCompleteTime == 0) {
+            result.tracker.push({
+              color: "gray",
+              tooltip: d.Start_Date,
+            });
+          } else {
+            performance += 1;
+            result.tracker.push({
+              color: "emerald",
+              tooltip: d.Start_Date,
+            });
+          }
+        });
+        // const percentage = (result.performance / 31) * 100;
+        //  result.performance = Math.round(percentage / 10) * 10;
+        result.performance = Math.floor((performance / 31) * 100);
+        return result;
+        // Respond with the fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+        return error;
+      }
+    }),
 });
 
 function generateWhereClause(filter) {

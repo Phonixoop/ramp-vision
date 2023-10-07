@@ -1,3 +1,5 @@
+import moment from "jalali-moment";
+
 export function getPathName(path) {
   return path?.substring(path.lastIndexOf("/") + 1);
 }
@@ -117,3 +119,17 @@ const ServiceName_Color = {
   پاراکلینیک: "slate",
   "ثبت ارزیابی بدون اسکن مدارک": "cyan",
 };
+
+export function getDatesForLastMonth(): string[] {
+  const currentDate = moment().locale("fa").subtract(1, "months"); // Get the current date
+  const daysInMonth = currentDate.daysInMonth(); // Get the number of days in the current month
+  const datesArray = [];
+
+  // Iterate through each day of the month and store the dates in the array
+  for (let i = 1; i <= daysInMonth; i++) {
+    const date = moment(currentDate).locale("fa").date(i);
+    datesArray.push(date.format("YYYY/MM/DD"));
+  }
+
+  return datesArray;
+}
