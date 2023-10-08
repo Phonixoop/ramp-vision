@@ -2,7 +2,7 @@ import { ArrowDownRightIcon, UserCog2 } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 
-import Menu from "~/features/menu";
+import Menu, { InPageMenu } from "~/features/menu";
 
 import Table from "~/features/table";
 
@@ -14,7 +14,17 @@ import { Container } from "~/ui/containers";
 
 import { useDeferredValue, useMemo, useState } from "react";
 import { api } from "~/utils/api";
-import { Title, BarChart, AreaChart, DonutChart, Tracker } from "@tremor/react";
+import {
+  Title,
+  BarChart,
+  AreaChart,
+  DonutChart,
+  Tracker,
+  Card,
+  Metric,
+  CategoryBar,
+  Legend,
+} from "@tremor/react";
 import CheckboxList, {
   SelectColumnFilter,
   SelectControlled,
@@ -33,6 +43,9 @@ import {
   processDepoCompleteTimeData,
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
+import TrackerView from "~/features/tracker";
+import { Reports_Period } from "~/constants";
+import { cn } from "~/lib/utils";
 const menu = [
   {
     value: "خانه",
@@ -145,27 +158,32 @@ const cities = [
   },
 ];
 function DeposTable({ sessionData }) {
-  // const [selectedDates, setSelectedDates] = useState<string[]>([
-  //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
-  // ]);
+  const [selectedDates, setSelectedDates] = useState<string[]>([
+    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+  ]);
+
+  const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
   const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
     refetchOnWindowFocus: false,
   });
 
   const [filters, setDataFilters] = useState({
-    CityName: initialFilters.data?.Cities.map((a) => a.CityName),
-    DocumentType: undefined,
-    ServiceName: undefined,
-    Start_Date: [
-      moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
-    ],
+    periodType: reportPeriod,
+    filter: {
+      CityName: initialFilters.data?.Cities.map((a) => a.CityName),
+      DocumentType: undefined,
+      ServiceName: undefined,
+      Start_Date: [
+        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+      ],
+    },
   });
   const deferredFilter = useDeferredValue(filters);
   const getTracker = api.depo.get30DaysTrack.useQuery(
     {
       filter: {
-        CityName: deferredFilter.CityName,
+        CityName: deferredFilter.filter.CityName,
       },
     },
     {
@@ -174,15 +192,10 @@ function DeposTable({ sessionData }) {
     },
   );
 
-  const depo = api.depo.getAll.useQuery(
-    {
-      filter: deferredFilter,
-    },
-    {
-      enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
-      refetchOnWindowFocus: false,
-    },
-  );
+  const depo = api.depo.getAll.useQuery(deferredFilter, {
+    enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
+    refetchOnWindowFocus: false,
+  });
 
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
@@ -198,34 +211,6 @@ function DeposTable({ sessionData }) {
               <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary">
                 {row.index + 1}
               </div>
-            );
-          },
-          Filter: () => {
-            return (
-              <>
-                <DatePicker
-                  multiple
-                  value={deferredFilter.Start_Date}
-                  calendar={persian}
-                  locale={persian_fa}
-                  plugins={[<DatePanel />]}
-                  onChange={(date) => {
-                    //@ts-ignore
-                    if (!date) return;
-                    if (Array.isArray(date) && date.length <= 0) return;
-                    const dates = Array.isArray(date)
-                      ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                      : [en(date.format("YYYY/MM/DD"))];
-                    setDataFilters((prev) => {
-                      return {
-                        ...prev,
-                        Start_Date: dates,
-                      };
-                    });
-                    // setSelectedDates((prevState) => dates);
-                  }}
-                />
-              </>
             );
           },
         },
@@ -341,6 +326,56 @@ function DeposTable({ sessionData }) {
             isLoading={depo.isLoading}
             data={depo.data ?? []}
             columns={columns}
+            renderInFilterView={() => {
+              return (
+                <>
+                  <div className="flex flex-col gap-2 rounded-xl bg-secbuttn p-5">
+                    <InPageMenu
+                      className=" rounded-xl "
+                      list={Reports_Period}
+                      value={0}
+                      onChange={(value) => {
+                        setReportPeriod(value.item.name);
+                      }}
+                    />
+
+                    <DatePicker
+                      inputClass="text-center"
+                      multiple={reportPeriod !== "ماهانه"}
+                      value={deferredFilter.filter.Start_Date}
+                      calendar={persian}
+                      locale={persian_fa}
+                      weekPicker={reportPeriod === "هفتگی"}
+                      onlyMonthPicker={reportPeriod === "ماهانه"}
+                      plugins={[<DatePanel />]}
+                      onClose={() => {
+                        setDataFilters((prev) => {
+                          return {
+                            periodType: reportPeriod,
+                            filter: {
+                              ...prev.filter,
+                              Start_Date: selectedDates,
+                            },
+                          };
+                        });
+                      }}
+                      onChange={(date) => {
+                        //@ts-ignore
+                        if (!date) return;
+
+                        if (Array.isArray(date) && date.length <= 0) return;
+                        const dates = Array.isArray(date)
+                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
+                          : [en(date.format("YYYY/MM/DD"))];
+                        setSelectedDates(dates);
+
+                        // setSelectedDates((prevState) => dates);
+                      }}
+                    />
+                  </div>
+                </>
+              );
+            }}
             renderChild={(rows) => {
               const flatRows = rows.map((row) => row.original);
               const dateDate = processDataForChart(flatRows, "Start_Date", [
@@ -443,35 +478,28 @@ function DeposTable({ sessionData }) {
                         </div>
                       </div>
                     </div>
+
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-11/12  items-stretch justify-center gap-5 laptopMax:flex-col">
+                        <div className="flex w-11/12  items-center justify-center gap-5 laptopMax:flex-col">
                           {!getTracker.isLoading && (
                             <>
-                              <div className="relative flex w-96 flex-col gap-2 rounded-xl bg-secbuttn p-5">
-                                <div className="flex w-full items-center justify-between">
-                                  <H2 className="text-right text-xl font-bold text-primbuttn">
-                                    وضعیت
-                                  </H2>
-                                  <span className="relative flex h-3 w-3">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primbuttn opacity-75"></span>
-                                    <span className="relative inline-flex h-3 w-3 rounded-full bg-primbuttn"></span>
-                                  </span>
-                                </div>
-                                <p className="text-right">
-                                  ماه {getTracker.data.date}
-                                </p>
-                                <div className="flex w-full flex-col items-center justify-center">
-                                  <div className=" flex w-full justify-end ">
-                                    <div className=" inline-flex w-max flex-shrink-0 cursor-default items-center justify-center rounded-tremor-full bg-rose-100 px-2.5 py-0.5 text-sm text-rose-700">
-                                      عمکلرد {getTracker.data.performance}%
-                                      <ArrowDownRightIcon className="h-5 w-5 stroke-red-700" />
-                                    </div>
-                                  </div>
-                                </div>
-                                <Tracker
-                                  data={getTracker.data.tracker ?? []}
-                                  className="mt-2"
+                              <div className="w-full max-w-md ">
+                                <TrackerView data={getTracker.data} />
+                              </div>
+                              <div className="relative w-full max-w-md rounded-2xl  border-primary bg-secondary p-6 text-right  ring-1 ring-accent/20  ">
+                                <H2>تمامی شعبه ها</H2>
+                                <span className="text-3xl">10,483</span>
+                                <CategoryBar
+                                  className="mt-4"
+                                  values={[6724, 3621]}
+                                  colors={["emerald", "red"]}
+                                />
+                                <Legend
+                                  dir="ltr"
+                                  className="mt-3"
+                                  categories={["شعب فعال", "شعب غیر فعال"]}
+                                  colors={["emerald", "red"]}
                                 />
                               </div>
                             </>

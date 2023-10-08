@@ -10,6 +10,7 @@ export default function Table({
   clickedRowIndex = "",
   onClick = (cell) => {},
   renderChild = (rows) => {},
+  renderInFilterView = () => <></>,
 }) {
   const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -19,7 +20,8 @@ export default function Table({
     <>
       {renderChild(rows)}
       <div className="flex w-full flex-row  justify-center py-10 ">
-        <div className="flex w-full flex-wrap gap-5 sm:w-11/12">
+        <div className="flex w-full flex-wrap items-center justify-start gap-5 sm:w-11/12">
+          {renderInFilterView()}
           {headerGroups.map((headerGroup) => {
             return headerGroup.headers.map((column) => {
               if (column["Filter"]) return <>{column.render("Filter")}</>;

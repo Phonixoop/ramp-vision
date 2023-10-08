@@ -124,7 +124,10 @@ export function InPageMenu({
                   return a;
                 });
               });
-              onChange(i);
+              onChange({
+                item: item,
+                index: i,
+              });
             }}
           >
             <InPageMenuItem

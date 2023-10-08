@@ -28,3 +28,5 @@ export const THEMESE = [
     value: "theme-dark-3",
   },
 ];
+
+export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];

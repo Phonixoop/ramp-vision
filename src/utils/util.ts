@@ -133,3 +133,27 @@ export function getDatesForLastMonth(): string[] {
 
   return datesArray;
 }
+
+export function extractYearAndMonth(dateString) {
+  const [year, month] = dateString.split("/").slice(0, 2);
+  return `${year}/${month}`;
+}
+
+export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
+  // Get the first day of the month in the Jalali calendar
+  // Get the current date
+  const currentDate = moment()
+    .locale("fa")
+    .year(year)
+    .month(month - 1);
+
+  // Get the last day of the current month
+  const lastDayOfMonth = currentDate.endOf("month");
+
+  // Calculate the start date of the last week
+  const startDateOfLastWeek = lastDayOfMonth.subtract(6, "days");
+
+  // Calculate the end date of the last week
+  const endDateOfLastWeek = startDateOfLastWeek.clone().add(6, "days");
+  return startDateOfLastWeek.format("YYYY/MM/DD");
+}
