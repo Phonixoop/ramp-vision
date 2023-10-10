@@ -3,77 +3,19 @@ import { Permission } from "types";
 import { Switch } from "~/components/ui/switch";
 import { PERMISSIONS } from "~/constants";
 
-function SubPermissionList({
-  subPermissions,
-  handlePermissionToggle,
-  toggleAll,
-}: {
-  subPermissions: Permission[];
-  handlePermissionToggle: (id: string) => void;
-  toggleAll: (subPermissions: Permission[]) => void;
-}) {
-  const [allChecked, setAllChecked] = useState(false);
-  const [indeterminate, setIndeterminate] = useState(false);
-
-  useEffect(() => {
-    if (subPermissions) {
-      const checkedCount = subPermissions.filter(
-        (subPermission) => subPermission.isActive,
-      ).length;
-      setAllChecked(
-        checkedCount === subPermissions.length && subPermissions.length > 0,
-      );
-      setIndeterminate(
-        checkedCount > 0 && checkedCount < subPermissions.length,
-      );
-    }
-  }, [subPermissions]);
-
+export default function TestPage() {
   return (
-    <div className="flex w-full flex-col items-end justify-center rounded-xl bg-secondary/50 p-2 shadow-sm shadow-accent">
-      <div
-        className="relative flex w-full cursor-pointer items-center justify-end gap-3 rounded-xl px-2 py-4 hover:bg-primbuttn/5"
-        onClick={() => {
-          toggleAll(subPermissions);
-        }}
-      >
-        <label className="cursor-pointer">تغییر وضعیت همه</label>
-        <Switch
-          middle={indeterminate}
-          checked={allChecked}
-          className="bg-accent"
-          onCheckedChange={() => {
-            toggleAll(subPermissions);
-          }}
-        />
-      </div>
-      {subPermissions &&
-        subPermissions.map((permission) => (
-          <div
-            className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
-            onClick={() => handlePermissionToggle(permission.id)}
-          >
-            <Switch
-              id={permission.id}
-              className="bg-accent"
-              checked={permission.isActive}
-              onCheckedChange={() => handlePermissionToggle(permission.id)}
-            />
-
-            <label
-              className="cursor-pointer"
-              onClick={() => handlePermissionToggle(permission.id)}
-              htmlFor="id"
-            >
-              {permission.faLabel}
-            </label>
-          </div>
-        ))}
-    </div>
+    <>
+      <main className="flex min-h-screen w-full items-center justify-center ">
+        <div className="h-[500px] w-1/2 overflow-y-auto rounded-xl  ">
+          <PermissionPanel />
+        </div>
+      </main>
+    </>
   );
 }
 
-const PermissionPanel = () => {
+function PermissionPanel() {
   const [permissions, setPermissions] = useState<Permission[]>(PERMISSIONS);
 
   function toggleAll(subPermission) {
@@ -129,14 +71,14 @@ const PermissionPanel = () => {
   }
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col items-end justify-center gap-5 rounded-lg  bg-secbuttn/50 p-8 text-white shadow-lg">
-      <h1 className=" text-2xl font-bold">تنظیمات</h1>
+    <div className="mx-auto flex w-full flex-col items-end justify-center gap-5  rounded-lg  bg-secbuttn/50 p-8 text-white shadow-lg">
+      <h1 className=" text-2xl font-bold">دسترسی ها</h1>
 
       <div className="flex w-full flex-col items-center justify-center gap-2">
         {permissions.map((permission) => (
           <div
             key={permission.id}
-            className="flex w-full max-w-lg flex-col items-center justify-center gap-5"
+            className="flex w-full  flex-col items-center justify-center gap-5"
           >
             <div
               className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
@@ -175,9 +117,65 @@ const PermissionPanel = () => {
       <button className="mt-6 w-full rounded-full bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600">
         Save Changes
       </button>
-      <pre> {JSON.stringify(permissions, null, 2)}</pre>
+      {/* <pre> {JSON.stringify(permissions, null, 2)}</pre> */}
     </div>
   );
-};
+}
 
-export default PermissionPanel;
+function SubPermissionList({
+  subPermissions,
+  handlePermissionToggle,
+  toggleAll,
+}: {
+  subPermissions: Permission[];
+  handlePermissionToggle: (id: string) => void;
+  toggleAll: (subPermissions: Permission[]) => void;
+}) {
+  const checkedCount = subPermissions.filter(
+    (subPermission) => subPermission.isActive,
+  ).length;
+  return (
+    <div className="flex w-full flex-col items-end justify-center rounded-xl bg-secondary/50 p-2 shadow-sm shadow-accent">
+      <div
+        className="relative flex w-full cursor-pointer items-center justify-end gap-3 rounded-xl px-2 py-4 hover:bg-primbuttn/5"
+        onClick={() => {
+          toggleAll(subPermissions);
+        }}
+      >
+        <label className="cursor-pointer">تغییر وضعیت همه</label>
+        <Switch
+          middle={checkedCount > 0 && checkedCount < subPermissions.length}
+          checked={
+            checkedCount === subPermissions.length && subPermissions.length > 0
+          }
+          className="bg-accent"
+          onCheckedChange={() => {
+            toggleAll(subPermissions);
+          }}
+        />
+      </div>
+      {subPermissions &&
+        subPermissions.map((permission) => (
+          <div
+            className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
+            onClick={() => handlePermissionToggle(permission.id)}
+          >
+            <Switch
+              id={permission.id}
+              className="bg-accent"
+              checked={permission.isActive}
+              onCheckedChange={() => handlePermissionToggle(permission.id)}
+            />
+
+            <label
+              className="cursor-pointer"
+              onClick={() => handlePermissionToggle(permission.id)}
+              htmlFor="id"
+            >
+              {permission.faLabel}
+            </label>
+          </div>
+        ))}
+    </div>
+  );
+}
