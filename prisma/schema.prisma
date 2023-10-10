@@ -20,7 +20,7 @@ model User {
     updated_at  DateTime?
     roleId      String?
     sessions    Session[]
-    roles       Role?     @relation(fields: [roleId], references: [id])
+    role        Role?     @relation(fields: [roleId], references: [id])
 
     @@map("users")
 }

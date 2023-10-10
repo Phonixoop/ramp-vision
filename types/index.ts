@@ -21,3 +21,11 @@ export type TremorColor =
   | "fuchsia"
   | "pink"
   | "rose";
+
+export type Permission = {
+  id: string;
+  isActive: boolean;
+  enLabel: string;
+  faLabel: string;
+  subPermissions?: Permission[];
+};

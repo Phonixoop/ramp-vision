@@ -7,6 +7,7 @@ export const createUserSchema = z.object({
   password: z
     .string({ required_error: "این فیلد اجباری است" })
     .min(6, "پسورد نمیتواند کمتر از 6 حرف باشد."),
+  roleId: z.string().nullish(),
 });
 
 export const updateUserSchema = createUserSchema.extend({ id: z.string() });

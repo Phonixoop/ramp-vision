@@ -86,11 +86,11 @@ export const depoRouter = createTRPCRouter({
             parseInt(date[0]),
             parseInt(date[1]),
           );
-          console.log(date, lastWeek);
-          const monthName = moment()
-            .locale("fa")
-            .month(parseInt(date[1]) - 1)
-            .format("MMMM");
+          // console.log(date, lastWeek);
+          // const monthName = moment()
+          //   .locale("fa")
+          //   .month(parseInt(date[1]) - 1)
+          //   .format("MMMM");
           queryStart = `
           SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
           SUM(CASE WHEN Start_Date = '${lastWeek}' THEN DepoCount ELSE 0 END) AS DepoCount

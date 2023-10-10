@@ -7,15 +7,26 @@ import { useRouter } from "next/router";
 import { getPathName } from "~/utils/util";
 import { twMerge } from "tailwind-merge";
 
-type MenuInput = { rootPath: String; list: { value: String; link: String }[] };
-export default function Menu({ rootPath = "", list = [] }: MenuInput) {
+type MenuInput = {
+  rootPath: String;
+  list: { value: String; link: String }[];
+  theme?: "solid" | "round";
+};
+export default function Menu({
+  rootPath = "",
+  list = [],
+  theme = "solid",
+}: MenuInput) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const router = useRouter();
   const pathName = getPathName(router.asPath);
 
   return (
     <motion.div
-      className="group  flex w-full cursor-pointer items-end gap-3 overflow-hidden  overflow-x-auto rounded-[30px] bg-secbuttn px-1 py-1  scrollbar-none md:w-fit"
+      className={twMerge(
+        "group  flex w-full cursor-pointer items-end gap-3 overflow-hidden  overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit",
+        theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
+      )}
       onHoverEnd={() => {
         setActiveIndex(-1);
       }}
@@ -35,6 +46,7 @@ export default function Menu({ rootPath = "", list = [] }: MenuInput) {
               rootPath={rootPath}
               isHovered={activeIndex === i}
               isActive={pathName === item.link}
+              theme={theme}
             />
           </motion.span>
         );
@@ -50,6 +62,7 @@ function MenuItem({
   isActive = false,
   rootPath,
   onHover = () => {},
+  theme = "solid",
 }) {
   const activeClass = "text-primary";
   return (
@@ -65,7 +78,10 @@ function MenuItem({
               duration: 0.15,
             }}
             layoutId="bg-follower"
-            className="absolute inset-0 -z-10  rounded-full bg-primbuttn/30 opacity-0 transition-opacity duration-1000 group-hover:opacity-100 "
+            className={twMerge(
+              "absolute inset-0 -z-10  bg-primbuttn/30  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
+              theme === "solid" ? "rounded-md" : "rounded-full ",
+            )}
           />
         )}
 

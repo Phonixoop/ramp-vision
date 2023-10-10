@@ -46,6 +46,7 @@ import H2 from "~/ui/heading/h2";
 import TrackerView from "~/features/tracker";
 import { Reports_Period } from "~/constants";
 import { cn } from "~/lib/utils";
+import { Column } from "react-table";
 const menu = [
   {
     value: "خانه",
@@ -99,7 +100,7 @@ export default function Home() {
       <BlurBackground />
       <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000 ">
         <Container
-          className="flex  flex-col items-center justify-between py-5"
+          className="flex  flex-col items-center justify-between py-5 sm:p-0 "
           rtl={true}
         >
           <div className="flex items-center justify-center gap-4 py-5 ">
@@ -121,7 +122,7 @@ export default function Home() {
           <div className="col-start-4 row-span-3 row-start-1"></div>
         </div> */}
 
-        <Container>
+        <Container className="sm:p-0 ">
           <DeposTable sessionData={sessionData} />
         </Container>
         <div className=" pt-9">
@@ -201,7 +202,7 @@ function DeposTable({ sessionData }) {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
   const columns =
-    useMemo(
+    useMemo<Column<any>[]>(
       () => [
         {
           Header: "#",
@@ -307,9 +308,6 @@ function DeposTable({ sessionData }) {
           Header: "تاریخ",
           accessor: "Start_Date",
           filter: filterColumn,
-          Filter: ({ column }) => {
-            return <></>;
-          },
         },
       ],
       [depo.data],
@@ -453,7 +451,7 @@ function DeposTable({ sessionData }) {
 
                     <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
                       <div className="flex w-11/12  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
-                        <H2>زمان اتمام دپو | به روز</H2>
+                        <H2>زمان اتمام دپو | {reportPeriod}</H2>
                         <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
                           {depoCompletionTime.map((t) => {
                             return (

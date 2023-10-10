@@ -1,17 +1,34 @@
 import { AreaChart } from "@tremor/react";
 import { ArrowUpFromDotIcon, Loader2Icon, LoaderIcon } from "lucide-react";
-import { useTable, useSortBy, useFilters } from "react-table";
+import {
+  useTable,
+  useSortBy,
+  useFilters,
+  TableInstance,
+  Column,
+  Row,
+} from "react-table";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
-
+type Props = {
+  useTableInstance?: TableInstance<any>;
+  isLoading?: boolean;
+  columns: Column<any>[];
+  data: any[];
+  clickedRowIndex?: string;
+  onClick?: (cell: any) => void;
+  renderChild?: (rows: Row<any>[]) => JSX.Element;
+  renderInFilterView?: () => JSX.Element;
+};
 export default function Table({
+  useTableInstance = undefined,
   isLoading = false,
   columns = [],
   data = [],
   clickedRowIndex = "",
   onClick = (cell) => {},
-  renderChild = (rows) => {},
+  renderChild = (rows) => <></>,
   renderInFilterView = () => <></>,
-}) {
+}: Props) {
   const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
@@ -29,7 +46,7 @@ export default function Table({
           })}
         </div>
       </div>
-      <div className="relative flex h-[30rem] w-full items-stretch justify-center">
+      <div className="relative flex h-[31rem] min-h-[30rem] w-full items-stretch justify-center">
         {isLoading && (
           <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
             <Loader2Icon className="h-12 w-12 animate-spin" />
