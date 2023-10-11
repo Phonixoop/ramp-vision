@@ -139,7 +139,7 @@ export function RoleForm({
         {selectedRole && (
           <>
             <Button
-              className="border border-accent"
+              className="border border-accent "
               isLoading={deleteRole.isLoading}
               onClick={() => onClear()}
             >

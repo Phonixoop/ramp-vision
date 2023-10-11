@@ -36,7 +36,7 @@ export default function Button({
       type={type}
       onClick={onClick}
       className={twMerge(
-        "duration-400 relative flex  select-none items-center justify-center rounded-lg  p-2 ",
+        "duration-400 relative flex  select-none items-center justify-center rounded-lg p-2  text-primary ",
         className,
         !disabled ? enabldedClass : busyClass,
         isLoading ? "bg-opacity-10" : "",
