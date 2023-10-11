@@ -59,6 +59,7 @@ export default function AdminMainLayout({ children }: any): any {
           >
             <div className="flex flex-col  items-center justify-center gap-2 md:flex-row">
               <div>
+                <span className="px-2"> {session.data.user.username}</span>
                 <Link href={"/admin"} className="text-accent">
                   {isDesktop ? "💻" : "📱"} {session.data.user.name}
                 </Link>

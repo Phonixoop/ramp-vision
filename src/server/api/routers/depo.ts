@@ -14,6 +14,9 @@ import {
   getDatesForLastMonth,
   getFirstSaturdayOfLastWeekOfMonth,
 } from "~/utils/util";
+import { Permission } from "~/types";
+import { PERMISSIONS } from "~/constants";
+import { getPermission } from "~/server/server-utils";
 
 const config = {
   user: "admin",
@@ -47,7 +50,16 @@ export const depoRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         // Connect to SQL Server
+
+        const permissions = await getPermission({ ctx });
+        const cities = permissions
+          .find((permission) => permission.id === "ViewCities")
+          .subPermissions.filter((permission) => permission.isActive)
+          .map((permission) => permission.enLabel);
+
         let filter = input.filter;
+
+        filter.CityName = cities;
 
         let queryStart = `SELECT DISTINCT 
            ServiceName
@@ -118,7 +130,14 @@ export const depoRouter = createTRPCRouter({
     try {
       // Connect to SQL Server
 
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.users WHERE CityName is not NULL
+      const permissions = await getPermission({ ctx });
+      const cities = permissions
+        .find((permission) => permission.id === "ViewCities")
+        .subPermissions.filter((permission) => permission.isActive)
+        .map((permission) => permission.enLabel);
+
+      const whereClause = generateWhereClause({ CityName: cities });
+      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.users ${whereClause}
       `;
 
       const resultOfCities = await sql.query(queryCities);

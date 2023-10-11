@@ -34,11 +34,11 @@ export const THEMESE = [
 export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
 
 export const CITIES: City[] = [
-  // { EnglishName: "Tehran InDirect", PersianName: "تهران غیر مستقیم" },
-  // { EnglishName: "Tehran Direct", PersianName: "تهران مستقیم" },
+  { EnglishName: "Tehran InDirect", PersianName: "تهران غیر مستقیم" },
+  { EnglishName: "Tehran Direct", PersianName: "تهران مستقیم" },
   // { EnglishName: "Tehran Jobran", PersianName: "تهران جبران" },
   // { EnglishName: "Tehran Not Jobran", PersianName: "تهران غیر جبران" },
-  { EnglishName: "Tehran", PersianName: "تهران" },
+  // { EnglishName: "Tehran", PersianName: "تهران" },
   { EnglishName: "Ardabil", PersianName: "اردبیل" },
   { EnglishName: "Isfahan", PersianName: "اصفهان" },
   { EnglishName: "Alborz", PersianName: "البرز" },

@@ -1,4 +1,4 @@
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useUser } from "~/context/user.context";
@@ -7,10 +7,12 @@ import { User } from "~/types";
 import Button from "~/ui/buttons";
 import withConfirmation from "~/ui/with-confirmation";
 import { api } from "~/utils/api";
+import { reloadSession } from "~/utils/util";
 
 const ButtonWithConfirmation = withConfirmation(Button);
 
 export default function UsersList() {
+  const session = useSession();
   const { setSelectedRowUser, selectedRowUser } = useUser();
 
   const users = api.user.getUsers.useInfiniteQuery(
@@ -113,12 +115,15 @@ export default function UsersList() {
               >
                 <Button
                   onClick={async () => {
+                    reloadSession();
                     await signIn("credentials", {
                       username: user.username,
                       password: user.password,
-                      callbackUrl: `${window.location.origin}/`,
-                      redirect: true,
+                      session: session.data.user,
+                      callbackUrl: `${window.location.origin}/admin`,
+                      redirect: false,
                     });
+                    reloadSession();
                   }}
                   className="w-full cursor-pointer rounded-full bg-secbuttn px-2 py-2 text-primbuttn  "
                 >

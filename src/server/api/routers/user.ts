@@ -36,7 +36,7 @@ export const userRouter = createTRPCRouter({
         },
         data: {
           username: input.username,
-          password: hashPassword(input.password),
+          password: input.password,
           roleId: input.roleId,
         },
       });

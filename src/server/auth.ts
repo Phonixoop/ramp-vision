@@ -10,9 +10,10 @@ import { db } from "~/server/db";
 
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import type { User } from "@prisma/client";
+import type { Role, User as PrismaUser } from "@prisma/client";
 import { createHash } from "crypto";
 import { compareHashPassword } from "~/utils/util";
+import { Permission, User } from "~/types";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -22,7 +23,7 @@ import { compareHashPassword } from "~/utils/util";
  */
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    user: User;
+    user: PrismaUser & { role?: Role };
   }
 
   // interface User {
@@ -51,7 +52,10 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       //@ts-ignore
-      async authorize(credentials, req) {
+      async authorize(
+        credentials: Record<"username" | "password" | "session", string>,
+        req,
+      ) {
         // Add logic here to look up the user from the credentials supplied
 
         const user = await db.user.findFirst({
@@ -60,10 +64,36 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
+        if (credentials.session) {
+          const loggedInUser = await db.user.findFirst({
+            where: {
+              //@ts-ignore
+              username: credentials.session.username,
+            },
+            include: {
+              role: true,
+            },
+          });
+          console.log({
+            alreadyLoggedIn: loggedInUser.username,
+            wannaLogIn: credentials.username,
+          });
+          if (loggedInUser.role?.permissions) {
+            const permissions: Permission[] = JSON.parse(
+              loggedInUser.role.permissions,
+            );
+            if (
+              permissions.find((a) => a.id === "ManageUsers")?.isActive === true
+            ) {
+              return user;
+            } else return;
+          }
+        }
         if (user) {
           if (
             compareHashPassword(credentials.password, user.password).success
           ) {
+            console.log({ cp: credentials.password, up: user.password });
             return user;
           }
           return undefined;
@@ -86,6 +116,7 @@ export const authOptions: NextAuthOptions = {
     session: async ({ session, token }: { session: any; token: any }) => {
       const user = await db.user.findUnique({
         where: { username: token.user.username },
+        include: { role: true },
       });
       session.user = user;
       return session;
