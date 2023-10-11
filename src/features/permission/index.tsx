@@ -10,6 +10,7 @@ export default function PermissionPanel({
   setPermissions = (permission) => {},
 }) {
   if (!Array.isArray(permissions)) return <></>;
+
   function toggleAll(permission: Permission) {
     const updatedPermissions = permission.subPermissions.map(
       (a: Permission) => {
@@ -83,14 +84,16 @@ export default function PermissionPanel({
             key={permission.id}
             className="flex w-full  flex-col items-center justify-center gap-5"
           >
-            <div className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5">
+            <div
+              className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
+              onClick={() => handlePermissionToggle(permission.id)}
+            >
               <Switch
                 id={permission.id}
                 className="bg-accent"
                 checked={permission.isActive}
-                onCheckedChange={() => handlePermissionToggle(permission.id)}
               />
-
+              {permission.isActive ? "active" : "disabled"}
               <label className="cursor-pointer" htmlFor="id">
                 {permission.faLabel}
               </label>
@@ -130,7 +133,12 @@ function SubPermissionList({
   ).length;
   return (
     <div className="flex w-full  flex-col items-end justify-center rounded-xl bg-secbuttn p-2  ">
-      <div className="relative flex w-full cursor-pointer items-center justify-end gap-3 rounded-xl px-2 py-4 hover:bg-primbuttn/5">
+      <div
+        className="relative flex w-full cursor-pointer items-center justify-end gap-3 rounded-xl px-2 py-4 hover:bg-primbuttn/5"
+        onClick={() => {
+          toggleAll(permission);
+        }}
+      >
         <label className="cursor-pointer">
           <ListRestartIcon className="h-6 w-6" />
         </label>
@@ -140,9 +148,6 @@ function SubPermissionList({
             checkedCount === subPermissions.length && subPermissions.length > 0
           }
           className="bg-accent"
-          onCheckedChange={() => {
-            toggleAll(permission);
-          }}
         />
       </div>
       {subPermissions &&
@@ -150,12 +155,12 @@ function SubPermissionList({
           <div
             key={permission.id}
             className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
+            onClick={() => handlePermissionToggle(permission.id)}
           >
             <Switch
               id={permission.id}
               className="bg-accent"
               checked={permission.isActive}
-              onCheckedChange={() => handlePermissionToggle(permission.id)}
             />
 
             <label className="cursor-pointer" htmlFor="id">

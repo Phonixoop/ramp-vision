@@ -108,7 +108,7 @@ export function RoleForm({
     validationSchema: toFormikValidationSchema(createRoleSchema),
     validateOnBlur: true,
     onSubmit: (values: typeof createRoleSchema._type) => {
-      if (selectedRole.id) {
+      if (selectedRole) {
         return updateRole.mutate({
           id: selectedRole.id,
           name: values.name,
