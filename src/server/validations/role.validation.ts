@@ -1,11 +1,31 @@
 import { z } from "zod";
 
+let permissionSchema = z.object({
+  id: z.string(),
+  isActive: z.boolean(),
+  enLabel: z.string(),
+  faLabel: z.string().nullish(),
+});
+
+permissionSchema = permissionSchema.extend({
+  subPermissions: permissionSchema.nullish(),
+});
+
 export const createRoleSchema = z.object({
   name: z
     .string({ required_error: "این فیلد اجباری است" })
     .min(3, "نام نقش نمیتواند کم تر از 3 حرف باشد "),
-  permissions: z
+  permissions: z.string(),
+});
+
+export const updateRoleSchema = z.object({
+  id: z.string(),
+  name: z
     .string({ required_error: "این فیلد اجباری است" })
-    .min(6, "پسورد نمیتواند کمتر از 6 حرف باشد."),
-  roleId: z.string().nullish(),
+    .min(3, "نام نقش نمیتواند کم تر از 3 حرف باشد "),
+  permissions: z.string(),
+});
+
+export const deleteRoleSchema = z.object({
+  id: z.string(),
 });

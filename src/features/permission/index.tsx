@@ -1,33 +1,36 @@
-import React, { useState, useEffect } from "react";
+import { ListRestartIcon } from "lucide-react";
+import { useState } from "react";
 import { Permission } from "~/types";
 import { Switch } from "~/components/ui/switch";
 import { PERMISSIONS } from "~/constants";
+import Button from "~/ui/buttons";
 
-export default function TestPage() {
-  return (
-    <>
-      <main className="flex min-h-screen w-full items-center justify-center ">
-        <div className="h-[500px] w-1/2 overflow-y-auto rounded-xl  ">
-          <PermissionPanel />
-        </div>
-      </main>
-    </>
-  );
-}
+export default function PermissionPanel({
+  permissions,
+  setPermissions = (permission) => {},
+}) {
+  if (!Array.isArray(permissions)) return <></>;
+  function toggleAll(permission: Permission) {
+    const updatedPermissions = permission.subPermissions.map(
+      (a: Permission) => {
+        return {
+          ...a,
+          isActive: !a.isActive,
+        };
+      },
+    );
 
-function PermissionPanel() {
-  const [permissions, setPermissions] = useState<Permission[]>(PERMISSIONS);
+    const newPermissions = permissions.map((a) => {
+      if (a.id === permission.id)
+        return {
+          ...a,
+          subPermissions: updatedPermissions,
+        };
 
-  function toggleAll(subPermission) {
-    const updatedPermissions = subPermission.map((a: Permission) => {
-      return (a.isActive = !a.isActive);
+      return a;
     });
-    setPermissions((prev) => {
-      return prev.map((a: Permission) => {
-        if (a.id == subPermission.id) return updatedPermissions;
-        return a;
-      });
-    });
+
+    setPermissions(newPermissions);
   }
 
   function handlePermissionToggle(id: string) {
@@ -71,7 +74,7 @@ function PermissionPanel() {
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col items-end justify-center gap-5  rounded-lg  bg-secbuttn/50 p-8 text-white shadow-lg">
+    <div className="mx-auto flex w-full flex-col items-end justify-center gap-5  rounded-lg bg-secondary  p-8 text-primary ">
       <h1 className=" text-2xl font-bold">دسترسی ها</h1>
 
       <div className="flex w-full flex-col items-center justify-center gap-2">
@@ -80,10 +83,7 @@ function PermissionPanel() {
             key={permission.id}
             className="flex w-full  flex-col items-center justify-center gap-5"
           >
-            <div
-              className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
-              onClick={() => handlePermissionToggle(permission.id)}
-            >
+            <div className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5">
               <Switch
                 id={permission.id}
                 className="bg-accent"
@@ -91,22 +91,18 @@ function PermissionPanel() {
                 onCheckedChange={() => handlePermissionToggle(permission.id)}
               />
 
-              <label
-                className="cursor-pointer"
-                onClick={() => handlePermissionToggle(permission.id)}
-                htmlFor="id"
-              >
+              <label className="cursor-pointer" htmlFor="id">
                 {permission.faLabel}
               </label>
             </div>
             {permission.subPermissions &&
               permission.subPermissions.length > 0 &&
               permission.isActive && (
-                <div className="w-full px-10 ">
+                <div className="max-h-96 w-full overflow-y-auto rounded-2xl px-10 ">
                   <SubPermissionList
-                    toggleAll={toggleAll}
-                    subPermissions={permission.subPermissions}
-                    handlePermissionToggle={handlePermissionToggle}
+                    permission={permission}
+                    toggleAll={(permission) => toggleAll(permission)}
+                    handlePermissionToggle={(id) => handlePermissionToggle(id)}
                   />
                 </div>
               )}
@@ -114,35 +110,30 @@ function PermissionPanel() {
         ))}
       </div>
 
-      <button className="mt-6 w-full rounded-full bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600">
-        Save Changes
-      </button>
       {/* <pre> {JSON.stringify(permissions, null, 2)}</pre> */}
     </div>
   );
 }
 
 function SubPermissionList({
-  subPermissions,
+  permission,
   handlePermissionToggle,
   toggleAll,
 }: {
-  subPermissions: Permission[];
+  permission: Permission;
   handlePermissionToggle: (id: string) => void;
-  toggleAll: (subPermissions: Permission[]) => void;
+  toggleAll: (permission: Permission) => void;
 }) {
+  const subPermissions = permission.subPermissions;
   const checkedCount = subPermissions.filter(
     (subPermission) => subPermission.isActive,
   ).length;
   return (
-    <div className="flex w-full flex-col items-end justify-center rounded-xl bg-secondary/50 p-2 shadow-sm shadow-accent">
-      <div
-        className="relative flex w-full cursor-pointer items-center justify-end gap-3 rounded-xl px-2 py-4 hover:bg-primbuttn/5"
-        onClick={() => {
-          toggleAll(subPermissions);
-        }}
-      >
-        <label className="cursor-pointer">تغییر وضعیت همه</label>
+    <div className="flex w-full  flex-col items-end justify-center rounded-xl bg-secbuttn p-2  ">
+      <div className="relative flex w-full cursor-pointer items-center justify-end gap-3 rounded-xl px-2 py-4 hover:bg-primbuttn/5">
+        <label className="cursor-pointer">
+          <ListRestartIcon className="h-6 w-6" />
+        </label>
         <Switch
           middle={checkedCount > 0 && checkedCount < subPermissions.length}
           checked={
@@ -150,15 +141,15 @@ function SubPermissionList({
           }
           className="bg-accent"
           onCheckedChange={() => {
-            toggleAll(subPermissions);
+            toggleAll(permission);
           }}
         />
       </div>
       {subPermissions &&
         subPermissions.map((permission) => (
           <div
+            key={permission.id}
             className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
-            onClick={() => handlePermissionToggle(permission.id)}
           >
             <Switch
               id={permission.id}
@@ -167,11 +158,7 @@ function SubPermissionList({
               onCheckedChange={() => handlePermissionToggle(permission.id)}
             />
 
-            <label
-              className="cursor-pointer"
-              onClick={() => handlePermissionToggle(permission.id)}
-              htmlFor="id"
-            >
+            <label className="cursor-pointer" htmlFor="id">
               {permission.faLabel}
             </label>
           </div>

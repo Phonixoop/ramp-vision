@@ -4,16 +4,7 @@ import { twMerge } from "tailwind-merge";
 export default function TextField({
   children = <></> || "",
 
-  className = `bg-transparent placeholder:opacity-0
-   focus:placeholder:opacity-100 
-   selection:text-secondry
-    block px-2.5 pb-2.5 pt-5 
-    w-full 
-    text-sm 
-    text-primary font-bold 
-  
-    border-b-2 border-primary appearance-none 
-   focus:border-accent focus:outline-none focus:ring-0  peer rounded-t-lg`,
+  className = ``,
   value = "",
   placeholder = " ",
   isRtl = true,
@@ -53,7 +44,20 @@ export default function TextField({
         dir={isRtl ? "rtl" : "ltr"}
         ref={ref}
         type="text"
-        className={twMerge(direction, className)}
+        className={twMerge(
+          direction,
+          `selection:text-secondry peer
+        block 
+        w-full
+         appearance-none rounded-t-lg border-b-2 border-primary 
+         bg-transparent 
+         px-2.5 
+         pb-2.5 pt-5 
+       
+         text-sm font-bold text-primary 
+        placeholder:opacity-0 focus:border-accent focus:outline-none  focus:ring-0 focus:placeholder:opacity-100`,
+          className,
+        )}
         placeholder={" "}
         value={value}
         autoComplete="off"

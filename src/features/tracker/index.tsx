@@ -1,7 +1,7 @@
 import { Tracker } from "@tremor/react";
 import { ArrowDownRightIcon, ArrowUpRightIcon } from "lucide-react";
 import React from "react";
-import { TremorColor } from "types";
+import { TremorColor } from "~/types";
 import { cn } from "~/lib/utils";
 import H2 from "~/ui/heading/h2";
 

@@ -28,9 +28,11 @@ model User {
 model Role {
     id          String @id @default(cuid())
     name        String
-    permissions String
+    permissions String @db.Text
     users       User[]
 
+    @@unique([name])
+    @@index([name])
     @@map("roles")
 }
 

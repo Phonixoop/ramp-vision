@@ -10,6 +10,8 @@ export default function Button({
   disabled = false,
   isLoading = false,
   className = "",
+  initialtranslateY = 0,
+  translateY = 0,
   onClick = (e) => {},
   ...rest
 }) {
@@ -23,6 +25,11 @@ export default function Button({
           duration: 0,
         },
       }}
+      initial={{ y: initialtranslateY }}
+      animate={{
+        y: translateY,
+      }}
+      transition={{ duration: 0.2, ease: "linear" }}
       disabled={disabled}
       dir="rtl"
       //@ts-ignore
@@ -32,7 +39,7 @@ export default function Button({
         "duration-400 relative flex  select-none items-center justify-center rounded-lg  p-2 ",
         className,
         !disabled ? enabldedClass : busyClass,
-        isLoading ? "bg-opacity-10" : ""
+        isLoading ? "bg-opacity-10" : "",
       )}
       {...rest}
     >

@@ -1,4 +1,4 @@
-import { Permission } from "types";
+import { Permission } from "~/types";
 
 export const THEMESE = [
   {
