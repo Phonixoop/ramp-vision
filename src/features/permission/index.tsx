@@ -93,7 +93,7 @@ export default function PermissionPanel({
                 className="bg-accent"
                 checked={permission.isActive}
               />
-              {permission.isActive ? "active" : "disabled"}
+
               <label className="cursor-pointer" htmlFor="id">
                 {permission.faLabel}
               </label>
