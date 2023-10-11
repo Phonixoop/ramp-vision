@@ -12,6 +12,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import type { User } from "@prisma/client";
 import { createHash } from "crypto";
+import { compareHashPassword } from "~/utils/util";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -112,14 +113,3 @@ export const getServerAuthSession = (ctx: {
 }) => {
   return getServerSession(ctx.req, ctx.res, authOptions);
 };
-
-function hashPassword(password: string) {
-  return createHash("sha256").update(password).digest("hex");
-}
-
-function compareHashPassword(password: string, hashedPassword: string) {
-  if (hashPassword(password) === hashedPassword) {
-    return { success: true, message: "Password matched" };
-  }
-  return { success: false, message: "Password not matched" };
-}

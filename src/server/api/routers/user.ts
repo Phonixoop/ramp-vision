@@ -9,6 +9,7 @@ import {
   updateUserSchema,
   userIdSchema,
 } from "~/server/validations/user.validation";
+import { hashPassword } from "~/utils/util";
 
 export const userRouter = createTRPCRouter({
   getUser: protectedProcedure.query(({ ctx }) => {
@@ -21,7 +22,7 @@ export const userRouter = createTRPCRouter({
       return await ctx.db.user.create({
         data: {
           username: input.username,
-          password: input.password,
+          password: hashPassword(input.password),
           roleId: input.roleId,
         },
       });
@@ -35,7 +36,7 @@ export const userRouter = createTRPCRouter({
         },
         data: {
           username: input.username,
-          password: input.password,
+          password: hashPassword(input.password),
           roleId: input.roleId,
         },
       });
@@ -54,7 +55,9 @@ export const userRouter = createTRPCRouter({
         (await ctx.db.user.findMany({
           take: limit + 1, // get an extra item at the end which we'll use as next cursor
           cursor: cursor ? { id: cursor } : undefined,
-
+          include: {
+            role: true,
+          },
           orderBy: {
             created_at: "desc",
           },
@@ -64,6 +67,7 @@ export const userRouter = createTRPCRouter({
         const nextItem = items.pop();
         nextCursor = nextItem!.id;
       }
+
       return {
         items,
         nextCursor,

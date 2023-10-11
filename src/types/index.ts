@@ -1,3 +1,5 @@
+import { Role, User as PrismaUser } from "@prisma/client";
+
 export type TremorColor =
   | "slate"
   | "gray"
@@ -29,3 +31,5 @@ export type Permission = {
   faLabel: string;
   subPermissions?: Permission[];
 };
+
+export type User = PrismaUser & { role?: Role };

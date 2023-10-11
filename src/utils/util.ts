@@ -1,4 +1,16 @@
+import { createHash } from "crypto";
 import moment from "jalali-moment";
+
+export function hashPassword(password: string) {
+  return createHash("sha256").update(password).digest("hex");
+}
+
+export function compareHashPassword(password: string, hashedPassword: string) {
+  if (hashPassword(password) === hashedPassword) {
+    return { success: true, message: "Password matched" };
+  }
+  return { success: false, message: "Password not matched" };
+}
 
 export function getPathName(path) {
   return path?.substring(path.lastIndexOf("/") + 1);
