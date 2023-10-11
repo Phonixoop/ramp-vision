@@ -74,7 +74,7 @@ export default function PermissionPanel({
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col items-end justify-center gap-5  rounded-lg bg-secondary  p-8 text-primary ">
+    <div className="mx-auto flex w-full flex-col items-end justify-center gap-5  rounded-lg bg-secondary  text-primary sm:p-8 ">
       <h1 className=" text-2xl font-bold">دسترسی ها</h1>
 
       <div className="flex w-full flex-col items-center justify-center gap-2">
