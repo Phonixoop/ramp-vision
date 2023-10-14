@@ -23,7 +23,7 @@ const config = {
   password: "Mohammad@2525",
   server: "109.125.137.43",
   port: 5090,
-  database: "RAMP_Daily",
+  database: "", // RAMP_Daily | RAMP_Weekly
   options: {
     encrypt: true, // For securing the connection (optional, based on your setup)
     trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)

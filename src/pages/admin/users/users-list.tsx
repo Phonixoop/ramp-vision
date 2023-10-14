@@ -1,4 +1,4 @@
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useUser } from "~/context/user.context";
@@ -115,15 +115,13 @@ export default function UsersList() {
               >
                 <Button
                   onClick={async () => {
-                    reloadSession();
                     await signIn("credentials", {
                       username: user.username,
                       password: user.password,
-                      session: session.data.user,
+                      session: JSON.stringify(session.data.user),
                       callbackUrl: `${window.location.origin}/admin`,
                       redirect: false,
                     });
-                    reloadSession();
                   }}
                   className="w-full cursor-pointer rounded-full bg-secbuttn px-2 py-2 text-primbuttn  "
                 >
@@ -147,7 +145,7 @@ export default function UsersList() {
           },
         },
       ],
-      [],
+      [session],
     ) || [];
 
   if (users.isLoading) return <UsersSkeleton />;

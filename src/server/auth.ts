@@ -65,15 +65,18 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (credentials.session) {
+          const session = JSON.parse(credentials.session);
           const loggedInUser = await db.user.findFirst({
             where: {
               //@ts-ignore
-              username: credentials.session.username,
+              username: session.username,
             },
             include: {
               role: true,
             },
           });
+          const p: Permission[] = JSON.parse(loggedInUser.role.permissions);
+
           console.log({
             alreadyLoggedIn: loggedInUser.username,
             wannaLogIn: credentials.username,
@@ -88,8 +91,7 @@ export const authOptions: NextAuthOptions = {
               return user;
             } else return;
           }
-        }
-        if (user) {
+        } else if (user) {
           if (
             compareHashPassword(credentials.password, user.password).success
           ) {
