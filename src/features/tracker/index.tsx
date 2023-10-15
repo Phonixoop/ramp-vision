@@ -1,5 +1,9 @@
 import { Tracker } from "@tremor/react";
-import { ArrowDownRightIcon, ArrowUpRightIcon } from "lucide-react";
+import {
+  ArrowDownRightIcon,
+  MoveLeftIcon,
+  ArrowUpRightIcon,
+} from "lucide-react";
 import React from "react";
 import { TremorColor } from "~/types";
 import { cn } from "~/lib/utils";
@@ -16,7 +20,10 @@ type TrackerType = {
 
 export default function TrackerView({ data }: { data: TrackerType }) {
   return (
-    <div className="relative flex w-full flex-col gap-2 rounded-xl bg-secbuttn p-6">
+    <div
+      dir="rtl"
+      className="relative flex w-full flex-col gap-2 rounded-xl bg-secbuttn p-6"
+    >
       <div className="flex w-full items-center justify-between">
         <H2 className="text-right text-xl font-bold text-primbuttn">وضعیت</H2>
         {/* blinker */}
@@ -29,7 +36,8 @@ export default function TrackerView({ data }: { data: TrackerType }) {
         ماه <span className="text-primbuttn">{data.date}</span>
       </p>
       <div className="flex w-full flex-col items-center justify-center">
-        <div className=" flex w-full justify-end ">
+        <div className=" flex w-full justify-between ">
+          <MoveLeftIcon />
           <div
             className={cn(
               "inline-flex w-max flex-shrink-0 cursor-default items-center justify-center rounded-tremor-full px-2.5 py-0.5 text-sm  ",
@@ -47,6 +55,7 @@ export default function TrackerView({ data }: { data: TrackerType }) {
           </div>
         </div>
       </div>
+
       <Tracker data={data.tracker ?? []} className="mt-2" />
     </div>
   );

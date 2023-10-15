@@ -2,11 +2,7 @@ import { z } from "zod";
 
 import sql from "mssql";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import moment from "jalali-moment";
 import {
   calculateDepoCompleteTime,
@@ -14,8 +10,7 @@ import {
   getDatesForLastMonth,
   getFirstSaturdayOfLastWeekOfMonth,
 } from "~/utils/util";
-import { Permission } from "~/types";
-import { PERMISSIONS } from "~/constants";
+
 import { getPermission } from "~/server/server-utils";
 
 const config = {
@@ -78,6 +73,7 @@ export const depoRouter = createTRPCRouter({
         } else if (input.periodType === "هفتگی") {
           dbName = "RAMP_Weekly.dbo.depos";
           filter.Start_Date = [filter.Start_Date[0]];
+
           whereClause = generateWhereClause(filter);
           whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date`;
         } else if (input.periodType === "ماهانه") {
@@ -119,6 +115,40 @@ export const depoRouter = createTRPCRouter({
         console.log(query);
         const result = await sql.query(query);
 
+        if (input.periodType === "هفتگی") {
+          const date = filter.Start_Date[0].split("/");
+
+          const monthName = moment()
+            .locale("fa")
+            .month(parseInt(date[1]) - 1)
+            .format("MMMM");
+
+          const weekNumber = getWeekOfMonth(filter.Start_Date[0]);
+          const weekName = `هفته ${weekNumber} ${monthName}`;
+
+          return result.recordsets[0].map((record) => {
+            return {
+              ...record,
+              Start_Date: weekName,
+            };
+          });
+        }
+
+        if (input.periodType === "ماهانه") {
+          const date = filter.Start_Date[0].split("/");
+
+          const monthName = moment()
+            .locale("fa")
+            .month(parseInt(date[1]) - 1)
+            .format("MMMM");
+
+          return result.recordsets[0].map((record) => {
+            return {
+              ...record,
+              Start_Date: monthName,
+            };
+          });
+        }
         return result.recordsets[0];
         // Respond with the fetched data
       } catch (error) {
@@ -137,7 +167,7 @@ export const depoRouter = createTRPCRouter({
         .map((permission) => permission.enLabel);
 
       const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.users ${whereClause}
+      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.depos ${whereClause}
       `;
 
       const resultOfCities = await sql.query(queryCities);
@@ -168,9 +198,16 @@ export const depoRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         // Connect to SQL Server
+
+        const permissions = await getPermission({ ctx });
+        const cities = permissions
+          .find((permission) => permission.id === "ViewCities")
+          .subPermissions.filter((permission) => permission.isActive)
+          .map((permission) => permission.enLabel);
+
         const days = getDatesForLastMonth();
         const whereClause = generateWhereClause({
-          CityName: input.filter.CityName,
+          CityName: cities,
           Start_Date: days,
         });
         const queryDaysOfMonth = `SELECT 
@@ -264,3 +301,45 @@ function generateFilterOnlySelect(filter: string[]) {
 
   return columns.length > 0 ? `${columns.join(",")}` : "";
 }
+
+// function getWeekOfMonth(input) {
+//   input = moment(input, "YYYY/MM/DD").locale("fa");
+//   const dayOfInput = input.clone().day(); // Saunday is 0 and Saturday is 6
+//   if (dayOfInput != 6) return input.clone().day();
+//   const diffToNextWeek = 7 - dayOfInput;
+//   const nextWeekStartDate = input.date() + diffToNextWeek;
+//   const weekNumber = Math.ceil(nextWeekStartDate / 7);
+//   return weekNumberText[weekNumber];
+// }
+
+function getWeekOfMonth(date: string) {
+  const currentDate = moment(date);
+
+  const [jalaliYear, jalaliMonth] = currentDate
+    .format("jYYYY/jM")
+    .split("/")
+    .map(Number);
+
+  // Get the first day of the month and check if it's Saturday (6) or not
+  const firstDayOfMonth = moment([jalaliYear, jalaliMonth - 1, 1]);
+  const isFirstDaySaturday = firstDayOfMonth.day() === 6;
+
+  let totalDays = currentDate.date();
+
+  // If the first day is not Saturday, subtract 1 from the week number
+  if (!isFirstDaySaturday) {
+    totalDays--;
+  }
+
+  const fullWeeks = Math.floor(totalDays / 7);
+  const semiWeek = totalDays % 7 === 0 ? 0 : 1;
+
+  return weekNumberText[fullWeeks + semiWeek];
+}
+
+const weekNumberText = {
+  1: "اول",
+  2: "دوم",
+  3: "سوم",
+  4: "چهارم",
+};

@@ -12,7 +12,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import type { Role, User as PrismaUser } from "@prisma/client";
 import { createHash } from "crypto";
-import { compareHashPassword } from "~/utils/util";
+import { compareHashPassword, hashPassword } from "~/utils/util";
 import { Permission, User } from "~/types";
 
 /**

@@ -6,7 +6,7 @@ export function hashPassword(password: string) {
 }
 //
 export function compareHashPassword(password: string, hashedPassword: string) {
-  if (password === hashedPassword) {
+  if (hashPassword(password) === hashedPassword) {
     return { success: true, message: "Password matched" };
   }
 }
