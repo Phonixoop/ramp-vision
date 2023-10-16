@@ -13,7 +13,7 @@ import Button from "~/ui/buttons";
 import { Container } from "~/ui/containers";
 
 import { useDeferredValue, useMemo, useState } from "react";
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 import {
   Title,
   BarChart,
@@ -42,6 +42,7 @@ import {
   getServiceNameColor,
   processDataForChart,
   processDepoCompleteTimeData,
+  sumColumnBasedOnRowValue,
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import TrackerView from "~/features/tracker";
@@ -100,6 +101,9 @@ function filterColumn(rows, id, filterValue) {
     return filterValue.includes(rowValue);
   });
 }
+
+type DepoGetAll = RouterOutputs["depo"]["getAll"][number];
+
 export default function DeposPage() {
   // const users = api.example.getAll.useQuery();
   const { data: sessionData } = useSession();
@@ -196,9 +200,7 @@ function DeposTable({ sessionData }) {
   const deferredFilter = useDeferredValue(filters);
   const getTracker = api.depo.get30DaysTrack.useQuery(
     {
-      filter: {
-        CityName: ["Alborz"],
-      },
+      filter: {},
     },
     {
       enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
@@ -414,6 +416,41 @@ function DeposTable({ sessionData }) {
                 "Capicity",
               ]);
               const depoCompletionTime = processDepoCompleteTimeData(flatRows);
+              const totalComplete = depoCompletionTime.reduce(
+                (a, b) => a + b.DepoCompleteTime,
+                0,
+              );
+              const entryBaseOnSabt = sumColumnBasedOnRowValue(
+                flatRows,
+                "EntryCount",
+                "ServiceName",
+                [
+                  "ثبت ارزیابی با اسکن مدارک",
+                  "ثبت ارزیابی بدون اسکن مدارک",
+                  "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+                ],
+              );
+
+              const capacityBaseOnSabt = sumColumnBasedOnRowValue(
+                flatRows,
+                "Capicity",
+                "ServiceName",
+                [
+                  "ثبت ارزیابی با اسکن مدارک",
+                  "ثبت ارزیابی بدون اسکن مدارک",
+                  "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+                ],
+              );
+              const entry_capacity = [
+                {
+                  name: "ورودی",
+                  value: entryBaseOnSabt,
+                },
+                {
+                  name: "رسیدگی",
+                  value: capacityBaseOnSabt,
+                },
+              ];
 
               return (
                 <>
@@ -476,7 +513,10 @@ function DeposTable({ sessionData }) {
 
                     <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
                       <div className="flex w-11/12  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
-                        <H2>زمان اتمام دپو | {reportPeriod}</H2>
+                        <H2>
+                          زمان اتمام دپو |{" "}
+                          <span className="text-primbuttn">{reportPeriod}</span>
+                        </H2>
                         <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
                           {depoCompletionTime.map((t) => {
                             return (
@@ -504,25 +544,49 @@ function DeposTable({ sessionData }) {
 
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-11/12  items-center justify-center gap-5 laptopMax:flex-col">
+                        <div className="flex w-11/12  items-center justify-between gap-5 laptopMax:flex-col-reverse">
                           {!getTracker.isLoading ? (
                             <>
-                              <div className="w-full max-w-md ">
-                                <TrackerView data={getTracker.data} />
-                              </div>
-                              <div className="relative w-full max-w-md rounded-2xl  border-primary bg-secondary p-6 text-right  ring-1 ring-accent/20  ">
-                                <H2>تمامی شعبه ها</H2>
-                                <span className="text-3xl">10,483</span>
-                                <CategoryBar
-                                  className="mt-4"
-                                  values={[6724, 3621]}
-                                  colors={["emerald", "red"]}
-                                />
-                                <Legend
+                              <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl  border border-dashed  border-accent/10 p-5 sm:flex-row ">
+                                <div className="w-full max-w-md ">
+                                  <TrackerView data={getTracker.data} />
+                                </div>
+                                <div
                                   dir="ltr"
-                                  className="mt-3"
-                                  categories={["شعب فعال", "شعب غیر فعال"]}
-                                  colors={["emerald", "red"]}
+                                  className="flex w-full  max-w-md flex-col justify-center gap-5 rounded-2xl"
+                                >
+                                  <H2>تعداد ورودی و رسیدگی شده</H2>
+                                  <DonutChart
+                                    data={entry_capacity}
+                                    category="value"
+                                    index="name"
+                                    colors={["red", "green"]}
+                                  />
+                                </div>
+                              </div>
+                              <div
+                                dir="ltr"
+                                className="flex w-full max-w-md  flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5"
+                              >
+                                <H2>
+                                  زمان کلی اتمام دپو |{" "}
+                                  <span className="text-primbuttn">
+                                    {reportPeriod}
+                                  </span>
+                                </H2>
+                                <DonutChart
+                                  className=""
+                                  data={depoCompletionTime}
+                                  category={"DepoCompleteTime"}
+                                  index="ServiceName"
+                                  colors={[
+                                    "teal",
+                                    "yellow",
+                                    "cyan",
+                                    "red",
+                                    "rose",
+                                    "fuchsia",
+                                  ]}
                                 />
                               </div>
                             </>

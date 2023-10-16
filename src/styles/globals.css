@@ -246,3 +246,14 @@ input[type="number"] {
   border-radius: 7px !important;
   background-color: rgb(var(--secbuttn));
 }
+
+/* tremor */
+.tremor-Legend-legendItem {
+  display: flex !important;
+  justify-items: right !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+.tremor-Legend-legendItem svg {
+  margin: 0 !important;
+}

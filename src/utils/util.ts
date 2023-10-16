@@ -118,6 +118,26 @@ export function processDepoCompleteTimeData(
   });
 }
 
+export function sumColumnBasedOnRowValue(
+  table,
+  valueColumn,
+  targetColumn,
+  targetValues,
+) {
+  let totalSum = 0;
+
+  for (let i = 0; i < table.length; i++) {
+    const row = table[i];
+    const targetValue = row[targetColumn];
+    const value = row[valueColumn];
+
+    if (targetValues.includes(targetValue)) {
+      totalSum += value;
+    }
+  }
+
+  return totalSum;
+}
 export function getServiceNameColor(key) {
   return ServiceName_Color[key];
 }
