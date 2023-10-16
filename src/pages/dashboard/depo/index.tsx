@@ -122,7 +122,7 @@ export default function DeposPage() {
           className="flex  flex-col items-center justify-between py-5 sm:p-0 "
           rtl={true}
         >
-          <div className="flex items-center justify-center gap-4 py-5 ">
+          <div className="flex flex-col items-center justify-center gap-4 py-5 md:flex-row ">
             <AuthShowcase />
             <Menu rootPath="/" list={menu} />
           </div>
@@ -141,9 +141,9 @@ export default function DeposPage() {
           <div className="col-start-4 row-span-3 row-start-1"></div>
         </div> */}
 
-        <Container className="sm:p-0 ">
+        <div className="w-full  sm:p-0">
           <DeposTable sessionData={sessionData} />
-        </Container>
+        </div>
         <div className=" pt-9">
           <ThemeBoxHovery />
         </div>
@@ -340,7 +340,7 @@ function DeposTable({ sessionData }) {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
-        <div className="w-full  rounded-lg  bg-secondary py-5 text-center ">
+        <div className="flex w-11/12 items-center justify-center  rounded-lg  bg-secondary py-5 text-center ">
           <Table
             isLoading={depo.isLoading}
             data={depo.data ?? []}
@@ -348,7 +348,7 @@ function DeposTable({ sessionData }) {
             renderInFilterView={() => {
               return (
                 <>
-                  <div className="flex max-w-xs flex-col items-center justify-center gap-2 rounded-xl bg-secbuttn p-5">
+                  <div className="flex  flex-col items-center justify-center gap-2 rounded-xl bg-secondary p-5">
                     <InPageMenu
                       className=" rounded-xl "
                       list={Reports_Period}
@@ -460,8 +460,8 @@ function DeposTable({ sessionData }) {
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">
-                    <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                      <div className="flex w-11/12  items-stretch justify-between gap-5 laptopMax:flex-col">
+                    <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
+                      <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
                         <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
                           <H2>نمودار دپو</H2>
                           <BarChart
@@ -519,7 +519,7 @@ function DeposTable({ sessionData }) {
                     </div>
 
                     <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                      <div className="flex w-11/12  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
+                      <div className="flex w-full  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
                         <H2>
                           زمان اتمام دپو |{" "}
                           <span className="text-primbuttn">{reportPeriod}</span>
@@ -553,10 +553,10 @@ function DeposTable({ sessionData }) {
 
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-11/12  items-center justify-between gap-5 laptopMax:flex-col-reverse">
+                        <div className="flex w-full  items-center justify-between gap-5 laptopMax:flex-col-reverse">
                           {!getTracker.isLoading ? (
                             <>
-                              <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl  border border-dashed  border-accent/10 p-5 sm:flex-row ">
+                              <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl  border border-dashed  border-accent/10 p-5 xl:flex-row ">
                                 <div className="w-full max-w-md ">
                                   <TrackerView data={getTracker.data} />
                                 </div>

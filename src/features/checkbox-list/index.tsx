@@ -27,7 +27,7 @@ export default function CheckboxList({ checkboxes, onCheckboxChange }) {
 
 export function SelectControlled({ list = [], value, onChange, title }) {
   return (
-    <div className="min-w-[20rem] max-w-md px-2 sm:w-fit sm:px-0 ">
+    <div className="w-full  px-2 sm:px-0 ">
       <MultiSelect
         className="min-w-full"
         placeholder={title}
