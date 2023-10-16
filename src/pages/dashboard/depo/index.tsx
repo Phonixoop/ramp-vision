@@ -557,12 +557,12 @@ function DeposTable({ sessionData }) {
                           {!getTracker.isLoading ? (
                             <>
                               <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl  border border-dashed  border-accent/10 p-5 xl:flex-row ">
-                                <div className="w-full max-w-md ">
+                                <div className="w-full xl:w-7/12">
                                   <TrackerView data={getTracker.data} />
                                 </div>
                                 <div
                                   dir="ltr"
-                                  className="flex w-full  max-w-md flex-col justify-center gap-5 rounded-2xl"
+                                  className="flex w-full flex-col   justify-center gap-5 rounded-2xl xl:w-5/12"
                                 >
                                   <H2>تعداد ورودی و رسیدگی شده</H2>
                                   <DonutChart
