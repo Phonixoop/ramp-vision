@@ -300,14 +300,17 @@ function DeposTable({ sessionData }) {
         {
           Header: "تعداد بلاتکلیف",
           accessor: "DepoCount",
+          Cell: ({ row }) => <span>{commify(row.original.DepoCount)}</span>,
         },
         {
           Header: "تعداد ورودی",
           accessor: "EntryCount",
+          Cell: ({ row }) => <span>{commify(row.original.EntryCount)}</span>,
         },
         {
           Header: "تعداد رسیدگی شده",
           accessor: "Capicity",
+          Cell: ({ row }) => <span>{commify(row.original.Capicity)}</span>,
         },
         {
           Header: "مدت زمان اتمام دپو",
@@ -319,7 +322,7 @@ function DeposTable({ sessionData }) {
               return (
                 <span className="text-red-400">دپو در حال افزایش است</span>
               );
-            return result;
+            return commify(result);
           },
         },
         {
