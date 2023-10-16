@@ -38,6 +38,7 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import {
   calculateDepoCompleteTime,
+  commify,
   en,
   getServiceNameColor,
   processDataForChart,
@@ -46,7 +47,7 @@ import {
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import TrackerView from "~/features/tracker";
-import { Reports_Period } from "~/constants";
+import { Reports_Period, Text } from "~/constants";
 import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 const menu = [
@@ -94,6 +95,7 @@ const chartdata = [
 const dataFormatter = (number: number) => {
   return "$ " + Intl.NumberFormat("us").format(number).toString();
 };
+
 function filterColumn(rows, id, filterValue) {
   return rows.filter((row) => {
     const rowValue = row.values[id];
@@ -479,8 +481,9 @@ function DeposTable({ sessionData }) {
                               "تعداد رسیدگی",
                             ]}
                             colors={["blue", "red", "green"]}
-                            // valueFormatter={dataFormatter}
+                            valueFormatter={commify}
                             yAxisWidth={48}
+                            noDataText={Text.noData.fa}
                           />
                         </div>
                         <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
@@ -505,7 +508,8 @@ function DeposTable({ sessionData }) {
                               "تعداد رسیدگی",
                             ]}
                             colors={["blue", "red", "green"]}
-                            // valueFormatter={dataFormatter}
+                            valueFormatter={commify}
+                            noDataText={Text.noData.fa}
                           />
                         </div>
                       </div>
@@ -533,6 +537,8 @@ function DeposTable({ sessionData }) {
                                     colors={[
                                       getServiceNameColor(t.ServiceName),
                                     ]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
                                   />
                                 </div>
                               </>
@@ -561,6 +567,8 @@ function DeposTable({ sessionData }) {
                                     category="value"
                                     index="name"
                                     colors={["red", "green"]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
                                   />
                                 </div>
                               </div>
@@ -587,6 +595,8 @@ function DeposTable({ sessionData }) {
                                     "rose",
                                     "fuchsia",
                                   ]}
+                                  valueFormatter={commify}
+                                  noDataText={Text.noData.fa}
                                 />
                               </div>
                             </>

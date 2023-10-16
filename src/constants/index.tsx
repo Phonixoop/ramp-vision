@@ -124,3 +124,10 @@ type City = {
   EnglishName: string;
   PersianName: string;
 };
+
+export const Text = {
+  noData: {
+    fa: "داده ای موجود نیست",
+    en: "No Data",
+  },
+};
