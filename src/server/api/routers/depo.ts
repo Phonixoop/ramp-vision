@@ -9,6 +9,7 @@ import {
   extractYearAndMonth,
   getDatesForLastMonth,
   getFirstSaturdayOfLastWeekOfMonth,
+  getWeekOfMonth,
 } from "~/utils/util";
 
 import { getPermission } from "~/server/server-utils";
@@ -311,35 +312,3 @@ function generateFilterOnlySelect(filter: string[]) {
 //   const weekNumber = Math.ceil(nextWeekStartDate / 7);
 //   return weekNumberText[weekNumber];
 // }
-
-function getWeekOfMonth(date: string) {
-  const currentDate = moment(date);
-
-  const [jalaliYear, jalaliMonth] = currentDate
-    .format("jYYYY/jM")
-    .split("/")
-    .map(Number);
-
-  // Get the first day of the month and check if it's Saturday (6) or not
-  const firstDayOfMonth = moment([jalaliYear, jalaliMonth - 1, 1]);
-  const isFirstDaySaturday = firstDayOfMonth.day() === 6;
-
-  let totalDays = currentDate.date();
-
-  // If the first day is not Saturday, subtract 1 from the week number
-  if (!isFirstDaySaturday) {
-    totalDays--;
-  }
-
-  const fullWeeks = Math.floor(totalDays / 7);
-  const semiWeek = totalDays % 7 === 0 ? 0 : 1;
-
-  return weekNumberText[fullWeeks + semiWeek];
-}
-
-const weekNumberText = {
-  1: "اول",
-  2: "دوم",
-  3: "سوم",
-  4: "چهارم",
-};

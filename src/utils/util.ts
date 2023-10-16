@@ -168,3 +168,38 @@ export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
   const endDateOfLastWeek = startDateOfLastWeek.clone().add(6, "days");
   return startDateOfLastWeek.format("YYYY/MM/DD");
 }
+
+export function getWeekOfMonth(date: string) {
+  console.log({ date });
+  const currentDate = moment(date);
+
+  const [jalaliYear, jalaliMonth] = currentDate
+    .format("YYYY/MM")
+    .split("/")
+    .map(Number);
+
+  // Get the first day of the month and check if it's Saturday (6) or not
+  const firstDayOfMonth = moment([jalaliYear, jalaliMonth - 1, 1]);
+  const isFirstDaySaturday = firstDayOfMonth.day() === 4;
+
+  let totalDays = currentDate.date();
+
+  // If the first day is not Saturday, subtract 1 from the week number
+  if (!isFirstDaySaturday) {
+    totalDays--;
+  }
+
+  const fullWeeks = Math.floor(totalDays / 7);
+  const semiWeek = totalDays % 7 === 0 ? 0 : 1;
+  console.log(fullWeeks + semiWeek);
+  return weekNumberText[fullWeeks + semiWeek]
+    ? weekNumberText[fullWeeks + semiWeek]
+    : "";
+}
+
+const weekNumberText = {
+  1: "اول",
+  2: "دوم",
+  3: "سوم",
+  4: "چهارم",
+};
