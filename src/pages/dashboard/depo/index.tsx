@@ -322,7 +322,7 @@ function DeposTable({ sessionData }) {
               return (
                 <span className="text-red-400">دپو در حال افزایش است</span>
               );
-            return commify(result);
+            return result.toFixed(3);
           },
         },
         {
@@ -518,7 +518,7 @@ function DeposTable({ sessionData }) {
                       </div>
                     </div>
 
-                    <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
+                    {/* <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
                       <div className="flex w-full  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
                         <H2>
                           زمان اتمام دپو |{" "}
@@ -549,31 +549,28 @@ function DeposTable({ sessionData }) {
                           })}
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-full  items-center justify-between gap-5 laptopMax:flex-col-reverse">
+                        <div className="flex w-full  items-stretch justify-between gap-5 laptopMax:flex-col-reverse">
                           {!getTracker.isLoading ? (
                             <>
-                              <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl  border border-dashed  border-accent/10 p-5 xl:flex-row ">
-                                <div className="w-full xl:w-7/12">
-                                  <TrackerView data={getTracker.data} />
-                                </div>
-                                <div
-                                  dir="ltr"
-                                  className="flex w-full flex-col   justify-center gap-5 rounded-2xl xl:w-5/12"
-                                >
-                                  <H2>تعداد ورودی و رسیدگی شده</H2>
-                                  <DonutChart
-                                    data={entry_capacity}
-                                    category="value"
-                                    index="name"
-                                    colors={["red", "green"]}
-                                    valueFormatter={commify}
-                                    noDataText={Text.noData.fa}
-                                  />
-                                </div>
+                              <TrackerView data={getTracker.data} />
+
+                              <div
+                                dir="ltr"
+                                className="flex w-full flex-col   justify-center gap-5 rounded-2xl  border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:w-5/12"
+                              >
+                                <H2>تعداد ورودی و رسیدگی شده</H2>
+                                <DonutChart
+                                  data={entry_capacity}
+                                  category="value"
+                                  index="name"
+                                  colors={["red", "green"]}
+                                  valueFormatter={commify}
+                                  noDataText={Text.noData.fa}
+                                />
                               </div>
                               <div
                                 dir="ltr"

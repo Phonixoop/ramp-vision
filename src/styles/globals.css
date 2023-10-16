@@ -257,3 +257,11 @@ input[type="number"] {
 .tremor-Legend-legendItem svg {
   margin: 0 !important;
 }
+
+.tremor-Tracker-root {
+  @apply flex h-10 items-center justify-center gap-1 space-x-0;
+}
+
+.tremor-Tracker-trackingBlock {
+  @apply h-full w-full rounded-lg;
+}
