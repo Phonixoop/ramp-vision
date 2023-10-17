@@ -169,8 +169,13 @@ function CreateAccountForm() {
               </Button>
             </div>
           </>,
-          <span className="pb-10">در حال برسی</span>,
-          <div className="flex flex-col items-center justify-center gap-4">
+          <span key={2} className="pb-10">
+            در حال برسی
+          </span>,
+          <div
+            key={3}
+            className="flex flex-col items-center justify-center gap-4"
+          >
             <span className="text-red-500">
               رمز عبور یا نام کاربری اشتباه است
             </span>

@@ -48,9 +48,10 @@ export function RolesList({ onChange = (role: Role) => {} }) {
     <>
       <div className="flex w-full flex-wrap items-start justify-end gap-5">
         {!roles.isLoading &&
-          roles.data.map((r) => {
+          roles.data.map((r, i) => {
             return (
               <Button
+                key={i}
                 onClick={() => {
                   onChange(r);
                 }}

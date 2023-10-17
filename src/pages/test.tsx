@@ -155,8 +155,9 @@ function SubPermissionList({
         />
       </div>
       {subPermissions &&
-        subPermissions.map((permission) => (
+        subPermissions.map((permission, i) => (
           <div
+            key={i}
             className="relative flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-4 hover:bg-primbuttn/5"
             onClick={() => handlePermissionToggle(permission.id)}
           >

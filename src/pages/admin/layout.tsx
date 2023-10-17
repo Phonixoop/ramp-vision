@@ -12,7 +12,6 @@ import ExitIcon from "~/ui/icons/exits";
 import Menu from "~/features/menu";
 import BlurBackground from "~/ui/blur-backgrounds";
 import ThemeBox from "~/features/theme-box";
-import Company from "~/features/company";
 
 import useStatus from "~/hooks/useStatus";
 import { LayoutGroup } from "framer-motion";

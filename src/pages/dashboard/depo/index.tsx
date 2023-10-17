@@ -379,7 +379,7 @@ function DeposTable({ sessionData }) {
                       locale={persian_fa}
                       weekPicker={reportPeriod === "هفتگی"}
                       onlyMonthPicker={reportPeriod === "ماهانه"}
-                      plugins={[<DatePanel />]}
+                      plugins={[<DatePanel key={"00DatePanel"} />]}
                       onClose={() => {
                         setDataFilters((prev) => {
                           return {
