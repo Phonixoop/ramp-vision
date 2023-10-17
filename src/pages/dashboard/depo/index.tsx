@@ -141,7 +141,7 @@ export default function DeposPage() {
           <div className="col-start-4 row-span-3 row-start-1"></div>
         </div> */}
 
-        <div className="w-full  sm:p-0">
+        <div className="w-full sm:p-0  xl:w-11/12">
           <DeposTable sessionData={sessionData} />
         </div>
         <div className=" pt-9">
@@ -340,7 +340,7 @@ function DeposTable({ sessionData }) {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
-        <div className="flex w-11/12 items-center justify-center  rounded-lg  bg-secondary py-5 text-center ">
+        <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
             isLoading={depo.isLoading}
             data={depo.data ?? []}
