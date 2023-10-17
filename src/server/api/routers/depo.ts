@@ -13,6 +13,7 @@ import {
 } from "~/utils/util";
 
 import { getPermission } from "~/server/server-utils";
+import { TremorColor } from "~/types";
 
 const config = {
   user: "admin",
@@ -226,36 +227,48 @@ export const depoRouter = createTRPCRouter({
         // console.log(queryDocumentTypes);
         // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
-        const result = {
+        const result: {
+          date: string;
+          performance: number;
+          tracker: {
+            color: TremorColor;
+            tooltip: string;
+          }[];
+        } = {
           date: moment().locale("fa").subtract(1, "months").format("MMMM"),
           tracker: [],
           performance: 0,
         };
+        days.forEach((day) => {
+          result.tracker.push({
+            color: "stone",
+            tooltip: day + " | بدون دیتا",
+          });
+        });
         let performance = 0;
         resultDays.recordsets[0].map((d) => {
-          const DepoCompleteTime = calculateDepoCompleteTime(d);
+          const depoCompleteTime = calculateDepoCompleteTime(d);
+          const track = result.tracker.find(
+            (a) => a.tooltip.split("|")[0].trim() === d.Start_Date,
+          );
 
-          if (DepoCompleteTime <= 0)
-            result.tracker.push({
-              color: "rose",
-              tooltip: d.Start_Date,
-            });
-          else if (DepoCompleteTime == 0) {
-            result.tracker.push({
-              color: "gray",
-              tooltip: d.Start_Date,
-            });
+          if (depoCompleteTime <= 0) {
+            track.color = "rose";
+          } else if (depoCompleteTime == 0) {
+            track.color = "slate";
           } else {
             performance += 1;
-            result.tracker.push({
-              color: "emerald",
-              tooltip: d.Start_Date,
-            });
+            track.color = "emerald";
           }
+
+          track.tooltip = d.Start_Date;
         });
+        console.log(JSON.stringify(result.tracker, null, 2));
         // const percentage = (result.performance / 31) * 100;
         //  result.performance = Math.round(percentage / 10) * 10;
-        result.performance = Math.floor((performance / 31) * 100);
+        result.performance = Math.floor(
+          (performance / result.tracker.length) * 100,
+        );
         return result;
         // Respond with the fetched data
       } catch (error) {
