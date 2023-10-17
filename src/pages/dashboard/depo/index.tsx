@@ -195,7 +195,7 @@ function DeposTable({ sessionData }) {
       DocumentType: undefined,
       ServiceName: undefined,
       Start_Date: [
-        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
     },
   });
@@ -554,55 +554,57 @@ function DeposTable({ sessionData }) {
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
                         <div className="flex w-full  items-stretch justify-between gap-5 laptopMax:flex-col-reverse">
-                          {!getTracker.isLoading ? (
-                            <>
-                              <TrackerView data={getTracker.data} />
+                          <>
+                            <TrackerView data={getTracker.data ?? []} />
 
-                              <div
-                                dir="ltr"
-                                className="flex w-full flex-col   justify-center gap-5 rounded-2xl  border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:w-5/12"
-                              >
-                                <H2>تعداد ورودی و رسیدگی شده</H2>
-                                <DonutChart
-                                  data={entry_capacity}
-                                  category="value"
-                                  index="name"
-                                  colors={["red", "green"]}
-                                  valueFormatter={commify}
-                                  noDataText={Text.noData.fa}
-                                />
-                              </div>
-                              <div
-                                dir="ltr"
-                                className="flex w-full max-w-md  flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5"
-                              >
-                                <H2>
-                                  زمان کلی اتمام دپو |{" "}
-                                  <span className="text-primbuttn">
-                                    {reportPeriod}
-                                  </span>
-                                </H2>
-                                <DonutChart
-                                  className=""
-                                  data={depoCompletionTime}
-                                  category={"DepoCompleteTime"}
-                                  index="ServiceName"
-                                  colors={[
-                                    "teal",
-                                    "yellow",
-                                    "cyan",
-                                    "red",
-                                    "rose",
-                                    "fuchsia",
-                                  ]}
-                                  valueFormatter={commify}
-                                  noDataText={Text.noData.fa}
-                                />
-                              </div>
-                            </>
-                          ) : (
-                            "loading"
-                          )}
+                            <div
+                              dir="ltr"
+                              className="flex w-full flex-col   justify-center gap-5 rounded-2xl  border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:w-5/12"
+                            >
+                              <H2>تعداد ورودی و رسیدگی شده</H2>
+                              <DonutChart
+                                label={
+                                  " باقی مانده : " +
+                                  Math.abs(
+                                    entryBaseOnSabt - capacityBaseOnSabt,
+                                  ).toString()
+                                }
+                                data={entry_capacity}
+                                category="value"
+                                index="name"
+                                colors={["red", "green"]}
+                                valueFormatter={commify}
+                                noDataText={Text.noData.fa}
+                              />
+                            </div>
+                            <div
+                              dir="ltr"
+                              className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md"
+                            >
+                              <H2>
+                                زمان کلی اتمام دپو |{" "}
+                                <span className="text-primbuttn">
+                                  {reportPeriod}
+                                </span>
+                              </H2>
+                              <DonutChart
+                                className=""
+                                data={depoCompletionTime}
+                                category={"DepoCompleteTime"}
+                                index="ServiceName"
+                                colors={[
+                                  "teal",
+                                  "yellow",
+                                  "cyan",
+                                  "red",
+                                  "rose",
+                                  "fuchsia",
+                                ]}
+                                valueFormatter={commify}
+                                noDataText={Text.noData.fa}
+                              />
+                            </div>
+                          </>
                         </div>
                       </div>
                     </div>

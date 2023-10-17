@@ -263,7 +263,7 @@ export const depoRouter = createTRPCRouter({
 
           track.tooltip = d.Start_Date;
         });
-        console.log(JSON.stringify(result.tracker, null, 2));
+
         // const percentage = (result.performance / 31) * 100;
         //  result.performance = Math.round(percentage / 10) * 10;
         result.performance = Math.floor(

@@ -3,7 +3,7 @@ import Script from "next/script";
 
 export default function Document() {
   return (
-    <Html className=" h-full" dir="rtl">
+    <Html className=" h-full">
       <Head>
         {/* <link rel="shortcut icon" href={favicon} /> */}
         {/* <link rel="shortcut icon" href="/icons/main/roomchi.svg" /> */}
