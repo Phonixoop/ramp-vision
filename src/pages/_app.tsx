@@ -79,16 +79,16 @@ function MyApp({
 
   // Use the layout defined at the page level, if available
   const getLayout = Component.PageLayout ?? ((page) => page);
-  useEffect(() => {
-    const lenis = new Lenis();
+  // useEffect(() => {
+  //   const lenis = new Lenis();
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+  //   function raf(time) {
+  //     lenis.raf(time);
+  //     requestAnimationFrame(raf);
+  //   }
 
-    requestAnimationFrame(raf);
-  }, []);
+  //   requestAnimationFrame(raf);
+  // }, []);
   return Component.PageLayout ? (
     <>
       <SessionProvider session={session}>
