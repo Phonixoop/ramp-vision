@@ -170,7 +170,7 @@ export const depoRouter = createTRPCRouter({
         .map((permission) => permission.enLabel);
 
       const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.depos ${whereClause}
+      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.depos ${whereClause} ORDER BY CityName ASC
       `;
 
       const resultOfCities = await sql.query(queryCities);

@@ -51,6 +51,61 @@ export const MENU = [
 ];
 
 export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
+export const City_Levels: {
+  name: string;
+  cities: string[];
+}[] = [
+  {
+    name: "همه",
+    cities: [],
+  },
+  {
+    name: "ممتاز",
+    cities: [
+      "Tehran InDirect",
+      "Tehran Direct",
+      "Isfahan",
+      "Fars",
+      "East Azerbaijan",
+      "Khorasan, Razavi",
+      "Khuzestan",
+      "Mazandaran",
+    ],
+  },
+  {
+    name: "درجه یک",
+    cities: [
+      "Alborz",
+      "Ardabil",
+      "Bushehr",
+      "Gilan",
+      "Golestan Province",
+      "Ilam",
+      "Kerman",
+      "Kermanshah",
+      "Kohgiluyeh and Boyer-Ahmad",
+      "Lorestan",
+      "Markazi",
+      "Qom",
+      "West Azerbaijan",
+      "Yazd",
+    ],
+  },
+  {
+    name: "درجه دو",
+    cities: [
+      "Chahar Mahaal and Bakhtiari",
+      ,
+      "Khorasan, North",
+      "Khorasan, South",
+      "Kurdistan",
+      "Qazvin",
+      "Semnan",
+      "Sistan and Baluchestan",
+      "Zanjan",
+    ],
+  },
+];
 
 export const CITIES: City[] = [
   { EnglishName: "Tehran InDirect", PersianName: "تهران غیر مستقیم" },

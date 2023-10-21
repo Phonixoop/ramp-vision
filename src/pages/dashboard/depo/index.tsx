@@ -47,10 +47,11 @@ import {
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import TrackerView from "~/features/tracker";
-import { Reports_Period, Text } from "~/constants";
+import { City_Levels, Reports_Period, Text } from "~/constants";
 import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
+import { LayoutGroup } from "framer-motion";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -143,6 +144,7 @@ function DeposTable({ sessionData }) {
   ]);
 
   const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
+  const [cityLevel, setCityLevel] = useState<string>("");
   const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
     refetchOnWindowFocus: false,
@@ -198,18 +200,23 @@ function DeposTable({ sessionData }) {
           filter: filterColumn,
           Filter: ({ column }) => {
             return (
-              <SelectColumnFilter
-                column={column}
-                data={depo.data}
-                onChange={(filter) => {
-                  // setDataFilters((prev) => {
-                  //   return {
-                  //     ...prev,
-                  //     [filter.id]: filter.values,
-                  //   };
-                  // });
-                }}
-              />
+              <>
+                <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">سرویس ها</span>
+                  <SelectColumnFilter
+                    column={column}
+                    data={depo.data}
+                    onChange={(filter) => {
+                      // setDataFilters((prev) => {
+                      //   return {
+                      //     ...prev,
+                      //     [filter.id]: filter.values,
+                      //   };
+                      // });
+                    }}
+                  />
+                </div>
+              </>
             );
           },
         },
@@ -219,19 +226,53 @@ function DeposTable({ sessionData }) {
           filter: filterColumn,
           Filter: ({ column }) => {
             return (
-              <SelectColumnFilter
-                column={column}
-                data={initialFilters.data?.Cities}
-                onChange={(filter) => {
-                  getTracker.refetch();
-                  // setDataFilters((prev) => {
-                  //   return {
-                  //     ...prev,
-                  //     [filter.id]: filter.values,
-                  //   };
-                  // });
-                }}
-              />
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">شهر ها</span>
+                {initialFilters.data?.Cities && (
+                  <LayoutGroup id="CityLevelMenu">
+                    <InPageMenu
+                      className=" w-full rounded-md bg-secbuttn px-2 py-1 "
+                      list={City_Levels.map((a) => a.name)}
+                      value={0}
+                      onChange={(value) => {
+                        const { setFilter } = column;
+                        const cities = City_Levels.find(
+                          (a) => a.name === value.item.name,
+                        ).cities;
+
+                        // beacuse our system is permission based we need to only filter allowed cities.
+                        const canFilterCities = cities.filter((city) =>
+                          initialFilters.data.Cities.map(
+                            (a) => a.CityName,
+                          ).includes(city),
+                        );
+
+                        if (cities.length <= 0) {
+                          setFilter(
+                            initialFilters.data.Cities.map((a) => a.CityName),
+                          );
+                        } else setFilter(canFilterCities);
+
+                        setCityLevel(value.item.name);
+                      }}
+                    />
+                  </LayoutGroup>
+                )}
+
+                <SelectColumnFilter
+                  column={column}
+                  data={initialFilters.data?.Cities}
+                  onChange={(filter) => {
+                    getTracker.refetch();
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
             );
           },
         },
@@ -242,18 +283,21 @@ function DeposTable({ sessionData }) {
           filter: filterColumn,
           Filter: ({ column }) => {
             return (
-              <SelectColumnFilter
-                column={column}
-                data={depo.data}
-                onChange={(filter) => {
-                  // setDataFilters((prev) => {
-                  //   return {
-                  //     ...prev,
-                  //     [filter.id]: filter.values,
-                  //   };
-                  // });
-                }}
-              />
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">سند ها</span>
+                <SelectColumnFilter
+                  column={column}
+                  data={depo.data}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
             );
           },
         },
@@ -308,15 +352,17 @@ function DeposTable({ sessionData }) {
             renderInFilterView={() => {
               return (
                 <>
-                  <div className="flex  flex-col items-center justify-center gap-2 rounded-xl bg-secondary p-5">
-                    <InPageMenu
-                      className=" rounded-xl "
-                      list={Reports_Period}
-                      value={0}
-                      onChange={(value) => {
-                        setReportPeriod(value.item.name);
-                      }}
-                    />
+                  <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                    <span className="font-bold text-primary">تاریخ</span>
+                    <LayoutGroup id="DateMenu">
+                      <InPageMenu
+                        list={Reports_Period}
+                        value={0}
+                        onChange={(value) => {
+                          setReportPeriod(value.item.name);
+                        }}
+                      />
+                    </LayoutGroup>
                     {/* {deferredFilter.filter.Start_Date} */}
                     <DatePicker
                       //@ts-ignore
@@ -553,11 +599,11 @@ function DeposTable({ sessionData }) {
                                 category={"DepoCompleteTime"}
                                 index="ServiceName"
                                 colors={[
-                                  "teal",
+                                  "emerald",
                                   "yellow",
                                   "cyan",
                                   "red",
-                                  "rose",
+                                  "orange",
                                   "fuchsia",
                                 ]}
                                 valueFormatter={commify}
