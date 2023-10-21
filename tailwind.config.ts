@@ -145,10 +145,13 @@ export default {
             inverted: "#ffffff", // white
           },
           background: {
-            muted: "#f9fafb", // gray-50
-            subtle: "#f3f4f6", // gray-100
-            DEFAULT: "#ffffff", // white
-            emphasis: "#374151", // gray-700
+            //@ts-ignore
+            muted: withOpacity("--secondary"), // custom
+            //@ts-ignore
+            subtle: withOpacity("--secbuttn"), // gray-800
+            //@ts-ignore
+            DEFAULT: withOpacity("--secondary"), // gray-900
+            emphasis: "#d1d5db", // gray-300
           },
           border: {
             DEFAULT: "#e5e7eb", // gray-200
@@ -157,12 +160,15 @@ export default {
             DEFAULT: "#e5e7eb", // gray-200
           },
           content: {
-            subtle: "#9ca3af", // gray-400
             //@ts-ignore
-            DEFAULT: withOpacity("--primary"), // gray-500
-            emphasis: "#374151", // gray-700
-            strong: "#111827", // gray-900
-            inverted: "#ffffff", // white
+            subtle: withOpacity("--accent"), // gray-600 // icons
+            //@ts-ignore
+            DEFAULT: withOpacity("--primary"), // gray-500 // bg
+            //@ts-ignore
+            emphasis: withOpacity("--primary"), // gray-200 // text
+            strong: "#f9fafb", // gray-50
+            //@ts-ignore
+            inverted: withOpacity("--secondary"), // black
           },
         },
         // dark mode
@@ -191,12 +197,15 @@ export default {
             DEFAULT: "#1f2937", // gray-800
           },
           content: {
-            subtle: "#4b5563", // gray-600
             //@ts-ignore
-            DEFAULT: withOpacity("--primary"), // gray-500
-            emphasis: "#e5e7eb", // gray-200
+            subtle: withOpacity("--accent"), // gray-600 // icons
+            //@ts-ignore
+            DEFAULT: withOpacity("--primary"), // gray-500 // bg
+            //@ts-ignore
+            emphasis: withOpacity("--primary"), // gray-200 // text
             strong: "#f9fafb", // gray-50
-            inverted: "#000000", // black
+            //@ts-ignore
+            inverted: withOpacity("--secondary"), // black
           },
         },
       },
