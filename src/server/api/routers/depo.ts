@@ -97,27 +97,6 @@ export const depoRouter = createTRPCRouter({
             parseInt(date[1]),
           );
 
-          const d = getFirstSaturdayOfLastWeekOfMonth(
-            parseInt("1402"),
-            parseInt("5"),
-          );
-          console.log(d);
-          const dd = getFirstSaturdayOfLastWeekOfMonth(
-            parseInt("1402"),
-            parseInt("6"),
-          );
-          console.log(dd);
-          const ddd = getFirstSaturdayOfLastWeekOfMonth(
-            parseInt("1402"),
-            parseInt("7"),
-          );
-          console.log(ddd);
-          const dddd = getFirstSaturdayOfLastWeekOfMonth(
-            parseInt("1402"),
-            parseInt("8"),
-          );
-          console.log(dddd);
-
           // console.log(date, lastWeek);
           // const monthName = moment()
           //   .locale("fa")
