@@ -1,5 +1,10 @@
 import { AreaChart } from "@tremor/react";
-import { ArrowUpFromDotIcon, Loader2Icon, LoaderIcon } from "lucide-react";
+import {
+  ArrowUpFromDotIcon,
+  FilterIcon,
+  Loader2Icon,
+  LoaderIcon,
+} from "lucide-react";
 import {
   useTable,
   useSortBy,
@@ -38,7 +43,10 @@ export default function Table({
       {renderInFilterView !== undefined && (
         <div className="flex  w-full flex-row justify-center px-4 md:px-0 xl:w-3/12  ">
           <div className="sticky top-10 flex h-fit w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
-            <span className="text-lg font-bold text-primary"> فیلتر ها</span>
+            <div className="flex items-center justify-center gap-3 text-accent">
+              <FilterIcon className="h-4 w-4" />
+              <span className="text-lg font-bold ">فیلتر ها</span>
+            </div>
             {renderInFilterView()}
             {headerGroups.map((headerGroup) => {
               return headerGroup.headers.map((column) => {
