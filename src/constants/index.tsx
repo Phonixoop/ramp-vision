@@ -31,6 +31,25 @@ export const THEMESE = [
   },
 ];
 
+export const MENU = [
+  {
+    value: "خانه",
+    link: "/",
+  },
+  {
+    value: "درباره ویژن",
+    link: "atysa.ir",
+  },
+  {
+    value: "جزئیات عملکرد شعب",
+    link: "/dashboard/depo",
+  },
+  {
+    value: "جزئیات عملکرد پرسنل شعب",
+    link: "/dashboard/personnel_performance",
+  },
+];
+
 export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
 
 export const CITIES: City[] = [

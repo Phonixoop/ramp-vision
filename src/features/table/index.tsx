@@ -27,7 +27,7 @@ export default function Table({
   clickedRowIndex = "",
   onClick = (cell) => {},
   renderChild = (rows) => <></>,
-  renderInFilterView = () => <></>,
+  renderInFilterView = undefined,
 }: Props) {
   const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -35,16 +35,18 @@ export default function Table({
 
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
-      <div className="flex  w-full flex-row justify-center px-4 md:px-0 xl:w-3/12  ">
-        <div className="sticky top-10 flex h-fit w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-10  ">
-          {renderInFilterView()}
-          {headerGroups.map((headerGroup) => {
-            return headerGroup.headers.map((column) => {
-              if (column["Filter"]) return <>{column.render("Filter")}</>;
-            });
-          })}
+      {renderInFilterView !== undefined && (
+        <div className="flex  w-full flex-row justify-center px-4 md:px-0 xl:w-3/12  ">
+          <div className="sticky top-10 flex h-fit w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-10  ">
+            {renderInFilterView()}
+            {headerGroups.map((headerGroup) => {
+              return headerGroup.headers.map((column) => {
+                if (column["Filter"]) return <>{column.render("Filter")}</>;
+              });
+            })}
+          </div>
         </div>
-      </div>
+      )}
       <div className="w-full ">
         {renderChild(rows)}
 

@@ -4,12 +4,14 @@ import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 
 import { cn } from "~/lib/utils";
-import { CheckIcon, Minus, XIcon } from "lucide-react";
+import { CheckIcon, MinusIcon, XIcon } from "lucide-react";
 
 export function Switch({
-  className,
+  className = "",
   middle = false,
   checked = false,
+  IconLeft = XIcon,
+  IconRight = CheckIcon,
   ...props
 }) {
   return (
@@ -43,9 +45,10 @@ export function Switch({
       relative
       block h-4 w-4
        rounded-full 
-       shadow-lg ring-0 
-       transition-transform 
-     
+        shadow-lg 
+       ring-0 
+          
+       transition-transform
         data-[state=checked]:bg-primbuttn 
         data-[state=unchecked]:bg-primary/20`,
           middle
@@ -61,28 +64,28 @@ export function Switch({
         )}
       />
       {middle && (
-        <Minus
+        <MinusIcon
           className={cn(
-            `absolute left-1/2 top-1/2 w-4 -translate-x-1/2 -translate-y-1/2`,
+            `absolute left-1/2  top-1/2 w-4 -translate-x-1/2 -translate-y-1/2`,
           )}
         />
       )}
 
-      <CheckIcon
+      <IconRight
         className={cn(
-          `absolute right-0  top-1/2 h-3 w-3 -translate-x-[2px] -translate-y-1/2 transition-all duration-500`,
+          `absolute right-0 top-1/2  h-3 w-3 -translate-x-[2px] -translate-y-1/2 stroke-accent transition-all duration-500`,
           checked && !middle
             ? ""
-            : "right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 scale-0",
+            : "right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 -rotate-180 scale-0",
         )}
       />
 
-      <XIcon
+      <IconLeft
         className={cn(
-          `absolute right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2  transition-all  duration-500`,
+          `absolute right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 stroke-accent  transition-all  duration-500`,
           !checked && !middle
             ? ""
-            : "right-0 top-1/2 h-3 w-3 -translate-x-[2px] -translate-y-1/2 scale-0",
+            : "right-0 top-1/2 h-3 w-3 -translate-x-[2px] -translate-y-1/2 -rotate-180 scale-0",
         )}
       />
     </div>

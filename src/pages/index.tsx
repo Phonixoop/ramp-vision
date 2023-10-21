@@ -48,6 +48,7 @@ import TrackerView from "~/features/tracker";
 import { Reports_Period } from "~/constants";
 import { cn } from "~/lib/utils";
 import { Column } from "react-table";
+import Header from "~/features/header";
 const menu = [
   {
     value: "خانه",
@@ -112,19 +113,7 @@ export default function Home() {
       </Head>
       <BlurBackground />
       <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000 ">
-        <Container
-          className="flex  flex-col items-center justify-between py-5 sm:p-0 "
-          rtl={true}
-        >
-          <div className="flex items-center justify-center gap-4 py-5 ">
-            <AuthShowcase />
-            <Menu rootPath="/" list={menu} />
-          </div>
-        </Container>
-
-        <div className=" pt-9">
-          <ThemeBoxHovery />
-        </div>
+        <Header />
       </div>
     </>
   );
