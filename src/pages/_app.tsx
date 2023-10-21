@@ -9,8 +9,6 @@ import ProgressBar from "@badrap/bar-of-progress";
 import { useRouter } from "next/router";
 import { Toaster } from "~/components/ui/toast/toaster";
 
-import Lenis from "@studio-freight/lenis";
-
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   PageLayout?: (page: ReactElement) => ReactElement<any, any>;
 };
