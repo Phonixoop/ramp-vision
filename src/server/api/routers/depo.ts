@@ -12,7 +12,7 @@ import {
   getWeekOfMonth,
 } from "~/utils/util";
 
-import { getPermission } from "~/server/server-utils";
+import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
 
 const config = {
@@ -96,6 +96,28 @@ export const depoRouter = createTRPCRouter({
             parseInt(date[0]),
             parseInt(date[1]),
           );
+
+          const d = getFirstSaturdayOfLastWeekOfMonth(
+            parseInt("1402"),
+            parseInt("5"),
+          );
+          console.log(d);
+          const dd = getFirstSaturdayOfLastWeekOfMonth(
+            parseInt("1402"),
+            parseInt("6"),
+          );
+          console.log(dd);
+          const ddd = getFirstSaturdayOfLastWeekOfMonth(
+            parseInt("1402"),
+            parseInt("7"),
+          );
+          console.log(ddd);
+          const dddd = getFirstSaturdayOfLastWeekOfMonth(
+            parseInt("1402"),
+            parseInt("8"),
+          );
+          console.log(dddd);
+
           // console.log(date, lastWeek);
           // const monthName = moment()
           //   .locale("fa")
@@ -277,35 +299,6 @@ export const depoRouter = createTRPCRouter({
       }
     }),
 });
-
-function generateWhereClause(
-  filter,
-  ignoreKey = undefined,
-  customFun = undefined,
-) {
-  const conditions = [];
-
-  for (const key in filter) {
-    const value = filter[key];
-    if (Array.isArray(value)) {
-      // If the value is an array, create a condition with IN operator
-      const newValue = [];
-      value.forEach((v) => {
-        newValue.push(`N'${v}'`);
-      });
-
-      const cw = ignoreKey === key && customFun ? customFun : key;
-      const condition = `${cw} IN (${newValue.join(",")})`;
-      if (value.length > 0) conditions.push(condition);
-    } else if (value !== undefined && value !== null) {
-      const condition = `${key} = '${value}'`;
-      conditions.push(condition);
-    }
-  }
-  return conditions.length > 0
-    ? `WHERE CityName is not NULL AND ${conditions.join(" AND ")}`
-    : "";
-}
 
 function generateFilterOnlySelect(filter: string[]) {
   const columns = [];
