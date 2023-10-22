@@ -43,9 +43,9 @@ export default function Table({
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
       {renderInFilterView !== undefined && renderInFilterView !== undefined && (
-        <div className="sticky top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 md:px-0 xl:w-3/12  ">
+        <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 xl:pb-0  ">
           {renderInFilterView !== undefined && (
-            <div className="flex w-full flex-row justify-center px-4 md:px-0 ">
+            <div className="flex w-full flex-row justify-center md:px-0 ">
               <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
                 <div className="flex items-center justify-center gap-3 text-accent">
                   <FilterIcon className="h-4 w-4" />

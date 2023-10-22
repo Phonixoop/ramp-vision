@@ -236,7 +236,6 @@ function DeposTable({ sessionData }) {
                 {initialFilters.data?.Cities && (
                   <LayoutGroup id="CityLevelMenu">
                     <InPageMenu
-                      className=" w-full rounded-md bg-secbuttn px-2 py-1 "
                       list={City_Levels.map((a) => a.name)}
                       value={0}
                       onChange={(value) => {
@@ -430,7 +429,7 @@ function DeposTable({ sessionData }) {
               return (
                 <>
                   {!depo.isLoading && depo.data.length > 0 && (
-                    <div className="b flex w-full items-center justify-center  gap-5 rounded-2xl bg-secbuttn p-5">
+                    <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn p-5 xl:flex-row">
                       <FileBarChart2 className="stroke-accent" />
                       <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-sm  font-semibold text-emerald-900">
                         <DownloadCloudIcon />
