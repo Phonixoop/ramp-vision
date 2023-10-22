@@ -23,6 +23,7 @@ type Props = {
   onClick?: (cell: any) => void;
   renderChild?: (rows: Row<any>[]) => JSX.Element;
   renderInFilterView?: () => JSX.Element;
+  renderAfterFilterView?: (rows: Row<any>[]) => JSX.Element;
 };
 export default function Table({
   useTableInstance = undefined,
@@ -33,31 +34,39 @@ export default function Table({
   onClick = (cell) => {},
   renderChild = (rows) => <></>,
   renderInFilterView = undefined,
+  renderAfterFilterView = (rows) => <></>,
 }: Props) {
   const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
-
+  const flatRows = rows.map((row) => row.original);
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
-      {renderInFilterView !== undefined && (
-        <div className="flex  w-full flex-row justify-center px-4 md:px-0 xl:w-3/12  ">
-          <div className="sticky top-10 flex h-fit w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
-            <div className="flex items-center justify-center gap-3 text-accent">
-              <FilterIcon className="h-4 w-4" />
-              <span className="text-lg font-bold ">فیلتر ها</span>
+      {renderInFilterView !== undefined && renderInFilterView !== undefined && (
+        <div className="sticky top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 md:px-0 xl:w-3/12  ">
+          {renderInFilterView !== undefined && (
+            <div className="flex w-full flex-row justify-center px-4 md:px-0 ">
+              <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
+                <div className="flex items-center justify-center gap-3 text-accent">
+                  <FilterIcon className="h-4 w-4" />
+                  <span className="text-lg font-bold ">فیلتر ها</span>
+                </div>
+                {renderInFilterView()}
+                {headerGroups.map((headerGroup) => {
+                  return headerGroup.headers.map((column) => {
+                    if (column["Filter"]) return <>{column.render("Filter")}</>;
+                  });
+                })}
+              </div>
             </div>
-            {renderInFilterView()}
-            {headerGroups.map((headerGroup) => {
-              return headerGroup.headers.map((column) => {
-                if (column["Filter"]) return <>{column.render("Filter")}</>;
-              });
-            })}
-          </div>
+          )}
+          {renderInFilterView !== undefined && (
+            <div> {renderAfterFilterView(flatRows)}</div>
+          )}
         </div>
       )}
       <div className="w-full ">
-        {renderChild(rows)}
+        {renderChild(flatRows)}
 
         <div className="relative flex h-[31rem] min-h-[30rem] w-full items-stretch justify-center py-10">
           {isLoading && (
