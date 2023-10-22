@@ -647,23 +647,6 @@ function DeposTable({ sessionData }) {
                     <div className="flex w-full items-center justify-center gap-5 pt-10">
                       <div className="flex items-center justify-center gap-5 rounded-full bg-secbuttn p-5">
                         <FileBarChart2 className="stroke-accent" />
-                        <Button className="font-bo font flex justify-center gap-2 rounded-3xl  bg-amber-300 font-semibold text-amber-900">
-                          <DownloadCloudIcon />
-                          <CSVLink
-                            filename="فیلتر شده.csv"
-                            headers={columns
-                              .map((item) => {
-                                return {
-                                  label: item.Header,
-                                  key: item.accessor,
-                                };
-                              })
-                              .filter((f) => f.key != "number")}
-                            data={flatRows}
-                          >
-                            دانلود دیتای فیلتر شده
-                          </CSVLink>
-                        </Button>
                         <Button className="flex justify-center gap-2 rounded-3xl bg-emerald-300  font-semibold text-emerald-900">
                           <DownloadCloudIcon />
                           <CSVLink
@@ -679,6 +662,23 @@ function DeposTable({ sessionData }) {
                             data={depo.data}
                           >
                             دانلود دیتای کامل
+                          </CSVLink>
+                        </Button>
+                        <Button className="font-bo font flex justify-center gap-2 rounded-3xl  bg-amber-300 font-semibold text-amber-900">
+                          <DownloadCloudIcon />
+                          <CSVLink
+                            filename="فیلتر شده.csv"
+                            headers={columns
+                              .map((item) => {
+                                return {
+                                  label: item.Header,
+                                  key: item.accessor,
+                                };
+                              })
+                              .filter((f) => f.key != "number")}
+                            data={flatRows}
+                          >
+                            دانلود دیتای فیلتر شده
                           </CSVLink>
                         </Button>
                       </div>
