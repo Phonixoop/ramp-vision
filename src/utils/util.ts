@@ -70,13 +70,8 @@ export function processDataForChart(rawData, groupBy, values = []) {
 }
 
 export function calculateDepoCompleteTime(value) {
-  if (
-    value.DepoCount == 0 ||
-    value.EntryCount == 0 ||
-    value.Capicity == 0 ||
-    value.Capicity - value.EntryCount == 0
-  )
-    return 0;
+  if (value.DepoCount == 0) return 0;
+  if (value.Capicity - value.EntryCount == 0) return value.DepoCount;
   return value.DepoCount / (value.Capicity - value.EntryCount);
 }
 export function processDepoCompleteTimeData(

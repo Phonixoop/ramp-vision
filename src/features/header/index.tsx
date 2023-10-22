@@ -3,6 +3,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { Switch } from "~/components/ui/switch";
 import { MENU } from "~/constants";
+import { ThemeProvider, useTheme } from "~/context/theme.context";
 import Menu from "~/features/menu";
 import { ThemeBoxHovery } from "~/features/theme-box";
 import useLocalStorage from "~/hooks/useLocalStorage";
@@ -19,7 +20,9 @@ export default function Header() {
       >
         <div className="flex flex-col items-center justify-center gap-4 py-5 md:flex-row ">
           <AuthShowcase />
-          <ThemeSwitch />
+          <ThemeProvider>
+            <ThemeSwitch />
+          </ThemeProvider>
           <Menu rootPath="/" list={MENU} />
         </div>
       </Container>
@@ -35,18 +38,27 @@ function ThemeSwitch() {
   );
   const [value, setValue] = useState(true);
 
+  const { theme, setTheme } = useTheme();
   return (
     <>
       <Switch
         dir="ltr"
         className="scale-125"
-        checked={value}
+        middle={
+          (!theme.includes("dark") && !theme.includes("light")) || theme == ""
+        }
+        checked={theme.includes("dark") ? true : false}
         IconLeft={SunDimIcon}
         IconRight={MoonIcon}
         onClick={() => {
           setValue(!value);
-          if (!value) document.querySelector("body").className = "theme-dark-1";
-          else document.querySelector("body").className = "theme-light-4";
+          if (!value) {
+            document.querySelector("body").className = "theme-dark-1";
+            setTheme("theme-dark-1");
+          } else {
+            document.querySelector("body").className = "theme-light-4";
+            setTheme("theme-light-4");
+          }
         }}
       />
     </>

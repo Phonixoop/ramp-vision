@@ -52,8 +52,8 @@ function MyApp({
 
     const matchPrefersLight = window.matchMedia("(prefers-color-scheme:light)");
     if (matchPrefersLight.matches) {
-      document.querySelector("body").className = "theme-light-2";
-      localStorage.setItem("theme", "theme-light-2");
+      document.querySelector("body").className = "theme-light-4";
+      localStorage.setItem("theme", "theme-light-4");
       matchColorSchemeToTheme("light");
     } else {
       document.querySelector("body").className = "theme-dark-1";
@@ -61,7 +61,7 @@ function MyApp({
       matchColorSchemeToTheme("dark");
     }
     matchPrefersLight.addEventListener("change", (event) => {
-      const theme = event.matches ? "theme-light-2" : "theme-dark-3";
+      const theme = event.matches ? "theme-light-4" : "theme-dark-1";
 
       document.querySelector("body").className = theme;
       localStorage.setItem("theme", theme);

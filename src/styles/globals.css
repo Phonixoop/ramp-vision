@@ -265,3 +265,7 @@ input[type="number"] {
 .tremor-Tracker-trackingBlock {
   @apply h-full w-full rounded-lg;
 }
+
+.recharts-tooltip-wrapper {
+  direction: ltr;
+}

@@ -10,7 +10,7 @@ export default function Document() {
       </Head>
 
       <body
-        className="theme-dark-3 scrollbar-track-[var(--accent)] h-full"
+        className="theme-dark-1 scrollbar-track-[var(--accent)] h-full"
         style={{
           overflow: "overlay",
         }}

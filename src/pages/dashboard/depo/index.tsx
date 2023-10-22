@@ -1,7 +1,12 @@
-import { ArrowDownRightIcon, UserCog2 } from "lucide-react";
+import {
+  ArrowDownRightIcon,
+  UserCog2,
+  DownloadCloudIcon,
+  FileBarChart2,
+} from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-
+import { CSVLink } from "react-csv";
 import Menu, { InPageMenu } from "~/features/menu";
 
 import Table from "~/features/table";
@@ -184,7 +189,7 @@ function DeposTable({ sessionData }) {
     useMemo<Column<any>[]>(
       () => [
         {
-          Header: "#",
+          Header: "ردیف",
           accessor: "number",
           Cell: ({ row }) => {
             return (
@@ -321,12 +326,19 @@ function DeposTable({ sessionData }) {
           accessor: "MyDepoCompletionTime",
           Cell: ({ row }) => {
             const data = row.original;
-            var result = calculateDepoCompleteTime(data);
-            if (result <= 0)
+            const result = calculateDepoCompleteTime(data);
+
+            if (result < 0)
               return (
                 <span className="text-red-400">دپو در حال افزایش است</span>
               );
-            return result.toFixed(3);
+            else if (result == 0)
+              return <span className="text-amber-400">دپو صفر است</span>;
+            // > 0
+            else
+              return (
+                <span className="text-emerald-400 ">دپو در حال کاهش است</span>
+              );
           },
         },
         {
@@ -356,7 +368,7 @@ function DeposTable({ sessionData }) {
                     <span className="font-bold text-primary">تاریخ</span>
                     <LayoutGroup id="DateMenu">
                       <InPageMenu
-                        list={Reports_Period}
+                        list={Object.keys(Reports_Period)}
                         value={0}
                         onChange={(value) => {
                           setReportPeriod(value.item.name);
@@ -427,6 +439,7 @@ function DeposTable({ sessionData }) {
                 "Capicity",
               ]);
               const depoCompletionTime = processDepoCompleteTimeData(flatRows);
+              console.log(depoCompletionTime);
               const totalComplete = depoCompletionTime.reduce(
                 (a, b) => a + b.DepoCompleteTime,
                 0,
@@ -469,7 +482,7 @@ function DeposTable({ sessionData }) {
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
                       <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
                         <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
-                          <H2>نمودار دپو</H2>
+                          <H2>نمودار به تفکیک سرویس</H2>
                           <BarChart
                             showAnimation={true}
                             dir="rtl"
@@ -496,7 +509,7 @@ function DeposTable({ sessionData }) {
                           />
                         </div>
                         <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
-                          <H2>نمودار زمانی </H2>
+                          <H2>نمودار زمانی</H2>
                           <AreaChart
                             dir="rtl"
                             showAnimation={true}
@@ -570,9 +583,11 @@ function DeposTable({ sessionData }) {
                               <H2>تعداد ورودی و رسیدگی شده</H2>
                               <DonutChart
                                 label={
-                                  " باقی مانده : " +
-                                  Math.abs(
-                                    entryBaseOnSabt - capacityBaseOnSabt,
+                                  " مانده : " +
+                                  commify(
+                                    Math.abs(
+                                      capacityBaseOnSabt - entryBaseOnSabt,
+                                    ),
                                   ).toString()
                                 }
                                 data={entry_capacity}
@@ -583,10 +598,7 @@ function DeposTable({ sessionData }) {
                                 noDataText={Text.noData.fa}
                               />
                             </div>
-                            <div
-                              dir="ltr"
-                              className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md"
-                            >
+                            <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
                               <H2>
                                 زمان کلی اتمام دپو |{" "}
                                 <span className="text-primbuttn">
@@ -594,7 +606,23 @@ function DeposTable({ sessionData }) {
                                 </span>
                               </H2>
                               <DonutChart
-                                className=""
+                                label={
+                                  (
+                                    depoCompletionTime.reduce(
+                                      (accumulator, currentObject) => {
+                                        return (
+                                          accumulator +
+                                          currentObject.DepoCompleteTime
+                                        );
+                                      },
+                                      0,
+                                    ) / flatRows.length
+                                  )
+                                    .toFixed(2)
+                                    .toString() +
+                                  " " +
+                                  Reports_Period[reportPeriod]
+                                }
                                 data={depoCompletionTime}
                                 category={"DepoCompleteTime"}
                                 index="ServiceName"
@@ -615,6 +643,47 @@ function DeposTable({ sessionData }) {
                       </div>
                     </div>
                   </div>
+                  {!depo.isLoading && depo.data.length > 0 && (
+                    <div className="flex w-full items-center justify-center gap-5 pt-10">
+                      <div className="flex items-center justify-center gap-5 rounded-full bg-secbuttn p-5">
+                        <FileBarChart2 className="stroke-accent" />
+                        <Button className="font-bo font flex justify-center gap-2 rounded-3xl  bg-amber-300 font-semibold text-amber-900">
+                          <DownloadCloudIcon />
+                          <CSVLink
+                            filename="فیلتر شده.csv"
+                            headers={columns
+                              .map((item) => {
+                                return {
+                                  label: item.Header,
+                                  key: item.accessor,
+                                };
+                              })
+                              .filter((f) => f.key != "number")}
+                            data={flatRows}
+                          >
+                            دانلود دیتای فیلتر شده
+                          </CSVLink>
+                        </Button>
+                        <Button className="flex justify-center gap-2 rounded-3xl bg-emerald-300  font-semibold text-emerald-900">
+                          <DownloadCloudIcon />
+                          <CSVLink
+                            filename="کامل.csv"
+                            headers={columns
+                              .map((item) => {
+                                return {
+                                  label: item.Header,
+                                  key: item.accessor,
+                                };
+                              })
+                              .filter((f) => f.key != "number")}
+                            data={depo.data}
+                          >
+                            دانلود دیتای کامل
+                          </CSVLink>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </>
               );
             }}

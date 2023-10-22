@@ -50,7 +50,13 @@ export const MENU = [
   },
 ];
 
-export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
+// export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
+
+export const Reports_Period = {
+  روزانه: "روز",
+  هفتگی: "هفته",
+  ماهانه: "ماه",
+};
 export const City_Levels: {
   name: string;
   cities: string[];

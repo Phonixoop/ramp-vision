@@ -41,7 +41,7 @@ export default function TrackerView({ data }: { data: TrackerType }) {
       <div className="flex w-full flex-col justify-between gap-5">
         <div className="flex w-full flex-col items-center justify-center">
           <div className=" flex w-full justify-between ">
-            <MoveLeftIcon />
+            <MoveLeftIcon className="stroke-primary" />
             <div
               className={cn(
                 "inline-flex w-max flex-shrink-0 cursor-default items-center justify-center rounded-tremor-full px-2.5 py-0.5 text-sm  ",

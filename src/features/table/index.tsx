@@ -101,14 +101,14 @@ export default function Table({
                                 {...restHeaderProps}
                                 className="sticky top-0 bg-accent/20 px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-accent backdrop-blur-md"
                               >
-                                <div className="flex select-none items-center justify-center gap-3 text-center ">
+                                <div className="relative flex select-none items-center justify-center gap-3 text-center ">
                                   {
                                     // Render the header
                                     column.render("Header")
                                   }
 
                                   <ArrowUpFromDotIcon
-                                    className={`${
+                                    className={`absolute -left-5 ${
                                       isSorted && isSortedDesc
                                         ? "rotate-180"
                                         : "rotate-0"
