@@ -171,7 +171,7 @@ export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
   const currentDate = moment()
     .locale("fa")
     .year(year)
-    .month(month - 2)
+    .month(month - 1)
     .jDay(1);
 
   // Calculate the date for the Saturday in the 4th week
