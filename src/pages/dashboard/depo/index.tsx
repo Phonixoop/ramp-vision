@@ -485,11 +485,10 @@ function DeposTable({ sessionData }) {
               ]);
               const depoCompletionTime = processDepoCompleteTimeData(flatRows);
 
-              const totalComplete = (
+              const totalComplete =
                 depoCompletionTime.reduce((accumulator, currentObject) => {
                   return accumulator + currentObject.DepoCompleteTime;
-                }, 0) / flatRows.length
-              ).toFixed(2);
+                }, 0) / flatRows.length;
               const entryBaseOnSabt = sumColumnBasedOnRowValue(
                 flatRows,
                 "EntryCount",
@@ -657,7 +656,7 @@ function DeposTable({ sessionData }) {
                                 )}
                               </H2>
                               <DonutChart
-                                label={totalComplete}
+                                label={totalComplete.toFixed(2)}
                                 data={depoCompletionTime}
                                 category={"DepoCompleteTime"}
                                 index="ServiceName"
@@ -672,7 +671,7 @@ function DeposTable({ sessionData }) {
                                 valueFormatter={commify}
                                 noDataText={Text.noData.fa}
                               />
-                              {depo.data?.periodType && (
+                              {depo.data?.periodType && totalComplete > 0 && (
                                 <p className="w-full">
                                   <span className="text-accent">
                                     {humanizeDuration(

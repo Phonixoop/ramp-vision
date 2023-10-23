@@ -119,6 +119,9 @@ export const depoRouter = createTRPCRouter({
         console.log(query);
         const result = await sql.query(query);
 
+        if (input.periodType === "روزانه") {
+          finalResult = result.recordsets[0];
+        }
         if (input.periodType === "هفتگی") {
           const date = filter.Start_Date[0].split("/");
 
@@ -153,7 +156,6 @@ export const depoRouter = createTRPCRouter({
             };
           });
         }
-        finalResult = result.recordsets[0];
 
         return {
           periodType: input.periodType,

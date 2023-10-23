@@ -323,7 +323,7 @@ export function humanizeDuration(value, tag) {
   if (hours > 0) timeComponents.push(`${hours} ساعت`);
   if (minutes > 0) timeComponents.push(`${minutes} دقیقه`);
   if (remainingSeconds > 0)
-    timeComponents.push(`${remainingSeconds.toFixed(2)} ثانیه`);
+    timeComponents.push(`${remainingSeconds.toFixed(0)} ثانیه`);
 
   return timeComponents.join(" ، ");
 }
