@@ -29,7 +29,7 @@ export const config = {
      * - favicon.ico (favicon file)
      */
     // "/((?!api|_next/static|_next/image|favicon.ico).*)",
-    "/user/:path*",
+    "/dashboard/:path*",
     "/admin/:path*",
   ],
 };
