@@ -627,12 +627,14 @@ function DeposTable({ sessionData }) {
                               <H2>تعداد ورودی و رسیدگی شده</H2>
                               <DonutChart
                                 label={
-                                  " مانده : " +
-                                  commify(
-                                    Math.abs(
-                                      capacityBaseOnSabt - entryBaseOnSabt,
-                                    ),
-                                  ).toString()
+                                  depo.data?.result.length > 0
+                                    ? " مانده : " +
+                                      commify(
+                                        Math.abs(
+                                          capacityBaseOnSabt - entryBaseOnSabt,
+                                        ),
+                                      ).toString()
+                                    : "داده ای موجود نیست"
                                 }
                                 data={entry_capacity}
                                 category="value"
@@ -644,11 +646,15 @@ function DeposTable({ sessionData }) {
                             </div>
                             <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
                               <H2>
-                                <br />
-                                زمان کلی اتمام دپو |{" "}
-                                <span className="text-primbuttn">
-                                  {depo.data?.periodType}
-                                </span>
+                                زمان کلی اتمام دپو{" "}
+                                {depo.data?.periodType && (
+                                  <>
+                                    |{" "}
+                                    <span className="text-primbuttn">
+                                      {depo.data?.periodType}
+                                    </span>
+                                  </>
+                                )}
                               </H2>
                               <DonutChart
                                 label={totalComplete}
@@ -666,17 +672,19 @@ function DeposTable({ sessionData }) {
                                 valueFormatter={commify}
                                 noDataText={Text.noData.fa}
                               />
-                              <p className="w-full">
-                                <span className="text-accent">
-                                  {humanizeDuration(
-                                    totalComplete,
-                                    Reports_Period[depo.data?.periodType],
-                                  )}
-                                </span>{" "}
-                                <span className="text-primary">
-                                  تا اتمام دپو
-                                </span>
-                              </p>
+                              {depo.data?.periodType && (
+                                <p className="w-full">
+                                  <span className="text-accent">
+                                    {humanizeDuration(
+                                      totalComplete,
+                                      Reports_Period[depo.data?.periodType],
+                                    )}
+                                  </span>{" "}
+                                  <span className="text-primary">
+                                    تا اتمام دپو
+                                  </span>
+                                </p>
+                              )}
                             </div>
                           </>
                         </div>
