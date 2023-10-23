@@ -13,7 +13,7 @@ import { api } from "~/utils/api";
 
 type TThemeContext = {
   theme: string;
-  setTheme: (user: string) => void;
+  setTheme: (theme: string) => void;
 };
 
 type ThemeProviderProps = {
@@ -36,16 +36,16 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   const useIsomorphicLayoutEffect = canUseDOM ? useLayoutEffect : useEffect;
 
+  function listenStorageChanges() {
+    const _theme = localStorage.getItem("theme");
+
+    document.querySelector("body").className = _theme;
+    setTheme(_theme);
+  }
+
   useIsomorphicLayoutEffect(() => {
-    function listenStorageChanges() {
-      const _theme = localStorage.getItem("theme");
-      if (_theme === null) {
-        setTheme("theme-dark-1");
-      }
-      document.querySelector("body").className = _theme;
-      setTheme(_theme);
-    }
-    setTheme(localStorage.getItem("theme") ?? "");
+    setTheme(localStorage.getItem("theme"));
+
     window.addEventListener("storage", listenStorageChanges);
     return () => window.removeEventListener("storage", listenStorageChanges);
   }, []);

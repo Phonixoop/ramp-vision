@@ -36,7 +36,7 @@ export function UserForm({
   const { selectedRowUser, setSelectedRowUser } = useUser();
   const utils = api.useContext();
   const user = sessionUser ?? selectedRowUser ?? undefined;
-  console.log({ user });
+
   const createUser = api.user.createUser.useMutation({
     async onSuccess(addedUser: User) {
       await utils.user.getUsers.invalidate();

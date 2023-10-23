@@ -184,7 +184,6 @@ export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
 }
 
 export function getWeekOfMonth(date: string) {
-  console.log({ date });
   const currentDate = moment(date);
 
   const [jalaliYear, jalaliMonth] = currentDate
@@ -205,7 +204,7 @@ export function getWeekOfMonth(date: string) {
 
   const fullWeeks = Math.floor(totalDays / 7);
   const semiWeek = totalDays % 7 === 0 ? 0 : 1;
-  console.log(fullWeeks + semiWeek);
+
   return weekNumberText[fullWeeks + semiWeek]
     ? weekNumberText[fullWeeks + semiWeek]
     : "";

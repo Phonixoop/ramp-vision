@@ -1,8 +1,12 @@
 import moment from "jalali-moment";
 import React from "react";
-
+import { Card, Title, BarChart, Subtitle } from "@tremor/react";
 export default function Test() {
-  return <div>{getFirstSaturdayOfLastWeekOfMonth(1402, 7)}</div>;
+  return (
+    <div className="mx-auto w-6/12">
+      <Chart />
+    </div>
+  );
 }
 
 function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
@@ -21,4 +25,45 @@ function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
     .day(6); // Set the day to Saturday (0 is Sunday, 6 is Saturday)
 
   return fourthWeek.format("YYYY/MM/DD");
+}
+
+const chartdata = [
+  {
+    name: "Amphibians",
+    "Number of threatened species": 2488,
+  },
+  {
+    name: "Birds",
+    "Number of threatened species": 1445,
+  },
+  {
+    name: "Crustaceans",
+    "Number of threatened species": 743,
+  },
+];
+
+const valueFormatter = (number) =>
+  `$ ${new Intl.NumberFormat("us").format(number).toString()}`;
+
+export function Chart() {
+  return (
+    <>
+      <Card>
+        <Title>Number of species threatened with extinction (2021)</Title>
+        <Subtitle>
+          The IUCN Red List has assessed only a small share of the total known
+          species in the world.
+        </Subtitle>
+        <BarChart
+          className="mt-6"
+          data={chartdata}
+          index="name"
+          categories={["Number of threatened species"]}
+          colors={["blue"]}
+          valueFormatter={valueFormatter}
+          yAxisWidth={48}
+        />
+      </Card>
+    </>
+  );
 }

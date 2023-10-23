@@ -39,6 +39,7 @@ function ThemeSwitch() {
   const [value, setValue] = useState(true);
 
   const { theme, setTheme } = useTheme();
+
   return (
     <>
       <Switch
@@ -51,14 +52,17 @@ function ThemeSwitch() {
         IconLeft={SunDimIcon}
         IconRight={MoonIcon}
         onClick={() => {
-          setValue(!value);
-          if (!value) {
+          if (value === false) {
             document.querySelector("body").className = "theme-dark-1";
             setTheme("theme-dark-1");
+            localStorage.setItem("theme", "theme-dark-1");
           } else {
             document.querySelector("body").className = "theme-light-4";
+
             setTheme("theme-light-4");
+            localStorage.setItem("theme", "theme-light-4");
           }
+          setValue(!value);
         }}
       />
     </>

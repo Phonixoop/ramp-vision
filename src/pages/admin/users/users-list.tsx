@@ -39,7 +39,7 @@ export default function UsersList() {
       // Get the data from the queryCache
       const prevData = utils.user.getUsers.getInfiniteData();
       const newItems = flatUsers?.filter((item) => item.id !== deletedUser.id);
-      console.log({ prevData });
+
       // Optimistically update the data with our new comment
       utils.user.getUsers.setData(
         {},

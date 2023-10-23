@@ -77,10 +77,6 @@ export const authOptions: NextAuthOptions = {
           });
           const p: Permission[] = JSON.parse(loggedInUser.role.permissions);
 
-          console.log({
-            alreadyLoggedIn: loggedInUser.username,
-            wannaLogIn: credentials.username,
-          });
           if (loggedInUser.role?.permissions) {
             const permissions: Permission[] = JSON.parse(
               loggedInUser.role.permissions,
@@ -95,7 +91,6 @@ export const authOptions: NextAuthOptions = {
           if (
             compareHashPassword(credentials.password, user.password).success
           ) {
-            console.log({ cp: credentials.password, up: user.password });
             return user;
           }
           return undefined;

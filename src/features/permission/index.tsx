@@ -53,7 +53,6 @@ export default function PermissionPanel({
         const updatedSubPermissions = permission.subPermissions.map(
           (subPermission) => {
             if (subPermission.id === id) {
-              console.log(id);
               // Toggle active state of the sub-permission
               return { ...subPermission, isActive: !subPermission.isActive };
             } else {

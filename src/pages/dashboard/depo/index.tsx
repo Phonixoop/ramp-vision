@@ -482,11 +482,12 @@ function DeposTable({ sessionData }) {
                 "Capicity",
               ]);
               const depoCompletionTime = processDepoCompleteTimeData(flatRows);
-              console.log(depoCompletionTime);
-              const totalComplete = depoCompletionTime.reduce(
-                (a, b) => a + b.DepoCompleteTime,
-                0,
-              );
+
+              const totalComplete = (
+                depoCompletionTime.reduce((accumulator, currentObject) => {
+                  return accumulator + currentObject.DepoCompleteTime;
+                }, 0) / flatRows.length
+              ).toFixed(2);
               const entryBaseOnSabt = sumColumnBasedOnRowValue(
                 flatRows,
                 "EntryCount",
@@ -528,7 +529,6 @@ function DeposTable({ sessionData }) {
                           <H2>نمودار به تفکیک سرویس</H2>
                           <BarChart
                             showAnimation={true}
-                            dir="rtl"
                             data={(serviceData ?? []).map((row) => {
                               return {
                                 name: row.key,
@@ -554,7 +554,6 @@ function DeposTable({ sessionData }) {
                         <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
                           <H2>نمودار زمانی</H2>
                           <AreaChart
-                            dir="rtl"
                             showAnimation={true}
                             data={(dateDate ?? []).map((row) => {
                               return {
@@ -650,19 +649,7 @@ function DeposTable({ sessionData }) {
                               </H2>
                               <DonutChart
                                 label={
-                                  (
-                                    depoCompletionTime.reduce(
-                                      (accumulator, currentObject) => {
-                                        return (
-                                          accumulator +
-                                          currentObject.DepoCompleteTime
-                                        );
-                                      },
-                                      0,
-                                    ) / flatRows.length
-                                  )
-                                    .toFixed(2)
-                                    .toString() +
+                                  totalComplete.toString() +
                                   " " +
                                   Reports_Period[reportPeriod]
                                 }
