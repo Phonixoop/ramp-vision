@@ -44,8 +44,10 @@ import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import {
   calculateDepoCompleteTime,
   commify,
+  convertNumberToBetterFormat,
   en,
   getServiceNameColor,
+  humanizeDuration,
   processDataForChart,
   processDepoCompleteTimeData,
   sumColumnBasedOnRowValue,
@@ -145,7 +147,7 @@ const cities = [
 ];
 function DeposTable({ sessionData }) {
   const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+    moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
   ]);
 
   const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
@@ -162,7 +164,7 @@ function DeposTable({ sessionData }) {
       DocumentType: undefined,
       ServiceName: undefined,
       Start_Date: [
-        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
       ],
     },
   });
@@ -210,7 +212,7 @@ function DeposTable({ sessionData }) {
                   <span className="font-bold text-primary">سرویس ها</span>
                   <SelectColumnFilter
                     column={column}
-                    data={depo.data}
+                    data={depo.data?.result}
                     onChange={(filter) => {
                       // setDataFilters((prev) => {
                       //   return {
@@ -291,7 +293,7 @@ function DeposTable({ sessionData }) {
                 <span className="font-bold text-primary">سند ها</span>
                 <SelectColumnFilter
                   column={column}
-                  data={depo.data}
+                  data={depo.data?.result}
                   onChange={(filter) => {
                     // setDataFilters((prev) => {
                     //   return {
@@ -358,7 +360,7 @@ function DeposTable({ sessionData }) {
         <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
             isLoading={depo.isLoading}
-            data={depo.data ?? []}
+            data={depo.data?.result ?? []}
             columns={columns}
             renderInFilterView={() => {
               return (
@@ -428,7 +430,7 @@ function DeposTable({ sessionData }) {
             renderAfterFilterView={(flatRows) => {
               return (
                 <>
-                  {!depo.isLoading && depo.data.length > 0 && (
+                  {!depo.isLoading && depo.data.result.length > 0 && (
                     <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn p-5 xl:flex-row">
                       <FileBarChart2 className="stroke-accent" />
                       <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-sm  font-semibold text-emerald-900">
@@ -443,7 +445,7 @@ function DeposTable({ sessionData }) {
                               };
                             })
                             .filter((f) => f.key != "number")}
-                          data={depo.data}
+                          data={depo.data.result}
                         >
                           دانلود دیتای کامل
                         </CSVLink>
@@ -525,7 +527,7 @@ function DeposTable({ sessionData }) {
                   <div className="flex w-full flex-col items-center justify-center gap-5">
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
                       <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 xl:p-5">
                           <H2>نمودار به تفکیک سرویس</H2>
                           <BarChart
                             showAnimation={true}
@@ -551,7 +553,7 @@ function DeposTable({ sessionData }) {
                             noDataText={Text.noData.fa}
                           />
                         </div>
-                        <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5">
+                        <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 xl:p-5">
                           <H2>نمودار زمانی</H2>
                           <AreaChart
                             showAnimation={true}
@@ -642,17 +644,14 @@ function DeposTable({ sessionData }) {
                             </div>
                             <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
                               <H2>
+                                <br />
                                 زمان کلی اتمام دپو |{" "}
                                 <span className="text-primbuttn">
-                                  {reportPeriod}
+                                  {depo.data?.periodType}
                                 </span>
                               </H2>
                               <DonutChart
-                                label={
-                                  totalComplete.toString() +
-                                  " " +
-                                  Reports_Period[reportPeriod]
-                                }
+                                label={totalComplete}
                                 data={depoCompletionTime}
                                 category={"DepoCompleteTime"}
                                 index="ServiceName"
@@ -667,6 +666,17 @@ function DeposTable({ sessionData }) {
                                 valueFormatter={commify}
                                 noDataText={Text.noData.fa}
                               />
+                              <p className="w-full">
+                                <span className="text-accent">
+                                  {humanizeDuration(
+                                    totalComplete,
+                                    Reports_Period[depo.data?.periodType],
+                                  )}
+                                </span>{" "}
+                                <span className="text-primary">
+                                  تا اتمام دپو
+                                </span>
+                              </p>
                             </div>
                           </>
                         </div>

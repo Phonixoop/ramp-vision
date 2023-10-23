@@ -65,7 +65,7 @@ export default function Table({
           )}
         </div>
       )}
-      <div className="w-full ">
+      <div className="w-full px-5 xl:px-0 ">
         {renderChild(flatRows)}
 
         <div className="relative flex h-[31rem] min-h-[30rem] w-full items-stretch justify-center py-10">

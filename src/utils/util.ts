@@ -227,3 +227,103 @@ export function commify(num) {
   }
   return str.join(".");
 }
+
+export function convertNumberToBetterFormat(number, tag) {
+  // Define a dictionary to map tags to units and their conversion factor
+  const unitMap = {
+    ماه: { unit: "days", conversionFactor: 30 }, // Assuming 30 days in a month
+    هفته: { unit: "days", conversionFactor: 7 }, // 7 days in a week
+    روز: { unit: "hours", conversionFactor: 24 }, // 24 hours in a day
+  };
+
+  // Check if the tag is in the unitMap
+  if (unitMap[tag]) {
+    const { unit, conversionFactor } = unitMap[tag];
+
+    if (unit === "hours") {
+      // Convert to hours
+      return `${(number * conversionFactor).toFixed(3)} ${unit}`;
+    } else if (unit === "days") {
+      // Convert to days and hours
+      const days = Math.floor(number * conversionFactor);
+      const hours = number * conversionFactor - days * 24;
+      if (days === 0) {
+        return `${hours.toFixed(3)} ${unit}`;
+      } else if (hours === 0) {
+        return `${days} ${unit}`;
+      } else {
+        return `${days} days and ${hours.toFixed(3)} hours`;
+      }
+    }
+  }
+
+  // If the tag is not recognized, return an error message
+  return tag;
+}
+
+function convertToSeconds(value, tag) {
+  // Define constants for conversions
+  const SECONDS_PER_MINUTE = 60;
+  const MINUTES_PER_HOUR = 60;
+  const HOURS_PER_DAY = 24;
+  const DAYS_PER_WEEK = 7;
+  const DAYS_PER_MONTH = 30.44; // Approximate number of days in a month
+
+  // Convert the value to seconds based on the tag
+  if (tag === "ماه") {
+    return (
+      value *
+      DAYS_PER_MONTH *
+      HOURS_PER_DAY *
+      MINUTES_PER_HOUR *
+      SECONDS_PER_MINUTE
+    );
+  } else if (tag === "هفته") {
+    return (
+      value *
+      DAYS_PER_WEEK *
+      HOURS_PER_DAY *
+      MINUTES_PER_HOUR *
+      SECONDS_PER_MINUTE
+    );
+  } else if (tag === "روز") {
+    return value * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE;
+  } else {
+    throw new Error("Invalid tag. Use 'months', 'weeks', or 'days'.");
+  }
+}
+
+export function humanizeDuration(value, tag) {
+  const seconds = convertToSeconds(value, tag);
+  if (isNaN(seconds) || seconds < 0) {
+    return "Invalid input";
+  }
+
+  const secondsPerMinute = 60;
+  const secondsPerHour = 3600;
+  const secondsPerDay = 86400;
+  const secondsPerWeek = 604800;
+  const secondsPerMonth = 2628000; // An approximate value for a month (30.44 days)
+  const secondsPerYear = 31536000; // An approximate value for a year (365 days)
+
+  const years = Math.floor(seconds / secondsPerYear);
+  const months = Math.floor((seconds % secondsPerYear) / secondsPerMonth);
+  const weeks = Math.floor((seconds % secondsPerMonth) / secondsPerWeek);
+  const days = Math.floor((seconds % secondsPerWeek) / secondsPerDay);
+  const hours = Math.floor((seconds % secondsPerDay) / secondsPerHour);
+  const minutes = Math.floor((seconds % secondsPerHour) / secondsPerMinute);
+  const remainingSeconds = seconds % secondsPerMinute;
+
+  const timeComponents = [];
+
+  if (years > 0) timeComponents.push(`${years} سال`);
+  if (months > 0) timeComponents.push(`${months} ماه`);
+  if (weeks > 0) timeComponents.push(`${weeks} هفته`);
+  if (days > 0) timeComponents.push(`${days} روز`);
+  if (hours > 0) timeComponents.push(`${hours} ساعت`);
+  if (minutes > 0) timeComponents.push(`${minutes} دقیقه`);
+  if (remainingSeconds > 0)
+    timeComponents.push(`${remainingSeconds.toFixed(2)} ثانیه`);
+
+  return timeComponents.join(" ، ");
+}

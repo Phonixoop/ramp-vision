@@ -48,6 +48,7 @@ export const depoRouter = createTRPCRouter({
       try {
         // Connect to SQL Server
 
+        let finalResult = [];
         const permissions = await getPermission({ ctx });
         const cities = permissions
           .find((permission) => permission.id === "ViewCities")
@@ -129,7 +130,7 @@ export const depoRouter = createTRPCRouter({
           const weekNumber = getWeekOfMonth(filter.Start_Date[0]);
           const weekName = `هفته ${weekNumber} ${monthName}`;
 
-          return result.recordsets[0].map((record) => {
+          finalResult = result.recordsets[0].map((record) => {
             return {
               ...record,
               Start_Date: weekName,
@@ -145,14 +146,19 @@ export const depoRouter = createTRPCRouter({
             .month(parseInt(date[1]) - 1)
             .format("MMMM");
 
-          return result.recordsets[0].map((record) => {
+          finalResult = result.recordsets[0].map((record) => {
             return {
               ...record,
               Start_Date: monthName,
             };
           });
         }
-        return result.recordsets[0];
+        finalResult = result.recordsets[0];
+
+        return {
+          periodType: input.periodType,
+          result: finalResult ?? [],
+        };
         // Respond with the fetched data
       } catch (error) {
         console.error("Error fetching data:", error.message);
