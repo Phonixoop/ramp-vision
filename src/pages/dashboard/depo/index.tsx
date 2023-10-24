@@ -531,7 +531,7 @@ function DeposTable({ sessionData }) {
                   <div className="flex w-full flex-col items-center justify-center gap-5">
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
                       <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 xl:p-5">
+                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
                           <H2>نمودار به تفکیک سرویس</H2>
                           <BarChart
                             showAnimation={true}
@@ -557,7 +557,7 @@ function DeposTable({ sessionData }) {
                             noDataText={Text.noData.fa}
                           />
                         </div>
-                        <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 xl:p-5">
+                        <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
                           <H2>نمودار زمانی</H2>
                           <AreaChart
                             showAnimation={true}
