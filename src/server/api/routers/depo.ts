@@ -209,16 +209,21 @@ export const depoRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         // Connect to SQL Server
-
+        console.log({ input });
         const permissions = await getPermission({ ctx });
         const cities = permissions
           .find((permission) => permission.id === "ViewCities")
           .subPermissions.filter((permission) => permission.isActive)
           .map((permission) => permission.enLabel);
 
+        const commonCities = cities.filter(
+          (item) => input.filter.CityName?.includes(item),
+        );
+
+        console.log(JSON.stringify(commonCities, null, 2));
         const days = getDatesForLastMonth();
         const whereClause = generateWhereClause({
-          CityName: cities,
+          CityName: commonCities,
           Start_Date: days,
         });
         const queryDaysOfMonth = `SELECT 
@@ -261,11 +266,12 @@ export const depoRouter = createTRPCRouter({
             (a) => a.tooltip.split("|")[0].trim() === d.Start_Date,
           );
 
-          if (depoCompleteTime <= 0) {
+          if (depoCompleteTime < 0) {
             track.color = "rose";
           } else if (depoCompleteTime == 0) {
-            track.color = "slate";
+            track.color = "amber";
           } else {
+            // if more than zero
             performance += 1;
             track.color = "emerald";
           }
@@ -276,7 +282,9 @@ export const depoRouter = createTRPCRouter({
         // const percentage = (result.performance / 31) * 100;
         //  result.performance = Math.round(percentage / 10) * 10;
         result.performance = Math.floor(
-          (performance / result.tracker.length) * 100,
+          (performance /
+            result.tracker.filter((a) => a.color !== "stone").length) *
+            100,
         );
         return result;
         // Respond with the fetched data

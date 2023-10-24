@@ -59,6 +59,8 @@ import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
 import { LayoutGroup } from "framer-motion";
+import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -148,19 +150,20 @@ const cities = [
 function DeposTable({ sessionData }) {
   const utils = api.useContext();
 
-  const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
-  ]);
-
-  const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
-
   const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
     refetchOnWindowFocus: false,
   });
-  const [trackerFilter, setTrackerFilter] = useState({
-    cities: initialFilters.data?.Cities.map((a) => a.CityName),
-  });
+
+  const router = useRouter();
+
+  const [selectedDates, setSelectedDates] = useState<string[]>([
+    moment().locale("fa").subtract(3, "days").format("YYYY/MM/DD"),
+  ]);
+
+  const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
+  const [cityLevel, setCityLevel] = useState<string>("");
+
   const [filters, setDataFilters] = useState({
     periodType: reportPeriod,
     filter: {
@@ -168,7 +171,7 @@ function DeposTable({ sessionData }) {
       DocumentType: undefined,
       ServiceName: undefined,
       Start_Date: [
-        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(3, "days").format("YYYY/MM/DD"),
       ],
     },
   });
@@ -177,7 +180,7 @@ function DeposTable({ sessionData }) {
   const getTracker = api.depo.get30DaysTrack.useQuery(
     {
       filter: {
-        CityName: trackerFilter.cities,
+        CityName: [],
       },
     },
     {
@@ -190,6 +193,16 @@ function DeposTable({ sessionData }) {
     enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
     refetchOnWindowFocus: false,
   });
+
+  const searchParams = useSearchParams();
+  const selectedCities = searchParams.get("cities");
+  const selectedDates2 = searchParams.get("dates");
+  const selectedReportPeriod = searchParams.get("report_period");
+  const selectedServiceNames =
+    searchParams.get("service_names").length <= 0
+      ? depo.data?.result.map((a) => a.ServiceName)
+      : searchParams.get("service_names");
+  const selectedDocumentTypes = searchParams.get("document_types");
 
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
@@ -217,16 +230,24 @@ function DeposTable({ sessionData }) {
               <>
                 <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">سرویس ها</span>
-                  <SelectColumnFilter
-                    column={column}
-                    data={depo.data?.result}
-                    onChange={(filter) => {
-                      // setDataFilters((prev) => {
-                      //   return {
-                      //     ...prev,
-                      //     [filter.id]: filter.values,
-                      //   };
-                      // });
+
+                  <SelectControlled
+                    title={column.Header}
+                    list={[
+                      ...new Set(depo.data?.result.map((a) => a[column.id])),
+                    ]}
+                    value={column.filterValue}
+                    onChange={(values) => {
+                      column.setFilter(values);
+                      const params = new URLSearchParams({
+                        service_names: values,
+                      });
+
+                      router.push(`?${params}`, undefined, {
+                        scroll: false,
+                      });
+                      //  column.setFilter(values);
+                      console.log({ selectedServiceNames });
                     }}
                   />
                 </div>
@@ -266,9 +287,7 @@ function DeposTable({ sessionData }) {
                           );
                         } else setFilter(canFilterCities);
 
-                        setTrackerFilter({
-                          cities: canFilterCities,
-                        });
+                        setCityLevel(value.item.name);
                       }}
                     />
                   </LayoutGroup>
@@ -278,9 +297,12 @@ function DeposTable({ sessionData }) {
                   column={column}
                   data={initialFilters.data?.Cities}
                   onChange={(filter) => {
-                    setTrackerFilter({
-                      cities: filter.values,
-                    });
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
                   }}
                 />
               </div>
@@ -586,37 +608,37 @@ function DeposTable({ sessionData }) {
                     </div>
 
                     {/* <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                      <div className="flex w-full  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
-                        <H2>
-                          زمان اتمام دپو |{" "}
-                          <span className="text-primbuttn">{reportPeriod}</span>
-                        </H2>
-                        <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
-                          {depoCompletionTime.map((t) => {
-                            return (
-                              <>
-                                <div
-                                  dir="ltr"
-                                  className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/10 bg-secondary/50 p-5"
-                                >
-                                  <H2>{t.ServiceName}</H2>
-                                  <DonutChart
-                                    data={[t]}
-                                    category={"DepoCompleteTime"}
-                                    index="ServiceName"
-                                    colors={[
-                                      getServiceNameColor(t.ServiceName),
-                                    ]}
-                                    valueFormatter={commify}
-                                    noDataText={Text.noData.fa}
-                                  />
-                                </div>
-                              </>
-                            );
-                          })}
+                        <div className="flex w-full  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
+                          <H2>
+                            زمان اتمام دپو |{" "}
+                            <span className="text-primbuttn">{reportPeriod}</span>
+                          </H2>
+                          <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
+                            {depoCompletionTime.map((t) => {
+                              return (
+                                <>
+                                  <div
+                                    dir="ltr"
+                                    className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/10 bg-secondary/50 p-5"
+                                  >
+                                    <H2>{t.ServiceName}</H2>
+                                    <DonutChart
+                                      data={[t]}
+                                      category={"DepoCompleteTime"}
+                                      index="ServiceName"
+                                      colors={[
+                                        getServiceNameColor(t.ServiceName),
+                                      ]}
+                                      valueFormatter={commify}
+                                      noDataText={Text.noData.fa}
+                                    />
+                                  </div>
+                                </>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    </div> */}
+                      </div> */}
 
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">

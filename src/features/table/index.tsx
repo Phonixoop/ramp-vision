@@ -19,6 +19,7 @@ type Props = {
   isLoading?: boolean;
   columns: Column<any>[];
   data: any[];
+  initialFilters?: any;
   clickedRowIndex?: string;
   onClick?: (cell: any) => void;
   renderChild?: (rows: Row<any>[]) => JSX.Element;
@@ -30,6 +31,7 @@ export default function Table({
   isLoading = false,
   columns = [],
   data = [],
+  initialFilters = undefined,
   clickedRowIndex = "",
   onClick = (cell) => {},
   renderChild = (rows) => <></>,
@@ -40,6 +42,7 @@ export default function Table({
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
   const flatRows = rows.map((row) => row.original);
+
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
       {renderInFilterView !== undefined && renderInFilterView !== undefined && (

@@ -3,6 +3,7 @@ import {
   ArrowDownRightIcon,
   MoveLeftIcon,
   ArrowUpRightIcon,
+  Loader2Icon,
 } from "lucide-react";
 import React from "react";
 import { TremorColor } from "~/types";
@@ -10,16 +11,24 @@ import { cn } from "~/lib/utils";
 import H2 from "~/ui/heading/h2";
 import ToolTip from "~/ui/tooltip";
 
+type TTracker = {
+  color: TremorColor;
+  tooltip: string;
+};
 type TrackerType = {
   date: string;
   performance: number;
-  tracker: {
-    color: TremorColor;
-    tooltip: string;
-  }[];
+  tracker: TTracker[];
 };
 
+const tracker: TTracker[] = Array.from({ length: 30 }, (_, i) => ({
+  color: "stone",
+  tooltip: ``,
+}));
+
 export default function TrackerView({ data }: { data: TrackerType }) {
+  if (!data.date) return <Skeleton />;
+
   return (
     <div
       dir="rtl"
@@ -66,6 +75,27 @@ export default function TrackerView({ data }: { data: TrackerType }) {
   );
 }
 
+function Skeleton() {
+  return (
+    <>
+      <div
+        role="status"
+        className="flex w-full animate-pulse flex-col items-center justify-end gap-5"
+      >
+        <div className="h-2.5  w-full rounded-full bg-primary/50" />
+        <div className=" h-2 w-full rounded-full bg-primary/50" />
+        <div className=" h-2 rounded-full bg-primary/50" />
+
+        <div className=" flex w-full justify-between ">
+          <MoveLeftIcon className="self-start stroke-primary" />
+          <Loader2Icon className="animate-spin" />
+        </div>
+        <MyTracker data={tracker} className="mt-2" />
+      </div>
+    </>
+  );
+}
+
 function MyTracker({
   data,
   className,
@@ -77,13 +107,13 @@ function MyTracker({
   className: string;
 }) {
   return (
-    <div className=" flex h-10 items-center justify-center gap-1">
+    <div className="flex h-10 w-full items-center justify-center gap-1">
       {data.map((item, i) => {
         const delay = i * 0.2;
         return (
           <>
             <div
-              className={`group relative h-full w-full rounded-lg bg-${item.color}-500   `}
+              className={`group relative h-full w-full max-w-[10px] rounded-lg bg-${item.color}-500   `}
             >
               <ToolTip className="z-10">
                 <span>{item.tooltip}</span>
