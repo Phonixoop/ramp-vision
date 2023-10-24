@@ -321,9 +321,9 @@ export function humanizeDuration(value, tag) {
   if (weeks > 0) timeComponents.push(`${weeks} هفته`);
   if (days > 0) timeComponents.push(`${days} روز`);
   if (hours > 0) timeComponents.push(`${hours} ساعت`);
-  if (minutes > 0) timeComponents.push(`${minutes} دقیقه`);
-  if (remainingSeconds > 0)
-    timeComponents.push(`${remainingSeconds.toFixed(0)} ثانیه`);
+  if (minutes > 0 && hours <= 0) timeComponents.push(`${minutes} دقیقه`);
+  // if (remainingSeconds > 0)
+  //   timeComponents.push(`${remainingSeconds.toFixed(0)} ثانیه`);
 
   return timeComponents.join(" ، ");
 }
