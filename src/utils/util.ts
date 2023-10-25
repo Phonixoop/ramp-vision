@@ -69,6 +69,29 @@ export function processDataForChart(rawData, groupBy, values = []) {
   }, []);
 }
 
+export function countColumnValues(data, column, values) {
+  const countMap = {};
+
+  data.forEach((item) => {
+    const value = item[column];
+
+    if (values.includes(value)) {
+      if (countMap[value]) {
+        countMap[value]++;
+      } else {
+        countMap[value] = 1;
+      }
+    }
+  });
+
+  const result = Object.keys(countMap).map((key) => ({
+    name: key,
+    count: countMap[key],
+  }));
+
+  return result;
+}
+
 export function calculateDepoCompleteTime(value) {
   if (value.DepoCount == 0) return 0;
   if (value.Capicity - value.EntryCount == 0) return value.DepoCount;

@@ -22,7 +22,7 @@ type Props = {
   initialFilters?: any;
   clickedRowIndex?: string;
   onClick?: (cell: any) => void;
-  renderChild?: (rows: Row<any>[]) => JSX.Element;
+  renderChild?: (rows: any[]) => JSX.Element;
   renderInFilterView?: () => JSX.Element;
   renderAfterFilterView?: (rows: Row<any>[]) => JSX.Element;
 };
@@ -77,10 +77,10 @@ export default function Table({
               <Loader2Icon className="h-12 w-12 animate-spin" />
             </div>
           )}
-          <div className=" w-full overflow-auto rounded-[20px] ">
+          <div className=" w-full max-w-7xl  overflow-auto rounded-[20px] ">
             <table
               {...getTableProps()}
-              className=" w-full overflow-hidden overflow-y-auto  text-center "
+              className=" w-full  overflow-hidden overflow-y-auto  text-center "
             >
               <thead>
                 {

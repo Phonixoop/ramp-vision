@@ -56,7 +56,7 @@ export function SelectColumnFilter({ column, data, onChange }) {
   return (
     <SelectControlled
       title={column.Header}
-      list={unique}
+      list={unique.filter((item) => item != undefined)}
       value={filterValue}
       onChange={(values) => {
         setFilter(values);

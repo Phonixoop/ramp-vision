@@ -209,7 +209,7 @@ export const depoRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         // Connect to SQL Server
-        console.log({ input });
+
         const permissions = await getPermission({ ctx });
         const cities = permissions
           .find((permission) => permission.id === "ViewCities")

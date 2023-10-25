@@ -1,5 +1,6 @@
 import { depoRouter } from "~/server/api/routers/depo";
 import { exampleRouter } from "~/server/api/routers/example";
+import { personnelPerformanceRouter } from "~/server/api/routers/personnel _performance";
 import { roleRouter } from "~/server/api/routers/role";
 import { userRouter } from "~/server/api/routers/user";
 import { createTRPCRouter } from "~/server/api/trpc";
@@ -12,8 +13,9 @@ import { createTRPCRouter } from "~/server/api/trpc";
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
   depo: depoRouter,
+  personnelPerformance: personnelPerformanceRouter,
   role: roleRouter,
-  user:userRouter
+  user: userRouter,
 });
 
 // export type definition of API
