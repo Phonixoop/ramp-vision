@@ -59,16 +59,8 @@ import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
 import { LayoutGroup } from "framer-motion";
+import { ColumnDef } from "@tanstack/react-table";
 
-function CustomInput({ value, openCalendar }) {
-  return (
-    <>
-      <Button className="w-full text-center" onClick={openCalendar}>
-        {value ? value : "انتخاب کنید"}
-      </Button>
-    </>
-  );
-}
 const chartdata = [
   {
     name: "Amphibians",
@@ -88,14 +80,26 @@ const dataFormatter = (number: number) => {
   return "$ " + Intl.NumberFormat("us").format(number).toString();
 };
 
-function filterColumn(rows, id, filterValue) {
-  return rows.filter((row) => {
-    const rowValue = row.values[id];
-    // console.log(rowValue, filterValue);
-    return filterValue.includes(rowValue);
-  });
-}
+// function filterColumn(rows, id, filterValue) {
+//   if (rows.length <= 0) return [];
+//   return rows.filter((row) => {
+//     const rowValue = row.values[id];
+//     // console.log(rowValue, filterValue);
+//     return filterValue.includes(rowValue);
+//   });
+// }
 
+const filterColumn = (row, columnId, value, addMeta) => {
+  if (value === undefined || value.length === 0) {
+    return false;
+  } else {
+    const { someProp, otherProp } = value;
+    return (
+      someProp.includes(row.original.myObj?.someProp) &&
+      otherProp.includes(row.original.myObj?.otherProp)
+    );
+  }
+};
 type DepoGetAll = RouterOutputs["depo"]["getAll"][number];
 
 export default function DeposPage() {
@@ -145,11 +149,12 @@ const cities = [
     sales: 1398,
   },
 ];
+
 function DeposTable({ sessionData }) {
   const utils = api.useContext();
 
   const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   ]);
 
   const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
@@ -168,7 +173,7 @@ function DeposTable({ sessionData }) {
       DocumentType: undefined,
       ServiceName: undefined,
       Start_Date: [
-        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
     },
   });
@@ -195,12 +200,12 @@ function DeposTable({ sessionData }) {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
   const columns =
-    useMemo<Column<any>[]>(
+    useMemo<ColumnDef<any>[]>(
       () => [
         {
-          Header: "ردیف",
-          accessor: "number",
-          Cell: ({ row }) => {
+          header: "ردیف",
+          accessorKey: "Id",
+          cell: ({ row }) => {
             return (
               <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary">
                 {row.index + 1}
@@ -209,9 +214,9 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          Header: "نام سرویس",
-          accessor: "ServiceName",
-          filter: filterColumn,
+          header: "نام سرویس",
+          accessorKey: "ServiceName",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <>
@@ -235,9 +240,10 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          Header: "شهر",
-          accessor: "CityName",
-          filter: filterColumn,
+          header: "شهر",
+          accessorKey: "CityName",
+          filterFn: "arrIncludesSome",
+
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -248,7 +254,7 @@ function DeposTable({ sessionData }) {
                       list={City_Levels.map((a) => a.name)}
                       value={0}
                       onChange={(value) => {
-                        const { setFilter } = column;
+                        const { setFilterValue } = column;
                         const cities = City_Levels.find(
                           (a) => a.name === value.item.name,
                         ).cities;
@@ -261,10 +267,10 @@ function DeposTable({ sessionData }) {
                         );
 
                         if (cities.length <= 0) {
-                          setFilter(
+                          setFilterValue(
                             initialFilters.data.Cities.map((a) => a.CityName),
                           );
-                        } else setFilter(canFilterCities);
+                        } else setFilterValue(canFilterCities);
 
                         setTrackerFilter({
                           cities: canFilterCities,
@@ -289,10 +295,11 @@ function DeposTable({ sessionData }) {
         },
 
         {
-          Header: "نوع سند",
-          accessor: "DocumentType",
-          filter: filterColumn,
+          header: "نوع سند",
+          accessorKey: "DocumentType",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
+            console.log({ column });
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">سند ها</span>
@@ -313,24 +320,24 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          Header: "تعداد بلاتکلیف",
-          accessor: "DepoCount",
-          Cell: ({ row }) => <span>{commify(row.original.DepoCount)}</span>,
+          header: "تعداد بلاتکلیف",
+          accessorKey: "DepoCount",
+          cell: ({ row }) => <span>{commify(row.original.DepoCount)}</span>,
         },
         {
-          Header: "تعداد ورودی",
-          accessor: "EntryCount",
-          Cell: ({ row }) => <span>{commify(row.original.EntryCount)}</span>,
+          header: "تعداد ورودی",
+          accessorKey: "EntryCount",
+          cell: ({ row }) => <span>{commify(row.original.EntryCount)}</span>,
         },
         {
-          Header: "تعداد رسیدگی شده",
-          accessor: "Capicity",
-          Cell: ({ row }) => <span>{commify(row.original.Capicity)}</span>,
+          header: "تعداد رسیدگی شده",
+          accessorKey: "Capicity",
+          cell: ({ row }) => <span>{commify(row.original.Capicity)}</span>,
         },
         {
-          Header: "مدت زمان اتمام دپو",
-          accessor: "MyDepoCompletionTime",
-          Cell: ({ row }) => {
+          header: "مدت زمان اتمام دپو",
+          accessorKey: "MyDepoCompletionTime",
+          cell: ({ row }) => {
             const data = row.original;
             const result = calculateDepoCompleteTime(data);
 
@@ -348,9 +355,9 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          Header: "تاریخ",
-          accessor: "Start_Date",
-          filter: filterColumn,
+          header: "تاریخ",
+          accessorKey: "Start_Date",
+          filterFn: "arrIncludesSome",
         },
       ],
       [depo.data],
@@ -445,11 +452,12 @@ function DeposTable({ sessionData }) {
                           headers={columns
                             .map((item) => {
                               return {
-                                label: item.Header,
-                                key: item.accessor,
+                                label: item.header,
+                                //@ts-ignore
+                                key: item.accessorKey,
                               };
                             })
-                            .filter((f) => f.key != "number")}
+                            .filter((f) => f.key != "Id")}
                           data={depo.data.result}
                         >
                           دانلود دیتای کامل
@@ -462,11 +470,12 @@ function DeposTable({ sessionData }) {
                           headers={columns
                             .map((item) => {
                               return {
-                                label: item.Header,
-                                key: item.accessor,
+                                label: item.header,
+                                //@ts-ignore
+                                key: item.accessorKey,
                               };
                             })
-                            .filter((f) => f.key != "number")}
+                            .filter((f) => f.key != "Id")}
                           data={flatRows}
                         >
                           دانلود دیتای فیلتر شده

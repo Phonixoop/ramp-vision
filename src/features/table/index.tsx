@@ -5,19 +5,31 @@ import {
   Loader2Icon,
   LoaderIcon,
 } from "lucide-react";
+import { RefObject, useEffect, useRef, useState } from "react";
+
 import {
-  useTable,
-  useSortBy,
-  useFilters,
-  TableInstance,
-  Column,
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
   Row,
-} from "react-table";
+  Column,
+  useReactTable,
+  ColumnFiltersState,
+  getFilteredRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFacetedMinMaxValues,
+} from "@tanstack/react-table";
+import { useVirtual } from "@tanstack/react-virtual";
+
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
+import { cn } from "~/lib/utils";
+
 type Props = {
-  useTableInstance?: TableInstance<any>;
   isLoading?: boolean;
-  columns: Column<any>[];
+  columns: ColumnDef<any>[];
   data: any[];
   initialFilters?: any;
   clickedRowIndex?: string;
@@ -27,7 +39,6 @@ type Props = {
   renderAfterFilterView?: (rows: Row<any>[]) => JSX.Element;
 };
 export default function Table({
-  useTableInstance = undefined,
   isLoading = false,
   columns = [],
   data = [],
@@ -38,11 +49,51 @@ export default function Table({
   renderInFilterView = undefined,
   renderAfterFilterView = (rows) => <></>,
 }: Props) {
-  const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const table = useReactTable({
+    data,
+    columns,
+
+    state: {
+      columnFilters,
+    },
+    onColumnFiltersChange: setColumnFilters,
+
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    debugTable: true,
+    debugHeaders: true,
+    debugColumns: false,
+  });
+
+  const { rows } = table.getRowModel();
+  // const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
+  // const { getTableProps, getTableBodyProps, headerGroups, prepareRow } =
+  //   tableInstance;
+
   const flatRows = rows.map((row) => row.original);
 
+  // const { rows } = table.getRowModel();
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtual({
+    size: rows.length,
+    parentRef: tableContainerRef,
+
+    overscan: 20,
+  });
+
+  const { virtualItems: virtualRows, totalSize } = virtualizer;
+
+  const paddingTop = virtualRows?.length > 0 ? virtualRows?.[0].start || 0 : 0;
+  const paddingBottom =
+    virtualRows?.length > 0 ? totalSize - (virtualRows?.at(-1)?.end || 0) : 0;
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
       {renderInFilterView !== undefined && renderInFilterView !== undefined && (
@@ -55,9 +106,13 @@ export default function Table({
                   <span className="text-lg font-bold ">فیلتر ها</span>
                 </div>
                 {renderInFilterView()}
-                {headerGroups.map((headerGroup) => {
-                  return headerGroup.headers.map((column) => {
-                    if (column["Filter"]) return <>{column.render("Filter")}</>;
+                {table.getHeaderGroups().map((headerGroup) => {
+                  return headerGroup.headers.map((header, index) => {
+                    //@ts-ignore
+
+                    if (columns[index].Filter)
+                      //@ts-ignore
+                      return <>{columns[index].Filter(header)}</>;
                   });
                 })}
               </div>
@@ -77,47 +132,65 @@ export default function Table({
               <Loader2Icon className="h-12 w-12 animate-spin" />
             </div>
           )}
-          <div className=" w-full max-w-7xl  overflow-auto rounded-[20px] ">
+          <div
+            ref={tableContainerRef}
+            className=" w-full max-w-7xl  overflow-auto rounded-[20px] "
+          >
             <table
-              {...getTableProps()}
+              // style={{ height: `${totalSize}px` }}
+              // {...getTableProps()}
               className=" w-full  overflow-hidden overflow-y-auto  text-center "
             >
               <thead>
                 {
                   // Loop over the header rows
-                  headerGroups.map((headerGroup) => {
-                    const { key, ...restHeaderGroupProps } =
-                      headerGroup.getHeaderGroupProps();
+                  table.getHeaderGroups().map((headerGroup) => {
+                    // const { key, ...restHeaderGroupProps } =
+                    //   headerGroup.getHeaderGroupProps();
 
                     return (
                       <tr
                         className="text-center"
-                        key={key}
-                        {...restHeaderGroupProps}
+                        key={headerGroup.id}
+                        // {...restHeaderGroupProps}
                       >
                         {
                           // Loop over the headers in each row
-                          headerGroup.headers.map((column) => {
-                            const { key, ...restHeaderProps } =
-                              column.getHeaderProps(
-                                //@ts-ignore
-                                column.getSortByToggleProps(),
-                              );
+                          headerGroup.headers.map((header) => {
+                            // const { key, ...restHeaderProps } =
+                            //   column.getHeaderProps(
+                            //     //@ts-ignore
+                            //     column.getSortByToggleProps(),
+                            //   );
                             //@ts-ignore
-                            const isSorted = column.isSorted;
+
                             //@ts-ignore
-                            const isSortedDesc = column.isSortedDesc;
+
+                            const isSorted = header.column.getIsSorted();
+
+                            const isSortedDesc =
+                              (header.column.getIsSorted() as string) == "desc";
                             return (
                               <th
-                                key={key}
-                                {...restHeaderProps}
+                                key={header.id}
+                                colSpan={header.colSpan}
+                                // {...restHeaderProps}
                                 className="sticky top-0 bg-accent/20 px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-accent backdrop-blur-md"
                               >
-                                <div className="relative flex select-none items-center justify-center gap-3 text-center ">
-                                  {
+                                <div
+                                  className={cn(
+                                    "relative flex select-none items-center justify-center gap-3 text-center ",
+                                    header.column.getCanSort()
+                                      ? "cursor-pointer select-none"
+                                      : "",
+                                  )}
+                                  onClick={header.column.getToggleSortingHandler()}
+                                >
+                                  {flexRender(
                                     // Render the header
-                                    column.render("Header")
-                                  }
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
 
                                   <ArrowUpFromDotIcon
                                     className={`absolute -left-5 ${
@@ -143,43 +216,42 @@ export default function Table({
               </thead>
               {/* Apply the table body props */}
               <tbody
-                {...getTableBodyProps()}
+                //  {...getTableBodyProps()}
                 className="divide-y divide-accent/20 bg-secondary"
               >
+                {paddingTop > 0 && (
+                  <tr>
+                    <td style={{ height: paddingTop }} />
+                  </tr>
+                )}
                 {
                   // Loop over the table rows
-                  rows.map((row) => {
+                  virtualRows.map((virtualRow, index) => {
+                    const row = rows[virtualRow.index];
+
                     // Prepare the row for display
-                    prepareRow(row);
-                    const { key, ...restRowProps } = row.getRowProps();
+                    // prepareRow(row);
+                    // const { key, ...restRowProps } = row.getRowProps();
                     return (
                       // Apply the row props
                       <tr
-                        key={key}
-                        {...restRowProps}
+                        key={index}
+                        // {...restRowProps}
                         className={` ${
-                          row.original.id === clickedRowIndex
+                          index.toString() === clickedRowIndex
                             ? "bg-primary/20 hover:bg-primary/25"
                             : "hover:bg-primary/5"
                         } `}
                       >
                         {
-                          // Loop over the rows cells
-                          row.cells.map((cell) => {
-                            const { key, ...restCellProps } =
-                              cell.getCellProps();
-                            // Apply the cell props
+                          //@ts-ignore
+                          row.getVisibleCells().map((cell) => {
                             return (
-                              <td
-                                onClick={() => onClick(cell)}
-                                key={key}
-                                {...restCellProps}
-                                className="whitespace-no-wrap cursor-pointer px-6 py-4 text-sm font-medium leading-5 text-primary "
-                              >
-                                {
-                                  // Render the cell contents
-                                  cell.render("Cell")
-                                }
+                              <td key={cell.id} className="text-primary">
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                )}
                               </td>
                             );
                           })
@@ -188,6 +260,11 @@ export default function Table({
                     );
                   })
                 }
+                {paddingBottom > 0 && (
+                  <tr>
+                    <td style={{ height: paddingBottom }} />
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

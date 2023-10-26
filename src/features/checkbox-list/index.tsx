@@ -1,3 +1,4 @@
+import { Column } from "@tanstack/react-table";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
@@ -50,16 +51,16 @@ export function SelectControlled({ list = [], value, onChange, title }) {
 
 export function SelectColumnFilter({ column, data, onChange }) {
   if (!data || data.length === 0) return "";
-  const { filterValue, setFilter } = column;
+  const { getFilterValue, setFilterValue } = column as Column<any>;
   const unique = [...new Set(data.map((a) => a[column.id]))];
 
   return (
     <SelectControlled
       title={column.Header}
       list={unique.filter((item) => item != undefined)}
-      value={filterValue}
+      value={getFilterValue()}
       onChange={(values) => {
-        setFilter(values);
+        setFilterValue(values);
         onChange({
           id: column.id,
           values: values,

@@ -63,6 +63,7 @@ import Header from "~/features/header";
 import { LayoutGroup } from "framer-motion";
 import MyBarList from "~/features/bar-list";
 import Gauge from "~/features/gauge";
+import { ColumnDef } from "@tanstack/react-table";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -151,7 +152,7 @@ function PersonnelPerformanceTable({ sessionData }) {
   const utils = api.useContext();
 
   const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   ]);
 
   const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
@@ -173,7 +174,7 @@ function PersonnelPerformanceTable({ sessionData }) {
       DocumentType: undefined,
       ServiceName: undefined,
       Start_Date: [
-        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
     },
   });
@@ -203,12 +204,12 @@ function PersonnelPerformanceTable({ sessionData }) {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
   const columns =
-    useMemo<Column<any>[]>(
+    useMemo<ColumnDef<any>[]>(
       () => [
         {
-          Header: "ردیف",
-          accessor: "number",
-          Cell: ({ row }) => {
+          header: "ردیف",
+          accessorKey: "Id",
+          cell: ({ row }) => {
             return (
               <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary">
                 {row.index + 1}
@@ -218,9 +219,9 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         // CityName,NameFamily, ProjectType,ContractType,Role,RoleType,DateInfo
         {
-          Header: "شهر",
-          accessor: "CityName",
-          filter: filterColumn,
+          header: "شهر",
+          accessorKey: "CityName",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -231,7 +232,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                       list={City_Levels.map((a) => a.name)}
                       value={0}
                       onChange={(value) => {
-                        const { setFilter } = column;
+                        const { setFilterValue } = column;
                         const cities = City_Levels.find(
                           (a) => a.name === value.item.name,
                         ).cities;
@@ -244,10 +245,10 @@ function PersonnelPerformanceTable({ sessionData }) {
                         );
 
                         if (cities.length <= 0) {
-                          setFilter(
+                          setFilterValue(
                             initialFilters.data.Cities.map((a) => a.CityName),
                           );
-                        } else setFilter(canFilterCities);
+                        } else setFilterValue(canFilterCities);
 
                         setTrackerFilter({
                           cities: canFilterCities,
@@ -271,9 +272,9 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          Header: "کابران",
-          accessor: "NameFamily",
-          filter: filterColumn,
+          header: "کابران",
+          accessorKey: "NameFamily",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <>
@@ -297,9 +298,9 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          Header: "نوع پروژه",
-          accessor: "ProjectType",
-          filter: filterColumn,
+          header: "نوع پروژه",
+          accessorKey: "ProjectType",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -321,9 +322,9 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          Header: "نوع قرارداد",
-          accessor: "ContractType",
-          filter: filterColumn,
+          header: "نوع قرارداد",
+          accessorKey: "ContractType",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -345,9 +346,9 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          Header: "نقش",
-          accessor: "Role",
-          filter: filterColumn,
+          header: "نقش",
+          accessorKey: "Role",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -369,9 +370,9 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          Header: "نوع نقش",
-          accessor: "RoleType",
-          filter: filterColumn,
+          header: "نوع نقش",
+          accessorKey: "RoleType",
+          filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -394,45 +395,48 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
 
         {
-          Header: "ثبت اولیه اسناد",
-          accessor: "SabtAvalieAsnad",
+          header: "ثبت اولیه اسناد",
+          accessorKey: "SabtAvalieAsnad",
         },
         {
-          Header: "پذیرش و ثبت اولیه اسناد",
-          accessor: "PazireshVaSabtAvalieAsnad",
+          header: "پذیرش و ثبت اولیه اسناد",
+          accessorKey: "PazireshVaSabtAvalieAsnad",
         },
         {
-          Header: "ارزیابی اسناد بیمارستانی مستقیم",
-          accessor: "ArzyabiAsanadBimarsetaniDirect",
+          header: "ارزیابی اسناد بیمارستانی مستقیم",
+          accessorKey: "ArzyabiAsanadBimarsetaniDirect",
         },
         {
-          Header: "ارزیابی اسناد بیمارستانی غیر مستقیم",
-          accessor: "ArzyabiAsnadBimarestaniIndirect",
+          header: "ارزیابی اسناد بیمارستانی غیر مستقیم",
+          accessorKey: "ArzyabiAsnadBimarestaniIndirect",
         },
         {
-          Header: "ارزیابی اسناد دندان و پارا مستقیم",
-          accessor: "ArzyabiAsnadDandanVaParaDirect",
+          header: "ارزیابی اسناد دندان و پارا مستقیم",
+          accessorKey: "ArzyabiAsnadDandanVaParaDirect",
         },
         {
-          Header: "ارزیابی اسناد دندان و پارا غیر مستقیم",
-          accessor: "ArzyabiAsnadDandanVaParaIndirect",
+          header: "ارزیابی اسناد دندان و پارا غیر مستقیم",
+          accessorKey: "ArzyabiAsnadDandanVaParaIndirect",
         },
         {
-          Header: "ارزیابی اسناد دارو مستقیم",
-          accessor: "ArzyabiAsnadDaroDirect",
+          header: "ارزیابی اسناد دارو مستقیم",
+          accessorKey: "ArzyabiAsnadDaroDirect",
         },
         {
-          Header: "ازیابی اسناد دارو غیر مستقیم",
-          accessor: "ArzyabiAsnadDaroIndirect",
+          header: "ازیابی اسناد دارو غیر مستقیم",
+          accessorKey: "ArzyabiAsnadDaroIndirect",
         },
         {
-          Header: "عملکرد",
-          accessor: "TotalPerformance",
+          header: "عملکرد",
+          accessorKey: "TotalPerformance",
+          cell: ({ row }) => (
+            <span>{row.original.TotalPerformance.toFixed(2)}</span>
+          ),
         },
         {
-          Header: "تاریخ",
-          accessor: "Start_Date",
-          filter: filterColumn,
+          header: "تاریخ",
+          accessorKey: "Start_Date",
+          filterFn: "arrIncludesSome",
         },
       ],
       [personnelPerformance.data],
@@ -528,11 +532,12 @@ function PersonnelPerformanceTable({ sessionData }) {
                             headers={columns
                               .map((item) => {
                                 return {
-                                  label: item.Header,
-                                  key: item.accessor,
+                                  label: item.header,
+                                  //@ts-ignore
+                                  key: item.accessorKey,
                                 };
                               })
-                              .filter((f) => f.key != "number")}
+                              .filter((f) => f.key != "Id")}
                             data={personnelPerformance.data.result}
                           >
                             دانلود دیتای کامل
@@ -545,11 +550,12 @@ function PersonnelPerformanceTable({ sessionData }) {
                             headers={columns
                               .map((item) => {
                                 return {
-                                  label: item.Header,
-                                  key: item.accessor,
+                                  label: item.header,
+                                  //@ts-ignore
+                                  key: item.accessorKey,
                                 };
                               })
-                              .filter((f) => f.key != "number")}
+                              .filter((f) => f.key != "Id")}
                             data={flatRows}
                           >
                             دانلود دیتای فیلتر شده
