@@ -1,6 +1,6 @@
 import { Column } from "@tanstack/react-table";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { api } from "~/utils/api";
 
 export default function CheckboxList({ checkboxes, onCheckboxChange }) {
@@ -58,7 +58,10 @@ export function SelectColumnFilter({
   if (!data || data.length === 0) return "";
   const { getFilterValue, setFilterValue } = column as Column<any>;
   const unique = [...new Set(data.map((a) => a[column.id]))];
-  useLayoutEffect(() => {
+
+  const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
+  useIsomorphicLayoutEffect(() => {
     setFilterValue(initialFilters);
   }, []);
   return (
