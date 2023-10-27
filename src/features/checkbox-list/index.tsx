@@ -55,15 +55,16 @@ export function SelectColumnFilter({
   initialFilters = [],
   onChange,
 }) {
-  const { getFilterValue, setFilterValue } = column as Column<any>;
-  const unique = [...new Set(data.map((a) => a[column.id]))];
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+  const { getFilterValue, setFilterValue } = column as Column<any>;
   useIsomorphicLayoutEffect(() => {
     setFilterValue(initialFilters);
   }, []);
 
   if (!data || data.length === 0) return "";
+  const unique = [...new Set(data.map((a) => a[column.id]))];
 
   return (
     <SelectControlled
