@@ -55,13 +55,16 @@ export function SelectColumnFilter({
   initialFilters = [],
   onChange,
 }) {
-  if (!data || data.length === 0) return "";
   const { getFilterValue, setFilterValue } = column as Column<any>;
   const unique = [...new Set(data.map((a) => a[column.id]))];
-
-  useEffect(() => {
+  const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
+  useIsomorphicLayoutEffect(() => {
     setFilterValue(initialFilters);
   }, []);
+
+  if (!data || data.length === 0) return "";
+
   return (
     <SelectControlled
       title={column.Header}
