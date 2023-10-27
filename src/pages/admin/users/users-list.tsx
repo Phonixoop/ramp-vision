@@ -1,3 +1,4 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useMemo } from "react";
@@ -63,12 +64,12 @@ export default function UsersList() {
   });
 
   const columns =
-    useMemo(
+    useMemo<ColumnDef<any>[]>(
       () => [
         {
-          Header: "#",
-          accessor: "number",
-          Cell: ({ row }) => {
+          header: "#",
+          accessorKey: "number",
+          cell: ({ row }) => {
             return (
               <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary  ">
                 {row.index + 1}
@@ -77,9 +78,9 @@ export default function UsersList() {
           },
         },
         {
-          Header: "نام کاربری",
-          accessor: "username",
-          Cell: ({ row }) => {
+          header: "نام کاربری",
+          accessorKey: "username",
+          cell: ({ row }) => {
             const user: User = row.original;
             return (
               <div className="w-full cursor-pointer rounded-full  px-2 py-2 text-primary  ">
@@ -90,9 +91,9 @@ export default function UsersList() {
         },
 
         {
-          Header: "نقش",
-          accessor: "role",
-          Cell: ({ row }) => {
+          header: "نقش",
+          accessorKey: "role",
+          cell: ({ row }) => {
             const user: User = row.original;
             return (
               <div className="text-atysa-900 w-full cursor-pointer  rounded-full px-2 py-2  ">
@@ -102,9 +103,9 @@ export default function UsersList() {
           },
         },
         {
-          Header: "عملیات",
-          accessor: "",
-          Cell: ({ row }) => {
+          header: "عملیات",
+          accessorKey: "",
+          cell: ({ row }) => {
             const user: User = row.original;
             return (
               <div
@@ -155,10 +156,8 @@ export default function UsersList() {
       <span className="text-primary">{flatUsers.length}</span>
 
       <Table
-        {...{
-          columns: flatUsers.length > 0 ? columns : [],
-          data: flatUsers,
-        }}
+        columns={flatUsers.length > 0 ? columns : []}
+        data={flatUsers}
         clickedRowIndex={selectedRowUser?.id}
         onClick={(cell) => {
           const user = cell.row.original;

@@ -26,7 +26,7 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<string>("");
+  const [theme, setTheme] = useState<string>("theme-dark-1");
 
   const canUseDOM: boolean = !!(
     typeof window !== "undefined" &&
@@ -44,7 +44,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }
 
   useIsomorphicLayoutEffect(() => {
-    setTheme(localStorage.getItem("theme"));
+    setTheme(localStorage.getItem("theme") ?? "theme-light-1");
 
     window.addEventListener("storage", listenStorageChanges);
     return () => window.removeEventListener("storage", listenStorageChanges);
