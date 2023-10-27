@@ -167,8 +167,6 @@ function PersonnelPerformanceTable({ sessionData }) {
     periodType: reportPeriod,
     filter: {
       CityName: initialFilters.data?.Cities.map((a) => a.CityName),
-      DocumentType: undefined,
-      ServiceName: undefined,
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
@@ -283,6 +281,7 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
                 <SelectColumnFilter
+                  initialFilters={["جبران"]}
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {
@@ -307,6 +306,7 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع قرارداد</span>
                 <SelectColumnFilter
+                  initialFilters={["تمام وقت"]}
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {
@@ -331,6 +331,14 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نقش</span>
                 <SelectColumnFilter
+                  initialFilters={[
+                    "کارشناس ارزیاب اسناد بیمارستانی",
+                    "کارشناس ارزیاب اسناد پاراکلینیکی",
+                    "کارشناس ارزیاب اسناد دارویی",
+                    "کارشناس ارزیاب اسناد دندانپزشکی",
+                    "کارشناس پذیرش اسناد",
+                    "کارشناس ثبت اسناد خسارت",
+                  ]}
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {
@@ -414,6 +422,33 @@ function PersonnelPerformanceTable({ sessionData }) {
           header: "تاریخ",
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
+        },
+        {
+          header: "تاریخ گزارش پرنسل",
+          accessorKey: "DateInfo",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">
+                  تاریخ گزارش پرسنل
+                </span>
+                <SelectColumnFilter
+                  column={column}
+                  initialFilters={["1402/03/31"]}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
         },
       ],
       [personnelPerformance.data],
@@ -547,7 +582,7 @@ function PersonnelPerformanceTable({ sessionData }) {
               const roleData = countColumnValues(flatRows, "Role", [
                 "کارشناس ارزیاب اسناد بیمارستانی",
                 "کارشناس ارزیاب اسناد پاراکلینیکی",
-                " کارشناس ارزیاب اسناد دارویی",
+                "کارشناس ارزیاب اسناد دارویی",
                 "کارشناس ارزیاب اسناد دندانپزشکی",
                 "کارشناس پذیرش اسناد",
                 "کارشناس ثبت اسناد خسارت",
@@ -560,9 +595,9 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
-                      <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
-                          <H2>به تفکیک نقش</H2>
+                      <div className="flex w-full  flex-col items-center justify-between gap-5 xl:flex-row">
+                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-1/2 xl:p-5">
+                          <H2>تعداد پرسنل به تفکیک نقش</H2>
                           <MyBarList
                             data={(roleData ?? []).map((row) => {
                               return {
@@ -575,95 +610,17 @@ function PersonnelPerformanceTable({ sessionData }) {
                             // valueFormatter={commify}
                           />
                         </div>
-                        <div className="flex w-full flex-col items-center  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
-                          <H2>عملکرد</H2>
-                          {sumOfperformances}
-                          <br />
-                          {flatRows.length}
-                          <Gauge value={sumOfperformances / flatRows.length} />
+                        <div className="flex w-full flex-col items-center  justify-between gap-5 rounded-2xl xl:w-1/2">
+                          <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
+                            <H2>عملکرد</H2>
+
+                            <Gauge
+                              value={sumOfperformances / flatRows.length}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-
-                    {/* <div className="flex w-full flex-col items-center justify-center gap-5">
-                      <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-full  items-stretch justify-between gap-5 laptopMax:flex-col-reverse">
-                          <>
-                            <TrackerView data={getTracker.data ?? []} />
-
-                            <div
-                              dir="ltr"
-                              className="flex w-full flex-col   justify-center gap-5 rounded-2xl  border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:w-5/12"
-                            >
-                              <H2>تعداد ورودی و رسیدگی شده</H2>
-                              <DonutChart
-                                label={
-                                  personnelPerformance.data?.result.length > 0
-                                    ? " مانده : " +
-                                      commify(
-                                        Math.abs(
-                                          capacityBaseOnSabt - entryBaseOnSabt,
-                                        ),
-                                      ).toString()
-                                    : "داده ای موجود نیست"
-                                }
-                                data={entry_capacity}
-                                category="value"
-                                index="name"
-                                colors={["red", "green"]}
-                                valueFormatter={commify}
-                                noDataText={Text.noData.fa}
-                              />
-                            </div>
-                            <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
-                              <H2>
-                                زمان کلی اتمام دپو{" "}
-                                {personnelPerformance.data?.periodType && (
-                                  <>
-                                    |{" "}
-                                    <span className="text-primbuttn">
-                                      {personnelPerformance.data?.periodType}
-                                    </span>
-                                  </>
-                                )}
-                              </H2>
-                              <DonutChart
-                                label={totalComplete.toFixed(2)}
-                                data={depoCompletionTime}
-                                category={"DepoCompleteTime"}
-                                index="ServiceName"
-                                colors={[
-                                  "emerald",
-                                  "yellow",
-                                  "cyan",
-                                  "red",
-                                  "orange",
-                                  "fuchsia",
-                                ]}
-                                valueFormatter={commify}
-                                noDataText={Text.noData.fa}
-                              />
-                              {personnelPerformance.data?.periodType &&
-                                totalComplete > 0 && (
-                                  <p className="w-full">
-                                    <span className="text-accent">
-                                      {humanizeDuration(
-                                        totalComplete,
-                                        Reports_Period[
-                                          personnelPerformance.data?.periodType
-                                        ],
-                                      )}
-                                    </span>{" "}
-                                    <span className="text-primary">
-                                      تا اتمام دپو
-                                    </span>
-                                  </p>
-                                )}
-                            </div>
-                          </>
-                        </div>
-                      </div>
-                    </div> */}
                   </div>
                 </>
               );

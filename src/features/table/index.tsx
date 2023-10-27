@@ -5,7 +5,7 @@ import {
   Loader2Icon,
   LoaderIcon,
 } from "lucide-react";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
   ColumnDef,
@@ -94,6 +94,7 @@ export default function Table({
   const paddingTop = virtualRows?.length > 0 ? virtualRows?.[0].start || 0 : 0;
   const paddingBottom =
     virtualRows?.length > 0 ? totalSize - (virtualRows?.at(-1)?.end || 0) : 0;
+
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
       {renderInFilterView !== undefined && renderInFilterView !== undefined && (
@@ -134,7 +135,7 @@ export default function Table({
           )}
           <div
             ref={tableContainerRef}
-            className=" w-full max-w-7xl  overflow-auto rounded-[20px] "
+            className=" w-full max-w-[1350px] overflow-auto rounded-[20px] "
           >
             <table
               // style={{ height: `${totalSize}px` }}

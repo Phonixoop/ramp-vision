@@ -1,6 +1,6 @@
 import { Column } from "@tanstack/react-table";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { api } from "~/utils/api";
 
 export default function CheckboxList({ checkboxes, onCheckboxChange }) {
@@ -49,11 +49,18 @@ export function SelectControlled({ list = [], value, onChange, title }) {
   );
 }
 
-export function SelectColumnFilter({ column, data, onChange }) {
+export function SelectColumnFilter({
+  column,
+  data,
+  initialFilters = [],
+  onChange,
+}) {
   if (!data || data.length === 0) return "";
   const { getFilterValue, setFilterValue } = column as Column<any>;
   const unique = [...new Set(data.map((a) => a[column.id]))];
-
+  useLayoutEffect(() => {
+    setFilterValue(initialFilters);
+  }, []);
   return (
     <SelectControlled
       title={column.Header}
