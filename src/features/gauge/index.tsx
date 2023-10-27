@@ -17,6 +17,7 @@ export default function Gauge({ value }) {
   if (!value) return <></>;
   return (
     <div className="text-center">
+      {value}
       <GaugeChart
         // className="xl:scale-125"
         //@ts-ignore

@@ -49,6 +49,7 @@ import { Reports_Period } from "~/constants";
 import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
+import Image from "next/image";
 const menu = [
   {
     value: "خانه",
@@ -112,8 +113,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <BlurBackground />
-      <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000 ">
+      <div className=" flex min-h-screen w-full  flex-col items-center justify-between gap-5 overflow-hidden bg-secondary transition-colors duration-1000 ">
         <Header />
+        {/* 
+        <Image
+          className="absolute left-[1000px] top-20"
+          src={"/images/dashboard.jpg"}
+          width={1916}
+          height={1080}
+          alt="dashboard"
+        /> */}
       </div>
     </>
   );

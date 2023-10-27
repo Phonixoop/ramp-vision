@@ -149,8 +149,6 @@ const cities = [
   },
 ];
 function PersonnelPerformanceTable({ sessionData }) {
-  const utils = api.useContext();
-
   const [selectedDates, setSelectedDates] = useState<string[]>([
     moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   ]);
@@ -164,9 +162,7 @@ function PersonnelPerformanceTable({ sessionData }) {
       refetchOnWindowFocus: false,
     },
   );
-  const [trackerFilter, setTrackerFilter] = useState({
-    cities: initialFilters.data?.Cities.map((a) => a.CityName),
-  });
+
   const [filters, setDataFilters] = useState({
     periodType: reportPeriod,
     filter: {
@@ -180,17 +176,6 @@ function PersonnelPerformanceTable({ sessionData }) {
   });
 
   const deferredFilter = useDeferredValue(filters);
-  const getTracker = api.depo.get30DaysTrack.useQuery(
-    {
-      filter: {
-        CityName: trackerFilter.cities,
-      },
-    },
-    {
-      enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
-      refetchOnWindowFocus: false,
-    },
-  );
 
   const personnelPerformance = api.personnelPerformance.getAll.useQuery(
     deferredFilter,
@@ -249,10 +234,6 @@ function PersonnelPerformanceTable({ sessionData }) {
                             initialFilters.data.Cities.map((a) => a.CityName),
                           );
                         } else setFilterValue(canFilterCities);
-
-                        setTrackerFilter({
-                          cities: canFilterCities,
-                        });
                       }}
                     />
                   </LayoutGroup>
@@ -261,11 +242,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <SelectColumnFilter
                   column={column}
                   data={initialFilters.data?.Cities}
-                  onChange={(filter) => {
-                    setTrackerFilter({
-                      cities: filter.values,
-                    });
-                  }}
+                  onChange={(filter) => {}}
                 />
               </div>
             );
@@ -600,6 +577,9 @@ function PersonnelPerformanceTable({ sessionData }) {
                         </div>
                         <div className="flex w-full flex-col items-center  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
                           <H2>عملکرد</H2>
+                          {sumOfperformances}
+                          <br />
+                          {flatRows.length}
                           <Gauge value={sumOfperformances / flatRows.length} />
                         </div>
                       </div>
