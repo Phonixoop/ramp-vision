@@ -59,9 +59,7 @@ export function SelectColumnFilter({
   const { getFilterValue, setFilterValue } = column as Column<any>;
   const unique = [...new Set(data.map((a) => a[column.id]))];
 
-  const useIsomorphicLayoutEffect =
-    typeof window !== "undefined" ? useLayoutEffect : useEffect;
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     setFilterValue(initialFilters);
   }, []);
   return (
