@@ -359,6 +359,7 @@ const performance_ranges = [
 ];
 
 export function getPerformanceText(value: number) {
+  if (!value && value != 0) return "";
   let result = "نیاز به برسی"; // Default result
 
   performance_ranges.forEach((range) => {
