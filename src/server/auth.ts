@@ -62,6 +62,9 @@ export const authOptions: NextAuthOptions = {
           where: {
             username: credentials.username,
           },
+          include: {
+            role: true,
+          },
         });
 
         if (credentials.session) {
@@ -75,7 +78,6 @@ export const authOptions: NextAuthOptions = {
               role: true,
             },
           });
-          const p: Permission[] = JSON.parse(loggedInUser.role.permissions);
 
           if (loggedInUser.role?.permissions) {
             const permissions: Permission[] = JSON.parse(

@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import moment from "jalali-moment";
+import { Permission } from "~/types";
 
 export function hashPassword(password: string) {
   return createHash("sha256").update(password).digest("hex");
@@ -370,11 +371,31 @@ export function getPerformanceText(value: number) {
 
   return result;
 }
-// const performanceMap = {
-//   80: "ضعیف",
-//   100: "متوسط,",
-//   80: "ضعیف",
-//   80: "ضعیف",
-//   80: "ضعیف",
-//   80: "ضعیف",
-// };
+
+export function updateDynamicPermissions(
+  staticPermissions: Permission[],
+  dynamicPermissions: Permission[],
+): Permission[] {
+  // Create a map to store the dynamic permissions by ID for faster lookup
+  const dynamicPermissionMap = new Map(
+    dynamicPermissions.map((permission) => [permission.id, permission]),
+  );
+
+  // Create a result array to store the updated dynamic permissions
+  const updatedDynamicPermissions: Permission[] = [];
+
+  // Iterate through the static permissions list to preserve the order
+  for (const staticPermission of staticPermissions) {
+    if (dynamicPermissionMap.has(staticPermission.id)) {
+      // If the permission exists in dynamic, use it
+      updatedDynamicPermissions.push(
+        dynamicPermissionMap.get(staticPermission.id),
+      );
+    } else {
+      // If the permission doesn't exist in dynamic, use the static one
+      updatedDynamicPermissions.push(staticPermission);
+    }
+  }
+
+  return updatedDynamicPermissions;
+}

@@ -159,6 +159,12 @@ export const CITIES: City[] = [
 
 export const PERMISSIONS: Permission[] = [
   {
+    id: "ViewAdmin",
+    isActive: false,
+    enLabel: "View Admin",
+    faLabel: "دسترسی ادمین",
+  },
+  {
     id: "ViewDashboard",
     isActive: false,
     enLabel: "View Dashboard",

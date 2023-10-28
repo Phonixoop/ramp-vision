@@ -109,7 +109,7 @@ export default function UsersList() {
             const user: User = row.original;
             return (
               <div
-                className="flex items-center justify-center gap-5"
+                className="flex items-center justify-center gap-5 py-2"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
@@ -123,6 +123,7 @@ export default function UsersList() {
                       callbackUrl: `${window.location.origin}/admin`,
                       redirect: false,
                     });
+                    router.reload();
                   }}
                   className="w-full cursor-pointer rounded-full bg-secbuttn px-2 py-2 text-primbuttn  "
                 >
@@ -137,7 +138,7 @@ export default function UsersList() {
                     router.replace(`/admin/users/`, `/admin/users/`);
                   }}
                   title="حذف کاربر"
-                  className="w-full cursor-pointer rounded-full bg-primary px-2 py-2 text-secbuttn"
+                  className="w-full min-w-[5rem] cursor-pointer rounded-full bg-primary px-2 py-2 text-secbuttn"
                 >
                   حذف
                 </ButtonWithConfirmation>
@@ -159,8 +160,8 @@ export default function UsersList() {
         columns={flatUsers.length > 0 ? columns : []}
         data={flatUsers}
         clickedRowIndex={selectedRowUser?.id}
-        onClick={(cell) => {
-          const user = cell.row.original;
+        onClick={(row) => {
+          const user = row.original;
           setSelectedRowUser(user);
         }}
       />

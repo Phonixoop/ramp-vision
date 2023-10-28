@@ -236,6 +236,7 @@ export default function Table({
                     return (
                       // Apply the row props
                       <tr
+                        onClick={() => onClick(row)}
                         key={index}
                         // {...restRowProps}
                         className={` ${

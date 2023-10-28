@@ -17,6 +17,7 @@ import { Container } from "~/ui/containers";
 import withConfirmation from "~/ui/with-confirmation";
 import { toast } from "~/components/ui/toast/use-toast";
 import { Trash2Icon } from "lucide-react";
+import { updateDynamicPermissions } from "~/utils/util";
 const TextWithLabel = withLabel(TextField);
 export default function RolesPage() {
   const [role, setRole] = useState<Role>();
@@ -96,7 +97,14 @@ export function RoleForm({
     formik.setValues(() => {
       return {
         name: selectedRole?.name ?? "",
-        permissions: selectedRole?.permissions ?? JSON.stringify(PERMISSIONS),
+        permissions: selectedRole
+          ? JSON.stringify(
+              updateDynamicPermissions(
+                PERMISSIONS,
+                JSON.parse(selectedRole?.permissions),
+              ),
+            )
+          : JSON.stringify(PERMISSIONS),
       };
     });
   }, [selectedRole]);
@@ -104,7 +112,7 @@ export function RoleForm({
   const formik = useFormik({
     initialValues: {
       name: selectedRole?.name ?? "",
-      permissions: selectedRole?.permissions ?? JSON.stringify(PERMISSIONS),
+      permissions: JSON.stringify(PERMISSIONS),
     },
     validationSchema: toFormikValidationSchema(createRoleSchema),
     validateOnBlur: true,
