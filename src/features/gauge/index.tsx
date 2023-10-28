@@ -69,6 +69,10 @@ export default function Gauge({ value }) {
         labels={{
           valueLabel: {
             formatTextValue: (value) => `${value}%`,
+            matchColorWithArc: true,
+            style: {
+              textShadow: "none",
+            },
           },
           tickLabels: {
             type: "outer",

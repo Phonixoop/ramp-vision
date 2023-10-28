@@ -618,7 +618,9 @@ function PersonnelPerformanceTable({ sessionData }) {
                             <H2>عملکرد</H2>
 
                             <Gauge value={totalPerformance} />
-                            <p>{getPerformanceText(totalPerformance)}</p>
+                            <p className="text-accent">
+                              {getPerformanceText(totalPerformance)}
+                            </p>
                           </div>
                         </div>
                       </div>
