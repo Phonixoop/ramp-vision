@@ -24,16 +24,45 @@ export default function Gauge({ value }) {
         minValue={0}
         maxValue={500}
         arc={{
-          colorArray: ["#FF2121", "#00FF15"],
+          // colorArray: ["#FF2121", "#00FF15"],
           padding: 0.02,
           subArcs: [
-            { limit: 50 },
+            {
+              limit: 80,
+              color: "#B12B1D",
+              tooltip: {
+                text: "ضعیف",
+              },
+            },
 
-            { limit: 100 },
-            { limit: 200 },
-            { limit: 300 },
-            { limit: 400 },
-            { limit: 500 },
+            {
+              limit: 100,
+              color: "#7BB11B",
+              tooltip: {
+                text: "متوسط",
+              },
+            },
+            {
+              limit: 150,
+              color: "#7BB11B",
+              tooltip: {
+                text: "خوب",
+              },
+            },
+            {
+              limit: 200,
+              color: "#16B13D",
+              tooltip: {
+                text: "عالی",
+              },
+            },
+            {
+              limit: 500,
+              color: "#B12B1D",
+              tooltip: {
+                text: "نیاز به برسی",
+              },
+            },
           ],
         }}
         pointer={{ type: "blob", animationDelay: 1 }}
@@ -44,11 +73,10 @@ export default function Gauge({ value }) {
           tickLabels: {
             type: "outer",
             ticks: [
-              { value: 50 },
+              { value: 80 },
               { value: 100 },
+              { value: 150 },
               { value: 200 },
-              { value: 300 },
-              { value: 400 },
               { value: 500 },
             ],
           },

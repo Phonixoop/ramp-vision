@@ -48,6 +48,7 @@ import {
   convertNumberToBetterFormat,
   countColumnValues,
   en,
+  getPerformanceText,
   getServiceNameColor,
   humanizeDuration,
   processDataForChart,
@@ -591,6 +592,8 @@ function PersonnelPerformanceTable({ sessionData }) {
               const sumOfperformances = flatRows.reduce((acc, row) => {
                 return acc + row.TotalPerformance;
               }, 0);
+
+              const totalPerformance = sumOfperformances / flatRows.length;
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">
@@ -614,9 +617,8 @@ function PersonnelPerformanceTable({ sessionData }) {
                           <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
                             <H2>عملکرد</H2>
 
-                            <Gauge
-                              value={sumOfperformances / flatRows.length}
-                            />
+                            <Gauge value={totalPerformance} />
+                            <p>{getPerformanceText(totalPerformance)}</p>
                           </div>
                         </div>
                       </div>

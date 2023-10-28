@@ -350,3 +350,30 @@ export function humanizeDuration(value, tag) {
 
   return timeComponents.join(" ، ");
 }
+
+const performance_ranges = [
+  { min: 0, max: 80, result: "ضعیف" },
+  { min: 81, max: 100, result: "متوسط" },
+  { min: 101, max: 150, result: "خوب" },
+  { min: 151, max: 200, result: "عالی" },
+];
+
+export function getPerformanceText(value: number) {
+  let result = "نیاز به برسی"; // Default result
+
+  performance_ranges.forEach((range) => {
+    if (value >= range.min && value <= range.max) {
+      result = range.result;
+    }
+  });
+
+  return result;
+}
+// const performanceMap = {
+//   80: "ضعیف",
+//   100: "متوسط,",
+//   80: "ضعیف",
+//   80: "ضعیف",
+//   80: "ضعیف",
+//   80: "ضعیف",
+// };
