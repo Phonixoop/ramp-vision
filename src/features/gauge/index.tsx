@@ -58,7 +58,7 @@ export default function Gauge({ value }) {
             },
             {
               limit: 500,
-              color: "#B12B1D",
+              color: "#B1671E",
               tooltip: {
                 text: "نیاز به برسی",
               },
