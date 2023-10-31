@@ -13,7 +13,23 @@ import { Container } from "~/ui/containers";
 import { api } from "~/utils/api";
 import { Permission } from "~/types";
 
+function checkStatusForMenu(status) {
+  if (status === "unauthenticated")
+    return MENU.filter((menu) => {
+      switch (menu.value) {
+        case "جزئیات عملکرد شعب":
+          return false;
+        case "جزئیات عملکرد پرسنل شعب":
+          return false;
+      }
+      return true;
+    });
+
+  return MENU;
+}
 export default function Header() {
+  const session = useSession();
+
   return (
     <>
       <Container
@@ -21,11 +37,13 @@ export default function Header() {
         rtl={true}
       >
         <div className="flex flex-col items-center justify-center gap-4 py-5 md:flex-row ">
-          <AuthShowcase />
+          <AuthShowcase session={session} />
           <ThemeProvider>
             <ThemeSwitch />
           </ThemeProvider>
-          <Menu rootPath="/" list={MENU} />
+          {session.status !== "loading" && (
+            <Menu rootPath="/" list={checkStatusForMenu(session.status)} />
+          )}
         </div>
       </Container>
     </>
@@ -71,8 +89,8 @@ function ThemeSwitch() {
   );
 }
 
-function AuthShowcase() {
-  const { data: sessionData, status } = useSession();
+function AuthShowcase({ session }) {
+  const { data: sessionData, status } = session;
 
   if (status === "loading")
     return <div className="h-5 w-20 animate-pulse"></div>;
