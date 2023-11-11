@@ -113,28 +113,33 @@ function AuthShowcase({ session }) {
   const isAdmin = permission && permission?.isActive === true;
 
   return (
-    <>
+    <div className="flex gap-2 rounded-full bg-primary/10 p-2">
       <Button
-        className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent"
+        className="relative flex   justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         <span className="">{sessionData ? "خروج" : "ورود"}</span>
       </Button>
 
-      <span className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent">
-        <span className="p-2">{sessionData.user?.username}</span>
-      </span>
+      <div className="relative flex items-center justify-center gap-2 rounded-full bg-primary/10 px-1 py-1">
+        <span className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent">
+          <span className="p-2">{sessionData.user?.username}</span>
+        </span>
 
-      {isAdmin && (
-        <Link href={"/admin"}>
-          <Button className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent">
-            <span className="flex items-center justify-center gap-2">
-              <p>پنل ادمین</p>
-              <UserCog2Icon />
-            </span>
-          </Button>
-        </Link>
-      )}
-    </>
+        {isAdmin && (
+          <>
+            <div className="  h-[10px] w-[0.5px] bg-accent"></div>
+            <Link href={"/admin"}>
+              <Button className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent">
+                <span className="flex items-center justify-center gap-2">
+                  <p>پنل ادمین</p>
+                  <UserCog2Icon />
+                </span>
+              </Button>
+            </Link>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
