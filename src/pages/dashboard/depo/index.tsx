@@ -595,7 +595,7 @@ function DeposTable({ sessionData }) {
                               "تعداد ورودی",
                               "تعداد رسیدگی",
                             ]}
-                            colors={["purple", "cyan", "emerald"]}
+                            colors={["rose", "cyan", "emerald"]}
                             valueFormatter={commify}
                             yAxisWidth={20}
                             noDataText={Text.noData.fa}
