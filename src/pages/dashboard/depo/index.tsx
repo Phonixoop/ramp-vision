@@ -60,6 +60,7 @@ import { Column } from "react-table";
 import Header from "~/features/header";
 import { LayoutGroup } from "framer-motion";
 import { ColumnDef } from "@tanstack/react-table";
+import { Bar } from "react-chartjs-2";
 
 const chartdata = [
   {
@@ -535,6 +536,30 @@ function DeposTable({ sessionData }) {
                 },
               ];
 
+              const depoBaseOnSabtDirect = sumColumnBasedOnRowValue(
+                flatRows,
+                "DepoCount",
+                "ServiceName",
+                ["ثبت ارزیابی با اسکن مدارک", "ثبت ارزیابی بدون اسکن مدارک"],
+              );
+              const depoBaseOnSabtInDirect = sumColumnBasedOnRowValue(
+                flatRows,
+                "DepoCount",
+                "ServiceName",
+                ["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
+              );
+
+              const depo_BaseOnSabt = [
+                {
+                  name: "مستقیم",
+                  value: depoBaseOnSabtDirect,
+                },
+                {
+                  name: "غیر مستقیم",
+                  value: depoBaseOnSabtInDirect,
+                },
+              ];
+
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">
@@ -553,20 +578,22 @@ function DeposTable({ sessionData }) {
                               };
                             })}
                             index="name"
-                            showXAxis={false}
-                            //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
                             categories={[
                               "تعداد بلاتکلیف",
                               "تعداد ورودی",
                               "تعداد رسیدگی",
                             ]}
-                            colors={["blue", "red", "green"]}
+                            colors={["purple", "cyan", "emerald"]}
                             valueFormatter={commify}
-                            yAxisWidth={48}
+                            yAxisWidth={20}
                             noDataText={Text.noData.fa}
+                            intervalType="preserveStartEnd"
+                            // customTooltip={(value) => {
+                            //   return <>{JSON.stringify(value)}</>;
+                            // }}
                           />
                         </div>
-                        <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
+                        {/* <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
                           <H2>نمودار زمانی</H2>
                           <AreaChart
                             showAnimation={true}
@@ -590,7 +617,7 @@ function DeposTable({ sessionData }) {
                             valueFormatter={commify}
                             noDataText={Text.noData.fa}
                           />
-                        </div>
+                        </div> */}
                       </div>
                     </div>
 
@@ -633,29 +660,47 @@ function DeposTable({ sessionData }) {
                           <>
                             <TrackerView data={getTracker.data ?? []} />
 
-                            <div
-                              dir="ltr"
-                              className="flex w-full flex-col   justify-center gap-5 rounded-2xl  border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:w-5/12"
-                            >
-                              <H2>تعداد ورودی و رسیدگی شده</H2>
-                              <DonutChart
-                                label={
-                                  depo.data?.result.length > 0
-                                    ? " مانده : " +
-                                      commify(
-                                        Math.abs(
-                                          capacityBaseOnSabt - entryBaseOnSabt,
-                                        ),
-                                      ).toString()
-                                    : "داده ای موجود نیست"
-                                }
-                                data={entry_capacity}
-                                category="value"
-                                index="name"
-                                colors={["red", "green"]}
-                                valueFormatter={commify}
-                                noDataText={Text.noData.fa}
-                              />
+                            <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
+                              <div
+                                dir="ltr"
+                                className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 "
+                              >
+                                <H2>تعداد ورودی و رسیدگی شده</H2>
+                                <DonutChart
+                                  label={
+                                    depo.data?.result.length > 0
+                                      ? " مانده : " +
+                                        commify(
+                                          Math.abs(
+                                            capacityBaseOnSabt -
+                                              entryBaseOnSabt,
+                                          ),
+                                        ).toString()
+                                      : "داده ای موجود نیست"
+                                  }
+                                  data={entry_capacity}
+                                  category="value"
+                                  index="name"
+                                  colors={["red", "green"]}
+                                  valueFormatter={commify}
+                                  noDataText={Text.noData.fa}
+                                />
+                              </div>
+
+                              <div
+                                dir="ltr"
+                                className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2"
+                              >
+                                <H2>تعداد بلاتکلیف</H2>
+                                <DonutChart
+                                  data={depo_BaseOnSabt}
+                                  category="value"
+                                  index="name"
+                                  colors={["fuchsia", "cyan"]}
+                                  valueFormatter={commify}
+                                  noDataText={Text.noData.fa}
+                                />
+                              </div>
                             </div>
                             <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
                               <H2>
