@@ -122,7 +122,7 @@ function AuthShowcase({ session }) {
       </Button>
 
       <div className="relative flex items-center justify-center gap-2 rounded-full bg-primary/10 px-1 py-1">
-        <span className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent">
+        <span className="flex  items-stretch justify-center gap-2 rounded-full stroke-accent px-3 text-accent">
           <span className="p-2">{sessionData.user?.username}</span>
         </span>
 
