@@ -12,8 +12,9 @@ export async function getPermission({ ctx }): Promise<Permission[]> {
 
 export function generateWhereClause(
   filter,
-  ignoreKey = undefined,
+  ignoreKeys = [],
   customFun = undefined,
+  customWhere = "",
 ) {
   const conditions = [];
 
@@ -25,9 +26,9 @@ export function generateWhereClause(
       value.forEach((v) => {
         newValue.push(`N'${v}'`);
       });
-
-      const cw = ignoreKey === key && customFun ? customFun : key;
-      const condition = `${cw} IN (${newValue.join(",")})`;
+      if (ignoreKeys.includes(key)) continue;
+      // const cw = ignoreKey === key && customFun ? customFun : key;
+      const condition = `${key} IN (${newValue.join(",")})`;
       if (value.length > 0) conditions.push(condition);
     } else if (value !== undefined && value !== null) {
       const condition = `${key} = '${value}'`;
@@ -35,6 +36,8 @@ export function generateWhereClause(
     }
   }
   return conditions.length > 0
-    ? `WHERE CityName is not NULL AND ${conditions.join(" AND ")}`
+    ? `WHERE ${customWhere}  CityName is not NULL AND ${conditions.join(
+        " AND ",
+      )}`
     : "";
 }

@@ -214,32 +214,7 @@ function DeposTable({ sessionData }) {
             );
           },
         },
-        {
-          header: "نام فعالیت",
-          accessorKey: "ServiceName",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <>
-                <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">فعالیت ها</span>
-                  <SelectColumnFilter
-                    column={column}
-                    data={depo.data?.result}
-                    onChange={(filter) => {
-                      // setDataFilters((prev) => {
-                      //   return {
-                      //     ...prev,
-                      //     [filter.id]: filter.values,
-                      //   };
-                      // });
-                    }}
-                  />
-                </div>
-              </>
-            );
-          },
-        },
+
         {
           header: "شهر",
           accessorKey: "CityName",
@@ -294,7 +269,32 @@ function DeposTable({ sessionData }) {
             );
           },
         },
-
+        {
+          header: "نام فعالیت",
+          accessorKey: "ServiceName",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <>
+                <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">فعالیت ها</span>
+                  <SelectColumnFilter
+                    column={column}
+                    data={depo.data?.result}
+                    onChange={(filter) => {
+                      // setDataFilters((prev) => {
+                      //   return {
+                      //     ...prev,
+                      //     [filter.id]: filter.values,
+                      //   };
+                      // });
+                    }}
+                  />
+                </div>
+              </>
+            );
+          },
+        },
         {
           header: "نوع سند",
           accessorKey: "DocumentType",

@@ -207,6 +207,24 @@ export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
   return fourthWeek.format("YYYY/MM/DD");
 }
 
+export function getSecondOrLaterDayOfNextMonth(year: number, month: number) {
+  const currentDate = moment().locale("fa").year(year).month(month).jDay(2);
+
+  const currentDay = moment().format("dddd");
+
+  // Check if the current day is Friday
+  if (currentDay === "Friday") {
+    return moment()
+      .locale("fa")
+      .year(year)
+      .month(month)
+      .jDay(3)
+      .format("YYYY/MM/03");
+  } else {
+    return currentDate.format("YYYY/MM/02");
+  }
+}
+
 export function getWeekOfMonth(date: string) {
   const currentDate = moment(date);
 

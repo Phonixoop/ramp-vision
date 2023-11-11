@@ -9,6 +9,7 @@ import {
   extractYearAndMonth,
   getDatesForLastMonth,
   getFirstSaturdayOfLastWeekOfMonth,
+  getSecondOrLaterDayOfNextMonth,
   getWeekOfMonth,
 } from "~/utils/util";
 
@@ -72,42 +73,57 @@ export const depoRouter = createTRPCRouter({
         if (input.periodType === "روزانه") {
           dbName = "RAMP_Daily.dbo.depos";
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date`;
+          whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date ORDER BY CityName,Start_Date`;
         } else if (input.periodType === "هفتگی") {
           dbName = "RAMP_Weekly.dbo.depos";
           filter.Start_Date = [filter.Start_Date[0]];
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date`;
+          whereClause += ` Group By CityName,ServiceName,DocumentType,Start_Date ORDER BY CityName,Start_Date`;
         } else if (input.periodType === "ماهانه") {
-          dbName = "RAMP_Weekly.dbo.depos";
+          dbName = "RAMP_Daily.dbo.depos";
 
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
-
+          const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(
             filter,
-            "Start_Date",
-            "SUBSTRING(Start_Date, 1, 7)",
+            ["Start_Date"],
+            undefined,
+            `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}','1402/08') AND`,
           );
-          whereClause += ` group by ServiceName,DocumentType,CityName`;
-          const date = filter.Start_Date[0].split("/");
-          const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
+          whereClause += ` group by ServiceName,DocumentType,CityName ORDER BY CityName`;
+
+          // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
+          //   parseInt(date[0]),
+          //   parseInt(date[1]),
+          // );
+
+          const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
             parseInt(date[0]),
             parseInt(date[1]),
           );
-
           // console.log(date, lastWeek);
           // const monthName = moment()
           //   .locale("fa")
           //   .month(parseInt(date[1]) - 1)
           //   .format("MMMM");
-          queryStart = `
-          SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
-          SUM(CASE WHEN Start_Date = '${lastWeek}' THEN DepoCount ELSE 0 END) AS DepoCount
+          // queryStart = `
+          // SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
+          // SUM(CASE WHEN Start_Date = '${lastWeek}' THEN DepoCount ELSE 0 END) AS DepoCount
 
-          FROM
+          // FROM
+          // `;
+
+          queryStart = `
+          SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,
+
+          SUM(CASE WHEN Start_Date = '${secondDayOfNextMonth}' THEN DepoCount ELSE 0 END) AS DepoCount,
+          SUM(CASE WHEN SUBSTRING(Start_Date, 1, 7) = '${date[0]}/${date[1]}' THEN EntryCount ELSE 0 END) AS EntryCount,
+          SUM(CASE WHEN SUBSTRING(Start_Date, 1, 7) = '${date[0]}/${date[1]}' THEN Capicity ELSE 0 END) AS Capicity
+
+		    FROM 
           `;
         }
 
@@ -116,7 +132,7 @@ export const depoRouter = createTRPCRouter({
         ${dbName} 
         ${whereClause}
         `;
-        console.log(query);
+        console.log("monthly", query);
         const result = await sql.query(query);
 
         if (input.periodType === "روزانه") {
@@ -220,12 +236,16 @@ export const depoRouter = createTRPCRouter({
           (item) => input.filter.CityName?.includes(item),
         );
 
-        console.log(JSON.stringify(commonCities, null, 2));
         const days = getDatesForLastMonth();
-        const whereClause = generateWhereClause({
-          CityName: commonCities,
-          Start_Date: days,
-        });
+        const whereClause = generateWhereClause(
+          {
+            CityName: commonCities,
+            Start_Date: days,
+          },
+          undefined,
+          undefined,
+          " ServiceName like N'ثبت%' AND ",
+        );
         const queryDaysOfMonth = `SELECT 
         Start_Date, 
         SUM(DepoCount) AS DepoCount, 
@@ -234,7 +254,7 @@ export const depoRouter = createTRPCRouter({
         ${whereClause}
         GROUP BY Start_Date ORDER BY Start_Date
         `;
-        // console.log(queryDaysOfMonth);
+
         const resultDays = await sql.query(queryDaysOfMonth);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
