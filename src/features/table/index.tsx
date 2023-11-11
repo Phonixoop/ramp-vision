@@ -127,7 +127,7 @@ export default function Table({
       <div className="w-full px-5 xl:px-0 ">
         {renderChild(flatRows)}
 
-        <div className="relative flex h-[31rem] min-h-[30rem] w-full items-stretch justify-center py-10">
+        <div className="relative flex h-[31rem] min-h-[50rem] w-full items-stretch justify-center py-10">
           {isLoading && (
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
               <Loader2Icon className="h-12 w-12 animate-spin stroke-accent" />

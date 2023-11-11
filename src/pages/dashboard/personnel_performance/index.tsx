@@ -425,7 +425,7 @@ function PersonnelPerformanceTable({ sessionData }) {
           filterFn: "arrIncludesSome",
         },
         {
-          header: "تاریخ گزارش پرنسل",
+          header: "تاریخ گزارش پرسنل",
           accessorKey: "DateInfo",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
