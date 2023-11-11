@@ -251,7 +251,7 @@ export default function Table({
                             return (
                               <td
                                 key={cell.id}
-                                className=" border-l border-primary/50 text-center text-primary "
+                                className=" border-l border-primary/50 text-center text-primary last:border-0 "
                               >
                                 <div className=" flex min-w-max justify-center px-2 text-center">
                                   {flexRender(
