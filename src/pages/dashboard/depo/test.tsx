@@ -354,6 +354,16 @@ function DeposTable({ sessionData }) {
           accessor: "MyDepoCompletionTime",
           Cell: ({ row }) => {
             const data = row.original;
+            const result: number = calculateDepoCompleteTime(data);
+
+            return <>{result.toFixed(2)}</>;
+          },
+        },
+        {
+          Header: "وضعیت دپو",
+          accessor: "MyDepoCompletionTime",
+          Cell: ({ row }) => {
+            const data = row.original;
             const result = calculateDepoCompleteTime(data);
 
             if (result < 0)

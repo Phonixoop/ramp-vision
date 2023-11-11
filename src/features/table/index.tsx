@@ -135,7 +135,7 @@ export default function Table({
           )}
           <div
             ref={tableContainerRef}
-            className=" w-full max-w-[1350px] overflow-auto rounded-[20px] "
+            className=" w-full max-w-[1350px]  overflow-auto rounded-[20px] "
           >
             <table
               // style={{ height: `${totalSize}px` }}
@@ -180,7 +180,7 @@ export default function Table({
                               >
                                 <div
                                   className={cn(
-                                    "relative flex select-none items-center justify-center gap-3 text-center ",
+                                    "relative flex min-w-max select-none items-center justify-center gap-3 text-center ",
                                     header.column.getCanSort()
                                       ? "cursor-pointer select-none"
                                       : "",
@@ -249,11 +249,16 @@ export default function Table({
                           //@ts-ignore
                           row.getVisibleCells().map((cell) => {
                             return (
-                              <td key={cell.id} className="text-primary">
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
+                              <td
+                                key={cell.id}
+                                className=" border-l border-primary/50 text-center text-primary "
+                              >
+                                <div className=" flex min-w-max justify-center px-2 text-center">
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </div>
                               </td>
                             );
                           })
