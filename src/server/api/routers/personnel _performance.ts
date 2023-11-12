@@ -12,7 +12,7 @@ import {
   getWeekOfMonth,
 } from "~/utils/util";
 
-import { getPermission } from "~/server/server-utils";
+import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
 
 const config = {
@@ -66,12 +66,15 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         let queryStart = `SELECT Distinct CityName,NameFamily, ProjectType,ContractType,Role,RoleType,
         
-        SabtAvalieAsnad,
-        PazireshVaSabtAvalieAsnad,
-        ArzyabiAsanadBimarsetaniDirect,ArzyabiAsnadBimarestaniIndirect,
-        ArzyabiAsnadDandanVaParaDirect,ArzyabiAsnadDandanVaParaIndirect,
-        ArzyabiAsnadDaroDirect,ArzyabiAsnadDaroIndirect,
-        TotalPerformance,
+        SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
+        SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+	    	SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+	    	SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+	      SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+        SUM(TotalPerformance) as TotalPerformance, 
         
         DateInfo,Start_Date from dbName1 as p
         JOIN dbName2 as u on p.NationalCode = u.NationalCode  
@@ -84,16 +87,36 @@ export const personnelPerformanceRouter = createTRPCRouter({
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
           whereClause = generateWhereClause(filter);
-          //  whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date`;
+          whereClause += `Group By CityName,NameFamily,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+
+          Order By CityName,NameFamily `;
         } else if (input.periodType === "هفتگی") {
           dbName1 = "RAMP_Weekly.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
           filter.Start_Date = [filter.Start_Date[0]];
 
           whereClause = generateWhereClause(filter);
-          //  whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date`;
+          whereClause += `Group By CityName,NameFamily,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+
+          Order By CityName,NameFamily `;
         } else if (input.periodType === "ماهانه") {
-          dbName1 = "RAMP_Weekly.dbo.personnel_performance";
+          queryStart = `SELECT Distinct CityName,NameFamily, ProjectType,ContractType,Role,RoleType,
+        
+          SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
+          SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+          SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+          SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+          SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+          SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+          SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+          SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+          SUM(TotalPerformance) as TotalPerformance,  DateInfo,Start_Date
+          
+          from dbName1 as p
+          JOIN dbName2 as u on p.NationalCode = u.NationalCode  
+           `;
+
+          dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
 
           filter.Start_Date = filter.Start_Date.map((d) => {
@@ -102,10 +125,13 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
           whereClause = generateWhereClause(
             filter,
-            "Start_Date",
+            ["Start_Date"],
             "SUBSTRING(Start_Date, 1, 7)",
+            " DateInfo = '1402/03/31' AND ",
           );
-          //  whereClause += ` group by ServiceName,DocumentType,CityName`;
+          whereClause += `Group By CityName,NameFamily,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+
+          Order By CityName,NameFamily `;
           const date = filter.Start_Date[0].split("/");
           const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
             parseInt(date[0]),
@@ -320,31 +346,31 @@ function generateFilterOnlySelect(filter: string[]) {
   return columns.length > 0 ? `${columns.join(",")}` : "";
 }
 
-function generateWhereClause(
-  filter,
-  ignoreKey = undefined,
-  customFun = undefined,
-) {
-  const conditions = [];
+// function generateWhereClause(
+//   filter,
+//   ignoreKey = undefined,
+//   customFun = undefined,
+// ) {
+//   const conditions = [];
 
-  for (const key in filter) {
-    const value = filter[key];
-    if (Array.isArray(value)) {
-      // If the value is an array, create a condition with IN operator
-      const newValue = [];
-      value.forEach((v) => {
-        newValue.push(`N'${v}'`);
-      });
+//   for (const key in filter) {
+//     const value = filter[key];
+//     if (Array.isArray(value)) {
+//       // If the value is an array, create a condition with IN operator
+//       const newValue = [];
+//       value.forEach((v) => {
+//         newValue.push(`N'${v}'`);
+//       });
 
-      const cw = ignoreKey === key && customFun ? customFun : key;
-      const condition = `${cw} IN (${newValue.join(",")})`;
-      if (value.length > 0) conditions.push(condition);
-    } else if (value !== undefined && value !== null) {
-      const condition = `${key} = '${value}'`;
-      conditions.push(condition);
-    }
-  }
-  return conditions.length > 0
-    ? `WHERE CityName is not NULL AND ${conditions.join(" AND ")}`
-    : "";
-}
+//       const cw = ignoreKey === key && customFun ? customFun : key;
+//       const condition = `${cw} IN (${newValue.join(",")})`;
+//       if (value.length > 0) conditions.push(condition);
+//     } else if (value !== undefined && value !== null) {
+//       const condition = `${key} = '${value}'`;
+//       conditions.push(condition);
+//     }
+//   }
+//   return conditions.length > 0
+//     ? `WHERE CityName is not NULL AND ${conditions.join(" AND ")}`
+//     : "";
+// }
