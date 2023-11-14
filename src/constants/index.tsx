@@ -46,7 +46,7 @@ export const MENU = [
   },
   {
     value: "جزئیات عملکرد پرسنل شعب",
-    link: "/dashboard/personnel_performance",
+    link: "/dashboard/personnel_performance/cities",
   },
 ];
 
@@ -216,4 +216,16 @@ export const Text = {
     fa: "داده ای موجود نیست",
     en: "No Data",
   },
+};
+
+export const PersonnelPerformanceTranslate = {
+  SabtAvalieAsnad: "ثبت اولیه اسناد",
+  PazireshVaSabtAvalieAsnad: "پذیرش و ثبت اولیه اسناد",
+  ArzyabiAsanadBimarsetaniDirect: "ارزیابی اسناد بیمارستانی مستقیم",
+  ArzyabiAsnadBimarestaniIndirect: "ارزیابی اسناد بیمارستانی غیر مستقیم",
+  ArzyabiAsnadDandanVaParaDirect: "ارزیابی اسناد دندان و پارا مستقیم",
+  ArzyabiAsnadDandanVaParaIndirect: "ارزیابی اسناد دندان و پارا غیر مستقیم",
+  ArzyabiAsnadDaroDirect: "ارزیابی اسناد دارو مستقیم",
+  ArzyabiAsnadDaroIndirect: "ارزیابی اسناد دارو غیر مستقیم",
+  TotalPerformance: "عملکرد",
 };
