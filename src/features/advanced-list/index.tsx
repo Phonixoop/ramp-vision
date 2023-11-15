@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Button from "~/ui/buttons";
 
 export default function AdvancedList({
+  title = <></> || "",
   list = [],
   filteredList = [],
   disabled = false,
@@ -44,21 +45,26 @@ export default function AdvancedList({
     //setFilteredList(sorted);
   }
   return (
-    <>
-      <div className="flex max-h-[500px] w-full max-w-sm flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl bg-secbuttn p-1">
+    <div className="flex w-full max-w-sm flex-col items-center justify-center gap-1">
+      {title && (
+        <div className="w-full rounded-lg bg-secbuttn p-3 text-center text-lg font-bold text-primary">
+          {title}
+        </div>
+      )}
+      <div className="flex max-h-[500px] w-full  flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl bg-secbuttn p-1">
         <div className="sticky top-0 z-10 flex w-full flex-col items-center justify-center gap-1 bg-secbuttn py-2 drop-shadow-lg ">
           <input
             type="text"
             dir="rtl"
             placeholder="جستجو..."
-            className=" w-full rounded-md bg-secondary p-2 text-primary disabled:bg-primary/50 disabled:text-secondary "
+            className=" w-full rounded-md bg-secondary p-2 text-primary disabled:bg-primary/30 disabled:text-secondary "
             onChange={(e) => filterBySearch(e.target.value)}
             disabled={disabled}
           />
           <div className="flex w-full items-center justify-stretch gap-2 ">
             <Button
               disabled={disabled}
-              className="flex w-full items-center justify-around gap-2 bg-secondary  disabled:bg-primary/50 disabled:text-secondary"
+              className="flex w-full items-center justify-around gap-2 bg-secondary  disabled:bg-primary/70 disabled:text-secondary"
             >
               <span>حذف انتخاب</span>
               <EraserIcon />
@@ -66,7 +72,7 @@ export default function AdvancedList({
             <Button
               disabled={disabled}
               onClick={() => toggleSortOrder()}
-              className="flex w-full items-center justify-around gap-2 bg-secondary text-accent  disabled:bg-primary/50 disabled:text-secondary"
+              className="flex w-full items-center justify-around gap-2 bg-secondary text-accent  disabled:bg-primary/70 disabled:text-secondary"
             >
               <span>مرتب سازی</span>
               {sortOrder === "asc" ? <ArrowDownAZIcon /> : <ArrowUpAZIcon />}
@@ -77,6 +83,6 @@ export default function AdvancedList({
           return renderItem(item, i);
         })}
       </div>
-    </>
+    </div>
   );
 }

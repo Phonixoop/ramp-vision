@@ -2,6 +2,7 @@ import {
   TrendingDownIcon,
   TrendingUpIcon,
   ChevronLeftIcon,
+  BuildingIcon,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -110,11 +111,17 @@ export default function CitiesPage({ children }) {
     <>
       <BlurBackground />
 
-      <div className="flex h-screen w-full flex-col gap-5 bg-secondary">
+      <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
         <Header />
 
-        <div className="m-auto flex  w-11/12 flex-row-reverse justify-start gap-5">
+        <div className="m-auto flex w-11/12 flex-col justify-start gap-5 xl:flex-row-reverse">
           <AdvancedList
+            title={
+              <span className="flex items-center justify-center gap-2 text-primary">
+                شهر ها
+                <BuildingIcon />
+              </span>
+            }
             list={persianCities}
             filteredList={updatedList}
             onChange={(updatedList) => setUpdatedList(updatedList)}
@@ -131,7 +138,7 @@ export default function CitiesPage({ children }) {
                   className={twMerge(
                     "cursor-pointer rounded-xl py-2",
                     isActive
-                      ? "sticky z-20 bg-white/20 text-secondary backdrop-blur-md "
+                      ? "sticky z-20 bg-primary/30 text-secondary backdrop-blur-md "
                       : "bg-secondary",
                     "top-24",
                   )}

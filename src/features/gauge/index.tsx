@@ -25,6 +25,7 @@ export default function Gauge({ value }) {
         maxValue={500}
         arc={{
           // colorArray: ["#FF2121", "#00FF15"],
+
           padding: 0.02,
           subArcs: [
             {

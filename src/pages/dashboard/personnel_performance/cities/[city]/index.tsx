@@ -1,21 +1,29 @@
 import { BarChart, SparkAreaChart } from "@tremor/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import moment from "jalali-moment";
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { Contact2Icon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { InferGetStaticPropsType, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
-import { PersonnelPerformanceTranslate } from "~/constants";
+import {
+  PersonnelPerformanceIcons,
+  PersonnelPerformanceTranslate,
+} from "~/constants/personnel-performance";
+
 import AdvancedList from "~/features/advanced-list";
+import Gauge from "~/features/gauge";
+import LineGauge from "~/features/gauge/line";
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
 import Button from "~/ui/buttons";
+import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 
 import { api } from "~/utils/api";
+import { commify, getPerformanceText } from "~/utils/util";
 
 const chartdata = [
   {
@@ -63,7 +71,7 @@ export default function CityPage({ children, city }) {
       filter: {
         CityName: [city],
         Start_Date: [
-          moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+          moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
         ],
       },
       periodType: "روزانه",
@@ -80,9 +88,28 @@ export default function CityPage({ children, city }) {
   const numericItems = Object.entries(selectedUser ?? []).filter(
     ([key, value]) => typeof value === "number",
   );
+
+  const noneNumericItems = Object.entries(selectedUser ?? []).filter(
+    ([key, value]) => typeof value === "string",
+  );
+
+  const translateKeys = Object.keys(PersonnelPerformanceTranslate);
+
+  // Sort the numericItems based on the order in translateKeys
+  numericItems.sort(
+    (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
+  );
   return (
     <CitiesPage>
       <AdvancedList
+        title={
+          <span className="flex items-center justify-center gap-2  text-primary  ">
+            پرسنل
+            <Contact2Icon
+              className={!!!updatedList ? "animate-bounce duration-75" : ""}
+            />
+          </span>
+        }
         disabled={!!!updatedList}
         list={getAll.data?.result}
         filteredList={updatedList ?? [...new Array(10).keys()]}
@@ -97,8 +124,13 @@ export default function CityPage({ children, city }) {
             return (
               <div
                 key={i}
-                className=" flex  w-full animate-pulse flex-row-reverse items-center justify-between rounded-xl bg-secondary/60 px-2  py-5 text-right text-primary"
+                className=" flex  w-full animate-pulse flex-row-reverse items-center justify-between gap-2 rounded-xl bg-secondary/60 p-3 text-right text-primary"
               >
+                <span className="h-5 w-10 rounded-lg bg-secbuttn" />
+
+                <div className="flex w-full items-center justify-start px-2">
+                  <span className=" w-40 rounded-lg bg-secbuttn py-5" />
+                </div>
                 <span className="h-5 w-10 rounded-lg bg-secbuttn" />
                 <span className="h-4 w-4 rounded-lg bg-secbuttn" />
               </div>
@@ -110,24 +142,24 @@ export default function CityPage({ children, city }) {
                 className={twMerge(
                   "rounded-xl  ",
                   isActive
-                    ? "sticky top-24 z-10 bg-primbuttn text-secondary "
-                    : " bg-secondary  ",
+                    ? "sticky top-24 z-10 bg-primary text-secondary "
+                    : " bg-secondary  text-primary",
                 )}
                 onClick={() => {
                   setSelectedUser(user);
                 }}
               >
-                <div className=" flex w-full flex-row-reverse items-center justify-between gap-2  px-2 text-right text-primary">
+                <div className=" flex w-full flex-row-reverse items-center justify-between gap-2  px-2 text-right ">
                   <div className=" w-10">
                     <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
                   </div>
                   <div className="flex flex-col items-center justify-center">
-                    {performance < 50 ? (
+                    {user.TotalPerformance < 50 ? (
                       <TrendingDownIcon className="h-5 w-5 stroke-red-700" />
                     ) : (
                       <TrendingUpIcon className="h-5 w-5 stroke-emerald-700" />
                     )}
-                    {performance.toFixed(0)}
+                    {user.TotalPerformance.toFixed(0)}
                     {"%"}
                   </div>
                   <div className="flex w-full items-center justify-center">
@@ -139,7 +171,7 @@ export default function CityPage({ children, city }) {
                       className="h-10 w-36"
                     />
                   </div>
-                  <span className="w-full text-sm">{user.NameFamily}</span>
+                  <span className="w-full text-sm ">{user.NameFamily}</span>
                 </div>
               </Button>
             </>
@@ -147,32 +179,75 @@ export default function CityPage({ children, city }) {
         }}
       />
 
-      <div className="flex max-h-[500px] w-full flex-col flex-wrap items-center justify-center gap-1 overflow-hidden overflow-y-auto rounded-2xl bg-secbuttn p-1">
+      <div className="flex  w-full flex-col items-center justify-center gap-1  rounded-2xl bg-secbuttn p-1">
         {selectedUser && (
-          // Object.entries(selectedUser).map(([key, value]) => {
-          //   // You can perform any transformation or logic here
-          //   return (
-          //     <div className="gap-1rounded-2xl flex flex-col rounded-xl  bg-secondary p-2">
-          //       <span>{key}</span>
-          //       <span>{value as string}</span>
-          //     </div>
-          //   );
-          // })
-
           <>
-            <BarChart
-              data={numericItems.map(([key, value]) => {
-                return {
-                  name: PersonnelPerformanceTranslate[key],
-                  value,
-                };
-              })}
-              index="name"
-              showXAxis
-              categories={numericItems.map(
-                ([key, value]) => PersonnelPerformanceTranslate[key],
-              )}
-            />
+            <div className="flex w-full items-start justify-center gap-5">
+              <div
+                className="grid  grid-cols-1  gap-4 md:grid-cols-2 "
+                dir="rtl"
+              >
+                {numericItems.map(([key, value], index, array) => {
+                  const isLastItem = index === array.length - 1;
+                  return (
+                    <>
+                      <div
+                        key={key}
+                        className={twMerge(
+                          "flex  flex-col justify-center gap-2 rounded-2xl bg-secondary p-2",
+                          isLastItem ? " md:col-span-2" : "md:col-span-1",
+                        )}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          {PersonnelPerformanceIcons[key]}
+                          <span className="text-primary">
+                            {PersonnelPerformanceTranslate[key]}
+                          </span>
+                        </div>
+                        <span className="text-center font-bold text-accent">
+                          {commify((value as number).toFixed(0))}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })}
+              </div>
+              <div
+                className="grid  grid-cols-1  gap-4 md:grid-cols-2 "
+                dir="rtl"
+              >
+                {noneNumericItems.map(([key, value], index, array) => {
+                  const isLastItem = index === array.length - 1;
+
+                  if (key === "DateInfo") return;
+                  return (
+                    <>
+                      <div
+                        key={key}
+                        className={twMerge(
+                          "flex  min-w-[180px] flex-col justify-center  gap-2 rounded-2xl bg-secondary p-2",
+                          isLastItem || index === 0
+                            ? " md:col-span-2"
+                            : "md:col-span-1",
+                        )}
+                      >
+                        <span className="break-words text-center font-bold text-accent">
+                          {value as string}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })}
+                <div className="col-span-2  flex  w-full flex-col items-center justify-center   ">
+                  <H2>عملکرد</H2>
+
+                  <Gauge value={selectedUser.TotalPerformance} />
+                  <p className="text-accent">
+                    {getPerformanceText(selectedUser.TotalPerformance)}
+                  </p>
+                </div>
+              </div>
+            </div>
           </>
         )}
       </div>
@@ -195,7 +270,7 @@ export async function getStaticProps(ctx) {
     filter: {
       CityName: [city.toString()],
       Start_Date: [
-        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
     },
     periodType: "روزانه",
