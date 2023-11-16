@@ -182,7 +182,7 @@ export default function CityPage({ children, city }) {
       <div className="flex  w-full flex-col items-center justify-center gap-1  rounded-2xl bg-secbuttn p-1">
         {selectedUser && (
           <>
-            <div className="flex w-full items-start justify-center gap-5">
+            <div className="flex w-full flex-col items-start justify-center gap-5 xl:flex-row">
               <div
                 className="grid  grid-cols-1  gap-4 md:grid-cols-2 "
                 dir="rtl"
@@ -194,19 +194,17 @@ export default function CityPage({ children, city }) {
                       <div
                         key={key}
                         className={twMerge(
-                          "flex  flex-col justify-center gap-2 rounded-2xl bg-secondary p-2",
+                          "`p-2`  flex flex-col justify-center gap-2 rounded-2xl bg-secondary p-2",
                           isLastItem ? " md:col-span-2" : "md:col-span-1",
                         )}
                       >
-                        <div className="flex items-center justify-center gap-2">
-                          {PersonnelPerformanceIcons[key]}
-                          <span className="text-primary">
-                            {PersonnelPerformanceTranslate[key]}
+                        <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl bg-secbuttn p-2">
+                          <span> {PersonnelPerformanceIcons[key]}</span>
+                          <span> {PersonnelPerformanceTranslate[key]}</span>
+                          <span className="text-accent">
+                            {commify((value as number).toFixed(0))}
                           </span>
                         </div>
-                        <span className="text-center font-bold text-accent">
-                          {commify((value as number).toFixed(0))}
-                        </span>
                       </div>
                     </>
                   );
@@ -225,10 +223,10 @@ export default function CityPage({ children, city }) {
                       <div
                         key={key}
                         className={twMerge(
-                          "flex  min-w-[180px] flex-col justify-center  gap-2 rounded-2xl bg-secondary p-2",
+                          "flex  min-w-[150px] flex-col justify-center  gap-2 rounded-2xl bg-secondary p-2",
                           isLastItem || index === 0
                             ? " md:col-span-2"
-                            : "md:col-span-1",
+                            : "col-span-1",
                         )}
                       >
                         <span className="break-words text-center font-bold text-accent">
