@@ -1,5 +1,6 @@
 import { ArrowDownAZIcon, ArrowUpAZIcon, EraserIcon } from "lucide-react";
 import React, { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
 
 export default function AdvancedList({
@@ -44,33 +45,46 @@ export default function AdvancedList({
     onChange(sorted);
     //setFilteredList(sorted);
   }
+
+  const myDisabled = filteredList.length <= 0 || disabled;
+
   return (
-    <div className="flex w-full max-w-sm flex-col items-center justify-center gap-1">
+    <div className="relative flex  w-full max-w-sm flex-col items-center justify-start gap-1">
       {title && (
-        <div className="w-full rounded-lg bg-secbuttn p-3 text-center text-lg font-bold text-primary">
+        <div className="w-full  rounded-lg bg-secbuttn p-3 text-center text-lg font-bold text-primary">
           {title}
         </div>
       )}
-      <div className="flex max-h-[500px] w-full  flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl bg-secbuttn p-1">
-        <div className="sticky top-0 z-10 flex w-full flex-col items-center justify-center gap-1 bg-secbuttn py-2 drop-shadow-lg ">
+      <div
+        className={twMerge(
+          "flex  w-full  flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl  p-1",
+          filteredList.length > 0 ? "max-h-[500px] bg-secbuttn" : " h-full",
+        )}
+      >
+        <div
+          className={twMerge(
+            "sticky top-0 z-10 flex w-full flex-col items-center justify-center gap-1  py-2 drop-shadow-lg ",
+            filteredList.length > 0 ? "bg-secbuttn" : "",
+          )}
+        >
           <input
             type="text"
             dir="rtl"
             placeholder="جستجو..."
             className=" w-full rounded-md bg-secondary p-2 text-primary disabled:bg-primary/30 disabled:text-secondary "
             onChange={(e) => filterBySearch(e.target.value)}
-            disabled={disabled}
+            disabled={myDisabled}
           />
           <div className="flex w-full items-center justify-stretch gap-2 ">
             <Button
-              disabled={disabled}
+              disabled={myDisabled}
               className="flex w-full items-center justify-around gap-2 bg-secondary  disabled:bg-primary/70 disabled:text-secondary"
             >
               <span>حذف انتخاب</span>
               <EraserIcon />
             </Button>
             <Button
-              disabled={disabled}
+              disabled={myDisabled}
               onClick={() => toggleSortOrder()}
               className="flex w-full items-center justify-around gap-2 bg-secondary text-accent  disabled:bg-primary/70 disabled:text-secondary"
             >
@@ -79,9 +93,15 @@ export default function AdvancedList({
             </Button>
           </div>
         </div>
+
         {filteredList.map((item, i) => {
           return renderItem(item, i);
         })}
+        {filteredList.length <= 0 && (
+          <div className=" flex h-full w-full items-center justify-center">
+            <span>دیتا ای موجود نیست</span>
+          </div>
+        )}
       </div>
     </div>
   );

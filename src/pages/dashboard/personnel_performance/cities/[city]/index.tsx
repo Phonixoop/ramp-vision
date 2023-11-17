@@ -119,7 +119,7 @@ export default function CityPage({ children, city }) {
         }}
         renderItem={(user, i) => {
           const isActive = user.NationalCode === selectedUser?.NationalCode;
-          const performance = 50;
+
           if (!user?.NationalCode)
             return (
               <div
