@@ -73,7 +73,7 @@ export default function AdvancedList({
             placeholder="جستجو..."
             className=" w-full rounded-md bg-secondary p-2 text-primary disabled:bg-primary/30 disabled:text-secondary "
             onChange={(e) => filterBySearch(e.target.value)}
-            disabled={myDisabled}
+            disabled={disabled}
           />
           <div className="flex w-full items-center justify-stretch gap-2 ">
             <Button
