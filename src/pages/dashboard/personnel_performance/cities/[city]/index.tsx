@@ -71,7 +71,7 @@ export default function CityPage({ children, city }) {
       filter: {
         CityName: [city],
         Start_Date: [
-          moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+          moment().locale("fa").subtract(3, "days").format("YYYY/MM/DD"),
         ],
       },
       periodType: "روزانه",
@@ -194,13 +194,16 @@ export default function CityPage({ children, city }) {
                       <div
                         key={key}
                         className={twMerge(
-                          "`p-2`  flex flex-col justify-center gap-2 rounded-2xl bg-secondary p-2",
+                          "`p-2`  flex flex-col justify-center gap-2 rounded-2xl bg-secondary  p-2",
                           isLastItem ? " md:col-span-2" : "md:col-span-1",
                         )}
                       >
                         <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl bg-secbuttn p-2">
                           <span> {PersonnelPerformanceIcons[key]}</span>
-                          <span> {PersonnelPerformanceTranslate[key]}</span>
+                          <span className="text-primary">
+                            {" "}
+                            {PersonnelPerformanceTranslate[key]}
+                          </span>
                           <span className="text-accent">
                             {commify((value as number).toFixed(0))}
                           </span>
@@ -268,7 +271,7 @@ export async function getStaticProps(ctx) {
     filter: {
       CityName: [city.toString()],
       Start_Date: [
-        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+        moment().locale("fa").subtract(3, "days").format("YYYY/MM/DD"),
       ],
     },
     periodType: "روزانه",
