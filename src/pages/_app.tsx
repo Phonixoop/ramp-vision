@@ -8,6 +8,7 @@ import { NextPage } from "next";
 import ProgressBar from "@badrap/bar-of-progress";
 import { useRouter } from "next/router";
 import { Toaster } from "~/components/ui/toast/toaster";
+import { PersonnelFilterProvider } from "~/context/personnel-filter.context";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   PageLayout?: (page: ReactElement) => ReactElement<any, any>;
@@ -90,14 +91,18 @@ function MyApp({
   return Component.PageLayout ? (
     <>
       <SessionProvider session={session}>
-        <Component.PageLayout {...pageProps} />
-        <Toaster />
+        <PersonnelFilterProvider>
+          <Component.PageLayout {...pageProps} />
+          <Toaster />
+        </PersonnelFilterProvider>
       </SessionProvider>
     </>
   ) : (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
-      <Toaster />
+      <PersonnelFilterProvider>
+        <Component {...pageProps} />
+        <Toaster />
+      </PersonnelFilterProvider>
     </SessionProvider>
   );
 }

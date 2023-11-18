@@ -1,17 +1,19 @@
-import { BarChart, SparkAreaChart } from "@tremor/react";
+import { AreaChart, BarChart, SparkAreaChart } from "@tremor/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import moment from "jalali-moment";
 import { Contact2Icon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import { InferGetStaticPropsType, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
+import { CITIES } from "~/constants";
 import {
   PersonnelPerformanceIcons,
   PersonnelPerformanceTranslate,
 } from "~/constants/personnel-performance";
+import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
 import Gauge from "~/features/gauge";
@@ -23,7 +25,7 @@ import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 
 import { api } from "~/utils/api";
-import { commify, getPerformanceText } from "~/utils/util";
+import { commify, getPerformanceText, processDataForChart } from "~/utils/util";
 
 const chartdata = [
   {
@@ -63,33 +65,83 @@ const chartdata = [
   },
 ];
 
+type CityWithPerformanceData = {
+  CityName_En: string;
+  CityName_Fa: string;
+  TotalPerformance: number;
+};
+
+function DistinctData(data = []) {
+  const result = Object.values(
+    data.reduce((acc, item) => {
+      const key = item.NameFamily;
+      if (!acc[key]) {
+        acc[key] = {
+          count: 1,
+          TotalPerformance: item.TotalPerformance,
+          Start_Date: item.Start_Date,
+          ...item,
+        };
+      } else {
+        acc[key].count++;
+        acc[key].TotalPerformance += item.TotalPerformance;
+        acc[key].Start_Date += "," + item.Start_Date;
+        for (const prop in item) {
+          if (typeof item[prop] === "number" && prop !== "TotalPerformance") {
+            acc[key][prop] = (acc[key][prop] || 0) + item[prop];
+          }
+        }
+      }
+      return acc;
+    }, {}),
+  );
+
+  result.forEach((item) => {
+    //@ts-ignore
+    item.TotalPerformance = item.TotalPerformance / item.count;
+  });
+
+  return result;
+}
 export default function CityPage({ children, city }) {
   const router = useRouter();
+  const {
+    filters,
+    setFilters,
+    reportPeriod,
+    setReportPeriod,
+    selectedDates,
+    setSelectedDates,
+    selectedPerson,
+    setSelectedPerson,
+    setSelectedCity,
+  } = usePersonnelFilter();
 
   const getAll = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
         CityName: [city],
-        Start_Date: [
-          moment().locale("fa").subtract(3, "days").format("YYYY/MM/DD"),
-        ],
+        Start_Date: filters?.filter?.Start_Date,
       },
-      periodType: "روزانه",
+      periodType: filters.periodType,
     },
-    {},
+    {
+      onSuccess: (data) => {
+        setSelectedPerson((prev) =>
+          data.result.find((a) => a.NationalCode === prev?.NationalCode),
+        );
+        setUpdatedList(DistinctData(data.result));
+      },
+      refetchOnWindowFocus: false,
+    },
   );
   const [updatedList, setUpdatedList] = useState(getAll.data?.result ?? []);
 
-  useEffect(() => {
-    setUpdatedList(getAll.data?.result);
-  }, [getAll.data?.result]);
-  const [selectedUser, setSelectedUser] = useState(undefined);
-
-  const numericItems = Object.entries(selectedUser ?? []).filter(
+  const numericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "number",
   );
 
-  const noneNumericItems = Object.entries(selectedUser ?? []).filter(
+  const noneNumericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "string",
   );
 
@@ -99,6 +151,43 @@ export default function CityPage({ children, city }) {
   numericItems.sort(
     (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
   );
+
+  const fullData = processDataForChart(
+    getAll?.data?.result ?? [],
+    "Start_Date",
+    [
+      "SabtAvalieAsnad",
+      "PazireshVaSabtAvalieAsnad",
+      "ArzyabiAsanadBimarsetaniDirect",
+      "ArzyabiAsnadBimarestaniIndirect",
+      "ArzyabiAsnadDandanVaParaDirect",
+      "ArzyabiAsnadDandanVaParaIndirect",
+      "ArzyabiAsnadDaroDirect",
+      "ArzyabiAsnadDaroIndirect",
+      "TotalPerformance",
+    ],
+  ).map((d) => {
+    d.TotalPerformance = (
+      d.TotalPerformance /
+        getAll?.data?.result.map((a) => a.Start_Date === d.key).length ?? 1
+    ).toFixed(0);
+
+    const translatedData = {};
+    for (const key in d) {
+      if (PersonnelPerformanceTranslate[key]) {
+        translatedData[PersonnelPerformanceTranslate[key]] = d[key];
+      } else {
+        translatedData[key] = d[key];
+      }
+    }
+
+    return translatedData;
+  });
+
+  useEffect(() => {
+    setSelectedPerson(undefined);
+  }, [router]);
+
   return (
     <CitiesPage>
       <AdvancedList
@@ -110,16 +199,19 @@ export default function CityPage({ children, city }) {
             />
           </span>
         }
+        isLoading={getAll.isLoading}
         disabled={!!!updatedList}
-        list={getAll.data?.result}
-        filteredList={updatedList ?? [...new Array(10).keys()]}
+        list={DistinctData(getAll?.data?.result)}
+        filteredList={
+          !getAll.isLoading
+            ? updatedList
+            : [...new Array(10).map((a) => [undefined, a])]
+        }
         selectProperty={"NameFamily"}
         onChange={(updatedList) => {
           setUpdatedList(updatedList);
         }}
         renderItem={(user, i) => {
-          const isActive = user.NationalCode === selectedUser?.NationalCode;
-
           if (!user?.NationalCode)
             return (
               <div
@@ -135,6 +227,7 @@ export default function CityPage({ children, city }) {
                 <span className="h-4 w-4 rounded-lg bg-secbuttn" />
               </div>
             );
+          const isActive = user.NationalCode === selectedPerson?.NationalCode;
           return (
             <>
               <Button
@@ -146,7 +239,7 @@ export default function CityPage({ children, city }) {
                     : " bg-secondary  text-primary",
                 )}
                 onClick={() => {
-                  setSelectedUser(user);
+                  setSelectedPerson(user);
                 }}
               >
                 <div className=" flex w-full flex-row-reverse items-center justify-between gap-2  px-2 text-right ">
@@ -164,11 +257,20 @@ export default function CityPage({ children, city }) {
                   </div>
                   <div className="flex w-full items-center justify-center">
                     <SparkAreaChart
-                      data={chartdata}
-                      categories={["Performance", "Benchmark"]}
-                      index={"month"}
+                      data={getAll?.data?.result
+                        .filter((a) => a.NameFamily === user.NameFamily)
+                        .map((a) => {
+                          return {
+                            TotalPerformance: a.TotalPerformance,
+                            Start_Date: a.Start_Date,
+
+                            Middle: 80,
+                          };
+                        })}
+                      categories={["TotalPerformance", "Middle"]}
+                      index={"Start_Date"}
                       colors={["purple", "cyan"]}
-                      className="h-10 w-36"
+                      className="h-10 w-36 cursor-pointer"
                     />
                   </div>
                   <span className="w-full text-sm ">{user.NameFamily}</span>
@@ -179,8 +281,8 @@ export default function CityPage({ children, city }) {
         }}
       />
 
-      <div className="flex  w-full flex-col items-center justify-center gap-1  rounded-2xl bg-secbuttn p-1">
-        {selectedUser && (
+      <div className="flex  w-full flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn p-1">
+        {selectedPerson && (
           <>
             <div className="flex w-full flex-col items-start justify-center gap-5 xl:flex-row">
               <div
@@ -189,6 +291,7 @@ export default function CityPage({ children, city }) {
               >
                 {numericItems.map(([key, value], index, array) => {
                   const isLastItem = index === array.length - 1;
+                  if (!PersonnelPerformanceIcons[key]) return;
                   return (
                     <>
                       <div
@@ -201,7 +304,6 @@ export default function CityPage({ children, city }) {
                         <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl bg-secbuttn p-2">
                           <span> {PersonnelPerformanceIcons[key]}</span>
                           <span className="text-primary">
-                            {" "}
                             {PersonnelPerformanceTranslate[key]}
                           </span>
                           <span className="text-accent">
@@ -242,15 +344,42 @@ export default function CityPage({ children, city }) {
                 <div className="col-span-2  flex  w-full flex-col items-center justify-center   ">
                   <H2>عملکرد</H2>
 
-                  <Gauge value={selectedUser.TotalPerformance} />
+                  <Gauge value={selectedPerson.TotalPerformance} />
                   <p className="text-accent">
-                    {getPerformanceText(selectedUser.TotalPerformance)}
+                    {getPerformanceText(selectedPerson.TotalPerformance)}
                   </p>
                 </div>
               </div>
             </div>
           </>
         )}
+        <div
+          className={twMerge(
+            "flex w-full  flex-col items-center justify-center gap-2  rounded-xl  p-5",
+            selectedPerson ? "bg-secondary" : "",
+          )}
+        >
+          <H2>
+            نمای کلی شهر{" "}
+            {CITIES.find((a) => a.EnglishName === city).PersianName}
+          </H2>
+          <AreaChart
+            data={fullData}
+            dir="rtl"
+            index="key"
+            categories={[
+              "ثبت اولیه اسناد",
+              "پذیرش و ثبت اولیه اسناد",
+              "ارزیابی اسناد بیمارستانی مستقیم",
+              "ارزیابی اسناد بیمارستانی غیر مستقیم",
+              "ارزیابی اسناد دندان و پارا مستقیم",
+              "ارزیابی اسناد دندان و پارا غیر مستقیم",
+              "ارزیابی اسناد دارو مستقیم",
+              "ارزیابی اسناد دارو غیر مستقیم",
+              "عملکرد",
+            ]}
+          />
+        </div>
       </div>
     </CitiesPage>
   );

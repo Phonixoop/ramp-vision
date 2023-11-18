@@ -67,6 +67,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
             input.filter.CityName.includes(value),
           );
 
+        if (filter.CityName.length <= 0) return new Error("No Permission");
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
         
@@ -126,20 +127,22 @@ export const personnelPerformanceRouter = createTRPCRouter({
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
-
+          const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(
             filter,
             ["Start_Date"],
-            "SUBSTRING(Start_Date, 1, 7)",
+            undefined,
+            `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}') AND `,
           );
-          whereClause += `Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date
 
+          whereClause += `Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date
+            
           Order By CityName,NameFamily `;
-          const date = filter.Start_Date[0].split("/");
-          const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
-            parseInt(date[0]),
-            parseInt(date[1]),
-          );
+          // const date = filter.Start_Date[0].split("/");
+          // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
+          //   parseInt(date[0]),
+          //   parseInt(date[1]),
+          // );
 
           // console.log(date, lastWeek);
           // const monthName = moment()
@@ -161,9 +164,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        console.log(query);
+        //console.log(query);
         const result = await sql.query(query);
-        console.log({ input });
+        // console.log({ input });
         if (input.periodType === "روزانه") {
           finalResult = result.recordsets[0];
         }
@@ -369,37 +372,92 @@ export const personnelPerformanceRouter = createTRPCRouter({
       return error;
     }
   }),
-  getCitiesWithPerformance: protectedProcedure.query(async ({ ctx }) => {
-    try {
-      // Connect to SQL Server
+  getCitiesWithPerformance: protectedProcedure
+    .input(
+      z.object({
+        periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("روزانه"),
+        filter: z.object({
+          Start_Date: z.array(z.string()).nullish(),
+        }),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        // Connect to SQL Server
 
-      const permissions = await getPermission({ ctx });
-      const cities = permissions
-        .find((permission) => permission.id === "ViewCities")
-        .subPermissions.filter((permission) => permission.isActive)
-        .map((permission) => permission.enLabel);
+        const permissions = await getPermission({ ctx });
+        const cities = permissions
+          .find((permission) => permission.id === "ViewCities")
+          .subPermissions.filter((permission) => permission.isActive)
+          .map((permission) => permission.enLabel);
 
-      const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
+        let whereClause = generateWhereClause({
+          CityName: cities,
+          Start_Date: input.filter.Start_Date,
+        });
+
+        let filter = input.filter;
+        // let queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
+        // `;
+
+        let queryCities = `
+          
+          
+        SELECT DISTINCT CityName,SUM(TotalPerformance) / Count(CityName) as TotalPerformance,p.Start_Date 
+        FROM dbName.dbo.personnel_performance as p
+        JOIN
+        RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
+            ${whereClause}
+
+        group by CityName,p.Start_Date ORDER BY CityName ASC
         `;
 
-      const resultOfCities = await sql.query(queryCities);
+        if (input.periodType === "هفتگی") {
+          filter.Start_Date = [filter.Start_Date[0]];
 
-      // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-      // console.log(queryDocumentTypes);
-      // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+          whereClause = generateWhereClause(filter);
+        }
+        if (input.periodType === "ماهانه") {
+          filter.Start_Date = filter.Start_Date.map((d) => {
+            return extractYearAndMonth(d);
+          });
+          const date = filter.Start_Date[0].split("/");
+          whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
+          queryCities = `
+          
+          
+          SELECT DISTINCT CityName,SUM(TotalPerformance) / Count(CityName) as TotalPerformance,p.Start_Date 
+          FROM dbName.dbo.personnel_performance as p
+          JOIN
+          RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
+              ${whereClause} AND SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}')
+  
+          group by CityName,p.Start_Date ORDER BY CityName ASC
+          `;
+        }
 
-      const result = {
-        Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
-      };
+        if (input.periodType === "هفتگی")
+          queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
+        else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
+        console.log(queryCities);
+        console.log(input, whereClause);
+        const resultOfCities = await sql.query(queryCities);
 
-      return result;
-      // Respond with the fetched data
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-      return error;
-    }
-  }),
+        // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
+        // console.log(queryDocumentTypes);
+        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+
+        // const result = {
+        //   Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
+        // };
+
+        return resultOfCities.recordsets[0];
+        // Respond with the fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+        return error;
+      }
+    }),
   getUsersByCityName: protectedProcedure
     .input(
       z.object({

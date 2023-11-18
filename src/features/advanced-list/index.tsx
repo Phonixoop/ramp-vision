@@ -1,4 +1,9 @@
-import { ArrowDownAZIcon, ArrowUpAZIcon, EraserIcon } from "lucide-react";
+import {
+  ArrowDownAZIcon,
+  ArrowUpAZIcon,
+  EraserIcon,
+  Tally5Icon,
+} from "lucide-react";
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
@@ -7,6 +12,7 @@ export default function AdvancedList({
   title = <></> || "",
   list = [],
   filteredList = [],
+  isLoading = false,
   disabled = false,
   selectProperty = undefined,
 
@@ -58,7 +64,9 @@ export default function AdvancedList({
       <div
         className={twMerge(
           "flex  w-full  flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl  p-1",
-          filteredList.length > 0 ? "max-h-[500px] bg-secbuttn" : " h-full",
+          filteredList.length > 0
+            ? "max-h-[500px] min-h-[500px]  bg-secbuttn"
+            : "h-full min-h-[500px]",
         )}
       >
         <div
@@ -76,13 +84,11 @@ export default function AdvancedList({
             disabled={disabled}
           />
           <div className="flex w-full items-center justify-stretch gap-2 ">
-            <Button
-              disabled={myDisabled}
-              className="flex w-full items-center justify-around gap-2 bg-secondary  disabled:bg-primary/70 disabled:text-secondary"
-            >
-              <span>حذف انتخاب</span>
-              <EraserIcon />
-            </Button>
+            <div className="flex w-full items-center justify-around gap-2   rounded-lg bg-primary/10 p-2  text-primary">
+              <Tally5Icon />
+              <span>{filteredList.length}</span>
+            </div>
+
             <Button
               disabled={myDisabled}
               onClick={() => toggleSortOrder()}
@@ -97,7 +103,7 @@ export default function AdvancedList({
         {filteredList.map((item, i) => {
           return renderItem(item, i);
         })}
-        {filteredList.length <= 0 && (
+        {list.length <= 0 && !isLoading && (
           <div className=" flex h-full w-full items-center justify-center">
             <span>دیتا ای موجود نیست</span>
           </div>

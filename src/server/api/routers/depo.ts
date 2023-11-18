@@ -87,11 +87,18 @@ export const depoRouter = createTRPCRouter({
             return extractYearAndMonth(d);
           });
           const date = filter.Start_Date[0].split("/");
+
+          const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
+            parseInt(date[0]),
+            parseInt(date[1]),
+          );
+
+          const secondDate = secondDayOfNextMonth.split("/");
           whereClause = generateWhereClause(
             filter,
             ["Start_Date"],
             undefined,
-            `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}','1402/08') AND`,
+            `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}','${secondDate[0]}/${secondDate[1]}') AND`,
           );
           whereClause += ` group by ServiceName,DocumentType,CityName ORDER BY CityName`;
 
@@ -100,10 +107,6 @@ export const depoRouter = createTRPCRouter({
           //   parseInt(date[1]),
           // );
 
-          const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
-            parseInt(date[0]),
-            parseInt(date[1]),
-          );
           // console.log(date, lastWeek);
           // const monthName = moment()
           //   .locale("fa")
