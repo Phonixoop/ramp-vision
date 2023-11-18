@@ -122,6 +122,8 @@ export default function CityPage({ children, city }) {
       filter: {
         CityName: [city],
         Start_Date: filters?.filter?.Start_Date,
+        ProjectType: filters?.filter?.ProjectType,
+        Role: filters?.filter?.Role,
       },
       periodType: filters.periodType,
     },

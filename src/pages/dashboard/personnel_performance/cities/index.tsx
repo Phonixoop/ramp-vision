@@ -36,7 +36,7 @@ import {
   PersonnelFilterProvider,
   usePersonnelFilter,
 } from "~/context/personnel-filter.context";
-import { SelectColumnFilter } from "~/features/checkbox-list";
+import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
 
 type CityWithPerformanceData = {
   CityName_En: string;
@@ -87,8 +87,8 @@ export default function CitiesPage({ children }) {
         periodType: filters?.periodType,
         filter: {
           Start_Date: filters?.filter?.Start_Date,
-          // ProjectType : filters?.filter?.ProjectType,
-          // Role : filters?.filter?.Role,
+          ProjectType: filters?.filter?.ProjectType,
+          Role: filters?.filter?.Role,
         },
       },
       {
@@ -121,8 +121,8 @@ export default function CitiesPage({ children }) {
 
   // const persianNames = intersection.map((city) => city.PersianName);
 
-  // const getInitialFilters =
-  //   api.personnelPerformance.getInitialFilters.useQuery();
+  const getInitialFilters =
+    api.personnelPerformance.getInitialFilters.useQuery();
 
   return (
     <>
@@ -131,7 +131,10 @@ export default function CitiesPage({ children }) {
       <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
         <Header />
 
-        <div className="m-auto w-11/12 " dir="rtl">
+        <div
+          className="m-auto flex w-11/12 items-center justify-center"
+          dir="rtl"
+        >
           <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
             <span className="font-bold text-primary">تاریخ</span>
             <LayoutGroup id="DateMenu">
@@ -191,14 +194,61 @@ export default function CitiesPage({ children }) {
               }}
             />
           </div>
-          <div>
-            {" "}
-            {/* <SelectColumnFilter
-              initialFilters={["جبران"]}
-              column={column}
-              data={personnelPerformance.data?.result}
-            /> */}
-          </div>
+          {!getInitialFilters.isLoading && (
+            <>
+              <div className="w-full">
+                {
+                  <SelectControlled
+                    title={"نوع پروژه"}
+                    list={[
+                      ...new Set(
+                        getInitialFilters?.data
+                          ?.map((a) => a.ProjectType)
+                          .filter((a) => a),
+                      ),
+                    ]}
+                    value={filters.filter.ProjectType ?? ["جبران"]}
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            ProjectType: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                }
+              </div>
+
+              <SelectControlled
+                title={""}
+                list={[
+                  ...new Set(
+                    getInitialFilters?.data
+                      ?.map((a) => a.Role)
+                      .filter((a) => a),
+                  ),
+                ]}
+                value={filters.filter.Role ?? [""]}
+                onChange={(values) => {
+                  //@ts-ignore
+                  setFilters((prev) => {
+                    return {
+                      periodType: reportPeriod,
+                      filter: {
+                        ...prev.filter,
+                        Role: values,
+                      },
+                    };
+                  });
+                }}
+              />
+            </>
+          )}
         </div>
 
         <div className="m-auto flex w-11/12 flex-col justify-start gap-5 py-10 xl:flex-row-reverse">

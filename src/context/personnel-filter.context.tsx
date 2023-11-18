@@ -7,6 +7,11 @@ type FilterType = {
   periodType: PeriodType;
   filter: {
     Start_Date: string[];
+    ProjectType?: string[];
+    ContractType?: string[];
+    Role?: string[];
+    RoleType?: string[];
+    DateInfo?: string[];
   };
 };
 

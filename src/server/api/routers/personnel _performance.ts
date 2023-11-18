@@ -219,27 +219,19 @@ export const personnelPerformanceRouter = createTRPCRouter({
     try {
       // Connect to SQL Server
 
-      const permissions = await getPermission({ ctx });
-      const cities = permissions
-        .find((permission) => permission.id === "ViewCities")
-        .subPermissions.filter((permission) => permission.isActive)
-        .map((permission) => permission.enLabel);
+      // const permissions = await getPermission({ ctx });
+      // const cities = permissions
+      //   .find((permission) => permission.id === "ViewCities")
+      //   .subPermissions.filter((permission) => permission.isActive)
+      //   .map((permission) => permission.enLabel);
 
-      const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
+      //  const whereClause = generateWhereClause({ CityName: cities });
+      const query = `SELECT DISTINCT Role,RoleType,ContractType, ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
       `;
 
-      const resultOfCities = await sql.query(queryCities);
+      const result = await sql.query(query);
 
-      // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-      // console.log(queryDocumentTypes);
-      // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
-
-      const result = {
-        Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
-      };
-
-      return result;
+      return result.recordsets[0];
       // Respond with the fetched data
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -378,6 +370,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
         periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("روزانه"),
         filter: z.object({
           Start_Date: z.array(z.string()).nullish(),
+          ProjectType: z.array(z.string()).nullish(),
+          ContractType: z.array(z.string()).nullish(),
+          Role: z.array(z.string()).nullish(),
+          RoleType: z.array(z.string()).nullish(),
+          DateInfo: z.array(z.string()).nullish().default(["1402/03/31"]),
         }),
       }),
     )
@@ -439,8 +436,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         if (input.periodType === "هفتگی")
           queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
         else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-        console.log(queryCities);
-        console.log(input, whereClause);
+
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;

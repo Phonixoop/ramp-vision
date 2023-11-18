@@ -167,7 +167,7 @@ function PersonnelPerformanceTable({ sessionData }) {
   const [filters, setDataFilters] = useState({
     periodType: reportPeriod,
     filter: {
-      CityName: initialFilters.data?.Cities.map((a) => a.CityName),
+      CityName: initialFilters.data?.Cities?.map((a) => a.CityName),
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
