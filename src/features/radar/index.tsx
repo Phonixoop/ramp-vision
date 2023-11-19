@@ -1,3 +1,4 @@
+import moment from "jalali-moment";
 import React, { PureComponent } from "react";
 import {
   Radar,
@@ -11,7 +12,7 @@ import {
 import { api } from "~/utils/api";
 import { calculateAggregateByFields } from "~/utils/util";
 
-const data = [
+const fakeData = [
   {
     subject: "1",
     A: 100,
@@ -182,7 +183,49 @@ function aggregateData(inputData = []) {
 
   return result;
 }
+function assignColorsToItems(items) {
+  const colors = [
+    "#2196F3", // Blue
+    "#F44336", // Red
+    "#4CAF50", // Green
+    "#9C27B0", // Purple
+    "#E91E63", // Pink
+    "#009688", // Teal
+    "#00BCD4", // Cyan
+    "#673AB7", // Deep Purple
+    "#3F51B5", // Indigo
+    "#FFC107", // Amber
+    "#FF5722", // Deep Orange
+    "#795548", // Brown
+    "#607D8B", // Blue Grey
+    "#FF9800", // Orange
+    "#9E9E9E", // Grey
+    "#9C27B0", // Purple
+    "#3F51B5", // Indigo
+    "#E91E63", // Pink
+    "#FF5722", // Deep Orange
+    "#FF9800", // Orange
+    "#795548", // Brown
+    "#673AB7", // Deep Purple
+    "#9C27B0", // Purple
+    "#E91E63", // Pink
+    "#FFC107", // Amber
+    "#4CAF50", // Green
+    "#00BCD4", // Cyan
+    "#2196F3", // Blue
+    "#F44336", // Red
+    "#607D8B", // Blue Grey
+    "#9E9E9E", // Grey
+  ];
+  const result = [];
 
+  items.forEach((item, index) => {
+    const color = colors[index % colors.length];
+    result.push({ name: item, color: color });
+  });
+
+  return result;
+}
 export default function RadarGauge({ CityName = [] }) {
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
@@ -202,7 +245,7 @@ export default function RadarGauge({ CityName = [] }) {
           DateInfo: ["1402/03/31"],
           ContractType: ["تمام وقت"],
           RoleType: [],
-          Start_Date: ["1402/07/01"],
+          Start_Date: [moment().locale("fa").format("yyyy/MM/01")],
         },
       },
       {
@@ -225,44 +268,48 @@ export default function RadarGauge({ CityName = [] }) {
   //   );
   const data = aggregateData(getCitiesWithPerformance?.data).map((a) => {
     const dd = a;
-    dd["subject"] = a.date.split("/")[2];
-    delete dd.date;
+    dd.date = a.date.split("/")[2];
 
     dd["fullMark"] = 200;
     return a;
   });
-  const distinctCities = getDistinctCityNames(getCitiesWithPerformance?.data);
-  console.log(data ?? "no data");
+  const distinctCities = assignColorsToItems(
+    getDistinctCityNames(getCitiesWithPerformance?.data),
+  );
+
   return (
-    <div className="h-auto w-full rounded-2xl bg-secbuttn  ">
+    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn py-5 ">
+      {moment().locale("fa").format("MMMM")}
       <ResponsiveContainer
-        className="stroke-primary"
-        width="100%"
-        height="100%"
+        width={400}
+        height={300}
+        className="flex items-center justify-center stroke-primary"
       >
         <RadarChart
           className="stroke-primary"
-          cx="50%"
-          cy="50%"
-          outerRadius="100%"
+          cx={"50%"}
+          cy={"50%"}
+          outerRadius={150}
           data={data}
         >
           <PolarGrid className="stroke-primary" />
-          <PolarAngleAxis className="stroke-primary" dataKey="subject" />
+          <PolarAngleAxis className="stroke-primary" dataKey="date" />
           <PolarRadiusAxis
             className="stroke-primary"
             angle={30}
-            domain={[0, 5]}
+            domain={[0, 1]}
           />
 
-          {distinctCities.map((cityName) => {
+          {distinctCities.map((city) => {
             return (
               <>
                 <Radar
-                  key={cityName}
-                  name={cityName}
-                  dataKey={cityName}
-                  className=" fill-accent stroke-primary"
+                  legendType="none"
+                  key={city.name}
+                  name={city.name}
+                  dataKey={city.name}
+                  fill={city.color}
+                  className=" stroke-primary"
                   fillOpacity={0.6}
                 />
               </>
@@ -272,6 +319,22 @@ export default function RadarGauge({ CityName = [] }) {
           <Legend />
         </RadarChart>
       </ResponsiveContainer>
+      <div className="flex flex-wrap items-center justify-center gap-2 ">
+        {distinctCities.map((city) => {
+          return (
+            <>
+              <span
+                style={{
+                  background: city.color,
+                }}
+                className="rounded-xl  bg-secondary p-2  "
+              >
+                <p className="text-xs  text-primary">{city.name}</p>
+              </span>
+            </>
+          );
+        })}
+      </div>
     </div>
   );
 }

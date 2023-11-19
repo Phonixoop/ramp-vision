@@ -668,7 +668,7 @@ function DeposTable({ sessionData }) {
 
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-full  items-stretch justify-between gap-5 laptopMax:flex-col-reverse">
+                        <div className="flex w-full  items-center justify-between gap-5 laptopMax:flex-col-reverse">
                           <>
                             {/* <TrackerView data={getTracker.data ?? []} /> */}
 
