@@ -259,6 +259,7 @@ export default function RadarGauge({ CityName = [] }) {
             return (
               <>
                 <Radar
+                  key={cityName}
                   name={cityName}
                   dataKey={cityName}
                   className=" fill-accent stroke-primary"
