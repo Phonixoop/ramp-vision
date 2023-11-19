@@ -45,6 +45,10 @@ export const MENU = [
     link: "/dashboard/depo",
   },
   {
+    value: "جزئیات عملکرد پرسنل شعب (جدول)",
+    link: "/dashboard/personnel_performance",
+  },
+  {
     value: "جزئیات عملکرد پرسنل شعب",
     link: "/dashboard/personnel_performance/cities",
   },

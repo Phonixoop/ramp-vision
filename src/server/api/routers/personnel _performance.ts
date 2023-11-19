@@ -37,7 +37,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           .string(z.enum(["روزانه", "هفتگی", "ماهانه"]))
           .default("روزانه"),
         filter: z.object({
-          CityName: z.array(z.string()).nullish(),
+          CityName: z.array(z.string()).nullish().default([]),
           DocumentType: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
           NameFamily: z.array(z.string()).nullish(),
@@ -45,7 +45,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish(),
+          DateInfo: z.array(z.string()).nullish().default(["1402/03/31"]),
         }),
       }),
     )
@@ -62,12 +62,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         let filter = input.filter;
 
-        if (input.filter.CityName?.length > 0)
+        if (filter.CityName?.length > 0)
           filter.CityName = cities.filter((value) =>
             input.filter.CityName.includes(value),
           );
-
-        if (filter.CityName.length <= 0) return new Error("No Permission");
+        if (filter.CityName.length <= 0) filter.CityName = cities;
+        console.log(filter);
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
         
@@ -92,7 +92,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
           whereClause = generateWhereClause(filter);
-          whereClause += `Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "هفتگی") {
@@ -101,7 +101,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           filter.Start_Date = [filter.Start_Date[0]];
 
           whereClause = generateWhereClause(filter);
-          whereClause += `Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "ماهانه") {
@@ -135,7 +135,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
             `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}') AND `,
           );
 
-          whereClause += `Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date
+          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date
             
           Order By CityName,NameFamily `;
           // const date = filter.Start_Date[0].split("/");
@@ -164,7 +164,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        //console.log(query);
+        //  console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -226,12 +226,17 @@ export const personnelPerformanceRouter = createTRPCRouter({
       //   .map((permission) => permission.enLabel);
 
       //  const whereClause = generateWhereClause({ CityName: cities });
-      const query = `SELECT DISTINCT Role,RoleType,ContractType, ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
+      const query = `SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
+
+      SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
       `;
 
       const result = await sql.query(query);
-
-      return result.recordsets[0];
+      console.log(result.recordsets);
+      return {
+        usersInfo: result.recordsets[0],
+        Cities: result.recordsets[1],
+      };
       // Respond with the fetched data
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -260,7 +265,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           (item) => input.filter.CityName?.includes(item),
         );
 
-        console.log(JSON.stringify(commonCities, null, 2));
+        // console.log(JSON.stringify(commonCities, null, 2));
         const days = getDatesForLastMonth();
         const whereClause = generateWhereClause({
           CityName: commonCities,

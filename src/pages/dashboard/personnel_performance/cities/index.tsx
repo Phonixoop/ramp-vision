@@ -201,39 +201,13 @@ export default function CitiesPage({ children }) {
             </div>
             {!getInitialFilters.isLoading && (
               <>
-                <div className="flex min-w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">نوع نقش</span>
-                  <SelectControlled
-                    title={"نوع پروژه"}
-                    list={[
-                      ...new Set(
-                        getInitialFilters?.data
-                          ?.map((a) => a.ProjectType)
-                          .filter((a) => a),
-                      ),
-                    ]}
-                    value={filters.filter.ProjectType ?? ["جبران"]}
-                    onChange={(values) => {
-                      //@ts-ignore
-                      setFilters((prev) => {
-                        return {
-                          periodType: reportPeriod,
-                          filter: {
-                            ...prev.filter,
-                            ProjectType: values,
-                          },
-                        };
-                      });
-                    }}
-                  />
-                </div>
                 <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">نقش</span>
                   <SelectControlled
                     title={"نقش"}
                     list={[
                       ...new Set(
-                        getInitialFilters?.data
+                        getInitialFilters?.data?.usersInfo
                           ?.map((a) => a.Role)
                           .filter((a) => a),
                       ),
@@ -262,13 +236,40 @@ export default function CitiesPage({ children }) {
                     }}
                   />
                 </div>
+                <div className="flex min-w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">نوع پروژه</span>
+                  <SelectControlled
+                    title={"نوع پروژه"}
+                    list={[
+                      ...new Set(
+                        getInitialFilters?.data?.usersInfo
+                          ?.map((a) => a.ProjectType)
+                          .filter((a) => a),
+                      ),
+                    ]}
+                    value={filters.filter.ProjectType ?? ["جبران"]}
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            ProjectType: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                </div>
+
                 <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">نوع قرار داد</span>
                   <SelectControlled
                     title={"نوع قرار داد"}
                     list={[
                       ...new Set(
-                        getInitialFilters?.data
+                        getInitialFilters?.data?.usersInfo
                           ?.map((a) => a.ContractType)
                           .filter((a) => a),
                       ),
@@ -294,7 +295,7 @@ export default function CitiesPage({ children }) {
                     title={"نوع نقش"}
                     list={[
                       ...new Set(
-                        getInitialFilters?.data
+                        getInitialFilters?.data?.usersInfo
                           ?.map((a) => a.RoleType)
                           .filter((a) => a),
                       ),
@@ -322,7 +323,7 @@ export default function CitiesPage({ children }) {
                     title={"تاریخ گزارش پرنسل"}
                     list={[
                       ...new Set(
-                        getInitialFilters?.data
+                        getInitialFilters?.data?.usersInfo
                           ?.map((a) => a.DateInfo)
                           .filter((a) => a),
                       ),
@@ -352,13 +353,13 @@ export default function CitiesPage({ children }) {
             {selectedPerson && <span>{"/"}</span>}
             <span>
               {
-                CITIES.find((a) => a.EnglishName === router.query.city)
-                  .PersianName
+                CITIES.find((a) => a.EnglishName === router.query?.city)
+                  ?.PersianName
               }
             </span>
           </div>
         </div>
-        <div className="m-auto flex w-11/12 flex-col justify-start gap-5  xl:flex-row-reverse">
+        <div className="m-auto flex w-11/12 flex-col justify-start gap-5  pb-10 xl:flex-row-reverse">
           <AdvancedList
             title={
               <span className="flex items-center justify-center gap-2 text-primary">

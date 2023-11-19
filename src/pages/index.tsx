@@ -50,24 +50,7 @@ import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
 import Image from "next/image";
-const menu = [
-  {
-    value: "خانه",
-    link: "/",
-  },
-  {
-    value: "درباره ویژن",
-    link: "atysa.ir",
-  },
-  {
-    value: "جزئیات عملکرد شعب",
-    link: "/dashboard/depo",
-  },
-  {
-    value: "جزئیات عملکرد پرسنل شعب",
-    link: "/dashboard/personnel_performance",
-  },
-];
+
 function CustomInput({ value, openCalendar }) {
   return (
     <>
