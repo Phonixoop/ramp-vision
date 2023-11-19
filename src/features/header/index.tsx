@@ -19,7 +19,13 @@ function checkStatusForMenu(status) {
       switch (menu.value) {
         case "جزئیات عملکرد شعب":
           return false;
+        case "جزئیات عملکرد پرسنل شعب (جدول)":
+          return false;
         case "جزئیات عملکرد پرسنل شعب":
+          return false;
+        case "گیج عملکرد شهر ها":
+          return false;
+        case "پرسنل":
           return false;
       }
       return true;
