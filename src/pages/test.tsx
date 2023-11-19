@@ -3,15 +3,24 @@ import { Card, Title, BarChart, Subtitle } from "@tremor/react";
 import moment from "jalali-moment";
 import H2 from "~/ui/heading/h2";
 import Gauge from "~/features/gauge";
+import { SelectControlled } from "~/features/checkbox-list";
 export default function Test() {
   return (
-    <div className="mx-auto w-6/12">
-      <div className="flex w-full flex-col items-center  justify-between gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
-        <H2>عملکرد</H2>
-        <p className="text-right">% {(75).toFixed(2)}</p>
-        <Gauge value={75} />
+    <>
+      <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
+        <div
+          className="m-auto flex w-11/12 items-center justify-center"
+          dir="rtl"
+        >
+          <SelectControlled
+            title={"s"}
+            list={Array.from(Array(100).keys()).map((a) => a.toString())}
+            value={[0]}
+            onChange={() => {}}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

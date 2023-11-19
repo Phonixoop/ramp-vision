@@ -37,6 +37,7 @@ import {
   usePersonnelFilter,
 } from "~/context/personnel-filter.context";
 import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
+import H2 from "~/ui/heading/h2";
 
 type CityWithPerformanceData = {
   CityName_En: string;
@@ -78,7 +79,7 @@ export default function CitiesPage({ children }) {
     setReportPeriod,
     selectedDates,
     setSelectedDates,
-    setSelectedCity,
+    selectedPerson,
   } = usePersonnelFilter();
 
   const getCitiesWithPerformance =
@@ -89,6 +90,9 @@ export default function CitiesPage({ children }) {
           Start_Date: filters?.filter?.Start_Date,
           ProjectType: filters?.filter?.ProjectType,
           Role: filters?.filter?.Role,
+          ContractType: filters?.filter?.ContractType,
+          RoleType: filters?.filter?.RoleType,
+          DateInfo: filters?.filter?.DateInfo,
         },
       },
       {
@@ -130,74 +134,75 @@ export default function CitiesPage({ children }) {
 
       <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
         <Header />
+        <div className="mx-auto flex w-11/12 flex-col items-center justify-center gap-5 rounded-xl bg-primbuttn/10 p-2">
+          <H2 className="text-xl">فیلتر ها</H2>
+          <div
+            className="min-w-  z-20 flex flex-wrap items-stretch justify-center gap-5"
+            dir="rtl"
+          >
+            <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <span className="font-bold text-primary">تاریخ</span>
+              <LayoutGroup id="DateMenu">
+                <InPageMenu
+                  list={Object.keys(Reports_Period)}
+                  value={0}
+                  onChange={(value) => {
+                    setReportPeriod(value.item.name);
+                  }}
+                />
+              </LayoutGroup>
+              {/* {deferredFilter.filter.Start_Date} */}
+              <DatePicker
+                //@ts-ignore
+                render={(value, openCalendar) => {
+                  const seperator =
+                    filters?.periodType == "روزانه" ? " , " : " ~ ";
+                  return (
+                    <Button
+                      className="min-w- border border-dashed border-accent text-center hover:bg-accent/20"
+                      onClick={openCalendar}
+                    >
+                      {filters?.filter.Start_Date.join(seperator)}
+                    </Button>
+                  );
+                }}
+                inputClass="text-center"
+                multiple={reportPeriod !== "ماهانه"}
+                value={filters?.filter.Start_Date}
+                calendar={persian}
+                locale={persian_fa}
+                weekPicker={reportPeriod === "هفتگی"}
+                onlyMonthPicker={reportPeriod === "ماهانه"}
+                plugins={[<DatePanel key={"00DatePanel"} />]}
+                onClose={() => {
+                  //@ts-ignore
+                  setFilters((prev) => {
+                    return {
+                      periodType: reportPeriod,
+                      filter: {
+                        Start_Date: selectedDates,
+                      },
+                    };
+                  });
+                }}
+                onChange={(date) => {
+                  //@ts-ignore
+                  if (!date) return;
 
-        <div
-          className="m-auto flex w-11/12 items-center justify-center"
-          dir="rtl"
-        >
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">تاریخ</span>
-            <LayoutGroup id="DateMenu">
-              <InPageMenu
-                list={Object.keys(Reports_Period)}
-                value={0}
-                onChange={(value) => {
-                  setReportPeriod(value.item.name);
+                  if (Array.isArray(date) && date.length <= 0) return;
+                  const dates = Array.isArray(date)
+                    ? date.map((a) => en(a.format("YYYY/MM/DD")))
+                    : [en(date.format("YYYY/MM/DD"))];
+                  setSelectedDates(dates);
+
+                  // setSelectedDates((prevState) => dates);
                 }}
               />
-            </LayoutGroup>
-            {/* {deferredFilter.filter.Start_Date} */}
-            <DatePicker
-              //@ts-ignore
-              render={(value, openCalendar) => {
-                const seperator =
-                  filters?.periodType == "روزانه" ? " , " : " ~ ";
-                return (
-                  <Button
-                    className="w-full border border-dashed border-accent text-center hover:bg-accent/20"
-                    onClick={openCalendar}
-                  >
-                    {filters?.filter.Start_Date.join(seperator)}
-                  </Button>
-                );
-              }}
-              inputClass="text-center"
-              multiple={reportPeriod !== "ماهانه"}
-              value={filters?.filter.Start_Date}
-              calendar={persian}
-              locale={persian_fa}
-              weekPicker={reportPeriod === "هفتگی"}
-              onlyMonthPicker={reportPeriod === "ماهانه"}
-              plugins={[<DatePanel key={"00DatePanel"} />]}
-              onClose={() => {
-                //@ts-ignore
-                setFilters((prev) => {
-                  return {
-                    periodType: reportPeriod,
-                    filter: {
-                      Start_Date: selectedDates,
-                    },
-                  };
-                });
-              }}
-              onChange={(date) => {
-                //@ts-ignore
-                if (!date) return;
-
-                if (Array.isArray(date) && date.length <= 0) return;
-                const dates = Array.isArray(date)
-                  ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                  : [en(date.format("YYYY/MM/DD"))];
-                setSelectedDates(dates);
-
-                // setSelectedDates((prevState) => dates);
-              }}
-            />
-          </div>
-          {!getInitialFilters.isLoading && (
-            <>
-              <div className="w-full">
-                {
+            </div>
+            {!getInitialFilters.isLoading && (
+              <>
+                <div className="flex min-w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">نوع نقش</span>
                   <SelectControlled
                     title={"نوع پروژه"}
                     list={[
@@ -221,37 +226,139 @@ export default function CitiesPage({ children }) {
                       });
                     }}
                   />
-                }
-              </div>
-
-              <SelectControlled
-                title={""}
-                list={[
-                  ...new Set(
-                    getInitialFilters?.data
-                      ?.map((a) => a.Role)
-                      .filter((a) => a),
-                  ),
-                ]}
-                value={filters.filter.Role ?? [""]}
-                onChange={(values) => {
-                  //@ts-ignore
-                  setFilters((prev) => {
-                    return {
-                      periodType: reportPeriod,
-                      filter: {
-                        ...prev.filter,
-                        Role: values,
-                      },
-                    };
-                  });
-                }}
-              />
-            </>
-          )}
+                </div>
+                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">نقش</span>
+                  <SelectControlled
+                    title={"نقش"}
+                    list={[
+                      ...new Set(
+                        getInitialFilters?.data
+                          ?.map((a) => a.Role)
+                          .filter((a) => a),
+                      ),
+                    ]}
+                    value={
+                      filters.filter.Role ?? [
+                        "کارشناس ارزیاب اسناد بیمارستانی",
+                        "کارشناس ارزیاب اسناد پاراکلینیکی",
+                        "کارشناس ارزیاب اسناد دارویی",
+                        "کارشناس ارزیاب اسناد دندانپزشکی",
+                        "کارشناس پذیرش اسناد",
+                        "کارشناس ثبت اسناد خسارت",
+                      ]
+                    }
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            Role: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                </div>
+                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">نوع قرار داد</span>
+                  <SelectControlled
+                    title={"نوع قرار داد"}
+                    list={[
+                      ...new Set(
+                        getInitialFilters?.data
+                          ?.map((a) => a.ContractType)
+                          .filter((a) => a),
+                      ),
+                    ]}
+                    value={filters.filter.ContractType ?? ["تمام وقت"]}
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            ContractType: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                </div>
+                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">نوع نقش</span>
+                  <SelectControlled
+                    title={"نوع نقش"}
+                    list={[
+                      ...new Set(
+                        getInitialFilters?.data
+                          ?.map((a) => a.RoleType)
+                          .filter((a) => a),
+                      ),
+                    ]}
+                    value={filters.filter.RoleType ?? []}
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            RoleType: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                </div>
+                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <span className="font-bold text-primary">
+                    تاریخ گزارش پرسنل
+                  </span>
+                  <SelectControlled
+                    title={"تاریخ گزارش پرنسل"}
+                    list={[
+                      ...new Set(
+                        getInitialFilters?.data
+                          ?.map((a) => a.DateInfo)
+                          .filter((a) => a),
+                      ),
+                    ]}
+                    value={filters.filter.DateInfo ?? ["1402/03/31"]}
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            DateInfo: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
-
-        <div className="m-auto flex w-11/12 flex-col justify-start gap-5 py-10 xl:flex-row-reverse">
+        <div className="mx-auto flex w-11/12 items-center justify-end">
+          <div className="flex items-center justify-center gap-1 rounded-xl p-2 text-primbuttn">
+            <span> {selectedPerson?.NameFamily}</span>
+            {selectedPerson && <span>{"/"}</span>}
+            <span>
+              {
+                CITIES.find((a) => a.EnglishName === router.query.city)
+                  .PersianName
+              }
+            </span>
+          </div>
+        </div>
+        <div className="m-auto flex w-11/12 flex-col justify-start gap-5  xl:flex-row-reverse">
           <AdvancedList
             title={
               <span className="flex items-center justify-center gap-2 text-primary">

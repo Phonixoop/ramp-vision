@@ -45,7 +45,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish().default(["1402/03/31"]),
+          DateInfo: z.array(z.string()).nullish(),
         }),
       }),
     )
