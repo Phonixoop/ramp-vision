@@ -672,11 +672,7 @@ function DeposTable({ sessionData }) {
                           <>
                             {/* <TrackerView data={getTracker.data ?? []} /> */}
 
-                            <RadarGauge
-                              CityName={[
-                                ...new Set(flatRows.map((a) => a.CityName)),
-                              ]}
-                            />
+                            <RadarGauge CityName={trackerFilter.cities} />
                             <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
                               <div
                                 dir="ltr"

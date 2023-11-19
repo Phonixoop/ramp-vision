@@ -67,17 +67,21 @@ export function SelectColumnFilter({
   const unique = [...new Set(data.map((a) => a[column.id]))];
 
   return (
-    <SelectControlled
-      title={column.Header}
-      list={unique.filter((item) => item != undefined)}
-      value={getFilterValue()}
-      onChange={(values) => {
-        setFilterValue(values);
-        onChange({
-          id: column.id,
-          values: values,
-        });
-      }}
-    />
+    <>
+      {typeof getFilterValue()}
+      <SelectControlled
+        title={column.Header}
+        list={unique.filter((item) => item != undefined)}
+        value={getFilterValue() ?? []}
+        onChange={(values) => {
+          setFilterValue(values);
+
+          onChange({
+            id: column.id,
+            values: values,
+          });
+        }}
+      />
+    </>
   );
 }
