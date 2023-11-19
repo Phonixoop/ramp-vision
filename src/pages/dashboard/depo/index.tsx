@@ -61,6 +61,7 @@ import Header from "~/features/header";
 import { LayoutGroup } from "framer-motion";
 import { ColumnDef } from "@tanstack/react-table";
 import { Bar } from "react-chartjs-2";
+import RadarGauge from "~/features/radar";
 
 const chartdata = [
   {
@@ -300,7 +301,6 @@ function DeposTable({ sessionData }) {
           accessorKey: "DocumentType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
-            console.log({ column });
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">سند ها</span>
@@ -670,8 +670,13 @@ function DeposTable({ sessionData }) {
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
                         <div className="flex w-full  items-stretch justify-between gap-5 laptopMax:flex-col-reverse">
                           <>
-                            <TrackerView data={getTracker.data ?? []} />
+                            {/* <TrackerView data={getTracker.data ?? []} /> */}
 
+                            <RadarGauge
+                              CityName={[
+                                ...new Set(flatRows.map((a) => a.CityName)),
+                              ]}
+                            />
                             <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
                               <div
                                 dir="ltr"

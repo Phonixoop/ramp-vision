@@ -135,7 +135,7 @@ export const depoRouter = createTRPCRouter({
         ${dbName} 
         ${whereClause}
         `;
-        console.log("monthly", query);
+
         const result = await sql.query(query);
 
         if (input.periodType === "روزانه") {

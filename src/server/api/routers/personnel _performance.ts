@@ -374,6 +374,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       z.object({
         periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("روزانه"),
         filter: z.object({
+          CityName: z.array(z.string()).nullish().default([]),
           Start_Date: z.array(z.string()).nullish(),
           ProjectType: z.array(z.string()).nullish(),
           ContractType: z.array(z.string()).nullish(),
@@ -399,6 +400,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
         });
 
         let filter = input.filter;
+
+        if (filter.CityName?.length > 0)
+          filter.CityName = cities.filter((value) =>
+            filter.CityName.includes(value),
+          );
+        if (filter.CityName.length <= 0) filter.CityName = cities;
         // let queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
         // `;
 
