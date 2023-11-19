@@ -68,7 +68,6 @@ export function SelectColumnFilter({
 
   return (
     <>
-      {typeof getFilterValue()}
       <SelectControlled
         title={column.Header}
         list={unique.filter((item) => item != undefined)}
