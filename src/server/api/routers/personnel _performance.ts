@@ -427,7 +427,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           FROM dbName.dbo.personnel_performance as p
           JOIN
           RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-              ${whereClause} AND SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}')
+              ${whereClause} AND Start_Date LIKE '${date[0]}/${date[1]}%'
   
           group by CityName,p.Start_Date ORDER BY CityName ASC
           `;
@@ -437,6 +437,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
         else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
+        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;

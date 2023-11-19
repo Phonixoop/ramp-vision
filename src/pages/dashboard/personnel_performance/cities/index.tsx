@@ -113,11 +113,11 @@ export default function CitiesPage({ children }) {
     getCitiesWithPerformance?.data ?? [],
   );
 
-  const intersection = CITIES.filter((city) => {
-    getCitiesWithPerformance?.data
-      ?.map((a) => a.CityName)
-      .includes(city.EnglishName);
-  });
+  // const intersection = CITIES.filter((city) => {
+  //   getCitiesWithPerformance?.data
+  //     ?.map((a) => a.CityName)
+  //     .includes(city.EnglishName);
+  // });
 
   // const persianNames = intersection.map((city) => city.PersianName);
 
