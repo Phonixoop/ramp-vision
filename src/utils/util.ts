@@ -417,3 +417,87 @@ export function updateDynamicPermissions(
 
   return updatedDynamicPermissions;
 }
+
+export function DistinctData(data = []) {
+  const result = Object.values(
+    data.reduce((acc, item) => {
+      const key = item.NameFamily;
+      if (!acc[key]) {
+        acc[key] = {
+          count: 1,
+          TotalPerformance: item.TotalPerformance,
+          Start_Date: item.Start_Date,
+          ...item,
+        };
+      } else {
+        acc[key].count++;
+        acc[key].TotalPerformance += item.TotalPerformance;
+        acc[key].Start_Date += "," + item.Start_Date;
+        for (const prop in item) {
+          if (typeof item[prop] === "number" && prop !== "TotalPerformance") {
+            acc[key][prop] = (acc[key][prop] || 0) + item[prop];
+          }
+        }
+      }
+      return acc;
+    }, {}),
+  );
+
+  result.forEach((item) => {
+    //@ts-ignore
+    item.TotalPerformance = item.TotalPerformance / item.count;
+  });
+
+  return result;
+}
+
+export function calculateAggregateByFields(data = [], operations) {
+  const aggregatedData = {};
+
+  data.forEach((item) => {
+    const key = item.CityName;
+    if (!aggregatedData[key]) {
+      aggregatedData[key] = { CityName: key };
+      operations.forEach((operation) => {
+        if (operation.operation === "sum") {
+          aggregatedData[key][operation.fieldName] = 0;
+        } else if (operation.operation === "array") {
+          aggregatedData[key][operation.fieldName] = [];
+        } else if (operation.operation === "average") {
+          aggregatedData[key][operation.fieldName + "Sum"] = 0;
+          aggregatedData[key][operation.fieldName + "Count"] = 0;
+        }
+      });
+    }
+    operations.forEach((operation) => {
+      const fieldValue = item[operation.fieldName];
+      if (operation.operation === "sum") {
+        aggregatedData[key][operation.fieldName] += fieldValue;
+      } else if (operation.operation === "array") {
+        if (!aggregatedData[key][operation.fieldName].includes(fieldValue)) {
+          aggregatedData[key][operation.fieldName].push(fieldValue);
+        }
+      } else if (operation.operation === "average") {
+        aggregatedData[key][operation.fieldName + "Sum"] += fieldValue;
+        aggregatedData[key][operation.fieldName + "Count"]++;
+      }
+    });
+  });
+
+  Object.keys(aggregatedData).forEach((key) => {
+    operations.forEach((operation) => {
+      if (operation.operation === "average") {
+        const sumField = operation.fieldName + "Sum";
+        const countField = operation.fieldName + "Count";
+        aggregatedData[key][operation.fieldName] =
+          aggregatedData[key][sumField] / aggregatedData[key][countField];
+        delete aggregatedData[key][sumField];
+        delete aggregatedData[key][countField];
+      }
+    });
+  });
+
+  const result = Object.values(aggregatedData);
+
+  return result;
+}

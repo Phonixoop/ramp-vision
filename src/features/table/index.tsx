@@ -97,7 +97,7 @@ export default function Table({
 
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
-      {renderInFilterView !== undefined && renderInFilterView !== undefined && (
+      {renderInFilterView !== undefined && (
         <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 xl:pb-0  ">
           {renderInFilterView !== undefined && (
             <div className="flex w-full flex-row justify-center md:px-0 ">

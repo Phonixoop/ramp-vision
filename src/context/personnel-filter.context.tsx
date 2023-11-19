@@ -2,8 +2,8 @@ import { User } from "@prisma/client";
 import moment from "jalali-moment";
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 
-type PeriodType = "روزانه" | "هفتگی" | "ماهانه";
-type FilterType = {
+export type PeriodType = "روزانه" | "هفتگی" | "ماهانه";
+export type FilterType = {
   periodType: PeriodType;
   filter: {
     Start_Date: string[];

@@ -25,7 +25,12 @@ import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 
 import { api } from "~/utils/api";
-import { commify, getPerformanceText, processDataForChart } from "~/utils/util";
+import {
+  DistinctData,
+  commify,
+  getPerformanceText,
+  processDataForChart,
+} from "~/utils/util";
 
 const chartdata = [
   {
@@ -71,38 +76,6 @@ type CityWithPerformanceData = {
   TotalPerformance: number;
 };
 
-function DistinctData(data = []) {
-  const result = Object.values(
-    data.reduce((acc, item) => {
-      const key = item.NameFamily;
-      if (!acc[key]) {
-        acc[key] = {
-          count: 1,
-          TotalPerformance: item.TotalPerformance,
-          Start_Date: item.Start_Date,
-          ...item,
-        };
-      } else {
-        acc[key].count++;
-        acc[key].TotalPerformance += item.TotalPerformance;
-        acc[key].Start_Date += "," + item.Start_Date;
-        for (const prop in item) {
-          if (typeof item[prop] === "number" && prop !== "TotalPerformance") {
-            acc[key][prop] = (acc[key][prop] || 0) + item[prop];
-          }
-        }
-      }
-      return acc;
-    }, {}),
-  );
-
-  result.forEach((item) => {
-    //@ts-ignore
-    item.TotalPerformance = item.TotalPerformance / item.count;
-  });
-
-  return result;
-}
 export default function CityPage({ children, city }) {
   const router = useRouter();
   const {

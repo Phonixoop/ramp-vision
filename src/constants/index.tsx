@@ -52,6 +52,14 @@ export const MENU = [
     value: "جزئیات عملکرد پرسنل شعب",
     link: "/dashboard/personnel_performance/cities",
   },
+  {
+    value: "گیج عملکرد شهر ها",
+    link: "/dashboard/gauges",
+  },
+  {
+    value: "پرسنل",
+    link: "/dashboard/personnels",
+  },
 ];
 
 // export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
