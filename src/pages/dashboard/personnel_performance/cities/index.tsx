@@ -33,11 +33,15 @@ import { LayoutGroup } from "framer-motion";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import { en } from "~/utils/util";
 import {
-  PersonnelFilterProvider,
-  usePersonnelFilter,
-} from "~/context/personnel-filter.context";
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtDateInfos,
+  defualtRoles,
+} from "~/constants/personnel-performance";
+
 import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
 import H2 from "~/ui/heading/h2";
+import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 type CityWithPerformanceData = {
   CityName_En: string;
@@ -212,16 +216,7 @@ export default function CitiesPage({ children }) {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={
-                      filters.filter.Role ?? [
-                        "کارشناس ارزیاب اسناد بیمارستانی",
-                        "کارشناس ارزیاب اسناد پاراکلینیکی",
-                        "کارشناس ارزیاب اسناد دارویی",
-                        "کارشناس ارزیاب اسناد دندانپزشکی",
-                        "کارشناس پذیرش اسناد",
-                        "کارشناس ثبت اسناد خسارت",
-                      ]
-                    }
+                    value={filters.filter.Role ?? defualtRoles}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
@@ -247,7 +242,7 @@ export default function CitiesPage({ children }) {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={filters.filter.ProjectType ?? ["جبران"]}
+                    value={filters.filter.ProjectType ?? defaultProjectTypes}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
@@ -274,7 +269,7 @@ export default function CitiesPage({ children }) {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={filters.filter.ContractType ?? ["تمام وقت"]}
+                    value={filters.filter.ContractType ?? defualtContractTypes}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
@@ -328,7 +323,7 @@ export default function CitiesPage({ children }) {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={filters.filter.DateInfo ?? ["1402/03/31"]}
+                    value={filters.filter.DateInfo ?? defualtDateInfos}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
@@ -473,6 +468,9 @@ export async function getServerSideProps(context) {
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
+      ProjectType: defaultProjectTypes,
+      Role: defualtRoles,
+      DateInfo: defualtDateInfos,
     },
   });
 

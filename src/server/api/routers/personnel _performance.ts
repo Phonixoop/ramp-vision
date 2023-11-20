@@ -67,7 +67,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
             input.filter.CityName.includes(value),
           );
         if (filter.CityName.length <= 0) filter.CityName = cities;
-        console.log(filter);
+        //console.log(filter);
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
         
@@ -232,7 +232,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       `;
 
       const result = await sql.query(query);
-      console.log(result.recordsets);
+      // console.log(result.recordsets);
       return {
         usersInfo: result.recordsets[0],
         Cities: result.recordsets[1],
@@ -449,7 +449,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
         else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        console.log(queryCities);
+        // console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;

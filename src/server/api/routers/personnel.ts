@@ -69,9 +69,9 @@ export const personnelRouter = createTRPCRouter({
 
          ${whereClause}`;
 
-        console.log(query);
+        //  console.log(query);
         const result = await sql.query(query);
-        console.log(result.recordsets[0]);
+        //  console.log(result.recordsets[0]);
         return result.recordsets[0];
         // Respond with the fetched data
       } catch (error) {
@@ -96,7 +96,7 @@ export const personnelRouter = createTRPCRouter({
       `;
 
       const result = await sql.query(query);
-      console.log(result.recordsets);
+      // console.log(result.recordsets);
       return {
         usersInfo: result.recordsets[0],
         Cities: result.recordsets[1],

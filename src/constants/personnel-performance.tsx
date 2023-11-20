@@ -36,3 +36,18 @@ export const PersonnelPerformanceIcons = {
   ArzyabiAsnadDaroIndirect: <SyringeIcon className="stroke-purple-700" />,
   TotalPerformance: <FunctionSquareIcon className="stroke-cyan-600" />,
 };
+
+export const defualtRoles = [
+  "کارشناس ارزیاب اسناد بیمارستانی",
+  "کارشناس ارزیاب اسناد پاراکلینیکی",
+  "کارشناس ارزیاب اسناد دارویی",
+  "کارشناس ارزیاب اسناد دندانپزشکی",
+  "کارشناس پذیرش اسناد",
+  "کارشناس ثبت اسناد خسارت",
+];
+
+export const defaultProjectTypes = ["جبران"];
+
+export const defualtContractTypes = ["تمام وقت"];
+
+export const defualtDateInfos = ["1402/03/31"];
