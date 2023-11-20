@@ -9,6 +9,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import H2 from "~/ui/heading/h2";
 import { api } from "~/utils/api";
 import { calculateAggregateByFields } from "~/utils/util";
 
@@ -278,12 +279,12 @@ export default function RadarGauge({ CityName = [] }) {
   );
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn py-5 ">
-      {moment().locale("fa").format("MMMM")}
+    <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn py-5 2xl:flex-row ">
+      <H2 className="text-xl">{moment().locale("fa").format("MMMM")}</H2>
       <ResponsiveContainer
         width={400}
-        height={300}
-        className="flex items-center justify-center stroke-primary"
+        height={400}
+        className="flex items-center justify-center stroke-primary 2xl:w-1/2"
       >
         <RadarChart
           className="stroke-primary"
@@ -319,7 +320,7 @@ export default function RadarGauge({ CityName = [] }) {
           <Legend />
         </RadarChart>
       </ResponsiveContainer>
-      <div className="flex flex-wrap items-center justify-center gap-2 ">
+      <div className="flex flex-wrap items-center justify-center gap-2 2xl:w-1/2 ">
         {distinctCities.map((city) => {
           return (
             <>

@@ -62,6 +62,7 @@ import { LayoutGroup } from "framer-motion";
 import { ColumnDef } from "@tanstack/react-table";
 import { Bar } from "react-chartjs-2";
 import RadarGauge from "~/features/radar";
+import TestPage from "~/pages/test";
 
 const chartdata = [
   {
@@ -668,94 +669,96 @@ function DeposTable({ sessionData }) {
 
                     <div className="flex w-full flex-col items-center justify-center gap-5">
                       <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-full  items-center justify-between gap-5 laptopMax:flex-col-reverse">
+                        <div className="flex w-full  flex-col items-center justify-between gap-5">
                           <>
                             {/* <TrackerView data={getTracker.data ?? []} /> */}
 
                             <RadarGauge CityName={trackerFilter.cities} />
-                            <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
-                              <div
-                                dir="ltr"
-                                className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 "
-                              >
-                                <H2>تعداد ورودی و رسیدگی شده</H2>
-                                <DonutChart
-                                  label={
-                                    depo.data?.result.length > 0
-                                      ? " مانده : " +
-                                        commify(
-                                          Math.abs(
-                                            capacityBaseOnSabt -
-                                              entryBaseOnSabt,
-                                          ),
-                                        ).toString()
-                                      : "داده ای موجود نیست"
-                                  }
-                                  data={entry_capacity}
-                                  category="value"
-                                  index="name"
-                                  colors={["rose", "emerald"]}
-                                  valueFormatter={commify}
-                                  noDataText={Text.noData.fa}
-                                />
-                              </div>
+                            <div className="flex w-full flex-col items-center justify-between gap-5 2xl:flex-row">
+                              <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
+                                <div
+                                  dir="ltr"
+                                  className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 "
+                                >
+                                  <H2>تعداد ورودی و رسیدگی شده</H2>
+                                  <DonutChart
+                                    label={
+                                      depo.data?.result.length > 0
+                                        ? " مانده : " +
+                                          commify(
+                                            Math.abs(
+                                              capacityBaseOnSabt -
+                                                entryBaseOnSabt,
+                                            ),
+                                          ).toString()
+                                        : "داده ای موجود نیست"
+                                    }
+                                    data={entry_capacity}
+                                    category="value"
+                                    index="name"
+                                    colors={["rose", "emerald"]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
+                                  />
+                                </div>
 
-                              <div
-                                dir="ltr"
-                                className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2"
-                              >
-                                <H2>تعداد بلاتکلیف</H2>
+                                <div
+                                  dir="ltr"
+                                  className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2"
+                                >
+                                  <H2>تعداد بلاتکلیف</H2>
+                                  <DonutChart
+                                    data={depo_BaseOnSabt}
+                                    category="value"
+                                    index="name"
+                                    colors={["fuchsia", "cyan"]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
+                                <H2>
+                                  زمان کلی اتمام دپو{" "}
+                                  {depo.data?.periodType && (
+                                    <>
+                                      |{" "}
+                                      <span className="text-primbuttn">
+                                        {depo.data?.periodType}
+                                      </span>
+                                    </>
+                                  )}
+                                </H2>
                                 <DonutChart
-                                  data={depo_BaseOnSabt}
-                                  category="value"
-                                  index="name"
-                                  colors={["fuchsia", "cyan"]}
+                                  label={totalComplete.toFixed(2)}
+                                  data={depoCompletionTime}
+                                  category={"DepoCompleteTime"}
+                                  index="ServiceName"
+                                  colors={[
+                                    "emerald",
+                                    "yellow",
+                                    "cyan",
+                                    "red",
+                                    "orange",
+                                    "fuchsia",
+                                  ]}
                                   valueFormatter={commify}
                                   noDataText={Text.noData.fa}
                                 />
-                              </div>
-                            </div>
-                            <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
-                              <H2>
-                                زمان کلی اتمام دپو{" "}
-                                {depo.data?.periodType && (
-                                  <>
-                                    |{" "}
-                                    <span className="text-primbuttn">
-                                      {depo.data?.periodType}
+                                {depo.data?.periodType && totalComplete > 0 && (
+                                  <p className="w-full">
+                                    <span className="text-accent">
+                                      {humanizeDuration(
+                                        totalComplete,
+                                        Reports_Period[depo.data?.periodType],
+                                      )}
+                                    </span>{" "}
+                                    <span className="text-primary">
+                                      تا اتمام دپو
                                     </span>
-                                  </>
+                                  </p>
                                 )}
-                              </H2>
-                              <DonutChart
-                                label={totalComplete.toFixed(2)}
-                                data={depoCompletionTime}
-                                category={"DepoCompleteTime"}
-                                index="ServiceName"
-                                colors={[
-                                  "emerald",
-                                  "yellow",
-                                  "cyan",
-                                  "red",
-                                  "orange",
-                                  "fuchsia",
-                                ]}
-                                valueFormatter={commify}
-                                noDataText={Text.noData.fa}
-                              />
-                              {depo.data?.periodType && totalComplete > 0 && (
-                                <p className="w-full">
-                                  <span className="text-accent">
-                                    {humanizeDuration(
-                                      totalComplete,
-                                      Reports_Period[depo.data?.periodType],
-                                    )}
-                                  </span>{" "}
-                                  <span className="text-primary">
-                                    تا اتمام دپو
-                                  </span>
-                                </p>
-                              )}
+                              </div>
                             </div>
                           </>
                         </div>

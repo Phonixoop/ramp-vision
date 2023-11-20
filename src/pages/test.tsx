@@ -1,43 +1,68 @@
-import React from "react";
-import { Card, Title, BarChart, Subtitle } from "@tremor/react";
-import moment from "jalali-moment";
+import { AreaChart, Card, Title } from "@tremor/react";
 import H2 from "~/ui/heading/h2";
-import Gauge from "~/features/gauge";
-import { SelectControlled } from "~/features/checkbox-list";
-export default function Test() {
+
+const chartdata = [
+  {
+    date: "Jan 22",
+    SemiAnalysis: 2890,
+    "The Pragmatic Engineer": 2338,
+  },
+  {
+    date: "Feb 22",
+    SemiAnalysis: 2756,
+    "The Pragmatic Engineer": 2103,
+  },
+  {
+    date: "Mar 22",
+    SemiAnalysis: 3322,
+    "The Pragmatic Engineer": 2194,
+  },
+  {
+    date: "Apr 22",
+    SemiAnalysis: 3470,
+    "The Pragmatic Engineer": 2108,
+  },
+  {
+    date: "May 22",
+    SemiAnalysis: 3475,
+    "The Pragmatic Engineer": 1812,
+  },
+  {
+    date: "Jun 22",
+    SemiAnalysis: 3129,
+    "The Pragmatic Engineer": 1726,
+  },
+];
+
+const valueFormatter = function (number) {
+  return "$ " + new Intl.NumberFormat("us").format(number).toString();
+};
+
+export default function TestPage() {
   return (
     <>
-      <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
-        <div
-          className="m-auto flex w-11/12 items-center justify-center"
-          dir="rtl"
-        >
-          <SelectControlled
-            title={"s"}
-            list={Array.from(Array(100).keys()).map((a) => a.toString())}
-            value={[0]}
-            onChange={() => {}}
-          />
+      <div className="w-full px-5 xl:px-0 ">
+        <div className="flex w-full flex-col items-center justify-center gap-5">
+          <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
+            <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
+              <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
+                <H2 className="text-lg font-bold">نمودار به تفکیک فعالیت</H2>
+                <Card>
+                  <Title>Newsletter revenue over time (USD)</Title>
+                  <AreaChart
+                    className="mt-4 h-72"
+                    data={chartdata}
+                    index="date"
+                    categories={["SemiAnalysis", "The Pragmatic Engineer"]}
+                    colors={["indigo", "cyan"]}
+                    valueFormatter={valueFormatter}
+                  />
+                </Card>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
   );
-}
-
-export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
-  // Get the first day of the month in the Jalali calendar
-  // Get the current date
-  const currentDate = moment()
-    .locale("fa")
-    .year(year)
-    .month(month - 1)
-    .jDay(1);
-
-  // Calculate the date for the Saturday in the 4th week
-  const fourthWeek = currentDate
-    .clone()
-    .add(3, "weeks") // Add 3 weeks to get to the 4th week
-    .day(6); // Set the day to Saturday (0 is Sunday, 6 is Saturday)
-
-  return fourthWeek.format("YYYY/MM/DD");
 }

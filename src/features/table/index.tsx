@@ -26,6 +26,7 @@ import { useVirtual } from "@tanstack/react-virtual";
 
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { cn } from "~/lib/utils";
+import H2 from "~/ui/heading/h2";
 
 type Props = {
   isLoading?: boolean;
@@ -96,15 +97,15 @@ export default function Table({
     virtualRows?.length > 0 ? totalSize - (virtualRows?.at(-1)?.end || 0) : 0;
 
   return (
-    <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
+    <div className="flex w-full flex-col justify-center gap-5 md:items-stretch 2xl:flex-row ">
       {renderInFilterView !== undefined && (
-        <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 xl:pb-0  ">
+        <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 2xl:sticky 2xl:w-3/12 2xl:pb-0  ">
           {renderInFilterView !== undefined && (
             <div className="flex w-full flex-row justify-center md:px-0 ">
               <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
                 <div className="flex items-center justify-center gap-3 text-accent">
                   <FilterIcon className="h-4 w-4" />
-                  <span className="text-lg font-bold ">فیلتر ها</span>
+                  <H2 className="text-lg font-bold text-accent">فیلتر ها</H2>
                 </div>
                 {renderInFilterView()}
                 {table.getHeaderGroups().map((headerGroup) => {
@@ -124,7 +125,7 @@ export default function Table({
           )}
         </div>
       )}
-      <div className="w-full px-5 xl:px-0 ">
+      <div className="w-full px-5 2xl:px-0 ">
         {renderChild(flatRows)}
 
         <div className="relative flex h-[31rem] min-h-[50rem] w-full items-stretch justify-center py-10">
