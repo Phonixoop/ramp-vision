@@ -17,7 +17,7 @@ import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
 import Gauge from "~/features/gauge";
-import LineGauge from "~/features/gauge/line";
+
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
 import Button from "~/ui/buttons";
@@ -31,50 +31,6 @@ import {
   getPerformanceText,
   processDataForChart,
 } from "~/utils/util";
-
-const chartdata = [
-  {
-    month: "Jan 21",
-    Performance: 30000,
-    Benchmark: 3000,
-  },
-  {
-    month: "Feb 21",
-    Performance: 3000,
-    Benchmark: 21000,
-  },
-  {
-    month: "Mar 21",
-    Performance: 2000,
-    Benchmark: 17500,
-  },
-  {
-    month: "Apr 21",
-    Performance: 27800,
-    Benchmark: 2500,
-  },
-  {
-    month: "May 21",
-    Performance: 1829,
-    Benchmark: 1890,
-  },
-  {
-    month: "Jun 21",
-    Performance: 2390,
-    Benchmark: 2000,
-  },
-  {
-    month: "Jul 21",
-    Performance: 3090,
-    Benchmark: 3000,
-  },
-];
-
-type CityWithPerformanceData = {
-  CityName_En: string;
-  CityName_Fa: string;
-  TotalPerformance: number;
-};
 
 export default function CityPage({ children, city }) {
   const router = useRouter();

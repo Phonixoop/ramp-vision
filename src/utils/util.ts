@@ -432,7 +432,8 @@ export function DistinctData(data = []) {
       } else {
         acc[key].count++;
         acc[key].TotalPerformance += item.TotalPerformance;
-        acc[key].Start_Date += "," + item.Start_Date;
+        if (acc[key].Start_Date !== item.Start_Date)
+          acc[key].Start_Date += "," + item.Start_Date;
         for (const prop in item) {
           if (typeof item[prop] === "number" && prop !== "TotalPerformance") {
             acc[key][prop] = (acc[key][prop] || 0) + item[prop];
