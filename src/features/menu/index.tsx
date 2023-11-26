@@ -117,7 +117,7 @@ export function InPageMenu({
   return (
     <motion.div
       className={twMerge(
-        "group flex w-full cursor-pointer items-end justify-center  gap-3 overflow-hidden overflow-x-auto scrollbar-none md:w-fit",
+        "jus group flex cursor-pointer items-center justify-start  gap-3 overflow-hidden overflow-x-auto scrollbar-none ",
         className,
       )}
       onHoverEnd={() => {
