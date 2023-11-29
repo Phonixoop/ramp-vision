@@ -1,4 +1,8 @@
 import { AreaChart, Card, Title } from "@tremor/react";
+import moment from "jalali-moment";
+import { twMerge } from "tailwind-merge";
+import { validDateBeforeToScrewThem } from "~/constants";
+
 import H2 from "~/ui/heading/h2";
 
 const chartdata = [
@@ -38,31 +42,83 @@ const valueFormatter = function (number) {
   return "$ " + new Intl.NumberFormat("us").format(number).toString();
 };
 
+const m = moment("1367/11/4", "jYYYY/jM/jD");
+m.locale("fa");
+const isSameOrBefore = m.isSameOrBefore(moment("1402/08/06", "jYYYY/jM/jD"));
+
+const menuItems = [
+  {
+    value: "Home",
+    link: "/",
+  },
+  {
+    value: "Products",
+    link: "/products",
+    subMenu: [
+      {
+        value: "Category 1",
+        link: "/products/category1",
+        // subMenu: [
+        //   {
+        //     value: "Subcategory 1",
+        //     link: "/products/category1/subcategory1",
+        //   },
+        //   {
+        //     value: "Subcategory 2",
+        //     link: "/products/category1/subcategory2",
+        //   },
+        // ],
+      },
+      {
+        value: "Category 2",
+        link: "/products/category2",
+      },
+    ],
+  },
+  {
+    value: "Contact",
+    link: "/contact",
+  },
+];
 export default function TestPage() {
+  // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
     <>
-      <div className="w-full px-5 xl:px-0 ">
-        <div className="flex w-full flex-col items-center justify-center gap-5">
-          <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
-            <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-              <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
-                <H2 className="text-lg font-bold">نمودار به تفکیک فعالیت</H2>
-                <Card>
-                  <Title>Newsletter revenue over time (USD)</Title>
-                  <AreaChart
-                    className="mt-4 h-72"
-                    data={chartdata}
-                    index="date"
-                    categories={["SemiAnalysis", "The Pragmatic Engineer"]}
-                    colors={["indigo", "cyan"]}
-                    valueFormatter={valueFormatter}
-                  />
-                </Card>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Menu menuItems={menuItems} className="flex" />
     </>
+  );
+}
+
+function MenuItem({ item, className }) {
+  return (
+    <li className={className} key={item.value}>
+      <a href={item.link} className="block px-4 py-2">
+        {item.value}
+        {item.subMenu && " >"}
+      </a>
+      {item.subMenu && item.subMenu.length > 0 && (
+        <Menu
+          menuItems={item.subMenu}
+          className=" hidden group-hover:flex-col"
+          itemClassName=""
+        />
+      )}
+    </li>
+  );
+}
+
+function Menu({ menuItems, className = "", itemClassName = "" }) {
+  return (
+    <ul className={twMerge(" flex", className)}>
+      {menuItems.map((item) => (
+        <MenuItem
+          item={item}
+          className={twMerge(
+            "group relative  flex-row bg-secondary ",
+            itemClassName,
+          )}
+        />
+      ))}
+    </ul>
   );
 }

@@ -15,6 +15,7 @@ import {
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
+import { CITIES, validDateBeforeToScrewThem } from "~/constants";
 
 const config = {
   user: "admin",
@@ -49,6 +50,8 @@ export const depoRouter = createTRPCRouter({
       try {
         // Connect to SQL Server
 
+        // Parse the input date
+
         let finalResult = [];
         const permissions = await getPermission({ ctx });
         const cities = permissions
@@ -57,7 +60,19 @@ export const depoRouter = createTRPCRouter({
           .map((permission) => permission.enLabel);
 
         let filter = input.filter;
-
+        // // temprory
+        // filter.Start_Date = filter.Start_Date.filter((date) => {
+        //   const m = moment(date, "jYYYY/jMM/jDD");
+        //   m.locale("fa");
+        //   console.log(m.isSameOrBefore(moment("1402/08/06", "jYYYY/jMM/jDD")));
+        //   return m.isSameOrBefore(moment("1402/08/06", "jYYYY/jMM/jDD"));
+        // });
+        // if (filter.Start_Date.length <= 0)
+        //   return {
+        //     periodType: input.periodType,
+        //     result: [],
+        //   };
+        // // end temprory
         filter.CityName = cities;
 
         let queryStart = `SELECT DISTINCT 
@@ -178,7 +193,14 @@ export const depoRouter = createTRPCRouter({
 
         return {
           periodType: input.periodType,
-          result: finalResult ?? [],
+          result:
+            finalResult.map((cf) => {
+              return {
+                ...cf,
+                CityName: CITIES.find((a) => a.EnglishName === cf.CityName)
+                  .PersianName,
+              };
+            }) ?? [],
         };
         // Respond with the fetched data
       } catch (error) {
@@ -207,7 +229,14 @@ export const depoRouter = createTRPCRouter({
       // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
       const result = {
-        Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
+        Cities: resultOfCities.recordsets[0]
+          .filter((c) => c.CityName !== "")
+          .map((c) => {
+            return {
+              CityName: CITIES.find((a) => a.EnglishName === c.CityName)
+                .PersianName,
+            };
+          }),
       };
 
       return result;

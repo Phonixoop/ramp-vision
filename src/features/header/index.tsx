@@ -23,7 +23,7 @@ function checkStatusForMenu(status) {
           return false;
         case "جزئیات عملکرد پرسنل شعب":
           return false;
-        case "گیج عملکرد شهر ها":
+        case "گیج عملکرد استان ها":
           return false;
         case "پرسنل":
           return false;

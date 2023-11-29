@@ -75,7 +75,7 @@
     font-family: "Iransans";
     src:
       local("Iransans"),
-      url("/fonts/IRANSansWeb(FaNum)_Medium.woff") format("woff");
+      url("/fonts/IRANSansWeb(FaNum)_Medium.ttf") format("ttf");
     font-weight: 400;
     font-display: swap;
     font-style: normal;
@@ -269,3 +269,7 @@ input[type="number"] {
 .recharts-tooltip-wrapper {
   direction: ltr;
 }
+
+/* tspan {
+  @apply text-[10px];
+} */

@@ -14,7 +14,7 @@ permissionSchema = permissionSchema.extend({
 export const createRoleSchema = z.object({
   name: z
     .string({ required_error: "این فیلد اجباری است" })
-    .min(3, "نام نقش نمیتواند کم تر از 3 حرف باشد "),
+    .min(3, "نام سمت نمیتواند کم تر از 3 حرف باشد "),
   permissions: z.string(),
 });
 
@@ -22,7 +22,7 @@ export const updateRoleSchema = z.object({
   id: z.string(),
   name: z
     .string({ required_error: "این فیلد اجباری است" })
-    .min(3, "نام نقش نمیتواند کم تر از 3 حرف باشد "),
+    .min(3, "نام سمت نمیتواند کم تر از 3 حرف باشد "),
   permissions: z.string(),
 });
 

@@ -61,9 +61,7 @@ export default function CityPage({ children, city }) {
     },
     {
       onSuccess: (data) => {
-        setSelectedPerson((prev) =>
-          data.result.find((a) => a.NationalCode === prev?.NationalCode),
-        );
+        setSelectedPerson(undefined);
         setUpdatedList(DistinctData(data.result));
       },
       refetchOnWindowFocus: false,
@@ -98,6 +96,9 @@ export default function CityPage({ children, city }) {
       "ArzyabiAsnadDandanVaParaIndirect",
       "ArzyabiAsnadDaroDirect",
       "ArzyabiAsnadDaroIndirect",
+      "WithScanCount",
+      "WithoutScanCount",
+      "WithoutScanInDirectCount",
       "TotalPerformance",
     ],
   ).map((d) => {
@@ -162,6 +163,8 @@ export default function CityPage({ children, city }) {
               </div>
             );
           const isActive = user.NationalCode === selectedPerson?.NationalCode;
+          // ||
+          // user.NationalCode === router.query.personnel;
           return (
             <>
               <Button
@@ -173,6 +176,13 @@ export default function CityPage({ children, city }) {
                     : " bg-secondary  text-primary",
                 )}
                 onClick={() => {
+                  // router.push(
+                  //   `/dashboard/personnel_performance/cities/${city}/?personnel=${user.NationalCode}`,
+                  //   undefined,
+                  //   {
+                  //     shallow: true,
+                  //   },
+                  // );
                   setSelectedPerson(user);
                 }}
               >
@@ -231,8 +241,8 @@ export default function CityPage({ children, city }) {
                       <div
                         key={key}
                         className={twMerge(
-                          "`p-2`  flex flex-col justify-center gap-2 rounded-2xl bg-secondary  p-2",
-                          isLastItem ? " md:col-span-2" : "md:col-span-1",
+                          "`p-2`  flex flex-col justify-center gap-2 rounded-2xl bg-secondary  p-2 md:col-span-1",
+                          // isLastItem ? " md:col-span-2" : "md:col-span-1",
                         )}
                       >
                         <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl bg-secbuttn p-2">
@@ -278,9 +288,9 @@ export default function CityPage({ children, city }) {
                 <div className="col-span-2  flex  w-full flex-col items-center justify-center   ">
                   <H2>عملکرد</H2>
 
-                  <Gauge value={selectedPerson.TotalPerformance} />
+                  <Gauge value={selectedPerson?.TotalPerformance} />
                   <p className="text-accent">
-                    {getPerformanceText(selectedPerson.TotalPerformance)}
+                    {getPerformanceText(selectedPerson?.TotalPerformance)}
                   </p>
                 </div>
               </div>
@@ -310,6 +320,9 @@ export default function CityPage({ children, city }) {
               "ارزیابی اسناد دندان و پارا غیر مستقیم",
               "ارزیابی اسناد دارو مستقیم",
               "ارزیابی اسناد دارو غیر مستقیم",
+              "ثبت ارزیابی با اسکن مدارک",
+              "ثبت ارزیابی بدون اسکن مدارک",
+              "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
               "عملکرد",
             ]}
           />

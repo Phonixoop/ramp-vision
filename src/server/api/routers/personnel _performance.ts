@@ -14,6 +14,7 @@ import {
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
+import { CITIES } from "~/constants";
 
 const config = {
   user: "admin",
@@ -79,6 +80,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
 	    	SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
         SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
 	      SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+        SUM(WithScanCount) as WithScanCount,
+        SUM(WithoutScanCount) as WithoutScanCount,
+        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
         SUM(TotalPerformance) as TotalPerformance, 
         
         DateInfo,Start_Date from dbName1 as p
@@ -115,6 +119,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
           SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
           SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
           SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+          SUM(WithScanCount) as WithScanCount,
+          SUM(WithoutScanCount) as WithoutScanCount,
+          SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
           SUM(TotalPerformance) as TotalPerformance,  DateInfo,Start_Date
           
           from dbName1 as p
@@ -207,7 +214,14 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         return {
           periodType: input.periodType,
-          result: finalResult ?? [],
+          result:
+            finalResult.map((cf) => {
+              return {
+                ...cf,
+                CityName: CITIES.find((a) => a.EnglishName === cf.CityName)
+                  .PersianName,
+              };
+            }) ?? [],
         };
         // Respond with the fetched data
       } catch (error) {
@@ -235,7 +249,14 @@ export const personnelPerformanceRouter = createTRPCRouter({
       // console.log(result.recordsets);
       return {
         usersInfo: result.recordsets[0],
-        Cities: result.recordsets[1],
+        Cities: result.recordsets[1]
+          .filter((c) => c.CityName !== "")
+          .map((c) => {
+            return {
+              CityName: CITIES.find((a) => a.EnglishName === c.CityName)
+                .PersianName,
+            };
+          }),
       };
       // Respond with the fetched data
     } catch (error) {
@@ -492,7 +513,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
       SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
       SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
       SUM(TotalPerformance) as TotalPerformance, 
-      
+      SUM(WithScanCount) as WithScanCount,
+      SUM(WithoutScanCount) as WithoutScanCount,
+      SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
       DateInfo,Start_Date from dbName1 as p
       JOIN dbName2 as u on p.NationalCode = u.NationalCode  
        `;

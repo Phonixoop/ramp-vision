@@ -69,7 +69,7 @@ export function SelectColumnFilter({
   return (
     <>
       <SelectControlled
-        title={column.Header}
+        title={column.columnDef.header}
         list={unique.filter((item) => item != undefined)}
         value={getFilterValue() ?? []}
         onChange={(values) => {

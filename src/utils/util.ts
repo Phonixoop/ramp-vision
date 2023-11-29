@@ -379,7 +379,7 @@ const performance_ranges = [
 
 export function getPerformanceText(value: number) {
   if (!value && value != 0) return "";
-  let result = "نیاز به برسی"; // Default result
+  let result = "نیاز به بررسی"; // Default result
 
   performance_ranges.forEach((range) => {
     if (value >= range.min && value <= range.max) {

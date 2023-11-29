@@ -54,7 +54,7 @@ import {
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import TrackerView from "~/features/tracker";
-import { City_Levels, Reports_Period, Text } from "~/constants";
+import { CITIES, City_Levels, Reports_Period, Text } from "~/constants";
 import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
@@ -218,14 +218,14 @@ function DeposTable({ sessionData }) {
         },
 
         {
-          header: "شهر",
+          header: "استان",
           accessorKey: "CityName",
           filterFn: "arrIncludesSome",
 
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">شهر ها</span>
+                <span className="font-bold text-primary">استان ها</span>
                 {initialFilters.data?.Cities && (
                   <LayoutGroup id="CityLevelMenu">
                     <InPageMenu
@@ -238,11 +238,18 @@ function DeposTable({ sessionData }) {
                         ).cities;
 
                         // beacuse our system is permission based we need to only filter allowed cities.
-                        const canFilterCities = cities.filter((city) =>
-                          initialFilters.data.Cities.map(
-                            (a) => a.CityName,
-                          ).includes(city),
-                        );
+                        const canFilterCities = cities
+                          .filter((city) =>
+                            initialFilters.data.Cities.map((initCity) => {
+                              return CITIES.find(
+                                (a) => a.PersianName === initCity.CityName,
+                              ).EnglishName;
+                            }).includes(city),
+                          )
+                          .map((cf) => {
+                            return CITIES.find((a) => a.EnglishName === cf)
+                              .PersianName;
+                          });
 
                         if (cities.length <= 0) {
                           setFilterValue(
@@ -298,13 +305,13 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          header: "نوع سند",
+          header: "نوع پرونده",
           accessorKey: "DocumentType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">سند ها</span>
+                <span className="font-bold text-primary">پرونده ها</span>
                 <SelectColumnFilter
                   column={column}
                   data={depo.data?.result}
@@ -325,16 +332,46 @@ function DeposTable({ sessionData }) {
           header: "تعداد بلاتکلیف",
           accessorKey: "DepoCount",
           cell: ({ row }) => <span>{commify(row.original.DepoCount)}</span>,
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) + (row.getValue("DepoCount") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "تعداد ورودی",
           accessorKey: "EntryCount",
           cell: ({ row }) => <span>{commify(row.original.EntryCount)}</span>,
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) + (row.getValue("EntryCount") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "تعداد رسیدگی شده",
           accessorKey: "Capicity",
           cell: ({ row }) => <span>{commify(row.original.Capicity)}</span>,
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) + (row.getValue("Capicity") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "مدت زمان اتمام دپو",
@@ -460,7 +497,7 @@ function DeposTable({ sessionData }) {
                       <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-sm  font-semibold text-emerald-900">
                         <DownloadCloudIcon />
                         <CSVLink
-                          filename="کامل.csv"
+                          filename="جزئیات عملکرد شعب.csv"
                           headers={columns
                             .map((item) => {
                               return {
@@ -478,7 +515,7 @@ function DeposTable({ sessionData }) {
                       <Button className="font-bo font flex justify-center gap-1 rounded-3xl bg-amber-300 text-sm font-semibold text-amber-900">
                         <DownloadCloudIcon />
                         <CSVLink
-                          filename="فیلتر شده.csv"
+                          filename="جزئیات عملکرد شعب (فیلتر شده).csv"
                           headers={columns
                             .map((item) => {
                               return {
@@ -599,8 +636,10 @@ function DeposTable({ sessionData }) {
                             colors={["rose", "cyan", "emerald"]}
                             valueFormatter={commify}
                             yAxisWidth={20}
+                            showXAxis
                             noDataText={Text.noData.fa}
                             intervalType="preserveStartEnd"
+
                             // customTooltip={(value) => {
                             //   return <>{JSON.stringify(value)}</>;
                             // }}
@@ -686,10 +725,8 @@ function DeposTable({ sessionData }) {
                                       depo.data?.result.length > 0
                                         ? " مانده : " +
                                           commify(
-                                            Math.abs(
-                                              capacityBaseOnSabt -
-                                                entryBaseOnSabt,
-                                            ),
+                                            entryBaseOnSabt -
+                                              capacityBaseOnSabt,
                                           ).toString()
                                         : "داده ای موجود نیست"
                                     }

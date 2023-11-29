@@ -159,7 +159,7 @@ export function UserForm({
 
         <div className="w-full">
           <TextFieldWithLable
-            label={"شهر"}
+            label={"استان"}
             name="city_name"
             id="city_name"
             {...formik.getFieldProps("city_name")}
@@ -182,7 +182,7 @@ export function UserForm({
                   };
                 });
               }}
-              placeHolder="جستجو نقش ها"
+              placeHolder="جستجو سمت ها"
             />
           )}
         </div>

@@ -5,6 +5,7 @@ import {
   FileInputIcon,
   FilePlus2Icon,
   FilePlusIcon,
+  FileScanIcon,
   FunctionSquareIcon,
   SyringeIcon,
 } from "lucide-react";
@@ -18,6 +19,9 @@ export const PersonnelPerformanceTranslate = {
   ArzyabiAsnadDandanVaParaIndirect: "ارزیابی اسناد دندان و پارا غیر مستقیم",
   ArzyabiAsnadDaroDirect: "ارزیابی اسناد دارو مستقیم",
   ArzyabiAsnadDaroIndirect: "ارزیابی اسناد دارو غیر مستقیم",
+  WithScanCount: "ثبت ارزیابی با اسکن مدارک",
+  WithoutScanCount: "ثبت ارزیابی بدون اسکن مدارک",
+  WithoutScanInDirectCount: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
   TotalPerformance: "عملکرد",
 };
 
@@ -34,6 +38,12 @@ export const PersonnelPerformanceIcons = {
   ),
   ArzyabiAsnadDaroDirect: <SyringeIcon className="stroke-purple-500" />,
   ArzyabiAsnadDaroIndirect: <SyringeIcon className="stroke-purple-700" />,
+
+  WithScanCount: <FileScanIcon className="stroke-cyan-500" />,
+  WithoutScanCount: <FileScanIcon className="stroke-cyan-700" />,
+
+  WithoutScanInDirectCount: <FileScanIcon className="stroke-cyan-900" />,
+
   TotalPerformance: <FunctionSquareIcon className="stroke-cyan-600" />,
 };
 

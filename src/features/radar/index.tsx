@@ -195,7 +195,7 @@ function assignColorsToItems(items) {
     "#00BCD4", // Cyan
     "#673AB7", // Deep Purple
     "#3F51B5", // Indigo
-    "#FFC107", // Amber
+    "#BBAB8C", // BBAB8C
     "#FF5722", // Deep Orange
     "#795548", // Brown
     "#607D8B", // Blue Grey
@@ -210,7 +210,7 @@ function assignColorsToItems(items) {
     "#673AB7", // Deep Purple
     "#9C27B0", // Purple
     "#E91E63", // Pink
-    "#FFC107", // Amber
+    "#BEADFA", // BEADFA
     "#4CAF50", // Green
     "#00BCD4", // Cyan
     "#2196F3", // Blue

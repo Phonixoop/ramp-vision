@@ -175,7 +175,7 @@ function CreateAccountForm() {
             </div>
           </>,
           <span key={2} className="pb-10">
-            در حال برسی
+            در حال بررسی
           </span>,
           <div
             key={3}

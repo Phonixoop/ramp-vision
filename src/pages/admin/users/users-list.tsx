@@ -91,7 +91,7 @@ export default function UsersList() {
         },
 
         {
-          header: "نقش",
+          header: "سمت",
           accessorKey: "role",
           cell: ({ row }) => {
             const user: User = row.original;

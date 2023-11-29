@@ -27,6 +27,7 @@ import { useVirtual } from "@tanstack/react-virtual";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { cn } from "~/lib/utils";
 import H2 from "~/ui/heading/h2";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
   isLoading?: boolean;
@@ -177,7 +178,7 @@ export default function Table({
                                 key={header.id}
                                 colSpan={header.colSpan}
                                 // {...restHeaderProps}
-                                className="sticky top-0 bg-accent/20 px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-accent backdrop-blur-md"
+                                className="sticky top-0 bg-secbuttn px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-accent "
                               >
                                 <div
                                   className={cn(
@@ -274,6 +275,35 @@ export default function Table({
                   </tr>
                 )}
               </tbody>
+              <tfoot>
+                {table.getFooterGroups().map((footerGroup) => {
+                  return (
+                    <>
+                      <tr key={footerGroup.id}>
+                        {footerGroup.headers.map((header) => {
+                          const content = flexRender(
+                            header.column.columnDef.footer,
+                            header.getContext(),
+                          );
+                          return (
+                            <th
+                              key={header.id}
+                              colSpan={header.colSpan}
+                              // {...restHeaderProps}
+                              className={twMerge(
+                                "sticky bottom-0  px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-primary ",
+                                content ? "bg-primbuttn text-secondary" : "",
+                              )}
+                            >
+                              {header.isPlaceholder ? null : content}
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </>
+                  );
+                })}
+              </tfoot>
             </table>
           </div>
         </div>

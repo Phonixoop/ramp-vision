@@ -1,3 +1,4 @@
+import moment from "jalali-moment";
 import { Permission } from "~/types";
 
 export const THEMESE = [
@@ -47,13 +48,16 @@ export const MENU = [
   {
     value: "جزئیات عملکرد پرسنل شعب (جدول)",
     link: "/dashboard/personnel_performance",
+    subMenu: [
+      {
+        value: "جزئیات عملکرد پرسنل شعب",
+        link: "/dashboard/personnel_performance/cities",
+      },
+    ],
   },
+
   {
-    value: "جزئیات عملکرد پرسنل شعب",
-    link: "/dashboard/personnel_performance/cities",
-  },
-  {
-    value: "گیج عملکرد شهر ها",
+    value: "گیج عملکرد استان ها",
     link: "/dashboard/gauges",
   },
   {
@@ -120,6 +124,7 @@ export const City_Levels: {
       "Qazvin",
       "Semnan",
       "Sistan and Baluchestan",
+      "Hormozgan",
       "Zanjan",
     ],
   },
@@ -200,13 +205,13 @@ export const PERMISSIONS: Permission[] = [
     id: "ManageUsers",
     isActive: false,
     enLabel: "Manage Users",
-    faLabel: "مدیریت کاربران",
+    faLabel: "مدیریت پرسنل",
   },
   {
     id: "ViewCities",
     isActive: false,
     enLabel: "View Cities",
-    faLabel: "نمایش شهر ها",
+    faLabel: "نمایش استان ها",
     subPermissions: CITIES.map((a, i) => {
       return {
         id: `View_${a.EnglishName.replace(" ", "_")}_${i}`,
@@ -229,3 +234,8 @@ export const Text = {
     en: "No Data",
   },
 };
+
+export const validDateBeforeToScrewThem = moment(
+  "1402/08/06",
+  "jYYYY/jMM/jDD",
+).locale("fa");

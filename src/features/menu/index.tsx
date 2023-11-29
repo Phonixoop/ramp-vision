@@ -6,7 +6,11 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { getPathName } from "~/utils/util";
 import { twMerge } from "tailwind-merge";
-
+export type MenuItem = {
+  value: string;
+  link: string;
+  subMenu?: MenuItem[];
+};
 type MenuInput = {
   rootPath: String;
   list: { value: String; link: String }[];
@@ -24,7 +28,7 @@ export default function Menu({
   return (
     <motion.div
       className={twMerge(
-        "group  flex max-w-sm cursor-pointer items-end gap-3 overflow-hidden  overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
+        "group  z-0 flex max-w-sm cursor-pointer items-end gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
         theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
       )}
       onHoverEnd={() => {
@@ -41,11 +45,11 @@ export default function Menu({
             }}
           >
             <MenuItem
-              text={item.value}
-              link={item.link}
+              item={item}
+              index={i}
               rootPath={rootPath}
-              isHovered={activeIndex === i}
-              isActive={pathName === item.link}
+              activeIndex={activeIndex}
+              pathName={pathName}
               theme={theme}
             />
           </motion.span>
@@ -56,19 +60,21 @@ export default function Menu({
 }
 
 function MenuItem({
-  text,
-  link,
-  isHovered = false,
-  isActive = false,
+  item,
+  activeIndex,
+  index,
+  pathName,
   rootPath,
-  onHover = () => {},
   theme = "solid",
 }) {
+  const isHovered = activeIndex === index;
+  const isActive = pathName === item.link;
   const activeClass = "text-primary";
+  const { link, value } = item;
   return (
-    <Link href={`${rootPath}/${link}`} className="w-full text-center">
+    <Link href={`${rootPath}/${link}`} className="  w-full text-center">
       <div
-        className={`relative z-0 rounded-sm px-5  py-3 text-sm ${
+        className={`group relative z-0 rounded-sm  px-5 py-3 text-sm  ${
           isActive ? activeClass : "text-primary/50  hover:text-primary"
         } `}
       >
@@ -79,7 +85,7 @@ function MenuItem({
             }}
             layoutId="bg-follower"
             className={twMerge(
-              "absolute inset-0 -z-10  bg-primbuttn/30  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
+              "absolute inset-0 -z-10  bg-primbuttn  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
               theme === "solid" ? "rounded-md" : "rounded-full ",
             )}
           />
@@ -92,8 +98,31 @@ function MenuItem({
           />
         )}
 
-        <span className=" duration-100 ">{text}</span>
+        <span className="duration-100 ">{value}</span>
+
+        {item.subMenu && (
+          <>
+            <div className="absolute right-0 top-32 z-10 hidden overflow-visible bg-secondary group-hover:flex">
+              <Menu rootPath={rootPath} list={item.subMenu} />
+            </div>
+          </>
+        )}
       </div>
+
+      {/* {item.subMenu && item.subMenu.length > 0 && (
+        <ul className="absolute  hidden rounded  shadow-lg group-hover:block">
+          {item.subMenu.map((subItem, i) => (
+            <MenuItem
+              item={item}
+              index={i}
+              rootPath={rootPath}
+              activeIndex={activeIndex}
+              pathName={pathName}
+              theme={theme}
+            />
+          ))}
+        </ul>
+      )} */}
     </Link>
   );
 }

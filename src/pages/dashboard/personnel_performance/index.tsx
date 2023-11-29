@@ -57,7 +57,7 @@ import {
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import TrackerView from "~/features/tracker";
-import { City_Levels, Reports_Period, Text } from "~/constants";
+import { CITIES, City_Levels, Reports_Period, Text } from "~/constants";
 import { cn } from "~/lib/utils";
 import { Column } from "react-table";
 import Header from "~/features/header";
@@ -203,13 +203,13 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         // CityName,NameFamily, ProjectType,ContractType,Role,RoleType,DateInfo
         {
-          header: "شهر",
+          header: "استان",
           accessorKey: "CityName",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">شهر ها</span>
+                <span className="font-bold text-primary">استان ها</span>
                 {initialFilters.data?.Cities && (
                   <LayoutGroup id="CityLevelMenu">
                     <InPageMenu
@@ -222,11 +222,18 @@ function PersonnelPerformanceTable({ sessionData }) {
                         ).cities;
 
                         // beacuse our system is permission based we need to only filter allowed cities.
-                        const canFilterCities = cities.filter((city) =>
-                          initialFilters.data.Cities.map(
-                            (a) => a.CityName,
-                          ).includes(city),
-                        );
+                        const canFilterCities = cities
+                          .filter((city) =>
+                            initialFilters.data.Cities.map((initCity) => {
+                              return CITIES.find(
+                                (a) => a.PersianName === initCity.CityName,
+                              ).EnglishName;
+                            }).includes(city),
+                          )
+                          .map((cf) => {
+                            return CITIES.find((a) => a.EnglishName === cf)
+                              .PersianName;
+                          });
 
                         if (cities.length <= 0) {
                           setFilterValue(
@@ -255,7 +262,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             return (
               <>
                 <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">کاربران</span>
+                  <span className="font-bold text-primary">پرسنل</span>
                   <SelectColumnFilter
                     column={column}
                     data={personnelPerformance.data?.result}
@@ -324,13 +331,13 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          header: "نقش",
+          header: "سمت",
           accessorKey: "Role",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نقش</span>
+                <span className="font-bold text-primary">سمت</span>
                 <SelectColumnFilter
                   initialFilters={[
                     "کارشناس ارزیاب اسناد بیمارستانی",
@@ -356,13 +363,13 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          header: "نوع نقش",
+          header: "نوع سمت",
           accessorKey: "RoleType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نوع نقش</span>
+                <span className="font-bold text-primary">نوع سمت</span>
                 <SelectColumnFilter
                   column={column}
                   data={personnelPerformance.data?.result}
@@ -383,34 +390,126 @@ function PersonnelPerformanceTable({ sessionData }) {
         {
           header: "ثبت اولیه اسناد",
           accessorKey: "SabtAvalieAsnad",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("SabtAvalieAsnad") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "پذیرش و ثبت اولیه اسناد",
           accessorKey: "PazireshVaSabtAvalieAsnad",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("PazireshVaSabtAvalieAsnad") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "ارزیابی اسناد بیمارستانی مستقیم",
           accessorKey: "ArzyabiAsanadBimarsetaniDirect",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArzyabiAsanadBimarsetaniDirect") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "ارزیابی اسناد بیمارستانی غیر مستقیم",
           accessorKey: "ArzyabiAsnadBimarestaniIndirect",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArzyabiAsnadBimarestaniIndirect") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "ارزیابی اسناد دندان و پارا مستقیم",
           accessorKey: "ArzyabiAsnadDandanVaParaDirect",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArzyabiAsnadDandanVaParaDirect") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "ارزیابی اسناد دندان و پارا غیر مستقیم",
           accessorKey: "ArzyabiAsnadDandanVaParaIndirect",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue(
+                      "ArzyabiAsnadDandanVaParaIndirect",
+                    ) as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "ارزیابی اسناد دارو مستقیم",
           accessorKey: "ArzyabiAsnadDaroDirect",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue(
+                      "SabtAvArzyabiAsnadDaroDirectalieAsnad",
+                    ) as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "ازیابی اسناد دارو غیر مستقیم",
           accessorKey: "ArzyabiAsnadDaroIndirect",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArzyabiAsnadDaroIndirect") as number),
+                  0,
+                ),
+            ),
         },
         {
           header: "عملکرد",
@@ -418,6 +517,19 @@ function PersonnelPerformanceTable({ sessionData }) {
           cell: ({ row }) => (
             <span>{row.original.TotalPerformance.toFixed(2)}</span>
           ),
+          footer: ({ table }) =>
+            commify(
+              Math.round(
+                table
+                  .getFilteredRowModel()
+                  .rows.reduce(
+                    (total, row) =>
+                      (total as number) +
+                      (row.getValue("TotalPerformance") as number),
+                    0,
+                  ),
+              ),
+            ),
         },
         {
           header: "تاریخ",
@@ -541,7 +653,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                         <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-sm  font-semibold text-emerald-900">
                           <DownloadCloudIcon />
                           <CSVLink
-                            filename="کامل.csv"
+                            filename="جزئیات عملکرد پرسنل.csv"
                             headers={columns
                               .map((item) => {
                                 return {
@@ -559,7 +671,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                         <Button className="font-bo font flex justify-center gap-1 rounded-3xl bg-amber-300 text-sm font-semibold text-amber-900">
                           <DownloadCloudIcon />
                           <CSVLink
-                            filename="فیلتر شده.csv"
+                            filename="جزئیات عملکرد پرسنل (فیلتر شده).csv"
                             headers={columns
                               .map((item) => {
                                 return {
@@ -600,7 +712,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
                       <div className="flex w-full  flex-col items-center justify-between gap-5 xl:flex-row">
                         <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-1/2 xl:p-5">
-                          <H2>تعداد پرسنل به تفکیک نقش</H2>
+                          <H2>تعداد پرسنل به تفکیک سمت</H2>
                           <MyBarList
                             data={(roleData ?? []).map((row) => {
                               return {

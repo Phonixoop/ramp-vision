@@ -179,9 +179,9 @@ export default function GaugesPage() {
             {!getInitialFilters.isLoading && (
               <>
                 <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">نقش</span>
+                  <span className="font-bold text-primary">سمت</span>
                   <SelectControlled
-                    title={"نقش"}
+                    title={"سمت"}
                     list={[
                       ...new Set(
                         getInitialFilters?.data?.usersInfo
@@ -267,9 +267,9 @@ export default function GaugesPage() {
                   />
                 </div>
                 <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">نوع نقش</span>
+                  <span className="font-bold text-primary">نوع سمت</span>
                   <SelectControlled
-                    title={"نوع نقش"}
+                    title={"نوع سمت"}
                     list={[
                       ...new Set(
                         getInitialFilters?.data?.usersInfo

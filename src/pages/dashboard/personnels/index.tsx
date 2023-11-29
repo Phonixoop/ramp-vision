@@ -72,13 +72,13 @@ export default function GaugesPage() {
         },
         // CityName,NameFamily, ProjectType,ContractType,Role,RoleType,DateInfo
         // {
-        //   header: "شهر",
+        //   header: "استان",
         //   accessorKey: "CityName",
         //   filterFn: "arrIncludesSome",
         //   Filter: ({ column }) => {
         //     return (
         //       <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-        //         <span className="font-bold text-primary">شهر ها</span>
+        //         <span className="font-bold text-primary">استان ها</span>
         //         {initialFilters.data?.Cities && (
         //           <LayoutGroup id="CityLevelMenu">
         //             <InPageMenu
@@ -124,7 +124,7 @@ export default function GaugesPage() {
             return (
               <>
                 <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">کاربران</span>
+                  <span className="font-bold text-primary">پرسنل</span>
                   <SelectColumnFilter
                     column={column}
                     data={getPersonnls.data}
@@ -143,13 +143,13 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "شهر ها",
+          header: "استان ها",
           accessorKey: "CityName",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">شهر ها</span>
+                <span className="font-bold text-primary">استان ها</span>
                 <SelectColumnFilter
                   initialFilters={[]}
                   column={column}
@@ -218,13 +218,13 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "نقش",
+          header: "سمت",
           accessorKey: "Role",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نقش</span>
+                <span className="font-bold text-primary">سمت</span>
                 <SelectColumnFilter
                   initialFilters={[
                     "کارشناس ارزیاب اسناد بیمارستانی",
@@ -250,13 +250,13 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "نوع نقش",
+          header: "نوع سمت",
           accessorKey: "RoleType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نوع نقش</span>
+                <span className="font-bold text-primary">نوع سمت</span>
                 <SelectColumnFilter
                   column={column}
                   data={getPersonnls.data}

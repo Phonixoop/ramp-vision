@@ -152,7 +152,7 @@ export function RoleForm({
               isLoading={deleteRole.isLoading}
               onClick={() => onClear()}
             >
-              نقش جدید +
+              سمت جدید +
             </Button>
           </>
         )}
@@ -175,7 +175,7 @@ export function RoleForm({
                   })
                   .catch(() => {
                     toast({
-                      title: "خطای پاک کردن نقش",
+                      title: "خطای پاک کردن سمت",
                       description: deleteRole.error.message,
                     });
                   });
@@ -187,7 +187,7 @@ export function RoleForm({
           )}
           <div className="flex flex-col items-end justify-center ">
             <TextWithLabel
-              label="نام نقش"
+              label="نام سمت"
               name="name"
               id="name"
               {...formik.getFieldProps("name")}
