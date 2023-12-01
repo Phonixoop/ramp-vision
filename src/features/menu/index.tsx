@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { getPathName } from "~/utils/util";
 import { twMerge } from "tailwind-merge";
+import { ChevronDownIcon } from "lucide-react";
 export type MenuItem = {
   value: string;
   link: string;
@@ -13,13 +14,15 @@ export type MenuItem = {
 };
 type MenuInput = {
   rootPath: String;
-  list: { value: String; link: String }[];
+  list: MenuItem[];
   theme?: "solid" | "round";
+  isSub: boolean;
 };
 export default function Menu({
   rootPath = "",
   list = [],
   theme = "solid",
+  isSub = false,
 }: MenuInput) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const router = useRouter();
@@ -51,6 +54,7 @@ export default function Menu({
               activeIndex={activeIndex}
               pathName={pathName}
               theme={theme}
+              isSub={isSub}
             />
           </motion.span>
         );
@@ -66,17 +70,21 @@ function MenuItem({
   pathName,
   rootPath,
   theme = "solid",
+  isSub = false,
 }) {
   const isHovered = activeIndex === index;
   const isActive = pathName === item.link;
   const activeClass = "text-primary";
   const { link, value } = item;
   return (
-    <Link href={`${rootPath}/${link}`} className="  w-full text-center">
+    <Link href={`${rootPath}/${link}`} className="w-full text-center">
       <div
-        className={`group relative z-0 rounded-sm  px-5 py-3 text-sm  ${
-          isActive ? activeClass : "text-primary/50  hover:text-primary"
-        } `}
+        className={twMerge(
+          "group relative z-0 flex items-center justify-center gap-2 rounded-sm px-2 py-3 text-sm",
+          isActive ? activeClass : "text-primary/50  hover:text-primary",
+          theme === "solid" ? "rounded-md" : "rounded-full ",
+          isSub ? " bg-secbuttn" : "",
+        )}
       >
         {isHovered && (
           <motion.div
@@ -99,30 +107,18 @@ function MenuItem({
         )}
 
         <span className="duration-100 ">{value}</span>
-
-        {item.subMenu && (
-          <>
-            <div className="absolute right-0 top-32 z-10 hidden overflow-visible bg-secondary group-hover:flex">
-              <Menu rootPath={rootPath} list={item.subMenu} />
-            </div>
-          </>
-        )}
+        {item.subMenu && <ChevronDownIcon className="" />}
       </div>
 
-      {/* {item.subMenu && item.subMenu.length > 0 && (
-        <ul className="absolute  hidden rounded  shadow-lg group-hover:block">
-          {item.subMenu.map((subItem, i) => (
-            <MenuItem
-              item={item}
-              index={i}
-              rootPath={rootPath}
-              activeIndex={activeIndex}
-              pathName={pathName}
-              theme={theme}
-            />
-          ))}
+      {item.subMenu && item.subMenu.length > 0 && (
+        <ul className="absolute  hidden rounded  group-hover:block">
+          <Menu
+            list={item.subMenu}
+            rootPath={rootPath}
+            isSub={!!item.subMenu}
+          />
         </ul>
-      )} */}
+      )}
     </Link>
   );
 }

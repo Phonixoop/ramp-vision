@@ -58,16 +58,16 @@ const menuItems = [
       {
         value: "Category 1",
         link: "/products/category1",
-        // subMenu: [
-        //   {
-        //     value: "Subcategory 1",
-        //     link: "/products/category1/subcategory1",
-        //   },
-        //   {
-        //     value: "Subcategory 2",
-        //     link: "/products/category1/subcategory2",
-        //   },
-        // ],
+        subMenu: [
+          {
+            value: "Subcategory 1",
+            link: "/products/category1/subcategory1",
+          },
+          {
+            value: "Subcategory 2",
+            link: "/products/category1/subcategory2",
+          },
+        ],
       },
       {
         value: "Category 2",
@@ -83,24 +83,24 @@ const menuItems = [
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
-    <>
+    <div className="h-screen">
       <Menu menuItems={menuItems} className="flex" />
-    </>
+    </div>
   );
 }
 
 function MenuItem({ item, className }) {
   return (
     <li className={className} key={item.value}>
-      <a href={item.link} className="block px-4 py-2">
+      <a href={item.link} className="block px-4 py-2 text-white">
         {item.value}
         {item.subMenu && " >"}
       </a>
       {item.subMenu && item.subMenu.length > 0 && (
         <Menu
           menuItems={item.subMenu}
-          className=" hidden group-hover:flex-col"
-          itemClassName=""
+          className=" hidden flex-col group-hover:flex"
+          itemClassName=" hidden group-hover:flex"
         />
       )}
     </li>
