@@ -84,41 +84,41 @@ export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
     <div className="h-screen">
-      <Menu menuItems={menuItems} className="flex" />
+      {/* <Menu menuItems={menuItems} className="flex" /> */}
     </div>
   );
 }
 
-function MenuItem({ item, className }) {
-  return (
-    <li className={className} key={item.value}>
-      <a href={item.link} className="block px-4 py-2 text-white">
-        {item.value}
-        {item.subMenu && " >"}
-      </a>
-      {item.subMenu && item.subMenu.length > 0 && (
-        <Menu
-          menuItems={item.subMenu}
-          className=" hidden flex-col group-hover:flex"
-          itemClassName=" hidden group-hover:flex"
-        />
-      )}
-    </li>
-  );
-}
+// function MenuItem({ item, className }) {
+//   return (
+//     <li className={className} key={item.value}>
+//       <a href={item.link} className="block px-4 py-2 text-white">
+//         {item.value}
+//         {item.subMenu && " >"}
+//       </a>
+//       {item.subMenu && item.subMenu.length > 0 && (
+//         <Menu
+//           menuItems={item.subMenu}
+//           className=" hidden flex-col group-hover:flex"
+//           itemClassName=" hidden group-hover:flex"
+//         />
+//       )}
+//     </li>
+//   );
+// }
 
-function Menu({ menuItems, className = "", itemClassName = "" }) {
-  return (
-    <ul className={twMerge(" flex", className)}>
-      {menuItems.map((item) => (
-        <MenuItem
-          item={item}
-          className={twMerge(
-            "group relative  flex-row bg-secondary ",
-            itemClassName,
-          )}
-        />
-      ))}
-    </ul>
-  );
-}
+// function Menu({ menuItems, className = "", itemClassName = "" }) {
+//   return (
+//     <ul className={twMerge(" flex", className)}>
+//       {menuItems.map((item) => (
+//         <MenuItem
+//           item={item}
+//           className={twMerge(
+//             "group relative  flex-row bg-secondary ",
+//             itemClassName,
+//           )}
+//         />
+//       ))}
+//     </ul>
+//   );
+// }
