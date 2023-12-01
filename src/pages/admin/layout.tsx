@@ -16,6 +16,7 @@ import ThemeBox from "~/features/theme-box";
 import useStatus from "~/hooks/useStatus";
 import { LayoutGroup } from "framer-motion";
 import AdminLayoutLoading from "~/pages/admin/loading";
+import Header from "~/features/header";
 
 const menuList = [
   {
@@ -48,6 +49,7 @@ export default function AdminMainLayout({ children }: any): any {
       dir="rtl"
       className="m-auto flex min-h-screen w-full max-w-[1920px] flex-col items-center bg-secondary"
     >
+      <Header />
       <Container className="flex w-full items-center justify-center ">
         <BlurBackground />
 
