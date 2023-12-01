@@ -16,7 +16,7 @@ type MenuInput = {
   rootPath: String;
   list: MenuItem[];
   theme?: "solid" | "round";
-  isSub: boolean;
+  isSub?: boolean;
 };
 export default function Menu({
   rootPath = "",
