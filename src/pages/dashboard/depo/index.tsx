@@ -507,7 +507,21 @@ function DeposTable({ sessionData }) {
                               };
                             })
                             .filter((f) => f.key != "Id")}
-                          data={depo.data.result}
+                          data={depo.data.result.map((item) => {
+                            const depo: number =
+                              calculateDepoCompleteTime(item);
+
+                            let depoStatus = "";
+                            if (depo < 0) depoStatus = "دپو در حال افزایش است";
+                            else if (depo == 0) depoStatus = "دپو صفر است";
+                            else depoStatus = "دپو در حال کاهش است";
+
+                            return {
+                              ...item,
+                              MyDepoCompletionTime: depo.toFixed(2),
+                              DepoStatus: depoStatus,
+                            };
+                          })}
                         >
                           دانلود دیتای کامل
                         </CSVLink>
@@ -525,7 +539,21 @@ function DeposTable({ sessionData }) {
                               };
                             })
                             .filter((f) => f.key != "Id")}
-                          data={flatRows}
+                          data={flatRows.map((item) => {
+                            const depo: number =
+                              calculateDepoCompleteTime(item);
+
+                            let depoStatus = "";
+                            if (depo < 0) depoStatus = "دپو در حال افزایش است";
+                            else if (depo == 0) depoStatus = "دپو صفر است";
+                            else depoStatus = "دپو در حال کاهش است";
+
+                            return {
+                              ...item,
+                              MyDepoCompletionTime: depo.toFixed(2),
+                              DepoStatus: depoStatus,
+                            };
+                          })}
                         >
                           دانلود دیتای فیلتر شده
                         </CSVLink>
@@ -808,27 +836,6 @@ function DeposTable({ sessionData }) {
           />
         </div>
       </div>
-    </>
-  );
-}
-
-function UsersSkeleton() {
-  return (
-    <>
-      {[...Array(11).keys()].map((i) => {
-        return (
-          <>
-            <span
-              key={i}
-              className="inline-block h-12 w-full animate-pulse rounded-xl bg-accent opacity-30"
-              style={{
-                animationDelay: `${i * 5}`,
-                animationDuration: "1s",
-              }}
-            />
-          </>
-        );
-      })}
     </>
   );
 }

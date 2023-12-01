@@ -512,6 +512,52 @@ function PersonnelPerformanceTable({ sessionData }) {
             ),
         },
         {
+          header: "ثبت ارزیابی با اسکن مدارک",
+          accessorKey: "WithScanCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("WithScanCount") as number),
+                  0,
+                ),
+            ),
+        },
+        {
+          header: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+          accessorKey: "WithoutScanInDirectCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("WithoutScanInDirectCount") as number),
+                  0,
+                ),
+            ),
+        },
+        {
+          header: "ثبت ارزیابی بدون اسکن مدارک",
+          accessorKey: "WithoutScanCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("WithoutScanCount") as number),
+                  0,
+                ),
+            ),
+        },
+
+        {
           header: "عملکرد",
           accessorKey: "TotalPerformance",
           cell: ({ row }) => (
