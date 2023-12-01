@@ -9,6 +9,7 @@ import ProgressBar from "@badrap/bar-of-progress";
 import { useRouter } from "next/router";
 import { Toaster } from "~/components/ui/toast/toaster";
 import { PersonnelFilterProvider } from "~/context/personnel-filter.context";
+import { Default_Theme } from "~/constants/theme";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   PageLayout?: (page: ReactElement) => ReactElement<any, any>;
@@ -24,11 +25,17 @@ const progress = new ProgressBar({
   className: "bar-of-progress",
   delay: 100,
 });
-function matchColorSchemeToTheme(theme) {
-  if (theme.search("light"))
-    document.querySelector("html").style.colorScheme = "light";
-  if (theme.search("dark"))
-    document.querySelector("html").style.colorScheme = "dark";
+function matchColorSchemeToTheme(theme: string) {
+  if (theme.search("light")) {
+    localStorage.setItem("theme", theme);
+    return (document.querySelector("html").style.colorScheme = "light");
+  }
+  if (theme.search("dark")) {
+    localStorage.setItem("theme", theme);
+    return (document.querySelector("html").style.colorScheme = "dark");
+  }
+  localStorage.setItem("theme", Default_Theme);
+  return (document.querySelector("html").style.colorScheme = "dark");
 }
 function MyApp({
   Component,
@@ -51,23 +58,23 @@ function MyApp({
       return;
     }
 
-    const matchPrefersLight = window.matchMedia("(prefers-color-scheme:light)");
-    if (matchPrefersLight.matches) {
-      document.querySelector("body").className = "theme-light-4";
-      localStorage.setItem("theme", "theme-light-4");
-      matchColorSchemeToTheme("light");
-    } else {
-      document.querySelector("body").className = "theme-dark-1";
-      localStorage.setItem("theme", "theme-dark-1");
-      matchColorSchemeToTheme("dark");
-    }
-    matchPrefersLight.addEventListener("change", (event) => {
-      const theme = event.matches ? "theme-light-4" : "theme-dark-1";
+    // const matchPrefersLight = window.matchMedia("(prefers-color-scheme:light)");
+    // if (matchPrefersLight.matches) {
+    //   document.querySelector("body").className = "theme-light-4";
+    //   localStorage.setItem("theme", "theme-light-4");
+    //   matchColorSchemeToTheme("light");
+    // } else {
+    //   document.querySelector("body").className = "theme-dark-1";
+    //   localStorage.setItem("theme", "theme-dark-1");
+    //   matchColorSchemeToTheme("dark");
+    // }
+    // matchPrefersLight.addEventListener("change", (event) => {
+    //   const theme = event.matches ? "theme-light-4" : "theme-dark-1";
 
-      document.querySelector("body").className = theme;
-      localStorage.setItem("theme", theme);
-      matchColorSchemeToTheme(theme);
-    });
+    //   document.querySelector("body").className = theme;
+    //   localStorage.setItem("theme", theme);
+    //   matchColorSchemeToTheme(theme);
+    // });
 
     return () => {
       router.events.off("routeChangeStart", progress.start);

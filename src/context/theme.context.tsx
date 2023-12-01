@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { Default_Theme } from "~/constants/theme";
 
 import { api } from "~/utils/api";
 
@@ -26,7 +27,7 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<string>("theme-dark-1");
+  const [theme, setTheme] = useState<string>(Default_Theme);
 
   const canUseDOM: boolean = !!(
     typeof window !== "undefined" &&
@@ -44,7 +45,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }
 
   useIsomorphicLayoutEffect(() => {
-    setTheme(localStorage.getItem("theme") ?? "theme-light-1");
+    setTheme(localStorage.getItem("theme") ?? Default_Theme);
 
     window.addEventListener("storage", listenStorageChanges);
     return () => window.removeEventListener("storage", listenStorageChanges);

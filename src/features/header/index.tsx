@@ -72,9 +72,9 @@ function ThemeSwitch() {
         dir="ltr"
         className="scale-125"
         middle={
-          (!theme.includes("dark") && !theme.includes("light")) || theme == ""
+          (!theme?.includes("dark") && !theme?.includes("light")) || theme == ""
         }
-        checked={theme.includes("dark") ? true : false}
+        checked={theme?.includes("dark") ? true : false}
         IconLeft={SunDimIcon}
         IconRight={MoonIcon}
         onClick={() => {
