@@ -31,7 +31,7 @@ export default function Menu({
   return (
     <motion.div
       className={twMerge(
-        "group  z-0 flex max-w-sm cursor-pointer items-end gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
+        "  z-0 flex max-w-sm cursor-pointer items-end gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
         theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
       )}
       onHoverEnd={() => {
@@ -41,7 +41,7 @@ export default function Menu({
       {list.map((item, i) => {
         return (
           <motion.span
-            className="flex w-full min-w-fit items-center justify-center"
+            className=" flex w-full min-w-fit items-center justify-center"
             key={i}
             onHoverStart={() => {
               setActiveIndex(i);
@@ -77,10 +77,10 @@ function MenuItem({
   const activeClass = "text-primary";
   const { link, value } = item;
   return (
-    <Link href={`${rootPath}/${link}`} className="w-full text-center">
+    <Link href={`${rootPath}/${link}`} className=" group w-full text-center">
       <div
         className={twMerge(
-          "group relative z-0 flex items-center justify-center gap-2 rounded-sm px-2 py-3 text-sm",
+          " relative z-0 flex items-center justify-center gap-2 rounded-sm px-2 py-3 text-sm",
           isActive ? activeClass : "text-primary/50  hover:text-primary",
           theme === "solid" ? "rounded-md" : "rounded-full ",
           isSub ? " bg-secbuttn" : "",
@@ -111,7 +111,7 @@ function MenuItem({
       </div>
 
       {item.subMenu && item.subMenu.length > 0 && (
-        <ul className="absolute  hidden rounded  group-hover:block">
+        <ul className="absolute hidden rounded group-hover:block">
           <Menu
             list={item.subMenu}
             rootPath={rootPath}

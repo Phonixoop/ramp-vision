@@ -25,6 +25,11 @@ import {
 import { SelectControlled } from "~/features/checkbox-list";
 import H2 from "~/ui/heading/h2";
 import Gauge from "~/features/gauge";
+import {
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtRoles,
+} from "~/constants/personnel-performance";
 export default function GaugesPage() {
   const [selectedDates, setSelectedDates] = useState<string[]>([
     moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
@@ -45,9 +50,9 @@ export default function GaugesPage() {
         periodType: filters?.periodType,
         filter: {
           Start_Date: filters?.filter?.Start_Date,
-          ProjectType: filters?.filter?.ProjectType,
-          Role: filters?.filter?.Role,
-          ContractType: filters?.filter?.ContractType,
+          ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
+          Role: filters?.filter?.Role ?? defualtRoles,
+          ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
           RoleType: filters?.filter?.RoleType,
           DateInfo: filters?.filter?.DateInfo,
         },
@@ -189,16 +194,7 @@ export default function GaugesPage() {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={
-                      filters.filter.Role ?? [
-                        "کارشناس ارزیاب اسناد بیمارستانی",
-                        "کارشناس ارزیاب اسناد پاراکلینیکی",
-                        "کارشناس ارزیاب اسناد دارویی",
-                        "کارشناس ارزیاب اسناد دندانپزشکی",
-                        "کارشناس پذیرش اسناد",
-                        "کارشناس ثبت اسناد خسارت",
-                      ]
-                    }
+                    value={filters.filter.Role ?? defualtRoles}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
@@ -224,7 +220,7 @@ export default function GaugesPage() {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={filters.filter.ProjectType ?? ["جبران"]}
+                    value={filters.filter.ProjectType ?? defaultProjectTypes}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
@@ -251,7 +247,7 @@ export default function GaugesPage() {
                           .filter((a) => a),
                       ),
                     ]}
-                    value={filters.filter.ContractType ?? ["تمام وقت"]}
+                    value={filters.filter.ContractType ?? defualtContractTypes}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {

@@ -92,9 +92,9 @@ export default function CitiesPage({ children }) {
         periodType: filters?.periodType,
         filter: {
           Start_Date: filters?.filter?.Start_Date,
-          ProjectType: filters?.filter?.ProjectType,
-          Role: filters?.filter?.Role,
-          ContractType: filters?.filter?.ContractType,
+          ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
+          Role: filters?.filter?.Role ?? defualtRoles,
+          ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
           RoleType: filters?.filter?.RoleType,
           DateInfo: filters?.filter?.DateInfo,
         },

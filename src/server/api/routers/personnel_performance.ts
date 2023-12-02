@@ -171,7 +171,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        //  console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -408,7 +408,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         // Connect to SQL Server
-
+        let filter = input.filter;
         const permissions = await getPermission({ ctx });
         const cities = permissions
           .find((permission) => permission.id === "ViewCities")
@@ -416,11 +416,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
           .map((permission) => permission.enLabel);
 
         let whereClause = generateWhereClause({
+          ...filter,
           CityName: cities,
           Start_Date: input.filter.Start_Date,
         });
-
-        let filter = input.filter;
 
         if (filter.CityName?.length > 0)
           filter.CityName = cities.filter((value) =>
@@ -470,7 +469,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
         else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        // console.log(queryCities);
+        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
