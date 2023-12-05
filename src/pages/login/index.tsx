@@ -193,7 +193,9 @@ function CreateAccountForm() {
               بازگشت
             </Button>
           </div>,
-          <span className="text-primary">خوش آمدید</span>,
+          <span key={4} className="text-primary">
+            خوش آمدید
+          </span>,
         ]}
       />
     </form>
