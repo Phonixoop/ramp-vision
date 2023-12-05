@@ -174,7 +174,7 @@ function CreateAccountForm() {
               </Button>
             </div>
           </>,
-          <span key={2} className="pb-10">
+          <span key={2} className="pb-10 text-primary">
             در حال بررسی
           </span>,
           <div
@@ -193,7 +193,7 @@ function CreateAccountForm() {
               بازگشت
             </Button>
           </div>,
-          <>خوش آمدید</>,
+          <span className="text-primary">خوش آمدید</span>,
         ]}
       />
     </form>

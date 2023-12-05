@@ -9,6 +9,13 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import { CITIES } from "~/constants";
+import {
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtDateInfos,
+  defualtRoles,
+} from "~/constants/personnel-performance";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/utils/api";
 import { calculateAggregateByFields } from "~/utils/util";
@@ -228,23 +235,19 @@ function assignColorsToItems(items) {
   return result;
 }
 export default function RadarGauge({ CityName = [] }) {
+  console.log({ CityName });
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
         periodType: "ماهانه",
         filter: {
-          CityName,
-          Role: [
-            "کارشناس ارزیاب اسناد بیمارستانی",
-            "کارشناس ارزیاب اسناد پاراکلینیکی",
-            "کارشناس ارزیاب اسناد دارویی",
-            "کارشناس ارزیاب اسناد دندانپزشکی",
-            "کارشناس پذیرش اسناد",
-            "کارشناس ثبت اسناد خسارت",
-          ],
-          ProjectType: ["جبران"],
-          DateInfo: ["1402/03/31"],
-          ContractType: ["تمام وقت"],
+          CityName: CityName.map(
+            (c) => CITIES.find((a) => a.PersianName === c).EnglishName,
+          ),
+          Role: defualtRoles,
+          ProjectType: defaultProjectTypes,
+          DateInfo: defualtDateInfos,
+          ContractType: defualtContractTypes,
           RoleType: [],
           Start_Date: [moment().locale("fa").format("yyyy/MM/01")],
         },

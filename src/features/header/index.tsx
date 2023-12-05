@@ -12,6 +12,8 @@ import Button from "~/ui/buttons";
 import { Container } from "~/ui/containers";
 import { api } from "~/utils/api";
 import { Permission } from "~/types";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/router";
 
 function checkStatusForMenu(status) {
   if (status === "unauthenticated")
@@ -97,7 +99,7 @@ function ThemeSwitch() {
 
 function AuthShowcase({ session }) {
   const { data: sessionData, status } = session;
-
+  const router = useRouter();
   if (status === "loading")
     return <div className="h-5 w-20 animate-pulse"></div>;
 
@@ -113,7 +115,7 @@ function AuthShowcase({ session }) {
 
   const user = sessionData?.user;
 
-  const permissions: Permission[] = JSON.parse(user.role?.permissions);
+  const permissions: Permission[] = JSON.parse(user?.role?.permissions);
 
   const permission = permissions.find((p) => p.id === "ViewAdmin");
   const isAdmin = permission && permission?.isActive === true;

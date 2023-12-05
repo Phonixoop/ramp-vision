@@ -469,7 +469,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
         else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        console.log(queryCities);
+        // console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
