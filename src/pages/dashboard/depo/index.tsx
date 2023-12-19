@@ -225,12 +225,24 @@ function DeposTable({ sessionData }) {
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">استان ها</span>
+                <span className="font-bold text-primary">استان</span>
                 {initialFilters.data?.Cities && (
                   <LayoutGroup id="CityLevelMenu">
                     <InPageMenu
                       list={City_Levels.map((a) => a.name)}
-                      value={0}
+                      startIndex={-1}
+                      index={
+                        column.getFilterValue()?.length ==
+                        [
+                          ...new Set(
+                            initialFilters.data?.Cities.map(
+                              (a) => a[column.id],
+                            ),
+                          ),
+                        ].filter((item) => item != undefined)
+                          ? -1
+                          : undefined
+                      }
                       onChange={(value) => {
                         const { setFilterValue } = column;
                         const cities = City_Levels.find(
@@ -279,14 +291,14 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          header: "نام فعالیت",
+          header: "نوع فعالیت",
           accessorKey: "ServiceName",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <>
                 <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                  <span className="font-bold text-primary">فعالیت ها</span>
+                  <span className="font-bold text-primary">نوع فعالیت</span>
                   <SelectColumnFilter
                     column={column}
                     data={depo.data?.result}
@@ -311,7 +323,7 @@ function DeposTable({ sessionData }) {
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">پرونده ها</span>
+                <span className="font-bold text-primary">نوع پرونده</span>
                 <SelectColumnFilter
                   column={column}
                   data={depo.data?.result}
@@ -329,7 +341,7 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          header: "تعداد بلاتکلیف",
+          header: "تعداد دپو",
           accessorKey: "DepoCount",
           cell: ({ row }) => <span>{commify(row.original.DepoCount)}</span>,
           footer: ({ table }) =>
@@ -404,7 +416,7 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          header: "تاریخ",
+          header: "بازه تاریخ",
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
         },
@@ -431,7 +443,7 @@ function DeposTable({ sessionData }) {
                     <LayoutGroup id="DateMenu">
                       <InPageMenu
                         list={Object.keys(Reports_Period)}
-                        value={0}
+                        startIndex={0}
                         onChange={(value) => {
                           setReportPeriod(value.item.name);
                         }}
@@ -650,14 +662,14 @@ function DeposTable({ sessionData }) {
                             data={(serviceData ?? []).map((row) => {
                               return {
                                 name: row.key,
-                                "تعداد بلاتکلیف": row.DepoCount,
+                                "تعداد دپو": row.DepoCount,
                                 "تعداد ورودی": row.EntryCount,
                                 "تعداد رسیدگی": row.Capicity,
                               };
                             })}
                             index="name"
                             categories={[
-                              "تعداد بلاتکلیف",
+                              "تعداد دپو",
                               "تعداد ورودی",
                               "تعداد رسیدگی",
                             ]}
@@ -681,7 +693,7 @@ function DeposTable({ sessionData }) {
                               return {
                                 date: row.key,
 
-                                "تعداد بلاتکلیف": row.DepoCount,
+                                "تعداد دپو": row.DepoCount,
                                 "تعداد ورودی": row.EntryCount,
                                 "تعداد رسیدگی": row.Capicity,
                               };
@@ -689,7 +701,7 @@ function DeposTable({ sessionData }) {
                             index="date"
                             //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
                             categories={[
-                              "تعداد بلاتکلیف",
+                              "تعداد دپو",
                               "تعداد ورودی",
                               "تعداد رسیدگی",
                             ]}
@@ -740,8 +752,8 @@ function DeposTable({ sessionData }) {
                           <>
                             {/* <TrackerView data={getTracker.data ?? []} /> */}
 
-                            <RadarGauge CityName={trackerFilter.cities} />
-                            <div className="flex w-full flex-col items-center justify-between gap-5 2xl:flex-row">
+                            {/* <RadarGauge CityName={trackerFilter.cities} /> */}
+                            <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
                               <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
                                 <div
                                   dir="ltr"
@@ -771,7 +783,7 @@ function DeposTable({ sessionData }) {
                                   dir="ltr"
                                   className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2"
                                 >
-                                  <H2>تعداد بلاتکلیف</H2>
+                                  <H2>تعداد دپو</H2>
                                   <DonutChart
                                     data={depo_BaseOnSabt}
                                     category="value"

@@ -1,6 +1,6 @@
 import { MoonIcon, SunDimIcon, UserCog2Icon } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Switch } from "~/components/ui/switch";
 import { MENU } from "~/constants";
 import Link from "next/link";
@@ -15,8 +15,8 @@ import { Permission } from "~/types";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 
-function checkStatusForMenu(status) {
-  if (status === "unauthenticated")
+function checkStatusForMenu(status, user) {
+  if (status === "unauthenticated" || !user)
     return MENU.filter((menu) => {
       switch (menu.value) {
         case "جزئیات عملکرد شعب":
@@ -50,7 +50,10 @@ export default function Header() {
             <ThemeSwitch />
           </ThemeProvider>
           {session.status !== "loading" && (
-            <Menu rootPath="/" list={checkStatusForMenu(session.status)} />
+            <Menu
+              rootPath="/"
+              list={checkStatusForMenu(session.status, session?.data?.user)}
+            />
           )}
         </div>
       </Container>
@@ -99,11 +102,12 @@ function ThemeSwitch() {
 
 function AuthShowcase({ session }) {
   const { data: sessionData, status } = session;
+  const user = sessionData?.user;
   const router = useRouter();
   if (status === "loading")
     return <div className="h-5 w-20 animate-pulse"></div>;
 
-  if (status === "unauthenticated")
+  if (status === "unauthenticated" || !user)
     return (
       <Button
         className="flex  items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent"
@@ -112,8 +116,6 @@ function AuthShowcase({ session }) {
         <span className="">{sessionData ? "خروج" : "ورود"}</span>
       </Button>
     );
-
-  const user = sessionData?.user;
 
   const permissions: Permission[] = JSON.parse(user?.role?.permissions);
 

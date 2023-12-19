@@ -96,7 +96,19 @@ export default function Table({
   const paddingTop = virtualRows?.length > 0 ? virtualRows?.[0].start || 0 : 0;
   const paddingBottom =
     virtualRows?.length > 0 ? totalSize - (virtualRows?.at(-1)?.end || 0) : 0;
+  const getRightStickyPos = (index: number) => {
+    if (!index) return 0;
 
+    const prevColumnsTotalWidth = columns
+      .slice(0, index)
+      .reduce((curr, column) => {
+        //@ts-ignore
+        const width = column?.width;
+        //@ts-ignore
+        return curr + (width ?? 0);
+      }, 0);
+    return prevColumnsTotalWidth;
+  };
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch 2xl:flex-row ">
       {renderInFilterView !== undefined && (
@@ -147,10 +159,10 @@ export default function Table({
               <thead>
                 {
                   // Loop over the header rows
-                  table.getHeaderGroups().map((headerGroup) => {
+                  table.getHeaderGroups().map((headerGroup, i) => {
                     // const { key, ...restHeaderGroupProps } =
                     //   headerGroup.getHeaderGroupProps();
-
+                    let hasStickyCount = -1;
                     return (
                       <tr
                         className="text-center"
@@ -159,7 +171,7 @@ export default function Table({
                       >
                         {
                           // Loop over the headers in each row
-                          headerGroup.headers.map((header) => {
+                          headerGroup.headers.map((header, i) => {
                             // const { key, ...restHeaderProps } =
                             //   column.getHeaderProps(
                             //     //@ts-ignore
@@ -173,12 +185,25 @@ export default function Table({
 
                             const isSortedDesc =
                               (header.column.getIsSorted() as string) == "desc";
+
+                            //@ts-ignore
+                            const isSticky = header.column.columnDef.hSticky;
+
                             return (
                               <th
                                 key={header.id}
                                 colSpan={header.colSpan}
                                 // {...restHeaderProps}
-                                className="sticky top-0 bg-secbuttn px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-accent "
+                                className={twMerge(
+                                  "sticky top-0 z-0 w-5 bg-secbuttn px-6 py-3 text-center text-xs  font-black leading-4 tracking-wider text-accent   ",
+
+                                  isSticky ? ` z-20 ` : "",
+                                )}
+                                style={{
+                                  right: isSticky
+                                    ? getRightStickyPos(i)
+                                    : undefined,
+                                }}
                               >
                                 <div
                                   className={cn(
@@ -231,7 +256,7 @@ export default function Table({
                   // Loop over the table rows
                   virtualRows.map((virtualRow, index) => {
                     const row = rows[virtualRow.index];
-
+                    let hasStickyCount = -1;
                     // Prepare the row for display
                     // prepareRow(row);
                     // const { key, ...restRowProps } = row.getRowProps();
@@ -249,13 +274,35 @@ export default function Table({
                       >
                         {
                           //@ts-ignore
-                          row.getVisibleCells().map((cell) => {
+                          row.getVisibleCells().map((cell, i) => {
+                            // const right = `right-[${i * 30}px]`;
+                            //@ts-ignore
+                            const isSticky = cell.column.columnDef.hSticky;
+                            if (isSticky) hasStickyCount++;
+                            //@ts-ignore
+                            const width = cell.column.columnDef.width;
+
+                            const widthTw = `w-[${width}px]`;
                             return (
                               <td
                                 key={cell.id}
-                                className=" border-l border-primary/50 text-center text-primary last:border-0 "
+                                className={twMerge(
+                                  " z-10 border-l border-primary/50 bg-secondary text-center text-primary last:border-0 ",
+                                  isSticky ? "lg:sticky " : "",
+                                )}
+                                style={{
+                                  right: getRightStickyPos(i),
+                                }}
                               >
-                                <div className=" flex min-w-max justify-center px-2 text-center">
+                                <div
+                                  className={twMerge(
+                                    " flex  justify-center px-2 text-center",
+                                    "min-w-max",
+                                  )}
+                                  style={{
+                                    width: width,
+                                  }}
+                                >
                                   {flexRender(
                                     cell.column.columnDef.cell,
                                     cell.getContext(),
@@ -291,11 +338,15 @@ export default function Table({
                               colSpan={header.colSpan}
                               // {...restHeaderProps}
                               className={twMerge(
-                                "sticky bottom-0  px-6  py-3 text-center text-xs font-black leading-4  tracking-wider text-primary ",
-                                content ? "bg-primbuttn text-secondary" : "",
+                                "font-bol sticky bottom-0 z-40 bg-primbuttn px-6 py-3 text-center text-xs   leading-4 tracking-wider text-secondary ",
+                                content
+                                  ? " border-0 border-x border-primary"
+                                  : "",
                               )}
                             >
-                              {header.isPlaceholder ? null : content}
+                              <span className="text-lg font-bold">
+                                {header.isPlaceholder ? null : content}
+                              </span>
                             </th>
                           );
                         })}

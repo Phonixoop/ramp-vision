@@ -1,6 +1,8 @@
 import { Column } from "@tanstack/react-table";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import React, { useEffect, useLayoutEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import Button from "~/ui/buttons";
 import { api } from "~/utils/api";
 
 export default function CheckboxList({ checkboxes, onCheckboxChange }) {
@@ -26,9 +28,35 @@ export default function CheckboxList({ checkboxes, onCheckboxChange }) {
   );
 }
 
-export function SelectControlled({ list = [], value, onChange, title }) {
+export function SelectControlled({
+  list = [],
+  value,
+  onChange,
+  title,
+  withSelectAll = false,
+}) {
+  const selectAllState = value.length < list.length;
   return (
-    <div className=" w-full px-2 sm:px-0 ">
+    <div className=" flex w-full flex-col items-center justify-center gap-2 px-2 text-center sm:px-0 ">
+      {withSelectAll && (
+        <Button
+          className={twMerge(
+            "font-bold",
+            selectAllState
+              ? "bg-emerald-200 text-emerald-900"
+              : "bg-rose-400 text-rose-900",
+          )}
+          onClick={() => {
+            if (value.length == list.length) {
+              onChange([]);
+            } else {
+              onChange(list);
+            }
+          }}
+        >
+          {selectAllState ? "انتخاب همه" : "پاک کردن همه"}
+        </Button>
+      )}
       <MultiSelect
         className="min-w-full"
         placeholder={title}
@@ -64,13 +92,41 @@ export function SelectColumnFilter({
   }, []);
 
   if (!data || data.length === 0) return "";
-  const unique = [...new Set(data.map((a) => a[column.id]))];
-
+  const unique = [...new Set(data.map((a) => a[column.id]))].filter(
+    (item) => item != undefined,
+  );
+  const selectedCount = getFilterValue() ? (getFilterValue() as any).length : 0;
+  const selectAllState = selectedCount < unique.length;
   return (
     <>
+      <Button
+        className={twMerge(
+          "font-bold",
+          selectAllState
+            ? "bg-emerald-200 text-emerald-900"
+            : "bg-rose-400 text-rose-900",
+        )}
+        onClick={() => {
+          if (selectedCount == unique.length) {
+            setFilterValue([]);
+            onChange({
+              id: column.id,
+              values: [],
+            });
+          } else {
+            setFilterValue(unique);
+            onChange({
+              id: column.id,
+              values: unique,
+            });
+          }
+        }}
+      >
+        {selectAllState ? "انتخاب همه" : "پاک کردن همه"}
+      </Button>
       <SelectControlled
         title={column.columnDef.header}
-        list={unique.filter((item) => item != undefined)}
+        list={unique}
         value={getFilterValue() ?? []}
         onChange={(values) => {
           setFilterValue(values);

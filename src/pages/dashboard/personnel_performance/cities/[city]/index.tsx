@@ -259,10 +259,7 @@ export default function CityPage({ children, city }) {
                   );
                 })}
               </div>
-              <div
-                className="grid  grid-cols-1  gap-4 md:grid-cols-2 "
-                dir="rtl"
-              >
+              <div className="grid  gap-4 " dir="rtl">
                 {noneNumericItems.map(([key, value], index, array) => {
                   const isLastItem = index === array.length - 1;
 

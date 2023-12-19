@@ -47,10 +47,6 @@ export const City_Levels: {
   cities: string[];
 }[] = [
   {
-    name: "همه",
-    cities: [],
-  },
-  {
     name: "ممتاز",
     cities: [
       "Tehran InDirect",

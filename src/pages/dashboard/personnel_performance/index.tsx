@@ -123,32 +123,7 @@ export default function PersonnelPerformancePage() {
     </>
   );
 }
-const cities = [
-  {
-    name: "New York",
-    sales: 9800,
-  },
-  {
-    name: "London",
-    sales: 4567,
-  },
-  {
-    name: "Hong Kong",
-    sales: 3908,
-  },
-  {
-    name: "San Francisco",
-    sales: 2400,
-  },
-  {
-    name: "Singapore",
-    sales: 1908,
-  },
-  {
-    name: "Zurich",
-    sales: 1398,
-  },
-];
+
 function PersonnelPerformanceTable({ sessionData }) {
   const [selectedDates, setSelectedDates] = useState<string[]>([
     moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
@@ -209,12 +184,12 @@ function PersonnelPerformanceTable({ sessionData }) {
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">استان ها</span>
+                <span className="font-bold text-primary">استان</span>
                 {initialFilters.data?.Cities && (
                   <LayoutGroup id="CityLevelMenu">
                     <InPageMenu
                       list={City_Levels.map((a) => a.name)}
-                      value={0}
+                      startIndex={2}
                       onChange={(value) => {
                         const { setFilterValue } = column;
                         const cities = City_Levels.find(
@@ -256,6 +231,8 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         {
           header: "کابران",
+          hSticky: true,
+          width: 200,
           accessorKey: "NameFamily",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -282,6 +259,8 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         {
           header: "نوع پروژه",
+          hSticky: true,
+          width: 200,
           accessorKey: "ProjectType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -307,6 +286,8 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         {
           header: "نوع قرارداد",
+          hSticky: true,
+          width: 200,
           accessorKey: "ContractType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -332,6 +313,8 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         {
           header: "سمت",
+          hSticky: true,
+          width: 250,
           accessorKey: "Role",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -364,6 +347,8 @@ function PersonnelPerformanceTable({ sessionData }) {
         },
         {
           header: "نوع سمت",
+          enablePinning: true,
+          hSticky: true,
           accessorKey: "RoleType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -489,9 +474,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                 .rows.reduce(
                   (total, row) =>
                     (total as number) +
-                    (row.getValue(
-                      "SabtAvArzyabiAsnadDaroDirectalieAsnad",
-                    ) as number),
+                    (row.getValue("ArzyabiAsnadDaroDirect") as number),
                   0,
                 ),
             ),
@@ -578,7 +561,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             ),
         },
         {
-          header: "تاریخ",
+          header: "بازه تاریخ",
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
         },
@@ -628,11 +611,11 @@ function PersonnelPerformanceTable({ sessionData }) {
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                    <span className="font-bold text-primary">تاریخ</span>
+                    <span className="font-bold text-primary">بازه تاریخ</span>
                     <LayoutGroup id="DateMenu">
                       <InPageMenu
                         list={Object.keys(Reports_Period)}
-                        value={0}
+                        startIndex={0}
                         onChange={(value) => {
                           setReportPeriod(value.item.name);
                         }}
@@ -645,12 +628,17 @@ function PersonnelPerformanceTable({ sessionData }) {
                         const seperator =
                           deferredFilter.periodType == "روزانه" ? " , " : " ~ ";
                         return (
-                          <Button
-                            className="w-full border border-dashed border-accent text-center hover:bg-accent/20"
-                            onClick={openCalendar}
-                          >
-                            {deferredFilter.filter.Start_Date.join(seperator)}
-                          </Button>
+                          <div className="flex w-full items-center justify-center text-center">
+                            {openCalendar && (
+                              <Button onClick={openCalendar}>انتخاب</Button>
+                            )}
+                            <Button
+                              className="w-full border border-dashed border-accent text-center hover:bg-accent/20"
+                              onClick={openCalendar}
+                            >
+                              {deferredFilter.filter.Start_Date.join(seperator)}
+                            </Button>
+                          </div>
                         );
                       }}
                       inputClass="text-center"

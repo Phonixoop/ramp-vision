@@ -143,13 +143,13 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "استان ها",
+          header: "استان",
           accessorKey: "CityName",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">استان ها</span>
+                <span className="font-bold text-primary">استان</span>
                 <SelectColumnFilter
                   initialFilters={[]}
                   column={column}

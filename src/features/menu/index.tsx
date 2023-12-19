@@ -125,14 +125,15 @@ function MenuItem({
 
 export function InPageMenu({
   className = "",
-  value = -1,
+  startIndex = -1,
+  index = -1,
   list = [],
   onChange = (value) => {},
 }) {
-  const [activeIndex, setActiveIndex] = useState(value);
+  const [activeIndex, setActiveIndex] = useState(startIndex);
   const [items, setItems] = useState(
     list.map((item, i) => {
-      if (value == i) return { name: item, isActive: true };
+      if (startIndex == i) return { name: item, isActive: true };
       return { name: item, isActive: false };
     }),
   );

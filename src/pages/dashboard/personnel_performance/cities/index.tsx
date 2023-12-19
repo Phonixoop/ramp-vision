@@ -144,12 +144,12 @@ export default function CitiesPage({ children }) {
             className="min-w-  z-20 flex flex-wrap items-stretch justify-center gap-5"
             dir="rtl"
           >
-            <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-              <span className="font-bold text-primary">تاریخ</span>
+            <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <span className="font-bold text-primary">بازه تاریخ</span>
               <LayoutGroup id="DateMenu">
                 <InPageMenu
                   list={Object.keys(Reports_Period)}
-                  value={0}
+                  startIndex={0}
                   onChange={(value) => {
                     setReportPeriod(value.item.name);
                   }}
@@ -205,9 +205,10 @@ export default function CitiesPage({ children }) {
             </div>
             {!getInitialFilters.isLoading && (
               <>
-                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">سمت</span>
                   <SelectControlled
+                    withSelectAll
                     title={"سمت"}
                     list={[
                       ...new Set(
@@ -231,9 +232,10 @@ export default function CitiesPage({ children }) {
                     }}
                   />
                 </div>
-                <div className="flex min-w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">نوع پروژه</span>
                   <SelectControlled
+                    withSelectAll
                     title={"نوع پروژه"}
                     list={[
                       ...new Set(
@@ -258,9 +260,10 @@ export default function CitiesPage({ children }) {
                   />
                 </div>
 
-                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">نوع قرار داد</span>
                   <SelectControlled
+                    withSelectAll
                     title={"نوع قرار داد"}
                     list={[
                       ...new Set(
@@ -284,9 +287,10 @@ export default function CitiesPage({ children }) {
                     }}
                   />
                 </div>
-                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">نوع سمت</span>
                   <SelectControlled
+                    withSelectAll
                     title={"نوع سمت"}
                     list={[
                       ...new Set(
@@ -310,11 +314,12 @@ export default function CitiesPage({ children }) {
                     }}
                   />
                 </div>
-                <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">
                     تاریخ گزارش پرسنل
                   </span>
                   <SelectControlled
+                    withSelectAll
                     title={"تاریخ گزارش پرنسل"}
                     list={[
                       ...new Set(
@@ -358,7 +363,7 @@ export default function CitiesPage({ children }) {
           <AdvancedList
             title={
               <span className="flex items-center justify-center gap-2 text-primary">
-                استان ها
+                استان
                 <BuildingIcon />
               </span>
             }
@@ -423,7 +428,7 @@ export default function CitiesPage({ children }) {
                     <div className="flex w-full  items-center justify-center">
                       <SparkAreaChart
                         data={getCitiesWithPerformance.data
-                          .filter((a) => a.CityName === item.CityName_En)
+                          ?.filter((a) => a.CityName === item.CityName_En)
                           .map((a) => {
                             return {
                               TotalPerformance: a.TotalPerformance,
