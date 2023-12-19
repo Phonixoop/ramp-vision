@@ -127,7 +127,7 @@ export default function GaugesPage() {
               <LayoutGroup id="DateMenu">
                 <InPageMenu
                   list={Object.keys(Reports_Period)}
-                  value={0}
+                  startIndex={0}
                   onChange={(value) => {
                     setReportPeriod(value.item.name);
                   }}
