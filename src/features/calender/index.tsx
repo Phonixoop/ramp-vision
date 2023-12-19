@@ -46,7 +46,7 @@ const MONTHS = [
 type Props = {
   onDate?: (
     date: Moment,
-    monthNumber: number
+    monthNumber: number,
   ) => React.ReactNode | string | undefined;
   onMonthChange?: (startDate: Moment, endDate: Moment) => unknown;
   onClick?: (date: Moment) => unknown;
@@ -63,16 +63,16 @@ export default function Calender({
       <LayoutGroup id="months-InPageMenu">
         <InPageMenu
           className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
-          value={moment().locale("fa").month()}
+          startIndex={moment().locale("fa").month()}
           list={MONTHS}
           onChange={(monthNumber) => {
             const newCalendar = getMonthDays(
-              moment().jMonth(monthNumber).locale("fa")
+              moment().jMonth(monthNumber).locale("fa"),
             );
             setCalender(newCalendar);
             onMonthChange(
               newCalendar.at(0),
-              newCalendar.at(newCalendar.length - 1)
+              newCalendar.at(newCalendar.length - 1),
             );
           }}
         />
@@ -101,7 +101,7 @@ export default function Calender({
                   .clone()
                   .isBefore(moment().locale("fa").subtract(1, "day"))}
                 className={twMerge(
-                  "text-centerd group relative flex cursor-pointer items-center justify-center"
+                  "text-centerd group relative flex cursor-pointer items-center justify-center",
                 )}
               >
                 {isItemToday && (

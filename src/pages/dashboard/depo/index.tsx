@@ -63,6 +63,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Bar } from "react-chartjs-2";
 import RadarGauge from "~/features/radar";
 import TestPage from "~/pages/test";
+import { ServiceNames } from "~/constants/depo";
 
 const chartdata = [
   {
@@ -126,32 +127,6 @@ export default function DeposPage() {
     </>
   );
 }
-const cities = [
-  {
-    name: "New York",
-    sales: 9800,
-  },
-  {
-    name: "London",
-    sales: 4567,
-  },
-  {
-    name: "Hong Kong",
-    sales: 3908,
-  },
-  {
-    name: "San Francisco",
-    sales: 2400,
-  },
-  {
-    name: "Singapore",
-    sales: 1908,
-  },
-  {
-    name: "Zurich",
-    sales: 1398,
-  },
-];
 
 function DeposTable({ sessionData }) {
   const utils = api.useContext();
@@ -249,7 +224,7 @@ function DeposTable({ sessionData }) {
                           (a) => a.name === value.item.name,
                         ).cities;
 
-                        // beacuse our system is permission based we need to only filter allowed cities.
+                        // beacuse our system is permission based we need to only show cities that are allowed to filter.
                         const canFilterCities = cities
                           .filter((city) =>
                             initialFilters.data.Cities.map((initCity) => {
@@ -294,6 +269,7 @@ function DeposTable({ sessionData }) {
           header: "نوع فعالیت",
           accessorKey: "ServiceName",
           filterFn: "arrIncludesSome",
+
           Filter: ({ column }) => {
             return (
               <>
@@ -302,6 +278,7 @@ function DeposTable({ sessionData }) {
                   <SelectColumnFilter
                     column={column}
                     data={depo.data?.result}
+                    translate={ServiceNames}
                     onChange={(filter) => {
                       // setDataFilters((prev) => {
                       //   return {

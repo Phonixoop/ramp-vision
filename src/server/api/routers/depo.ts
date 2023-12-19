@@ -16,6 +16,7 @@ import {
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
 import { CITIES, validDateBeforeToScrewThem } from "~/constants";
+import { ServiceNames } from "~/constants/depo";
 
 const config = {
   user: "admin",
@@ -54,6 +55,7 @@ export const depoRouter = createTRPCRouter({
 
         let finalResult = [];
         const permissions = await getPermission({ ctx });
+
         const cities = permissions
           .find((permission) => permission.id === "ViewCities")
           .subPermissions.filter((permission) => permission.isActive)
@@ -199,6 +201,9 @@ export const depoRouter = createTRPCRouter({
                 ...cf,
                 CityName: CITIES.find((a) => a.EnglishName === cf.CityName)
                   .PersianName,
+                ServiceName: ServiceNames[cf.ServiceName]
+                  ? ServiceNames[cf.ServiceName]
+                  : cf.ServiceName,
               };
             }) ?? [],
         };

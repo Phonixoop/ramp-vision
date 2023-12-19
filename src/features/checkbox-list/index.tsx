@@ -2,6 +2,7 @@ import { Column } from "@tanstack/react-table";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { ServiceNamesType } from "~/constants/depo";
 import Button from "~/ui/buttons";
 import { api } from "~/utils/api";
 
@@ -82,6 +83,7 @@ export function SelectColumnFilter({
   data,
   initialFilters = [],
   onChange,
+  translate = undefined,
 }) {
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -95,6 +97,7 @@ export function SelectColumnFilter({
   const unique = [...new Set(data.map((a) => a[column.id]))].filter(
     (item) => item != undefined,
   );
+
   const selectedCount = getFilterValue() ? (getFilterValue() as any).length : 0;
   const selectAllState = selectedCount < unique.length;
   return (
