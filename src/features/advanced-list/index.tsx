@@ -105,7 +105,7 @@ export default function AdvancedList({
         })}
         {list.length <= 0 && !isLoading && (
           <div className=" flex h-full w-full items-center justify-center">
-            <span>دیتا ای موجود نیست</span>
+            <span className="text-primary">دیتا ای موجود نیست</span>
           </div>
         )}
       </div>

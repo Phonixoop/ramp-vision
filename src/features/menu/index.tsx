@@ -26,7 +26,7 @@ export default function Menu({
 }: MenuInput) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const router = useRouter();
-  const pathName = getPathName(router.asPath);
+  const pathName = router.asPath;
 
   return (
     <motion.div
