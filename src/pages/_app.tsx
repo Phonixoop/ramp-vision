@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { Toaster } from "~/components/ui/toast/toaster";
 import { PersonnelFilterProvider } from "~/context/personnel-filter.context";
 import { Default_Theme } from "~/constants/theme";
+import BlurBackground from "~/ui/blur-backgrounds";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   PageLayout?: (page: ReactElement) => ReactElement<any, any>;

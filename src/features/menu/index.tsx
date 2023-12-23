@@ -31,7 +31,7 @@ export default function Menu({
   return (
     <motion.div
       className={twMerge(
-        "  z-0 flex max-w-sm cursor-pointer items-end gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
+        "  z-0 flex max-w-sm cursor-pointer items-stretch gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
         theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
       )}
       onHoverEnd={() => {
@@ -74,16 +74,17 @@ function MenuItem({
 }) {
   const isHovered = activeIndex === index;
   const isActive = pathName === item.link;
-  const activeClass = "text-primary";
+
   const { link, value } = item;
   return (
     <Link href={`${rootPath}/${link}`} className=" group w-full text-center">
       <div
         className={twMerge(
-          " relative z-0 flex items-center justify-center gap-2 rounded-sm px-2 py-3 text-sm",
-          isActive ? activeClass : "text-primary/50  hover:text-primary",
+          "  relative z-0 flex items-center justify-center  gap-2 rounded-sm px-3 py-2 text-sm",
+          isActive ? "text-accent hover:text-secondary" : " text-primary",
+          isHovered ? "text-secondary" : "",
+          isSub ? "bg-primbuttn/90 text-primary hover:text-secondary" : "",
           theme === "solid" ? "rounded-md" : "rounded-full ",
-          isSub ? " bg-secbuttn" : "",
         )}
       >
         {isHovered && (
@@ -93,7 +94,7 @@ function MenuItem({
             }}
             layoutId="bg-follower"
             className={twMerge(
-              "absolute inset-0 -z-10  bg-primbuttn  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
+              "absolute inset-0 -z-10 bg-primary  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
               theme === "solid" ? "rounded-md" : "rounded-full ",
             )}
           />
@@ -102,12 +103,16 @@ function MenuItem({
         {isActive && (
           <motion.div
             layoutId="underline"
-            className="absolute -bottom-[2px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primbuttn"
+            className="absolute -bottom-[5px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primary"
           />
         )}
 
-        <span className="duration-100 ">{value}</span>
-        {item.subMenu && <ChevronDownIcon className="" />}
+        <span className=" group-hover:text-inherit/50 text-inherit  duration-100">
+          {value}
+        </span>
+        {item.subMenu && (
+          <ChevronDownIcon className="stroke-primary group-hover:stroke-secondary" />
+        )}
       </div>
 
       {item.subMenu && item.subMenu.length > 0 && (
@@ -185,11 +190,10 @@ export function InPageMenu({
 }
 
 function InPageMenuItem({ text, isHovered = false, isActive = false }) {
-  const activeClass = "text-primary";
   return (
     <div
       className={`relative z-0 rounded-sm px-5  pb-4 pt-2 text-sm ${
-        isActive ? activeClass : "text-primary/50  hover:text-primary"
+        isActive ? "text-primary" : "text-primary/50  hover:text-primary"
       } `}
     >
       {isHovered && (

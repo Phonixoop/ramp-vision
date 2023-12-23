@@ -7,8 +7,8 @@ export const MENU = [
     link: "/",
   },
   {
-    value: "درباره ویژن",
-    link: "atysa.ir",
+    value: "درباره RAMP",
+    link: "/about",
   },
   {
     value: "جزئیات عملکرد شعب",
