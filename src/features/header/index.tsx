@@ -1,4 +1,9 @@
-import { MoonIcon, SunDimIcon, UserCog2Icon } from "lucide-react";
+import {
+  FormInputIcon,
+  MoonIcon,
+  SunDimIcon,
+  UserCog2Icon,
+} from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { Switch } from "~/components/ui/switch";
@@ -143,10 +148,11 @@ function AuthShowcase({ session }) {
   if (status === "unauthenticated" || !user)
     return (
       <Button
-        className="flex  items-center justify-center gap-2 rounded-xl border border-primary/20 bg-secbuttn stroke-accent p-0 px-6 py-1  text-primary"
+        className="flex  items-center justify-center gap-2 rounded-lg border border-accent bg-primary stroke-accent p-0 px-2 py-1  text-secondary"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
       >
         <span className="">{sessionData ? "خروج" : "ورود"}</span>
+        <FormInputIcon className="stroke-secondary" />
       </Button>
     );
 

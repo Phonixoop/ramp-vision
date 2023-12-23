@@ -19,10 +19,10 @@ import { CITIES, validDateBeforeToScrewThem } from "~/constants";
 import { ServiceNames } from "~/constants/depo";
 
 const config = {
-  user: "admin",
-  password: "Mohammad@2525",
-  server: "109.125.137.43",
-  port: 5090,
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
+  server: process.env.SQL_SERVERIP,
+  port: process.env.SQL_PORT,
   database: "", // RAMP_Daily | RAMP_Weekly
   options: {
     encrypt: true, // For securing the connection (optional, based on your setup)

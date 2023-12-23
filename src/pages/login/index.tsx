@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import {
   CheckCheckIcon,
   CheckIcon,
+  FormInputIcon,
   KeySquareIcon,
   Loader2Icon,
   ShieldAlertIcon,
@@ -108,7 +109,10 @@ function CreateAccountForm() {
         e.preventDefault();
       }}
     >
-      <h2 className="w-full py-5 text-center text-accent">ورود</h2>
+      <div className="flex flex-col items-center justify-center ">
+        <FormInputIcon className="animate-pulse stroke-primary" />
+        <h2 className="w-full text-center text-accent">ورود</h2>
+      </div>
       <MultiStep
         loadingStep={2}
         isLoading={isLoading}
