@@ -31,7 +31,7 @@ export const env = createEnv({
     SQL_USER: z.string(),
     SQL_PASSWORD: z.string(),
     SQL_SERVERIP: z.string(),
-    SQL_PORT: z.string(),
+    SQL_PORT: z.number(),
 
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
     // DISCORD_CLIENT_ID: z.string(),
@@ -59,7 +59,7 @@ export const env = createEnv({
     SQL_USER: process.env.SQL_USER,
     SQL_PASSWORD: process.env.SQL_PASSWORD,
     SQL_SERVERIP: process.env.SQL_SERVERIP,
-    SQL_PORT: process.env.SQL_PORT,
+    SQL_PORT: parseInt(process.env.SQL_PORT),
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

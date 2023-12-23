@@ -20,7 +20,7 @@ const config = {
   user: process.env.SQL_USER,
   password: process.env.SQL_PASSWORD,
   server: process.env.SQL_SERVERIP,
-  port: process.env.SQL_PORT,
+  port: parseInt(process.env.SQL_PORT),
   database: "", // RAMP_Daily | RAMP_Weekly
   options: {
     encrypt: true, // For securing the connection (optional, based on your setup)
