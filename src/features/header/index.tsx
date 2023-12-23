@@ -159,7 +159,7 @@ function AuthShowcase({ session }) {
   const permissions: Permission[] = JSON.parse(user?.role?.permissions);
 
   const permission = permissions.find((p) => p.id === "ViewAdmin");
-  const isAdmin = true && true === true;
+  const isAdmin = permission && permission?.isActive === true;
 
   return (
     <div className="flex gap-2 rounded-full">
