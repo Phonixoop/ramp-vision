@@ -70,7 +70,7 @@ export default function Header() {
     <>
       <div
         dir="rtl"
-        className="z-50  flex w-full flex-col items-center justify-between border-b border-primary/20 bg-secondary/50 py-5  sm:p-0 "
+        className="sticky top-0 z-50 flex  w-full flex-col items-center justify-between border-b border-primary/20 bg-secondary/50 py-5 backdrop-blur-lg  sm:p-0 "
       >
         <div className="flex w-9/12 flex-col items-center justify-between gap-4 py-2 md:flex-row ">
           {session.status !== "loading" && (

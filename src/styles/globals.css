@@ -289,3 +289,91 @@ input[type="number"] {
 /* tspan {
   @apply text-[10px];
 } */
+
+@keyframes intro_width_140 {
+  0% {
+    opacity: 1;
+    width: 0%;
+    background-color: var(--primbuttn);
+  }
+
+  to {
+    background-color: var(--accent);
+    width: 140%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes intro_width_215 {
+  0% {
+    opacity: 1;
+    width: 0%;
+  }
+
+  to {
+    width: 215%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes intro_height_120 {
+  0% {
+    opacity: 1;
+    height: 0%;
+  }
+
+  to {
+    height: 120%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes intro_height_160 {
+  0% {
+    opacity: 1;
+    height: 0%;
+  }
+
+  to {
+    height: 160%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes intro_opacity {
+  to {
+    opacity: 1;
+  }
+}
+
+.line_width_animation_140 {
+  --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --a-duration: 1.08s;
+  --a-delay: 0.15s;
+  animation: intro_width_140 var(--a-duration) var(--a-easing) forwards;
+  animation-delay: calc(var(--a-delay) + 0.1s);
+}
+
+.line_width_animation_215 {
+  --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --a-duration: 1.08s;
+  --a-delay: 0.15s;
+  animation: intro_width_215 var(--a-duration) var(--a-easing) forwards;
+  animation-delay: calc(var(--a-delay) + 0.1s);
+}
+
+.line_height_animation_120 {
+  --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --a-duration: 1.08s;
+  --a-delay: 0.15s;
+  animation: intro_height_120 var(--a-duration) var(--a-easing) forwards;
+  animation-delay: calc(var(--a-delay) + 0.1s);
+}
+
+.line_height_animation_160 {
+  --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --a-duration: 1.08s;
+  --a-delay: 0.15s;
+  animation: intro_height_160 var(--a-duration) var(--a-easing) forwards;
+  animation-delay: calc(var(--a-delay) + 0.1s);
+}

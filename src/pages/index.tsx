@@ -12,6 +12,26 @@ import Count from "~/features/counter-animation";
 import NumberAnimation from "~/features/counter-animation";
 import Link from "next/link";
 import AreaChartFake from "~/features/fake-charts/area";
+import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
+import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
+
+function Card({ value = -1 }) {
+  return (
+    <div className="bg-secondary text-primary">
+      <p>
+        تا کنون{" "}
+        <span className="text-2xl text-accent">
+          {value < 0 ? "..." : value}
+        </span>{" "}
+        روز، گزارش گرفته شده
+      </p>
+    </div>
+  );
+}
+
+function FloatDiv({ className }) {
+  return <div className={className} />;
+}
 
 export default function Home() {
   // const users = api.example.getAll.useQuery();
@@ -29,47 +49,100 @@ export default function Home() {
       <div className=" flex min-h-screen w-full  flex-col items-center justify-center gap-5 overflow-hidden bg-secondary transition-colors duration-1000 ">
         <section
           dir="rtl"
-          className="mx-auto flex max-w-[1000px] flex-col items-center gap-7 p-0   sm:p-5"
+          className=" relative mx-auto flex max-w-[1000px] flex-col items-center gap-7 p-5"
         >
-          <h1 className="text-center text-4xl font-bold  text-primary">
+          <div className=" hidden items-center justify-center gap-5 text-primary lg:flex">
+            <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
+              جدید
+            </span>
+            <p className="text-primary/60">
+              <span className="text-primary">ویژگی</span> های نسخه جدید، سرعت
+              بهتر در مقایس بیشتر و امکانات آنلایز بهتر.
+            </p>
+            <Link
+              href={"/about"}
+              className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary px-4 py-1 text-primary"
+            >
+              بیشتر بخوانید
+              <ChevronLeftIcon className="h-3 w-3 fill-none stroke-primary stroke-2" />
+            </Link>
+          </div>
+          {/* mobile */}
+          <Link
+            href={"/about"}
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary py-1 pl-2 pr-1 text-primary lg:hidden"
+          >
+            <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
+              جدید
+            </span>
+            <p className="text-sm text-primary/60">
+              <span className="text-primary">ویژگی</span> ها و امکانات نسخه جدید
+            </p>
+            <ChevronLeftIcon className="h-3 w-3 fill-none stroke-primary stroke-2" />
+          </Link>
+          <FloatDiv
+            className="line_height_animation_120 absolute -top-[10%] 
+            left-0 h-[120%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
+          />
+          <FloatDiv
+            className="line_height_animation_120 absolute -top-[10%] 
+            right-0 h-[120%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
+          />
+          <h1 className="relative p-5 text-center text-4xl font-bold text-primary">
+            <FloatDiv
+              className="line_width_animation_140  absolute -left-[20%] 
+              top-0 h-[1px] w-[140%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
+            />
             نرم افزار جامع تجزیه تحلیل و آنالیز داده های پرسنل و شعب
           </h1>
-          <p className="max-w-[550px] text-center text-primary/80 ">
+          <div className="relative max-w-[550px] p-5 text-center text-primary/80 ">
             کلیه اطلاعات پایه و مدیریت مورد نیاز همانند انواع خدمت، پوشش های
             بیمه ای ، تعرفه های درمانی و ارزیابی ، اطلاعات کاربران و مراجع
             درمانی جهت نظارت بر فعالیت سامانه و کلیه بخش های زیر مجموعه آن از
             طریق این پنل صورت می گیرد.
-          </p>
-          <div className="flex w-full items-center justify-center gap-4 py-4 md:pb-10">
-            <Link
-              className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm  font-medium text-secondary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-              href={"about"}
-            >
-              درباره RAMP
-            </Link>
-
-            {!sessionData?.user && (
-              <Button
-                className="flex  items-center justify-center gap-2 rounded-lg border border-accent  stroke-accent p-0 px-2 py-1.5  text-primary"
-                onClick={
-                  sessionData ? () => void signOut() : () => void signIn()
-                }
+            <FloatDiv className="line_width_animation_215 absolute -left-[57.5%] bottom-0 h-[1px] w-[215%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  " />
+          </div>
+          <div className="relative flex w-auto flex-col items-center justify-center gap-4  p-5 ">
+            <FloatDiv
+              className="line_height_animation_160 absolute -top-[25%] 
+              right-0 h-[160%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/50 via-50% to-transparent to-100%  "
+            />
+            <FloatDiv
+              className="line_height_animation_160 absolute -top-[25%] 
+              left-0 h-[160%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/50 via-50% to-transparent to-100%  "
+            />
+            <div className="relative flex items-center justify-between gap-4  ">
+              <Link
+                className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm  font-medium text-secondary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                href={"about"}
               >
-                <span className="">ورود</span>
-                <FormInputIcon className="stroke-primary" />
-              </Button>
-            )}
+                درباره RAMP
+              </Link>
+
+              {!sessionData?.user && (
+                <Button
+                  className="flex  items-center justify-center gap-2 rounded-lg border border-accent  stroke-accent p-0 px-6 py-1.5  text-primary"
+                  onClick={
+                    sessionData ? () => void signOut() : () => void signIn()
+                  }
+                >
+                  <span className="">ورود</span>
+                  <FormInputIcon className="stroke-primary" />
+                </Button>
+              )}
+            </div>
+            <Card value={!getCount.data ? -1 : getCount.data} />
           </div>
         </section>
-        <Card value={!getCount.data ? 0 : getCount.data} />
-        <section className="flex w-9/12 items-center justify-center gap-2">
+
+        {/* <section className="flex w-9/12 items-center justify-center gap-2">
           <div className="w-full">
             <AreaChartFake />
           </div>
           <div className="w-full">
             <AreaChartFake />
           </div>
-        </section>
+        </section> */}
 
         {/* 
         <Image
@@ -80,68 +153,6 @@ export default function Home() {
           alt="dashboard"
         /> */}
       </div>
-    </>
-  );
-}
-
-function Card({ value = 50 }) {
-  return (
-    <div className="bg-secondary text-primary">
-      <p>
-        تا کنون <span className="text-2xl text-accent">{value}</span> روز، گزارش
-        گرفته شده
-      </p>
-    </div>
-  );
-}
-const cities = [
-  {
-    name: "New York",
-    sales: 9800,
-  },
-  {
-    name: "London",
-    sales: 4567,
-  },
-  {
-    name: "Hong Kong",
-    sales: 3908,
-  },
-  {
-    name: "San Francisco",
-    sales: 2400,
-  },
-  {
-    name: "Singapore",
-    sales: 1908,
-  },
-  {
-    name: "Zurich",
-    sales: 1398,
-  },
-];
-
-function AuthShowcase() {
-  const { data: sessionData } = useSession();
-
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined },
-  );
-
-  return (
-    <>
-      <Button
-        className="flex items-stretch justify-center gap-2 rounded-full bg-secbuttn stroke-accent px-3 text-accent"
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        <span className="pt-1">
-          {sessionData ? sessionData.user?.username : "ورود"}
-        </span>
-        <span>
-          <UserCog2 />
-        </span>
-      </Button>
     </>
   );
 }
