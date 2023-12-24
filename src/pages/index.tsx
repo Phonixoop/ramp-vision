@@ -17,7 +17,7 @@ import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 
 function Card({ value = -1 }) {
   return (
-    <div className="bg-secondary text-primary">
+    <div className=" text-primary">
       <p>
         تا کنون{" "}
         <span className="text-2xl text-accent">
