@@ -76,7 +76,7 @@ export default function Header() {
         dir="rtl"
         className="sticky top-0 z-50 flex  w-full flex-col items-center justify-between border-b border-primary/20 bg-secondary/50 py-5 backdrop-blur-lg  sm:p-0 "
       >
-        <div className="flex w-9/12 flex-col items-center justify-between gap-4 py-2 md:flex-row ">
+        <div className="flex w-full flex-col items-center justify-between gap-4 py-2 lg:w-9/12 lg:flex-row ">
           {session.status !== "loading" && (
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <div className="flex items-center justify-center gap-4">
@@ -189,11 +189,11 @@ function AuthShowcase({ session }) {
           <>
             <div className="h-[15px] w-[0.5px] bg-accent"></div>
             <Link href={"/admin"}>
-              <Button className="flex items-stretch justify-center gap-2 rounded-xl bg-secondary  stroke-accent px-3 text-accent">
-                <span className="flex items-center justify-center gap-2">
-                  <p>پنل ادمین</p>
+              <Button className="flex min-w-max items-stretch justify-center gap-2 rounded-xl bg-secondary  stroke-accent  text-accent">
+                <div className="flex w-fit items-center justify-center gap-2">
+                  <span>پنل ادمین</span>
                   <UserCog2Icon />
-                </span>
+                </div>
               </Button>
             </Link>
           </>
