@@ -14,6 +14,7 @@ import Link from "next/link";
 import AreaChartFake from "~/features/fake-charts/area";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
+import { twMerge } from "tailwind-merge";
 
 function Card({ value = -1 }) {
   return (
@@ -30,7 +31,7 @@ function Card({ value = -1 }) {
 }
 
 function FloatDiv({ className }) {
-  return <div className={className} />;
+  return <div className={twMerge("opacity-0", className)} />;
 }
 
 export default function Home() {
@@ -57,7 +58,8 @@ export default function Home() {
             </span>
             <p className="text-primary/60">
               <span className="text-primary">ویژگی</span> های نسخه جدید، سرعت
-              بهتر در مقایس بیشتر و امکانات آنلایز بهتر.
+              بهتر در مقایسه بیشتر، بهبود امکانات آنلایز و اضافه شدن گزارش گیری
+              ماهانه.
             </p>
             <Link
               href={"/about"}
