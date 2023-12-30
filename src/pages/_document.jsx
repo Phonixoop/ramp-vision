@@ -3,14 +3,14 @@ import Script from "next/script";
 
 export default function Document() {
   return (
-    <Html className=" h-full">
+    <Html className=" h-full ">
       <Head>
         {/* <link rel="shortcut icon" href={favicon} /> */}
         {/* <link rel="shortcut icon" href="/icons/main/roomchi.svg" /> */}
       </Head>
 
       <body
-        className="theme-dark-1 scrollbar-track-[var(--accent)] h-full"
+        className="theme-dark-1 scrollbar-track-[var(--accent)] h-full "
         style={{
           overflow: "overlay",
         }}

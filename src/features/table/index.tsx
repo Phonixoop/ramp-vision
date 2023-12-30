@@ -149,7 +149,7 @@ export default function Table({
           )}
           <div
             ref={tableContainerRef}
-            className=" w-full max-w-[1350px]  overflow-auto rounded-[20px] "
+            className=" w-full max-w-[1350px]  overflow-auto rounded-[20px] scrollbar-w-12  "
           >
             <table
               // style={{ height: `${totalSize}px` }}
@@ -249,7 +249,9 @@ export default function Table({
               >
                 {paddingTop > 0 && (
                   <tr>
-                    <td style={{ height: paddingTop }} />
+                    <td
+                      style={{ height: paddingTop, overflowAnchor: "none" }}
+                    />
                   </tr>
                 )}
                 {
@@ -263,6 +265,7 @@ export default function Table({
                     return (
                       // Apply the row props
                       <tr
+                        style={{ overflowAnchor: "none" }}
                         onClick={() => onClick(row)}
                         key={index}
                         // {...restRowProps}
@@ -338,7 +341,7 @@ export default function Table({
                               colSpan={header.colSpan}
                               // {...restHeaderProps}
                               className={twMerge(
-                                "font-bol sticky bottom-0 z-40 bg-primbuttn px-6 py-3 text-center text-xs   leading-4 tracking-wider text-secondary ",
+                                "font-bol sticky bottom-0 z-40 bg-secbuttn px-6 py-3 text-center text-xs   leading-4 tracking-wider text-primary ",
                                 content
                                   ? " border-0 border-x border-primary"
                                   : "",
