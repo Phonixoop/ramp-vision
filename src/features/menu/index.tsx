@@ -148,7 +148,7 @@ export function InPageMenu({
   return (
     <motion.div
       className={twMerge(
-        "jus group flex cursor-pointer items-center justify-start  gap-3 overflow-hidden overflow-x-auto scrollbar-none ",
+        " group flex cursor-pointer items-center justify-start  gap-3 overflow-hidden overflow-x-auto scrollbar-none ",
         className,
       )}
       onHoverEnd={() => {
@@ -217,7 +217,7 @@ function InPageMenuItem({ text, isHovered = false, isActive = false }) {
               duration: 0.15,
             }}
             layoutId="bg-follower-inpage"
-            className="absolute inset-0 -z-10 h-[80%] rounded-md bg-primbuttn/30  transition-opacity duration-1000  "
+            className="absolute inset-0 -z-10 h-[80%] rounded-md border border-primary  transition-opacity duration-1000  "
           />
         </>
       )}

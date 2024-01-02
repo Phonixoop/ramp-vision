@@ -118,7 +118,7 @@ export default function Table({
               <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
                 <div className="flex items-center justify-center gap-3 text-accent">
                   <FilterIcon className="h-4 w-4" />
-                  <H2 className="text-lg font-bold text-accent">فیلتر ها</H2>
+                  <H2 className="text-lg font-bold text-accent">فیلترها</H2>
                 </div>
                 {renderInFilterView()}
                 {table.getHeaderGroups().map((headerGroup) => {
@@ -141,7 +141,7 @@ export default function Table({
       <div className="w-full px-5 2xl:px-0 ">
         {renderChild(flatRows)}
 
-        <div className="relative flex h-[31rem] min-h-[50rem] w-full items-stretch justify-center py-10">
+        <div className="relative flex h-[31rem] min-h-[50rem] w-full items-stretch justify-start py-10">
           {isLoading && (
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
               <Loader2Icon className="h-12 w-12 animate-spin stroke-accent" />
@@ -149,12 +149,12 @@ export default function Table({
           )}
           <div
             ref={tableContainerRef}
-            className=" w-full max-w-[1350px]  overflow-auto rounded-[20px] scrollbar-w-12  "
+            className=" w-full  max-w-5xl  overflow-auto rounded-[20px] scrollbar-w-12"
           >
             <table
               // style={{ height: `${totalSize}px` }}
               // {...getTableProps()}
-              className=" w-full  overflow-hidden overflow-y-auto  text-center "
+              className=" w-full overflow-hidden overflow-y-auto  text-center "
             >
               <thead>
                 {

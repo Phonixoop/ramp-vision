@@ -139,13 +139,13 @@ export default function CitiesPage({ children }) {
       <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
         <Header />
         <div className="mx-auto flex w-11/12 flex-col items-center justify-center gap-5 rounded-xl bg-primbuttn/10 p-2">
-          <H2 className="text-xl">فیلتر ها</H2>
+          <H2 className="text-xl">فیلترها</H2>
           <div
             className="min-w-  z-20 flex flex-wrap items-stretch justify-center gap-5"
             dir="rtl"
           >
             <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-              <span className="font-bold text-primary">بازه تاریخ</span>
+              <span className="font-bold text-primary">بازه گزارش</span>
               <LayoutGroup id="DateMenu">
                 <InPageMenu
                   list={Object.keys(Reports_Period)}

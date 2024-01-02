@@ -561,7 +561,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             ),
         },
         {
-          header: "بازه تاریخ",
+          header: "بازه گزارش",
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
         },
@@ -611,7 +611,7 @@ function PersonnelPerformanceTable({ sessionData }) {
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                    <span className="font-bold text-primary">بازه تاریخ</span>
+                    <span className="font-bold text-primary">بازه گزارش</span>
                     <LayoutGroup id="DateMenu">
                       <InPageMenu
                         list={Object.keys(Reports_Period)}

@@ -37,7 +37,7 @@ import CheckboxList, {
 import MultiBox from "~/ui/multi-box";
 import moment from "jalali-moment";
 import DatePicker from "react-multi-date-picker";
-import { default as DatePickerButton } from "react-multi-date-picker/components/button";
+import "react-multi-date-picker/styles/layouts/mobile.css";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
@@ -64,6 +64,9 @@ import { Bar } from "react-chartjs-2";
 import RadarGauge from "~/features/radar";
 import TestPage from "~/pages/test";
 import { ServiceNames } from "~/constants/depo";
+import ReBarChart from "~/features/rechart-ui/bar";
+import { ResponsiveContainer } from "recharts";
+import InputIcon from "react-multi-date-picker/components/input_icon";
 
 const chartdata = [
   {
@@ -393,7 +396,7 @@ function DeposTable({ sessionData }) {
           },
         },
         {
-          header: "بازه تاریخ",
+          header: "بازه گزارش",
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
         },
@@ -416,29 +419,34 @@ function DeposTable({ sessionData }) {
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                    <span className="font-bold text-primary">تاریخ</span>
-                    <LayoutGroup id="DateMenu">
-                      <InPageMenu
-                        list={Object.keys(Reports_Period)}
-                        startIndex={0}
-                        onChange={(value) => {
-                          setReportPeriod(value.item.name);
-                        }}
-                      />
-                    </LayoutGroup>
+                    <span className="font-bold text-primary">بازه گزارش</span>
+
                     {/* {deferredFilter.filter.Start_Date} */}
                     <DatePicker
+                      portal
+                      className="rmdp-mobile"
                       //@ts-ignore
                       render={(value, openCalendar) => {
                         const seperator =
                           deferredFilter.periodType == "روزانه" ? " , " : " ~ ";
                         return (
-                          <Button
-                            className="w-full border border-dashed border-accent text-center hover:bg-accent/20"
-                            onClick={openCalendar}
-                          >
-                            {deferredFilter.filter.Start_Date.join(seperator)}
-                          </Button>
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <Button
+                              onClick={() => openCalendar()}
+                              className="w-full rounded-lg border border-dashed border-accent bg-primary p-2 text-center text-secondary"
+                            >
+                              {reportPeriod === "ماهانه"
+                                ? moment(
+                                    deferredFilter.filter.Start_Date[0],
+                                    "jYYYY,jMM,jDD",
+                                  )
+                                    .locale("fa")
+                                    .format("MMMM")
+                                : deferredFilter.filter.Start_Date.join(
+                                    seperator,
+                                  )}
+                            </Button>
+                          </div>
                         );
                       }}
                       inputClass="text-center"
@@ -449,17 +457,6 @@ function DeposTable({ sessionData }) {
                       weekPicker={reportPeriod === "هفتگی"}
                       onlyMonthPicker={reportPeriod === "ماهانه"}
                       plugins={[<DatePanel key={"00DatePanel"} />]}
-                      onClose={() => {
-                        setDataFilters((prev) => {
-                          return {
-                            periodType: reportPeriod,
-                            filter: {
-                              ...prev.filter,
-                              Start_Date: selectedDates,
-                            },
-                          };
-                        });
-                      }}
                       onChange={(date) => {
                         //@ts-ignore
                         if (!date) return;
@@ -468,11 +465,44 @@ function DeposTable({ sessionData }) {
                         const dates = Array.isArray(date)
                           ? date.map((a) => en(a.format("YYYY/MM/DD")))
                           : [en(date.format("YYYY/MM/DD"))];
-                        setSelectedDates(dates);
+
+                        // setSelectedDates(dates);
+
+                        setDataFilters((prev) => {
+                          return {
+                            periodType: reportPeriod,
+                            filter: {
+                              ...prev.filter,
+                              Start_Date: dates,
+                            },
+                          };
+                        });
 
                         // setSelectedDates((prevState) => dates);
                       }}
-                    />
+                    >
+                      <LayoutGroup id="DateMenu">
+                        <div
+                          dir={"rtl"}
+                          className="mx-0  w-fit rounded-lg bg-secondary p-2"
+                        >
+                          <InPageMenu
+                            list={Object.keys(Reports_Period)}
+                            startIndex={
+                              reportPeriod === "روزانه"
+                                ? 0
+                                : reportPeriod === "هفتگی"
+                                ? 1
+                                : 2
+                            }
+                            onChange={(value) => {
+                              // openCalendar();
+                              setReportPeriod(value.item.name);
+                            }}
+                          />
+                        </div>
+                      </LayoutGroup>
+                    </DatePicker>
                   </div>
                 </>
               );
@@ -634,8 +664,7 @@ function DeposTable({ sessionData }) {
                           <H2 className="text-lg font-bold">
                             نمودار به تفکیک فعالیت
                           </H2>
-                          <BarChart
-                            showAnimation={true}
+                          {/* <ReBarChart
                             data={(serviceData ?? []).map((row) => {
                               return {
                                 name: row.key,
@@ -650,17 +679,32 @@ function DeposTable({ sessionData }) {
                               "تعداد ورودی",
                               "تعداد رسیدگی",
                             ]}
-                            colors={["rose", "cyan", "emerald"]}
-                            valueFormatter={commify}
-                            yAxisWidth={20}
-                            showXAxis
-                            noDataText={Text.noData.fa}
-                            intervalType="preserveStartEnd"
-
-                            // customTooltip={(value) => {
-                            //   return <>{JSON.stringify(value)}</>;
-                            // }}
-                          />
+                          /> */}
+                          <ResponsiveContainer width="99%" height={300}>
+                            <BarChart
+                              showAnimation={true}
+                              data={(serviceData ?? []).map((row) => {
+                                return {
+                                  name: row.key,
+                                  "تعداد دپو": row.DepoCount,
+                                  "تعداد ورودی": row.EntryCount,
+                                  "تعداد رسیدگی": row.Capicity,
+                                };
+                              })}
+                              index="name"
+                              categories={[
+                                "تعداد دپو",
+                                "تعداد ورودی",
+                                "تعداد رسیدگی",
+                              ]}
+                              colors={["rose", "cyan", "emerald"]}
+                              valueFormatter={commify}
+                              yAxisWidth={20}
+                              showXAxis
+                              noDataText={Text.noData.fa}
+                              intervalType="preserveStartEnd"
+                            />
+                          </ResponsiveContainer>
                         </div>
                         {/* <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
                           <H2>نمودار زمانی</H2>
@@ -737,23 +781,28 @@ function DeposTable({ sessionData }) {
                                   className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 "
                                 >
                                   <H2>تعداد ورودی و رسیدگی شده</H2>
-                                  <DonutChart
-                                    label={
-                                      depo.data?.result.length > 0
-                                        ? " مانده : " +
-                                          commify(
-                                            entryBaseOnSabt -
-                                              capacityBaseOnSabt,
-                                          ).toString()
-                                        : "داده ای موجود نیست"
-                                    }
-                                    data={entry_capacity}
-                                    category="value"
-                                    index="name"
-                                    colors={["rose", "emerald"]}
-                                    valueFormatter={commify}
-                                    noDataText={Text.noData.fa}
-                                  />
+                                  <ResponsiveContainer
+                                    width="99%"
+                                    height={"100%"}
+                                  >
+                                    <DonutChart
+                                      label={
+                                        depo.data?.result.length > 0
+                                          ? " مانده : " +
+                                            commify(
+                                              entryBaseOnSabt -
+                                                capacityBaseOnSabt,
+                                            ).toString()
+                                          : "داده ای موجود نیست"
+                                      }
+                                      data={entry_capacity}
+                                      category="value"
+                                      index="name"
+                                      colors={["rose", "emerald"]}
+                                      valueFormatter={commify}
+                                      noDataText={Text.noData.fa}
+                                    />
+                                  </ResponsiveContainer>
                                 </div>
 
                                 <div
@@ -761,14 +810,19 @@ function DeposTable({ sessionData }) {
                                   className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2"
                                 >
                                   <H2>تعداد دپو</H2>
-                                  <DonutChart
-                                    data={depo_BaseOnSabt}
-                                    category="value"
-                                    index="name"
-                                    colors={["fuchsia", "cyan"]}
-                                    valueFormatter={commify}
-                                    noDataText={Text.noData.fa}
-                                  />
+                                  <ResponsiveContainer
+                                    width="99%"
+                                    height={"100%"}
+                                  >
+                                    <DonutChart
+                                      data={depo_BaseOnSabt}
+                                      category="value"
+                                      index="name"
+                                      colors={["fuchsia", "cyan"]}
+                                      valueFormatter={commify}
+                                      noDataText={Text.noData.fa}
+                                    />
+                                  </ResponsiveContainer>
                                 </div>
                               </div>
                               <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
@@ -783,22 +837,27 @@ function DeposTable({ sessionData }) {
                                     </>
                                   )}
                                 </H2>
-                                <DonutChart
-                                  label={totalComplete.toFixed(2)}
-                                  data={depoCompletionTime}
-                                  category={"DepoCompleteTime"}
-                                  index="ServiceName"
-                                  colors={[
-                                    "emerald",
-                                    "yellow",
-                                    "cyan",
-                                    "red",
-                                    "orange",
-                                    "fuchsia",
-                                  ]}
-                                  valueFormatter={commify}
-                                  noDataText={Text.noData.fa}
-                                />
+                                <ResponsiveContainer
+                                  width="99%"
+                                  height={"100%"}
+                                >
+                                  <DonutChart
+                                    label={totalComplete.toFixed(2)}
+                                    data={depoCompletionTime}
+                                    category={"DepoCompleteTime"}
+                                    index="ServiceName"
+                                    colors={[
+                                      "emerald",
+                                      "yellow",
+                                      "cyan",
+                                      "red",
+                                      "orange",
+                                      "fuchsia",
+                                    ]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
+                                  />
+                                </ResponsiveContainer>
                                 {depo.data?.periodType && totalComplete > 0 && (
                                   <p className="w-full">
                                     <span className="text-accent">

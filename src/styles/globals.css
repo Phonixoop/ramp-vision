@@ -377,3 +377,5 @@ input[type="number"] {
   animation: intro_height_160 var(--a-duration) var(--a-easing) forwards;
   animation-delay: calc(var(--a-delay) + 0.1s);
 }
+
+/* date picker */
