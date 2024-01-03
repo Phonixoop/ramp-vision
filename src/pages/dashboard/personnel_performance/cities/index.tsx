@@ -42,6 +42,7 @@ import {
 import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
 import H2 from "~/ui/heading/h2";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
+import DatePickerPeriodic from "~/features/date-picker-periodic";
 
 type CityWithPerformanceData = {
   CityName_En: string;
@@ -141,71 +142,44 @@ export default function CitiesPage({ children }) {
         <div className="mx-auto flex w-11/12 flex-col items-center justify-center gap-5 rounded-xl bg-primbuttn/10 p-2">
           <H2 className="text-xl">فیلترها</H2>
           <div
-            className="min-w-  z-20 flex flex-wrap items-stretch justify-center gap-5"
+            className=" z-20 flex flex-wrap items-stretch justify-center gap-1"
             dir="rtl"
           >
-            <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">بازه گزارش</span>
-              <LayoutGroup id="DateMenu">
-                <InPageMenu
-                  list={Object.keys(Reports_Period)}
-                  startIndex={0}
-                  onChange={(value) => {
-                    setReportPeriod(value.item.name);
-                  }}
-                />
-              </LayoutGroup>
-              {/* {deferredFilter.filter.Start_Date} */}
-              <DatePicker
-                //@ts-ignore
-                render={(value, openCalendar) => {
-                  const seperator =
-                    filters?.periodType == "روزانه" ? " , " : " ~ ";
-                  return (
-                    <Button
-                      className="min-w- border border-dashed border-accent text-center hover:bg-accent/20"
-                      onClick={openCalendar}
-                    >
-                      {filters?.filter.Start_Date.join(seperator)}
-                    </Button>
-                  );
-                }}
-                inputClass="text-center"
-                multiple={reportPeriod !== "ماهانه"}
-                value={filters?.filter.Start_Date}
-                calendar={persian}
-                locale={persian_fa}
-                weekPicker={reportPeriod === "هفتگی"}
-                onlyMonthPicker={reportPeriod === "ماهانه"}
-                plugins={[<DatePanel key={"00DatePanel"} />]}
-                onClose={() => {
+              <DatePickerPeriodic
+                filter={filters}
+                reportPeriod={reportPeriod}
+                onChange={(date) => {
+                  if (!date) return;
+
+                  if (Array.isArray(date) && date.length <= 0) return;
+                  let dates = [];
+                  if (Array.isArray(date)) {
+                    dates = date
+                      .filter((a) => a.format() != "")
+                      .map((a) => en(a.format("YYYY/MM/DD")));
+                  } else {
+                    if (date.format() != "")
+                      dates = [en(date.format("YYYY/MM/DD"))];
+                  }
+                  if (dates.length <= 0) return;
                   //@ts-ignore
                   setFilters((prev) => {
                     return {
                       periodType: reportPeriod,
                       filter: {
-                        Start_Date: selectedDates,
+                        Start_Date: dates,
                       },
                     };
                   });
                 }}
-                onChange={(date) => {
-                  //@ts-ignore
-                  if (!date) return;
-
-                  if (Array.isArray(date) && date.length <= 0) return;
-                  const dates = Array.isArray(date)
-                    ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                    : [en(date.format("YYYY/MM/DD"))];
-                  setSelectedDates(dates);
-
-                  // setSelectedDates((prevState) => dates);
-                }}
+                setReportPeriod={setReportPeriod}
               />
             </div>
             {!getInitialFilters.isLoading && (
               <>
-                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <div className="flex w-[23rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                   <span className="font-bold text-primary">سمت</span>
                   <SelectControlled
                     withSelectAll

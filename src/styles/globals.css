@@ -41,6 +41,14 @@
   --accent: 85, 119, 97;
 }
 
+/* .theme-light-4 {
+  --primary: 255, 255, 255;
+  --secondary: 226, 212, 189;
+  --primbuttn: 61, 87, 71;
+  --secbuttn: 15, 15, 15;
+  --accent: 85, 119, 97;
+} */
+
 .theme {
   --primary: rgb(36, 34, 27);
   --secondary: rgb(228, 220, 201);

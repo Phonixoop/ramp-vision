@@ -67,6 +67,7 @@ import { ServiceNames } from "~/constants/depo";
 import ReBarChart from "~/features/rechart-ui/bar";
 import { ResponsiveContainer } from "recharts";
 import InputIcon from "react-multi-date-picker/components/input_icon";
+import DatePickerPeriodic from "~/features/date-picker-periodic";
 
 const chartdata = [
   {
@@ -418,56 +419,28 @@ function DeposTable({ sessionData }) {
             renderInFilterView={() => {
               return (
                 <>
-                  <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">بازه گزارش</span>
 
                     {/* {deferredFilter.filter.Start_Date} */}
-                    <DatePicker
-                      portal
-                      className="rmdp-mobile"
-                      //@ts-ignore
-                      render={(value, openCalendar) => {
-                        const seperator =
-                          deferredFilter.periodType == "روزانه" ? " , " : " ~ ";
-                        return (
-                          <div className="flex flex-col items-center justify-center gap-2">
-                            <Button
-                              onClick={() => openCalendar()}
-                              className="w-full rounded-lg border border-dashed border-accent bg-primary p-2 text-center text-secondary"
-                            >
-                              {reportPeriod === "ماهانه"
-                                ? moment(
-                                    deferredFilter.filter.Start_Date[0],
-                                    "jYYYY,jMM,jDD",
-                                  )
-                                    .locale("fa")
-                                    .format("MMMM")
-                                : deferredFilter.filter.Start_Date.join(
-                                    seperator,
-                                  )}
-                            </Button>
-                          </div>
-                        );
-                      }}
-                      inputClass="text-center"
-                      multiple={reportPeriod !== "ماهانه"}
-                      value={deferredFilter.filter.Start_Date}
-                      calendar={persian}
-                      locale={persian_fa}
-                      weekPicker={reportPeriod === "هفتگی"}
-                      onlyMonthPicker={reportPeriod === "ماهانه"}
-                      plugins={[<DatePanel key={"00DatePanel"} />]}
+
+                    <DatePickerPeriodic
+                      filter={deferredFilter}
+                      reportPeriod={reportPeriod}
                       onChange={(date) => {
-                        //@ts-ignore
                         if (!date) return;
 
                         if (Array.isArray(date) && date.length <= 0) return;
-                        const dates = Array.isArray(date)
-                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                          : [en(date.format("YYYY/MM/DD"))];
-
-                        // setSelectedDates(dates);
-
+                        let dates = [];
+                        if (Array.isArray(date)) {
+                          dates = date
+                            .filter((a) => a.format() != "")
+                            .map((a) => en(a.format("YYYY/MM/DD")));
+                        } else {
+                          if (date.format() != "")
+                            dates = [en(date.format("YYYY/MM/DD"))];
+                        }
+                        if (dates.length <= 0) return;
                         setDataFilters((prev) => {
                           return {
                             periodType: reportPeriod,
@@ -477,32 +450,9 @@ function DeposTable({ sessionData }) {
                             },
                           };
                         });
-
-                        // setSelectedDates((prevState) => dates);
                       }}
-                    >
-                      <LayoutGroup id="DateMenu">
-                        <div
-                          dir={"rtl"}
-                          className="mx-0  w-fit rounded-lg bg-secondary p-2"
-                        >
-                          <InPageMenu
-                            list={Object.keys(Reports_Period)}
-                            startIndex={
-                              reportPeriod === "روزانه"
-                                ? 0
-                                : reportPeriod === "هفتگی"
-                                ? 1
-                                : 2
-                            }
-                            onChange={(value) => {
-                              // openCalendar();
-                              setReportPeriod(value.item.name);
-                            }}
-                          />
-                        </div>
-                      </LayoutGroup>
-                    </DatePicker>
+                      setReportPeriod={setReportPeriod}
+                    />
                   </div>
                 </>
               );

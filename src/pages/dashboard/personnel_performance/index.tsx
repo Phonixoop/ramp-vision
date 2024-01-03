@@ -65,6 +65,7 @@ import { LayoutGroup } from "framer-motion";
 import MyBarList from "~/features/bar-list";
 import Gauge from "~/features/gauge";
 import { ColumnDef } from "@tanstack/react-table";
+import DatePickerPeriodic from "~/features/date-picker-periodic";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -610,68 +611,37 @@ function PersonnelPerformanceTable({ sessionData }) {
             renderInFilterView={() => {
               return (
                 <>
-                  <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                  <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">بازه گزارش</span>
-                    <LayoutGroup id="DateMenu">
-                      <InPageMenu
-                        list={Object.keys(Reports_Period)}
-                        startIndex={0}
-                        onChange={(value) => {
-                          setReportPeriod(value.item.name);
-                        }}
-                      />
-                    </LayoutGroup>
-                    {/* {deferredFilter.filter.Start_Date} */}
-                    <DatePicker
-                      //@ts-ignore
-                      render={(value, openCalendar) => {
-                        const seperator =
-                          deferredFilter.periodType == "روزانه" ? " , " : " ~ ";
-                        return (
-                          <div className="flex w-full items-center justify-center text-center">
-                            {openCalendar && (
-                              <Button onClick={openCalendar}>انتخاب</Button>
-                            )}
-                            <Button
-                              className="w-full border border-dashed border-accent text-center hover:bg-accent/20"
-                              onClick={openCalendar}
-                            >
-                              {deferredFilter.filter.Start_Date.join(seperator)}
-                            </Button>
-                          </div>
-                        );
-                      }}
-                      inputClass="text-center"
-                      multiple={reportPeriod !== "ماهانه"}
-                      value={deferredFilter.filter.Start_Date}
-                      calendar={persian}
-                      locale={persian_fa}
-                      weekPicker={reportPeriod === "هفتگی"}
-                      onlyMonthPicker={reportPeriod === "ماهانه"}
-                      plugins={[<DatePanel key={"00DatePanel"} />]}
-                      onClose={() => {
+
+                    <DatePickerPeriodic
+                      filter={deferredFilter}
+                      reportPeriod={reportPeriod}
+                      onChange={(date) => {
+                        if (!date) return;
+
+                        if (Array.isArray(date) && date.length <= 0) return;
+                        let dates = [];
+                        if (Array.isArray(date)) {
+                          dates = date
+                            .filter((a) => a.format() != "")
+                            .map((a) => en(a.format("YYYY/MM/DD")));
+                        } else {
+                          if (date.format() != "")
+                            dates = [en(date.format("YYYY/MM/DD"))];
+                        }
+                        if (dates.length <= 0) return;
                         setDataFilters((prev) => {
                           return {
                             periodType: reportPeriod,
                             filter: {
                               ...prev.filter,
-                              Start_Date: selectedDates,
+                              Start_Date: dates,
                             },
                           };
                         });
                       }}
-                      onChange={(date) => {
-                        //@ts-ignore
-                        if (!date) return;
-
-                        if (Array.isArray(date) && date.length <= 0) return;
-                        const dates = Array.isArray(date)
-                          ? date.map((a) => en(a.format("YYYY/MM/DD")))
-                          : [en(date.format("YYYY/MM/DD"))];
-                        setSelectedDates(dates);
-
-                        // setSelectedDates((prevState) => dates);
-                      }}
+                      setReportPeriod={setReportPeriod}
                     />
                   </div>
                 </>
