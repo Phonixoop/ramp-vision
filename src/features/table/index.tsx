@@ -146,7 +146,7 @@ export default function Table({
       >
         {renderChild(flatRows)}
 
-        <div className="relative flex h-[31rem] min-h-[50rem] w-full items-stretch justify-start py-10">
+        <div className="relative flex  max-h-[50rem] w-full items-stretch justify-start py-10">
           {isLoading && (
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
               <Loader2Icon className="h-12 w-12 animate-spin stroke-accent" />
@@ -159,7 +159,7 @@ export default function Table({
             <table
               // style={{ height: `${totalSize}px` }}
               // {...getTableProps()}
-              className=" w-full overflow-hidden overflow-y-auto  text-center "
+              className=" sticky top-0 w-full overflow-hidden overflow-y-auto  text-center "
             >
               <thead>
                 {
