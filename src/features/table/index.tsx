@@ -110,9 +110,9 @@ export default function Table({
     return prevColumnsTotalWidth;
   };
   return (
-    <div className="flex w-full flex-col justify-center gap-5 md:items-stretch 2xl:flex-row ">
+    <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
       {renderInFilterView !== undefined && (
-        <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 2xl:sticky 2xl:w-3/12 2xl:pb-0  ">
+        <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 2xl:pb-0  ">
           {renderInFilterView !== undefined && (
             <div className="flex w-full flex-row justify-center md:px-0 ">
               <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
@@ -138,7 +138,12 @@ export default function Table({
           )}
         </div>
       )}
-      <div className="w-full px-5 2xl:px-0 ">
+      <div
+        className={twMerge(
+          " px-5 2xl:px-0 ",
+          renderInFilterView ? "w-full xl:w-9/12" : "w-full",
+        )}
+      >
         {renderChild(flatRows)}
 
         <div className="relative flex h-[31rem] min-h-[50rem] w-full items-stretch justify-start py-10">
@@ -149,7 +154,7 @@ export default function Table({
           )}
           <div
             ref={tableContainerRef}
-            className=" w-full  max-w-5xl  overflow-auto rounded-[20px] scrollbar-w-12"
+            className=" w-full overflow-auto rounded-[20px] scrollbar-w-12 "
           >
             <table
               // style={{ height: `${totalSize}px` }}
