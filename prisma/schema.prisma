@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-    id          String    @id @default(cuid())
-    name        String?
-    username    String    @unique
-    password    String
-    description String?
-    is_active   Boolean   @default(true)
-    image_url   String?
-    city_name   String?
-    created_at  DateTime  @default(now())
-    updated_at  DateTime?
-    roleId      String?
-    sessions    Session[]
-    role        Role?     @relation(fields: [roleId], references: [id])
+    id           String    @id @default(cuid())
+    name         String?
+    username     String    @unique
+    password     String
+    description  String?
+    is_active    Boolean   @default(true)
+    image_url    String?
+    display_name String?
+    created_at   DateTime  @default(now())
+    updated_at   DateTime?
+    roleId       String?
+    sessions     Session[]
+    role         Role?     @relation(fields: [roleId], references: [id])
 
     @@map("users")
 }

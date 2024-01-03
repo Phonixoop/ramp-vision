@@ -1,14 +1,15 @@
 import { useState } from "react";
-import Modal from "ui/modals";
+import Modal from "~/ui/modals";
 export default function withModalState(Component) {
   return function WrappedwithModal({
-    children,
     content,
-    isOpen,
+    isOpen = false,
     size,
     center = false,
     title = "",
-    onClose,
+    closeBtn = <></>,
+    onClose = () => {},
+    render = (closeModal) => {},
     ...rest
   }) {
     const [modal, setModal] = useState({ isOpen: false });
@@ -30,7 +31,7 @@ export default function withModalState(Component) {
             onClose: closeModal,
           }}
         >
-          {children}
+          {render(closeModal)}
         </Modal>
       </>
     );

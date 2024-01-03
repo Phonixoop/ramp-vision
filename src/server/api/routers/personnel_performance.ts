@@ -233,16 +233,18 @@ export const personnelPerformanceRouter = createTRPCRouter({
     try {
       // Connect to SQL Server
 
-      // const permissions = await getPermission({ ctx });
-      // const cities = permissions
-      //   .find((permission) => permission.id === "ViewCities")
-      //   .subPermissions.filter((permission) => permission.isActive)
-      //   .map((permission) => permission.enLabel);
+      const permissions = await getPermission({ ctx });
+      const cities = permissions
+        .find((permission) => permission.id === "ViewCities")
+        .subPermissions.filter((permission) => permission.isActive)
+        .map((permission) => permission.enLabel);
 
-      //  const whereClause = generateWhereClause({ CityName: cities });
+      const whereClause = generateWhereClause({ CityName: cities });
       const query = `SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
 
       SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
+
+      ${whereClause}
       `;
 
       const result = await sql.query(query);

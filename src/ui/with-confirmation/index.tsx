@@ -7,7 +7,7 @@ export default function withConfirmation(Component) {
   return function WrappedComponent({
     withModal = true,
     title = "",
-    onClick = (e) => {},
+    onConfirm = (e) => {},
     ...rest
   }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,7 @@ export default function withConfirmation(Component) {
                   <Content
                     onConfirm={(e) => {
                       setIsOpen(false);
-                      onClick(e);
+                      onConfirm(e);
                     }}
                     onReject={() => {
                       setIsOpen(false);
@@ -42,7 +42,7 @@ export default function withConfirmation(Component) {
               <Content
                 onConfirm={(e) => {
                   setIsOpen(false);
-                  onClick(e);
+                  onConfirm(e);
                 }}
                 onReject={() => {
                   setIsOpen(false);

@@ -6,6 +6,7 @@ import {
 } from "~/server/api/trpc";
 import {
   createUserSchema,
+  updateUserPassword,
   updateUserSchema,
   userIdSchema,
 } from "~/server/validations/user.validation";
@@ -36,8 +37,20 @@ export const userRouter = createTRPCRouter({
         },
         data: {
           username: input.username,
-          password: input.password,
           roleId: input.roleId,
+          display_name: input.display_name,
+        },
+      });
+    }),
+  updateUserPassword: protectedProcedure
+    .input(updateUserPassword)
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.db.user.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          password: hashPassword(input.password),
         },
       });
     }),

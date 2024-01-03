@@ -18,9 +18,27 @@ import { Command } from "~/components/ui/command";
 import { ComboBox } from "~/features/shadui/ComboBox";
 import { reloadSession } from "~/utils/util";
 import { User } from "~/types";
-
+import withConfirmation from "~/ui/with-confirmation";
+import withModal from "~/ui/modals";
+import withModalState from "~/ui/modals/with-modal-state";
+import { SquareAsteriskIcon } from "lucide-react";
 const TextFieldWithLable = withLabel(TextField);
 // const TextAreaWithLable = withLabel(TextAreaField);
+
+function ButtonForChangePasswordModal({ children, ...rest }) {
+  return (
+    <>
+      <Button
+        {...rest}
+        className="flex min-w-fit items-center justify-center gap-1 bg-secondary px-3 text-primary"
+      >
+        <SquareAsteriskIcon className="stroke-primary" />
+        {children}
+      </Button>
+    </>
+  );
+}
+const PasswordFieldWithModal = withModalState(ButtonForChangePasswordModal);
 
 export function UserForm({
   onCreateSuccess = (user: User) => {},
@@ -73,11 +91,19 @@ export function UserForm({
     },
   });
 
+  const updateUserPassword = api.user.updateUserPassword.useMutation({
+    onSuccess: async (data) => {
+      reloadSession();
+      await utils.user.getUsers.invalidate();
+    },
+  });
+
   const formik = useFormik({
     initialValues: {
       username: selectedRowUser?.username || "",
+      // i know its bad to return password from server even hashed password
       password: selectedRowUser?.password || "",
-      city_name: selectedRowUser?.city_name || "",
+      display_name: selectedRowUser?.display_name || "",
       roleId: selectedRowUser?.roleId || "",
     },
 
@@ -88,15 +114,14 @@ export function UserForm({
         return createUser.mutate({
           username: values?.username || "",
           password: values?.password || "",
-          city_name: values?.city_name || "",
+          display_name: values?.display_name || "",
           roleId: values.roleId,
         });
 
       return updateUser.mutate({
         id: user.id,
         username: values?.username || "",
-        password: values?.password || "",
-        city_name: values?.city_name || "",
+        display_name: values?.display_name || "",
         roleId: values.roleId,
       });
     },
@@ -107,7 +132,7 @@ export function UserForm({
       return {
         username: selectedRowUser?.username || "",
         password: selectedRowUser?.password || "",
-        city_name: selectedRowUser?.city_name || "",
+        display_name: selectedRowUser?.display_name || "",
         roleId: selectedRowUser?.roleId || "",
       };
     });
@@ -144,28 +169,64 @@ export function UserForm({
             />
             <InputError message={formik.errors.username} />
           </div>
-          <div className="relative w-full">
-            <PasswordField
-              label={"رمز عبور"}
-              name="password"
-              id="password"
-              type="password"
-              {...formik.getFieldProps("password")}
+          {user ? (
+            <PasswordFieldWithModal
+              content={"تغییر رمز عبور"}
+              title="تغییر رمز عبور"
+              size={"sm"}
+              center
+              render={(closeModal) => {
+                return (
+                  <form
+                    className="mx-auto flex w-fit flex-col items-center justify-center gap-5 px-2 py-5"
+                    dir="rtl"
+                    onSubmit={() => {
+                      return updateUserPassword.mutate({
+                        id: user.id,
+                        password: formik.values.password,
+                      });
+                    }}
+                  >
+                    <PasswordFieldView
+                      fieldProps={formik.getFieldProps("password")}
+                      errors={formik.errors.password}
+                    />
+                    <div className="flex w-full items-center justify-between gap-4 ">
+                      <Button
+                        type="submit"
+                        isLoading={updateUserPassword.isLoading}
+                        className="w-24 bg-emerald-800 text-emerald-200"
+                      >
+                        ویرایش
+                      </Button>
+                      <Button
+                        onClick={() => closeModal()}
+                        className="w-24 border border-primary text-amber-600"
+                      >
+                        لغو
+                      </Button>
+                    </div>
+                  </form>
+                );
+              }}
             />
-
-            <InputError message={formik.errors.password} />
-          </div>
+          ) : (
+            <PasswordFieldView
+              fieldProps={formik.getFieldProps("password")}
+              errors={formik.errors.password}
+            />
+          )}
         </div>
 
         <div className="w-full">
           <TextFieldWithLable
-            label={"استان"}
-            name="city_name"
-            id="city_name"
-            {...formik.getFieldProps("city_name")}
+            label={"نام نمایشی"}
+            name="display_name"
+            id="display_name"
+            {...formik.getFieldProps("display_name")}
             maxLength={100}
           />
-          <InputError message={formik.errors.city_name} />
+          <InputError message={formik.errors.display_name} />
         </div>
         <div className="z-30  flex w-full flex-col items-start justify-start gap-5">
           {getRole.data && (
@@ -187,7 +248,7 @@ export function UserForm({
           )}
         </div>
         <Button
-          disabled={createUser.isLoading || !formik.isValid}
+          disabled={!formik.isValid}
           isLoading={createUser.isLoading || updateUser.isLoading}
           type="submit"
           className="w-full rounded-xl bg-primbuttn text-secondary"
@@ -235,5 +296,21 @@ export default function MultiSelectBox({
         })}
       </div>
     </>
+  );
+}
+
+function PasswordFieldView({ fieldProps, errors }) {
+  return (
+    <div className="relative w-full">
+      <PasswordField
+        label={"رمز عبور"}
+        name="password"
+        id="password"
+        type="password"
+        {...fieldProps}
+      />
+
+      <InputError message={errors} />
+    </div>
   );
 }

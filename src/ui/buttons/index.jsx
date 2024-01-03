@@ -30,7 +30,7 @@ export default function Button({
         y: translateY,
       }}
       transition={{ duration: 0.2, ease: "linear" }}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       dir="rtl"
       //@ts-ignore
       type={type}

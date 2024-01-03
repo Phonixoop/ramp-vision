@@ -166,7 +166,7 @@ export default function Modal({
                 onClick={handleClose}
                 className={twMerge(
                   center ? "laptopMin:items-center" : "items-end",
-                  ` fixed  flex items-end justify-center overflow-hidden backdrop-blur-md ${zIndex} inset-0  `
+                  ` fixed  flex items-end justify-center overflow-hidden backdrop-blur-md ${zIndex} inset-0  `,
                 )}
               >
                 <motion.div
@@ -190,12 +190,13 @@ export default function Modal({
                     modalSize,
                     center ? "mobileMin:rounded-2xl" : "rounded-t-2xl",
                     "relative z-[101] flex  flex-col  items-center  justify-center gap-0 overflow-hidden border  border-accent/50  ",
-                    isOnMobile ? "h-full" : ""
+                    isOnMobile ? "h-full" : "",
                   )}
 
                   // h-auto top-52
                 >
                   <div
+                    dir="rtl"
                     className={`sticky top-[0px] z-20 flex h-auto w-full  flex-col items-center justify-center  overflow-hidden  `}
                   >
                     {/* <div className="mobileMax:flex hidden w-1/2 h-[10px] bg-gray-300 mt-1 mb-auto rounded-2xl" /> */}
@@ -244,7 +245,7 @@ export default function Modal({
           )}
         </AnimatePresence>
       </>,
-      document.getElementById("portal")
+      document.getElementById("portal"),
     )
   ) : (
     <></>

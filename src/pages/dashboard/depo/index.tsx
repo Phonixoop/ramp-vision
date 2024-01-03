@@ -248,9 +248,9 @@ function DeposTable({ sessionData }) {
                           );
                         } else setFilterValue(canFilterCities);
 
-                        setTrackerFilter({
-                          cities: canFilterCities,
-                        });
+                        // setTrackerFilter({
+                        //   cities: canFilterCities,
+                        // });
                       }}
                     />
                   </LayoutGroup>
@@ -260,9 +260,9 @@ function DeposTable({ sessionData }) {
                   column={column}
                   data={initialFilters.data?.Cities}
                   onChange={(filter) => {
-                    setTrackerFilter({
-                      cities: filter.values,
-                    });
+                    // setTrackerFilter({
+                    //   cities: filter.values,
+                    // });
                   }}
                 />
               </div>
@@ -421,8 +421,6 @@ function DeposTable({ sessionData }) {
                 <>
                   <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">بازه گزارش</span>
-
-                    {/* {deferredFilter.filter.Start_Date} */}
 
                     <DatePickerPeriodic
                       filter={deferredFilter}

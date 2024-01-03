@@ -131,7 +131,7 @@ export default function UsersList() {
                 </Button>
                 <ButtonWithConfirmation
                   isLoading={deleteUser.isLoading || !user.id}
-                  onClick={async () => {
+                  onConfirm={async () => {
                     if (navigator && !navigator.onLine)
                       return alert("شما آفلاین هستید");
                     await deleteUser.mutateAsync({ id: user.id });
