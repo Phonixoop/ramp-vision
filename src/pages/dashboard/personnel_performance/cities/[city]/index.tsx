@@ -12,6 +12,9 @@ import { CITIES } from "~/constants";
 import {
   PersonnelPerformanceIcons,
   PersonnelPerformanceTranslate,
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtRoles,
 } from "~/constants/personnel-performance";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
@@ -51,9 +54,9 @@ export default function CityPage({ children, city }) {
       filter: {
         CityName: [city],
         Start_Date: filters?.filter?.Start_Date,
-        ProjectType: filters?.filter?.ProjectType,
-        Role: filters?.filter?.Role,
-        ContractType: filters?.filter?.ContractType,
+        ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
+        Role: filters?.filter?.Role ?? defualtRoles,
+        ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
         RoleType: filters?.filter?.RoleType,
         DateInfo: filters?.filter?.DateInfo,
       },
