@@ -33,21 +33,21 @@
   --accent: 29, 47, 73;
 }
 
-.theme-light-4 {
+/* .theme-light-4 {
   --primary: 8, 12, 10;
   --secondary: 225, 234, 228;
   --primbuttn: 61, 87, 71;
   --secbuttn: 195, 213, 202;
   --accent: 85, 119, 97;
-}
-
-/* .theme-light-4 {
-  --primary: 255, 255, 255;
-  --secondary: 226, 212, 189;
-  --primbuttn: 61, 87, 71;
-  --secbuttn: 15, 15, 15;
-  --accent: 85, 119, 97;
 } */
+
+.theme-light-4 {
+  --primary: 8, 12, 10;
+  --secondary: 206, 204, 188;
+  --primbuttn: 61, 87, 71;
+  --secbuttn: 197, 188, 171;
+  --accent: 85, 119, 97;
+}
 
 .theme {
   --primary: rgb(36, 34, 27);
@@ -386,4 +386,9 @@ input[type="number"] {
   animation-delay: calc(var(--a-delay) + 0.1s);
 }
 
-/* date picker */
+/* guage */
+
+.tick-value > text,
+.tick-line > text {
+  fill: rgb(var(--primary)) !important;
+}

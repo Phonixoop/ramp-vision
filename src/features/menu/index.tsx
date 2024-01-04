@@ -31,7 +31,7 @@ export default function Menu({
   return (
     <motion.div
       className={twMerge(
-        "  z-0 flex max-w-sm cursor-pointer items-stretch gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
+        "  z-0 flex w-full cursor-pointer items-stretch gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
         theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
       )}
       onHoverEnd={() => {

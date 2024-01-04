@@ -11,6 +11,7 @@ import { Toaster } from "~/components/ui/toast/toaster";
 import { PersonnelFilterProvider } from "~/context/personnel-filter.context";
 import { Default_Theme } from "~/constants/theme";
 import BlurBackground from "~/ui/blur-backgrounds";
+import Footer from "~/features/footer";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   PageLayout?: (page: ReactElement) => ReactElement<any, any>;
@@ -103,6 +104,7 @@ function MyApp({
           <Component.PageLayout {...pageProps} />
           <Toaster />
         </PersonnelFilterProvider>
+        <Footer />
       </SessionProvider>
     </>
   ) : (
@@ -111,6 +113,7 @@ function MyApp({
         <Component {...pageProps} />
         <Toaster />
       </PersonnelFilterProvider>
+      <Footer />
     </SessionProvider>
   );
 }

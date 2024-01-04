@@ -63,13 +63,13 @@ export default function Header() {
 
   return (
     <>
-      <div
+      <header
         dir="rtl"
-        className="sticky top-0 z-50 flex  w-full flex-col items-center justify-between border-b border-primary/20 bg-secondary/50 py-5 backdrop-blur-lg sm:p-0 "
+        className="sticky top-0 z-50 flex w-full flex-col items-center justify-between border-b border-primary/20 bg-secondary/50 py-5 backdrop-blur-lg sm:p-0 "
       >
         <div className="flex w-full flex-col items-center justify-between gap-4 py-2 lg:w-11/12 lg:flex-row ">
           {session.status !== "loading" && (
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="flex w-full flex-col items-center justify-center gap-4 px-2 sm:flex-row sm:px-0">
               <div className="flex items-center justify-center gap-4">
                 <LogoRamp />
                 <span className="text-lg font-bold text-primary underline underline-offset-4">
@@ -86,7 +86,7 @@ export default function Header() {
             <AuthShowcase session={session} />
           </div>
         </div>
-      </div>
+      </header>
     </>
   );
 }
