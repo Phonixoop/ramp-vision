@@ -392,3 +392,12 @@ input[type="number"] {
 .tick-line > text {
   fill: rgb(var(--primary)) !important;
 }
+
+.bg-muted {
+  background-color: rgb(var(--accent)) !important;
+}
+
+[role="dialog"] {
+  /* @apply overflow-y-auto; */
+  padding: 0;
+}

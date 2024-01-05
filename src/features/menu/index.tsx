@@ -13,12 +13,14 @@ export type MenuItem = {
   subMenu?: MenuItem[];
 };
 type MenuInput = {
-  rootPath: String;
+  className?: string;
+  rootPath: string;
   list: MenuItem[];
   theme?: "solid" | "round";
   isSub?: boolean;
 };
 export default function Menu({
+  className = "",
   rootPath = "",
   list = [],
   theme = "solid",
@@ -33,6 +35,7 @@ export default function Menu({
       className={twMerge(
         "  z-0 flex w-full cursor-pointer items-stretch gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
         theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
+        className,
       )}
       onHoverEnd={() => {
         setActiveIndex(-1);

@@ -1,5 +1,6 @@
 import {
   FormInputIcon,
+  LogOutIcon,
   MoonIcon,
   SunDimIcon,
   UserCog2Icon,
@@ -20,6 +21,7 @@ import { Permission, User } from "~/types";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { twMerge } from "tailwind-merge";
+import DrawerView from "~/features/drawer-view";
 
 function checkStatusForMenu(status, user) {
   if (status === "unauthenticated" || !user)
@@ -67,9 +69,45 @@ export default function Header() {
         dir="rtl"
         className="sticky top-0 z-50 flex w-full flex-col items-center justify-between border-b border-primary/20 bg-secondary/50 py-5 backdrop-blur-lg sm:p-0 "
       >
-        <div className="flex w-full flex-col items-center justify-between gap-4 py-2 lg:w-11/12 lg:flex-row ">
+        <div className="flex w-full  flex-row items-center justify-between gap-4 py-2 lg:w-11/12 ">
           {session.status !== "loading" && (
-            <div className="flex w-full flex-col  items-center justify-center gap-4 px-2 sm:w-max sm:flex-row sm:px-0">
+            <div className="flex w-full flex-row items-center justify-start gap-4 px-2 sm:w-max sm:px-0">
+              <div className="flex sm:hidden">
+                <DrawerView className="bg-secondary" title="منو">
+                  <div dir="rtl" className="flex flex-col gap-4 p-4 text-right">
+                    {checkStatusForMenu(
+                      session.status,
+                      session?.data?.user,
+                    ).map((item) => {
+                      return (
+                        <>
+                          <Link
+                            className="rounded-lg bg-secbuttn p-2 text-primary"
+                            href={item.link}
+                          >
+                            {item.value}
+                          </Link>
+
+                          {item.subMenu
+                            ? item.subMenu.map((subItem) => {
+                                return (
+                                  <div dir="rtl" className="flex flex-col pr-4">
+                                    <Link
+                                      className="w-fit self-start rounded-lg bg-secbuttn p-2  text-primary"
+                                      href={subItem.link}
+                                    >
+                                      {subItem.value}
+                                    </Link>
+                                  </div>
+                                );
+                              })
+                            : ""}
+                        </>
+                      );
+                    })}
+                  </div>
+                </DrawerView>
+              </div>
               <div className="flex items-center justify-center gap-4">
                 <LogoRamp />
                 <span className="text-lg font-bold text-primary underline underline-offset-4">
@@ -77,6 +115,7 @@ export default function Header() {
                 </span>
               </div>
               <Menu
+                className="hidden sm:flex"
                 rootPath="/"
                 list={checkStatusForMenu(session.status, session?.data?.user)}
               />
@@ -139,12 +178,13 @@ function AuthShowcase({ session }) {
 
   if (status === "unauthenticated" || !user)
     return (
-      <div className="flex w-full items-center justify-between gap-5">
+      <div className="flex w-full items-center justify-between gap-5 px-4">
         <Button
           className="flex  items-center justify-center gap-2 rounded-lg border border-accent bg-primary stroke-accent p-0 px-2 py-1  text-secondary"
           onClick={sessionData ? () => void signOut() : () => void signIn()}
         >
-          <span className="">{sessionData ? "خروج" : "ورود"}</span>
+          <span>ورود</span>
+
           <FormInputIcon className="stroke-secondary" />
         </Button>
         <ThemeProvider>
@@ -159,28 +199,30 @@ function AuthShowcase({ session }) {
   const isAdmin = permission && permission?.isActive === true;
 
   return (
-    <div className="flex flex-col gap-2 rounded-full sm:flex-row">
-      <div className="flex w-full items-center justify-between gap-5">
+    <div className="flex  flex-row gap-4 rounded-full ">
+      <div className="flex items-center gap-5  px-2 ">
         <ThemeProvider>
           <ThemeSwitch />
         </ThemeProvider>
+      </div>
+      <div className="relative flex  items-center justify-center gap-2 rounded-full  ">
         <Button
-          className="flex  items-center justify-center gap-2 rounded-xl border border-primary/20  stroke-accent p-0 px-6 py-1  text-primary"
+          className="flex  items-center justify-center gap-2 rounded-xl border border-primary/20  stroke-accent p-2 text-primary sm:px-4 sm:py-1"
           onClick={sessionData ? () => void signOut() : () => void signIn()}
         >
-          <span>{sessionData ? "خروج" : "ورود"}</span>
+          <span className="hidden sm:flex">
+            {sessionData ? "خروج" : "ورود"}
+          </span>
+          <LogOutIcon className="h-4 w-4" />
         </Button>{" "}
-      </div>
-      <div className="relative flex items-center justify-center gap-2 rounded-full  ">
-        <span className="flex  items-stretch justify-center gap-2 rounded-full stroke-accent px-3 text-accent">
-          <span className="px-2">
+        <span className="hidden items-stretch justify-center gap-2 rounded-full stroke-accent px-3 text-accent sm:flex">
+          <span className="">
             {user?.display_name ? user.display_name : user.username}
           </span>
         </span>
-
         {isAdmin && (
           <>
-            <div className="h-[15px] w-[0.5px] bg-accent"></div>
+            <div className="hidden h-[15px] w-[0.5px] bg-accent sm:flex"></div>
             <Link href={"/admin"}>
               <Button className="flex min-w-max items-stretch justify-center gap-2 rounded-xl bg-secondary  stroke-accent  text-accent">
                 <div className="flex w-fit items-center justify-center gap-2">

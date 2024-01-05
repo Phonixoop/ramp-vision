@@ -28,6 +28,8 @@ import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { cn } from "~/lib/utils";
 import H2 from "~/ui/heading/h2";
 import { twMerge } from "tailwind-merge";
+import ResponsiveView from "~/features/responsive-view";
+import Button from "~/ui/buttons";
 
 type Props = {
   isLoading?: boolean;
@@ -111,33 +113,46 @@ export default function Table({
   };
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
-      {renderInFilterView !== undefined && (
-        <div className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 2xl:pb-0  ">
-          {renderInFilterView !== undefined && (
-            <div className="flex w-full flex-row justify-center md:px-0 ">
-              <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
-                <div className="flex items-center justify-center gap-3 text-accent">
-                  <FilterIcon className="h-4 w-4" />
-                  <H2 className="text-lg font-bold text-accent">فیلترها</H2>
-                </div>
-                {renderInFilterView()}
-                {table.getHeaderGroups().map((headerGroup) => {
-                  return headerGroup.headers.map((header, index) => {
-                    //@ts-ignore
-
-                    if (columns[index].Filter)
+      <ResponsiveView
+        drawerClassName={"flex justify-center"}
+        className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 overflow-y-auto px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 2xl:pb-0  "
+        dir="rtl"
+        icon={
+          <>
+            <span className="px-2">فیلترها</span>
+            <FilterIcon className="stroke-primary" />
+          </>
+        }
+      >
+        {renderInFilterView !== undefined && (
+          <>
+            {renderInFilterView !== undefined && (
+              <div className="flex w-full flex-row justify-center md:px-0 ">
+                <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
+                  <div className="flex items-center justify-center gap-3 text-accent">
+                    <FilterIcon className="h-4 w-4" />
+                    <H2 className="text-lg font-bold text-accent">فیلترها</H2>
+                  </div>
+                  {renderInFilterView()}
+                  {table.getHeaderGroups().map((headerGroup) => {
+                    return headerGroup.headers.map((header, index) => {
                       //@ts-ignore
-                      return <>{columns[index].Filter(header)}</>;
-                  });
-                })}
+
+                      if (columns[index].Filter)
+                        //@ts-ignore
+                        return <>{columns[index].Filter(header)}</>;
+                    });
+                  })}
+                </div>
               </div>
-            </div>
-          )}
-          {renderInFilterView !== undefined && (
-            <div> {renderAfterFilterView(flatRows)}</div>
-          )}
-        </div>
-      )}
+            )}
+            {renderInFilterView !== undefined && (
+              <div> {renderAfterFilterView(flatRows)}</div>
+            )}
+          </>
+        )}
+      </ResponsiveView>
+
       <div
         className={twMerge(
           " px-5 2xl:px-0 ",

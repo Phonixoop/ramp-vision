@@ -34,7 +34,8 @@ export default function DatePickerPeriodic({
                 onClick={() => openCalendar()}
                 className="w-full min-w-full rounded-lg border border-dashed border-accent bg-primary p-2 text-center text-secondary"
               >
-                {reportPeriod === "ماهانه"
+                {reportPeriod === "ماهانه" &&
+                filter.filter.Start_Date.length == 1
                   ? moment(filter.filter.Start_Date[0], "jYYYY,jMM,jDD")
                       .locale("fa")
                       .format("MMMM")
