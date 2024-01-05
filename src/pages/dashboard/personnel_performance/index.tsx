@@ -43,6 +43,7 @@ import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import {
+  DistinctData,
   calculateDepoCompleteTime,
   commify,
   convertNumberToBetterFormat,
@@ -163,22 +164,6 @@ function PersonnelPerformanceTable({ sessionData }) {
     },
   );
 
-  useEffect(() => {
-    console.log(reportPeriod);
-    if (
-      (filters.filter.CityName <= 0 || filters.filter.CityName > 3) &&
-      reportPeriod === "ماهانه"
-    ) {
-      toast("فیلتر غیر مجاز", {
-        description:
-          "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
-        action: {
-          label: "باشه",
-          onClick: () => {},
-        },
-      });
-    }
-  }, [filters]);
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
@@ -205,67 +190,69 @@ function PersonnelPerformanceTable({ sessionData }) {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">استان</span>
-                {initialFilters.data?.Cities && (
-                  <LayoutGroup id="CityLevelMenu">
-                    <InPageMenu
-                      list={City_Levels.map((a) => a.name)}
-                      startIndex={-1}
-                      onChange={(value) => {
-                        const { setFilterValue } = column;
-                        const cities = City_Levels.find(
-                          (a) => a.name === value.item.name,
-                        ).cities;
+                {initialFilters.data?.Cities &&
+                  initialFilters.data.Cities > 1 && (
+                    <LayoutGroup id="CityLevelMenu">
+                      <InPageMenu
+                        list={City_Levels.map((a) => a.name)}
+                        startIndex={-1}
+                        onChange={(value) => {
+                          const { setFilterValue } = column;
+                          const cities = City_Levels.find(
+                            (a) => a.name === value.item.name,
+                          ).cities;
 
-                        // beacuse our system is permission based we need to only filter allowed cities.
-                        const canFilterCities = cities
-                          .filter((city) =>
-                            initialFilters.data.Cities.map((initCity) => {
-                              return CITIES.find(
-                                (a) => a.PersianName === initCity.CityName,
-                              ).EnglishName;
-                            }).includes(city),
-                          )
-                          .map((cf) => {
-                            return CITIES.find((a) => a.EnglishName === cf)
-                              .PersianName;
+                          // beacuse our system is permission based we need to only filter allowed cities.
+                          const canFilterCities = cities
+                            .filter((city) =>
+                              initialFilters.data.Cities.map((initCity) => {
+                                return CITIES.find(
+                                  (a) => a.PersianName === initCity.CityName,
+                                ).EnglishName;
+                              }).includes(city),
+                            )
+                            .map((cf) => {
+                              return CITIES.find((a) => a.EnglishName === cf)
+                                .PersianName;
+                            });
+
+                          if (cities.length <= 0) {
+                            setFilterValue(
+                              initialFilters.data.Cities.map((a) => a.CityName),
+                            );
+                          } else setFilterValue(canFilterCities);
+
+                          if (
+                            (canFilterCities.length <= 0 ||
+                              canFilterCities.length > 3) &&
+                            reportPeriod === "ماهانه" &&
+                            initialFilters.data.Cities.length > 1
+                          ) {
+                            toast("فیلتر غیر مجاز", {
+                              description:
+                                "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+                              action: {
+                                label: "باشه",
+                                onClick: () => {},
+                              },
+                            });
+                            return;
+                          }
+                          setDataFilters((prev) => {
+                            return {
+                              ...prev,
+                              filter: {
+                                CityName: canFilterCities.map(
+                                  getPersianToEnglishCity,
+                                ),
+                                Start_Date: prev.filter.Start_Date,
+                              },
+                            };
                           });
-
-                        if (cities.length <= 0) {
-                          setFilterValue(
-                            initialFilters.data.Cities.map((a) => a.CityName),
-                          );
-                        } else setFilterValue(canFilterCities);
-
-                        if (
-                          (canFilterCities.length <= 0 ||
-                            canFilterCities.length > 3) &&
-                          reportPeriod === "ماهانه"
-                        ) {
-                          toast("فیلتر غیر مجاز", {
-                            description:
-                              "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
-                            action: {
-                              label: "باشه",
-                              onClick: () => {},
-                            },
-                          });
-                          return;
-                        }
-                        setDataFilters((prev) => {
-                          return {
-                            ...prev,
-                            filter: {
-                              CityName: canFilterCities.map(
-                                getPersianToEnglishCity,
-                              ),
-                              Start_Date: prev.filter.Start_Date,
-                            },
-                          };
-                        });
-                      }}
-                    />
-                  </LayoutGroup>
-                )}
+                        }}
+                      />
+                    </LayoutGroup>
+                  )}
 
                 <SelectColumnFilter
                   column={column}
@@ -273,7 +260,8 @@ function PersonnelPerformanceTable({ sessionData }) {
                   onChange={(filter) => {
                     if (
                       (filter.values.length <= 0 || filter.values.length > 3) &&
-                      reportPeriod === "ماهانه"
+                      reportPeriod === "ماهانه" &&
+                      initialFilters.data.Cities.length > 1
                     ) {
                       toast("فیلتر غیر مجاز", {
                         description:
@@ -677,7 +665,7 @@ function PersonnelPerformanceTable({ sessionData }) {
         <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
             isLoading={personnelPerformance.isLoading}
-            data={personnelPerformance.data?.result ?? []}
+            data={DistinctData(personnelPerformance.data?.result ?? [])}
             columns={columns}
             renderInFilterView={() => {
               return (
