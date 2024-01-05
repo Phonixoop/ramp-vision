@@ -22,6 +22,7 @@ import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { twMerge } from "tailwind-merge";
 import DrawerView from "~/features/drawer-view";
+import { NavigationMenuDemo } from "~/features/navigation-menu-view";
 
 function checkStatusForMenu(status, user) {
   if (status === "unauthenticated" || !user)
@@ -119,6 +120,7 @@ export default function Header() {
                 rootPath="/"
                 list={checkStatusForMenu(session.status, session?.data?.user)}
               />
+              {/* <NavigationMenuDemo /> */}
             </div>
           )}
           <div className="flex  items-center justify-center gap-5">
