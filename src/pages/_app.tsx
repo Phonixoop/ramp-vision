@@ -1,4 +1,3 @@
-import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { AppProps, type AppType } from "next/app";
 import { api } from "~/utils/api";
@@ -7,7 +6,7 @@ import { ReactElement, ReactNode, useEffect, useLayoutEffect } from "react";
 import { NextPage } from "next";
 import ProgressBar from "@badrap/bar-of-progress";
 import { useRouter } from "next/router";
-import { Toaster } from "~/components/ui/toast/toaster";
+import { Toaster } from "~/components/ui/sonner";
 import { PersonnelFilterProvider } from "~/context/personnel-filter.context";
 import { Default_Theme } from "~/constants/theme";
 import BlurBackground from "~/ui/blur-backgrounds";

@@ -68,7 +68,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
             input.filter.CityName.includes(value),
           );
         if (filter.CityName.length <= 0) filter.CityName = cities;
-        //console.log(filter);
+
+        if (input.periodType === "ماهانه" && cities.length > 3)
+          throw new Error(
+            "more than 3 cities in monthly filter is not allowed",
+          );
+
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
         
@@ -134,6 +139,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
+
           const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(
             filter,
@@ -171,7 +177,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {

@@ -17,7 +17,7 @@ import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 import { Container } from "~/ui/containers";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { RouterOutputs, api } from "~/utils/api";
 import {
   Title,
@@ -49,6 +49,7 @@ import {
   countColumnValues,
   en,
   getPerformanceText,
+  getPersianToEnglishCity,
   getServiceNameColor,
   humanizeDuration,
   processDataForChart,
@@ -66,6 +67,8 @@ import MyBarList from "~/features/bar-list";
 import Gauge from "~/features/gauge";
 import { ColumnDef } from "@tanstack/react-table";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
+
+import { toast } from "sonner";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -160,6 +163,22 @@ function PersonnelPerformanceTable({ sessionData }) {
     },
   );
 
+  useEffect(() => {
+    console.log(reportPeriod);
+    if (
+      (filters.filter.CityName <= 0 || filters.filter.CityName > 3) &&
+      reportPeriod === "ماهانه"
+    ) {
+      toast("فیلتر غیر مجاز", {
+        description:
+          "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+        action: {
+          label: "باشه",
+          onClick: () => {},
+        },
+      });
+    }
+  }, [filters]);
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
@@ -190,7 +209,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                   <LayoutGroup id="CityLevelMenu">
                     <InPageMenu
                       list={City_Levels.map((a) => a.name)}
-                      startIndex={2}
+                      startIndex={-1}
                       onChange={(value) => {
                         const { setFilterValue } = column;
                         const cities = City_Levels.find(
@@ -216,6 +235,33 @@ function PersonnelPerformanceTable({ sessionData }) {
                             initialFilters.data.Cities.map((a) => a.CityName),
                           );
                         } else setFilterValue(canFilterCities);
+
+                        if (
+                          (canFilterCities.length <= 0 ||
+                            canFilterCities.length > 3) &&
+                          reportPeriod === "ماهانه"
+                        ) {
+                          toast("فیلتر غیر مجاز", {
+                            description:
+                              "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+                            action: {
+                              label: "باشه",
+                              onClick: () => {},
+                            },
+                          });
+                          return;
+                        }
+                        setDataFilters((prev) => {
+                          return {
+                            ...prev,
+                            filter: {
+                              CityName: canFilterCities.map(
+                                getPersianToEnglishCity,
+                              ),
+                              Start_Date: prev.filter.Start_Date,
+                            },
+                          };
+                        });
                       }}
                     />
                   </LayoutGroup>
@@ -224,7 +270,32 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <SelectColumnFilter
                   column={column}
                   data={initialFilters.data?.Cities}
-                  onChange={(filter) => {}}
+                  onChange={(filter) => {
+                    if (
+                      (filter.values.length <= 0 || filter.values.length > 3) &&
+                      reportPeriod === "ماهانه"
+                    ) {
+                      toast("فیلتر غیر مجاز", {
+                        description:
+                          "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+                        action: {
+                          label: "باشه",
+                          onClick: () => {},
+                        },
+                      });
+                      return;
+                    }
+                    //@ts-ignore
+                    setDataFilters((prev) => {
+                      return {
+                        ...prev,
+                        filter: {
+                          CityName: filter.values.map(getPersianToEnglishCity),
+                          Start_Date: prev.filter.Start_Date,
+                        },
+                      };
+                    });
+                  }}
                 />
               </div>
             );

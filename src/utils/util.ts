@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import moment from "jalali-moment";
+import { CITIES } from "~/constants";
 import { Permission } from "~/types";
 
 export function hashPassword(password: string) {
@@ -501,4 +502,18 @@ export function calculateAggregateByFields(data = [], operations) {
   const result = Object.values(aggregatedData);
 
   return result;
+}
+
+const PersianKeyToEnglishValueMap = {};
+const EnglishKeyToPersianValueMap = {};
+CITIES.forEach((city) => {
+  PersianKeyToEnglishValueMap[city.PersianName] = city.EnglishName;
+  EnglishKeyToPersianValueMap[city.EnglishName] = city.PersianName;
+});
+
+export function getPersianToEnglishCity(cityName) {
+  return PersianKeyToEnglishValueMap[cityName] || cityName;
+}
+export function getEnglishToPersianCity(cityName) {
+  return EnglishKeyToPersianValueMap[cityName] || cityName;
 }

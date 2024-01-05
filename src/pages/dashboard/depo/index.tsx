@@ -161,17 +161,17 @@ function DeposTable({ sessionData }) {
   });
 
   const deferredFilter = useDeferredValue(filters);
-  const getTracker = api.depo.get30DaysTrack.useQuery(
-    {
-      filter: {
-        CityName: trackerFilter.cities,
-      },
-    },
-    {
-      enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
-      refetchOnWindowFocus: false,
-    },
-  );
+  // const getTracker = api.depo.get30DaysTrack.useQuery(
+  //   {
+  //     filter: {
+  //       CityName: trackerFilter.cities,
+  //     },
+  //   },
+  //   {
+  //     enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
+  //     refetchOnWindowFocus: false,
+  //   },
+  // );
 
   const depo = api.depo.getAll.useQuery(deferredFilter, {
     enabled: sessionData?.user !== undefined && !initialFilters.isLoading,

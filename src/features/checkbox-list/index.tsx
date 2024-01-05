@@ -94,9 +94,9 @@ export function SelectColumnFilter({
   }, []);
 
   if (!data || data.length === 0) return "";
-  const unique = [...new Set(data.map((a) => a[column.id]))].filter(
-    (item) => item != undefined,
-  );
+  const unique = [...new Set(data.map((a) => a[column.id]))]
+    .filter((item) => item != undefined)
+    .toSorted();
 
   const selectedCount = getFilterValue() ? (getFilterValue() as any).length : 0;
   const selectAllState = selectedCount < unique.length;
