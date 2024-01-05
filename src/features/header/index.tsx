@@ -22,7 +22,6 @@ import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { twMerge } from "tailwind-merge";
 import DrawerView from "~/features/drawer-view";
-import { NavigationMenuDemo } from "~/features/navigation-menu-view";
 
 function checkStatusForMenu(status, user) {
   if (status === "unauthenticated" || !user)
@@ -79,10 +78,11 @@ export default function Header() {
                     {checkStatusForMenu(
                       session.status,
                       session?.data?.user,
-                    ).map((item) => {
+                    ).map((item, i) => {
                       return (
                         <>
                           <Link
+                            key={i}
                             className="rounded-lg bg-secbuttn p-2 text-primary"
                             href={item.link}
                           >
@@ -90,9 +90,13 @@ export default function Header() {
                           </Link>
 
                           {item.subMenu
-                            ? item.subMenu.map((subItem) => {
+                            ? item.subMenu.map((subItem, j) => {
                                 return (
-                                  <div dir="rtl" className="flex flex-col pr-4">
+                                  <div
+                                    key={j}
+                                    dir="rtl"
+                                    className="flex flex-col pr-4"
+                                  >
                                     <Link
                                       className="w-fit self-start rounded-lg bg-secbuttn p-2  text-primary"
                                       href={subItem.link}
