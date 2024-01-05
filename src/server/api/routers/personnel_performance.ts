@@ -67,9 +67,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
           filter.CityName = cities.filter((value) =>
             input.filter.CityName.includes(value),
           );
-        if (filter.CityName.length <= 0) filter.CityName = cities;
 
-        if (input.periodType === "ماهانه" && cities.length > 3)
+        if (filter.CityName.length <= 0) filter.CityName = cities;
+        if (input.periodType === "ماهانه" && filter.CityName.length > 3)
           throw new Error(
             "more than 3 cities in monthly filter is not allowed",
           );
@@ -177,7 +177,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
