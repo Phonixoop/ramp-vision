@@ -69,7 +69,7 @@ export default function Header() {
       >
         <div className="flex w-full flex-col items-center justify-between gap-4 py-2 lg:w-11/12 lg:flex-row ">
           {session.status !== "loading" && (
-            <div className="flex w-full flex-col items-center justify-center gap-4 px-2 sm:flex-row sm:px-0">
+            <div className="flex w-full flex-col  items-center justify-center gap-4 px-2 sm:w-max sm:flex-row sm:px-0">
               <div className="flex items-center justify-center gap-4">
                 <LogoRamp />
                 <span className="text-lg font-bold text-primary underline underline-offset-4">
