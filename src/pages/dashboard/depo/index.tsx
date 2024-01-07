@@ -145,9 +145,9 @@ function DeposTable({ sessionData }) {
     enabled: sessionData?.user !== undefined,
     refetchOnWindowFocus: false,
   });
-  const [trackerFilter, setTrackerFilter] = useState({
-    cities: initialFilters.data?.Cities.map((a) => a.CityName),
-  });
+  // const [trackerFilter, setTrackerFilter] = useState({
+  //   cities: initialFilters.data?.Cities.map((a) => a.CityName),
+  // });
   const [filters, setDataFilters] = useState({
     periodType: reportPeriod,
     filter: {
@@ -282,7 +282,7 @@ function DeposTable({ sessionData }) {
                   <SelectColumnFilter
                     column={column}
                     data={depo.data?.result}
-                    translate={ServiceNames}
+                    // translate={ServiceNames}
                     onChange={(filter) => {
                       // setDataFilters((prev) => {
                       //   return {
@@ -531,11 +531,11 @@ function DeposTable({ sessionData }) {
               );
             }}
             renderChild={(flatRows) => {
-              const dateDate = processDataForChart(flatRows, "Start_Date", [
-                "DepoCount",
-                "EntryCount",
-                "Capicity",
-              ]);
+              // const dateDate = processDataForChart(flatRows, "Start_Date", [
+              //   "DepoCount",
+              //   "EntryCount",
+              //   "Capicity",
+              // ]);
               const serviceData = processDataForChart(flatRows, "ServiceName", [
                 "DepoCount",
                 "EntryCount",
@@ -547,14 +547,15 @@ function DeposTable({ sessionData }) {
                 depoCompletionTime.reduce((accumulator, currentObject) => {
                   return accumulator + currentObject.DepoCompleteTime;
                 }, 0) / flatRows.length;
+
               const entryBaseOnSabt = sumColumnBasedOnRowValue(
                 flatRows,
                 "EntryCount",
                 "ServiceName",
                 [
-                  "ثبت ارزیابی با اسکن مدارک",
-                  "ثبت ارزیابی بدون اسکن مدارک",
-                  "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+                  ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
                 ],
               );
 
@@ -563,9 +564,9 @@ function DeposTable({ sessionData }) {
                 "Capicity",
                 "ServiceName",
                 [
-                  "ثبت ارزیابی با اسکن مدارک",
-                  "ثبت ارزیابی بدون اسکن مدارک",
-                  "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+                  ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
                 ],
               );
               const entry_capacity = [
@@ -583,13 +584,16 @@ function DeposTable({ sessionData }) {
                 flatRows,
                 "DepoCount",
                 "ServiceName",
-                ["ثبت ارزیابی با اسکن مدارک", "ثبت ارزیابی بدون اسکن مدارک"],
+                [
+                  ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+                ],
               );
               const depoBaseOnSabtInDirect = sumColumnBasedOnRowValue(
                 flatRows,
                 "DepoCount",
                 "ServiceName",
-                ["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
+                [ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"]],
               );
 
               const depo_BaseOnSabt = [
@@ -724,10 +728,7 @@ function DeposTable({ sessionData }) {
                             {/* <RadarGauge CityName={trackerFilter.cities} /> */}
                             <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
                               <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
-                                <div
-                                  dir="ltr"
-                                  className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 "
-                                >
+                                <div className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 ">
                                   <H2>تعداد ورودی و رسیدگی شده</H2>
                                   <ResponsiveContainer
                                     width="99%"
