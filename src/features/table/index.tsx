@@ -114,9 +114,9 @@ export default function Table({
   return (
     <div className="flex w-full flex-col justify-center gap-5 md:items-stretch xl:flex-row ">
       <ResponsiveView
-        drawerClassName={"flex justify-center"}
         className="relative top-10 flex h-fit w-full flex-col justify-center gap-5 overflow-y-auto px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 2xl:pb-0  "
         dir="rtl"
+        btnClassName="bg-secondary text-primary"
         icon={
           <>
             <span className="px-2">فیلترها</span>

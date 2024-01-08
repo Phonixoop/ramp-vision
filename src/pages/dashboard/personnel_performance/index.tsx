@@ -49,6 +49,7 @@ import {
   convertNumberToBetterFormat,
   countColumnValues,
   en,
+  getEnglishToPersianCity,
   getPerformanceText,
   getPersianToEnglishCity,
   getServiceNameColor,
@@ -205,16 +206,13 @@ function PersonnelPerformanceTable({ sessionData }) {
                           // beacuse our system is permission based we need to only filter allowed cities.
                           const canFilterCities = cities
                             .filter((city) =>
-                              initialFilters.data.Cities.map((initCity) => {
-                                return CITIES.find(
-                                  (a) => a.PersianName === initCity.CityName,
-                                ).EnglishName;
-                              }).includes(city),
+                              initialFilters.data.Cities.map((initCity) =>
+                                getPersianToEnglishCity(initCity.CityName),
+                              ).includes(city),
                             )
-                            .map((cf) => {
-                              return CITIES.find((a) => a.EnglishName === cf)
-                                .PersianName;
-                            });
+                            .map((cityName) =>
+                              getEnglishToPersianCity(cityName),
+                            );
 
                           if (cities.length <= 0) {
                             setFilterValue(

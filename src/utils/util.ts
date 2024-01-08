@@ -511,9 +511,9 @@ CITIES.forEach((city) => {
   EnglishKeyToPersianValueMap[city.EnglishName] = city.PersianName;
 });
 
-export function getPersianToEnglishCity(cityName) {
+export function getPersianToEnglishCity(cityName: string) {
   return PersianKeyToEnglishValueMap[cityName] || cityName;
 }
-export function getEnglishToPersianCity(cityName) {
+export function getEnglishToPersianCity(cityName: string) {
   return EnglishKeyToPersianValueMap[cityName] || cityName;
 }

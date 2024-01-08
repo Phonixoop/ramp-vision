@@ -31,6 +31,7 @@ import { api } from "~/utils/api";
 import {
   DistinctData,
   commify,
+  getEnglishToPersianCity,
   getPerformanceText,
   processDataForChart,
 } from "~/utils/util";
@@ -303,10 +304,7 @@ export default function CityPage({ children, city }) {
             selectedPerson ? "bg-secondary" : "",
           )}
         >
-          <H2>
-            نمای کلی شهر{" "}
-            {CITIES.find((a) => a.EnglishName === city).PersianName}
-          </H2>
+          <H2>نمای کلی شهر {getEnglishToPersianCity(city)}</H2>
           <AreaChart
             data={fullData}
             dir="rtl"

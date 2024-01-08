@@ -8,6 +8,7 @@ import {
   calculateDepoCompleteTime,
   extractYearAndMonth,
   getDatesForLastMonth,
+  getEnglishToPersianCity,
   getFirstSaturdayOfLastWeekOfMonth,
   getSecondOrLaterDayOfNextMonth,
   getWeekOfMonth,
@@ -199,8 +200,7 @@ export const depoRouter = createTRPCRouter({
             finalResult.map((cf) => {
               return {
                 ...cf,
-                CityName: CITIES.find((a) => a.EnglishName === cf.CityName)
-                  .PersianName,
+                CityName: getEnglishToPersianCity(cf.CityName),
                 ServiceName: ServiceNames[cf.ServiceName]
                   ? ServiceNames[cf.ServiceName]
                   : cf.ServiceName,
@@ -238,8 +238,7 @@ export const depoRouter = createTRPCRouter({
           .filter((c) => c.CityName !== "")
           .map((c) => {
             return {
-              CityName: CITIES.find((a) => a.EnglishName === c.CityName)
-                .PersianName,
+              CityName: getEnglishToPersianCity(c.CityName),
             };
           }),
       };

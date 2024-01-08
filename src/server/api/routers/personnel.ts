@@ -8,6 +8,7 @@ import {
   calculateDepoCompleteTime,
   extractYearAndMonth,
   getDatesForLastMonth,
+  getEnglishToPersianCity,
   getFirstSaturdayOfLastWeekOfMonth,
   getWeekOfMonth,
 } from "~/utils/util";
@@ -72,7 +73,12 @@ export const personnelRouter = createTRPCRouter({
         //  console.log(query);
         const result = await sql.query(query);
         //  console.log(result.recordsets[0]);
-        return result.recordsets[0];
+        return result.recordsets[0].map((c) => {
+          return {
+            ...c,
+            CityName: getEnglishToPersianCity(c.CityName),
+          };
+        });
         // Respond with the fetched data
       } catch (error) {
         console.error("Error fetching data:", error.message);
@@ -99,7 +105,9 @@ export const personnelRouter = createTRPCRouter({
       // console.log(result.recordsets);
       return {
         usersInfo: result.recordsets[0],
-        Cities: result.recordsets[1],
+        Cities: result.recordsets[1].map((c) =>
+          getEnglishToPersianCity(c.CityName),
+        ),
       };
       // Respond with the fetched data
     } catch (error) {

@@ -8,6 +8,7 @@ import {
   calculateDepoCompleteTime,
   extractYearAndMonth,
   getDatesForLastMonth,
+  getEnglishToPersianCity,
   getFirstSaturdayOfLastWeekOfMonth,
   getWeekOfMonth,
 } from "~/utils/util";
@@ -224,8 +225,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
             finalResult.map((cf) => {
               return {
                 ...cf,
-                CityName: CITIES.find((a) => a.EnglishName === cf.CityName)
-                  .PersianName,
+                CityName: getEnglishToPersianCity(cf.CityName),
               };
             }) ?? [],
         };
@@ -261,8 +261,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           .filter((c) => c.CityName !== "")
           .map((c) => {
             return {
-              CityName: CITIES.find((a) => a.EnglishName === c.CityName)
-                .PersianName,
+              CityName: getEnglishToPersianCity(c.CityName),
             };
           }),
       };

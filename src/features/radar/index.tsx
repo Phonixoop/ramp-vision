@@ -18,7 +18,10 @@ import {
 } from "~/constants/personnel-performance";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/utils/api";
-import { calculateAggregateByFields } from "~/utils/util";
+import {
+  calculateAggregateByFields,
+  getPersianToEnglishCity,
+} from "~/utils/util";
 
 const fakeData = [
   {
@@ -241,9 +244,7 @@ export default function RadarGauge({ CityName = [] }) {
       {
         periodType: "ماهانه",
         filter: {
-          CityName: CityName.map(
-            (c) => CITIES.find((a) => a.PersianName === c).EnglishName,
-          ),
+          CityName: CityName.map((c) => getPersianToEnglishCity(c)),
           Role: defualtRoles,
           ProjectType: defaultProjectTypes,
           DateInfo: defualtDateInfos,

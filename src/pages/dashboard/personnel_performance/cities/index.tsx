@@ -5,7 +5,6 @@ import {
   BuildingIcon,
   FilterIcon,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
@@ -23,16 +22,9 @@ import { db } from "~/server/db";
 import { SparkAreaChart } from "@tremor/react";
 import { CITIES, Reports_Period } from "~/constants";
 import AdvancedList from "~/features/advanced-list";
-import Button from "~/ui/buttons";
-import DatePicker from "react-multi-date-picker";
-import { InPageMenu } from "~/features/menu";
-import { default as DatePickerButton } from "react-multi-date-picker/components/button";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
 import moment from "jalali-moment";
-import { LayoutGroup } from "framer-motion";
-import DatePanel from "react-multi-date-picker/plugins/date_panel";
-import { en } from "~/utils/util";
+
+import { en, getEnglishToPersianCity } from "~/utils/util";
 import {
   defaultProjectTypes,
   defualtContractTypes,
@@ -40,7 +32,7 @@ import {
   defualtRoles,
 } from "~/constants/personnel-performance";
 
-import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
+import { SelectControlled } from "~/features/checkbox-list";
 import H2 from "~/ui/heading/h2";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
@@ -66,7 +58,7 @@ function DistinctData(data = []): CityWithPerformanceData[] {
   const averageTotalPerformance: CityWithPerformanceData[] = Array.from(
     cityMap,
     ([city, { total, count }]) => {
-      if (!CITIES.find((a) => a.EnglishName === city).PersianName) return;
+      if (!getEnglishToPersianCity(city)) return;
       return {
         CityName_En: city,
         CityName_Fa: CITIES.find((a) => a.EnglishName === city).PersianName,
@@ -141,15 +133,20 @@ export default function CitiesPage({ children }) {
 
       <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
         <Header />
-        <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-xl bg-primbuttn/10 p-2 sm:flex-col">
-          <H2 className="text-xl">فیلترها</H2>
+        <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-xl p-2 sm:flex-col sm:bg-primbuttn/10">
+          <H2 className="hidden text-xl sm:flex">فیلترها</H2>
 
           {!getInitialFilters.isLoading && (
             <ResponsiveView
-              drawerClassName={"flex justify-center"}
-              className=" z-20 flex max-h-[100vh] flex-wrap items-stretch justify-center gap-1  bg-secbuttn py-5 sm:max-h-min sm:bg-transparent sm:py-0"
+              className=" z-20 flex max-h-[100vh] flex-wrap items-stretch justify-center gap-1  sm:max-h-min sm:bg-transparent sm:py-0"
               dir="rtl"
-              icon={<FilterIcon />}
+              btnClassName="bg-secondary text-primary"
+              icon={
+                <>
+                  <span className="px-2">فیلترها</span>
+                  <FilterIcon className="stroke-primary" />
+                </>
+              }
             >
               <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">بازه گزارش</span>
@@ -330,10 +327,9 @@ export default function CitiesPage({ children }) {
             <span> {selectedPerson?.NameFamily}</span>
             {selectedPerson && <span>{"/"}</span>}
             <span>
-              {
-                CITIES.find((a) => a.EnglishName === router.query?.city)
-                  ?.PersianName
-              }
+              {Array.isArray(router.query?.city)
+                ? ""
+                : getEnglishToPersianCity(router.query?.city ?? "")}
             </span>
           </div>
         </div>

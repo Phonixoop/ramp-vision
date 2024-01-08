@@ -46,6 +46,8 @@ import {
   commify,
   convertNumberToBetterFormat,
   en,
+  getEnglishToPersianCity,
+  getPersianToEnglishCity,
   getServiceNameColor,
   humanizeDuration,
   processDataForChart,
@@ -68,6 +70,8 @@ import ReBarChart from "~/features/rechart-ui/bar";
 import { ResponsiveContainer } from "recharts";
 import InputIcon from "react-multi-date-picker/components/input_icon";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
+import { date } from "zod";
+import { twMerge } from "tailwind-merge";
 
 const chartdata = [
   {
@@ -231,16 +235,11 @@ function DeposTable({ sessionData }) {
                         // beacuse our system is permission based we need to only show cities that are allowed to filter.
                         const canFilterCities = cities
                           .filter((city) =>
-                            initialFilters.data.Cities.map((initCity) => {
-                              return CITIES.find(
-                                (a) => a.PersianName === initCity.CityName,
-                              ).EnglishName;
-                            }).includes(city),
+                            initialFilters.data.Cities.map((initCity) =>
+                              getEnglishToPersianCity(initCity.CityName),
+                            ).includes(city),
                           )
-                          .map((cf) => {
-                            return CITIES.find((a) => a.EnglishName === cf)
-                              .PersianName;
-                          });
+                          .map((cf) => getEnglishToPersianCity(cf));
 
                         if (cities.length <= 0) {
                           setFilterValue(
@@ -752,12 +751,28 @@ function DeposTable({ sessionData }) {
                                       noDataText={Text.noData.fa}
                                     />
                                   </ResponsiveContainer>
+
+                                  <div className="flex justify-stretch gap-2 ">
+                                    <div className=" flex w-full justify-between rounded-xl bg-rose-200 p-2 text-center font-bold text-accent ">
+                                      <span className="text-rose-900">
+                                        ورودی
+                                      </span>
+                                      <span className="text-rose-900">
+                                        {commify(entryBaseOnSabt)}
+                                      </span>
+                                    </div>
+                                    <div className=" flex w-full justify-between rounded-xl bg-emerald-200 p-2 text-center font-bold text-accent ">
+                                      <span className="  text-emerald-900">
+                                        رسیدگی شده
+                                      </span>
+                                      <span className="text-emerald-900">
+                                        {commify(capacityBaseOnSabt)}
+                                      </span>
+                                    </div>
+                                  </div>
                                 </div>
 
-                                <div
-                                  dir="ltr"
-                                  className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2"
-                                >
+                                <div className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2">
                                   <H2>تعداد دپو</H2>
                                   <ResponsiveContainer
                                     width="99%"
@@ -772,8 +787,27 @@ function DeposTable({ sessionData }) {
                                       noDataText={Text.noData.fa}
                                     />
                                   </ResponsiveContainer>
+                                  <div className="flex justify-stretch gap-2 ">
+                                    <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
+                                      <span className="text-fuchsia-900">
+                                        دپو مستقیم
+                                      </span>
+                                      <span className="text-fuchsia-900">
+                                        {commify(depoBaseOnSabtDirect)}
+                                      </span>
+                                    </div>
+                                    <div className=" flex w-full justify-between rounded-xl bg-cyan-200 p-2 text-center font-bold text-accent ">
+                                      <span className="  text-cyan-900">
+                                        دپو غیر مستقیم
+                                      </span>
+                                      <span className="text-cyan-900">
+                                        {commify(depoBaseOnSabtInDirect)}
+                                      </span>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
+
                               <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
                                 <H2>
                                   زمان کلی اتمام دپو{" "}
@@ -836,3 +870,46 @@ function DeposTable({ sessionData }) {
     </>
   );
 }
+
+// type DetailType = {
+//   label: string;
+//   value: number;
+//   bgColor: string;
+//   foreColor: string;
+// };
+// function DetailsView({ data = [] }: { data: DetailType[] }) {
+//   return (
+//     <>
+//       <div className="flex justify-stretch gap-2 ">
+//         {data.map((item: DetailType) => {
+//           return (
+//             <>
+//               <DetailItem
+//                 label={item.label}
+//                 value={item.value}
+//                 bgColor={item.bgColor}
+//                 foreColor={item.foreColor}
+//               />
+//             </>
+//           );
+//         })}
+//       </div>
+//     </>
+//   );
+// }
+
+// function DetailItem({ label, value, bgColor, foreColor }: DetailType) {
+//   return (
+//     <>
+//       <div
+//         className={twMerge(
+//           "flex w-full justify-between rounded-xl  p-2 text-center font-bold text-accent",
+//           bgColor,
+//         )}
+//       >
+//         <span className={twMerge(foreColor)}>{label}</span>
+//         <span className={twMerge(foreColor)}>{commify(value)}</span>
+//       </div>
+//     </>
+//   );
+// }

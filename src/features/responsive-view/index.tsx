@@ -10,14 +10,19 @@ export default function ResponsiveView({
   title = "",
   icon = <></>,
   className,
-  drawerClassName,
+  btnClassName = "",
   dir,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <div className={twMerge(className, "flex sm:hidden")} dir={dir}>
-        <Button onClick={() => setIsOpen(true)}>{icon}</Button>
+        <Button
+          className={twMerge(btnClassName, "mx-auto flex w-fit sm:hidden")}
+          onClick={() => setIsOpen(true)}
+        >
+          {icon}
+        </Button>
         <Modal
           isOpen={isOpen}
           onClose={() => {
