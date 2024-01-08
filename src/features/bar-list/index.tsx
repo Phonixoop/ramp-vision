@@ -10,6 +10,7 @@ type BarListProps = {
 };
 export default function MyBarList({ data }: BarListProps) {
   const maxNumber = Math.max(...data.map((bar) => bar.value));
+  const sumOfValues = data.reduce((total, item) => total + item.value, 0);
 
   return (
     <div className="flex flex-col items-center justify-start  p-2 xl:p-0">
@@ -27,6 +28,12 @@ export default function MyBarList({ data }: BarListProps) {
           <span className="z-10">{bar.value}</span>
         </div>
       ))}
+
+      <div className="relative flex w-full items-center justify-between rounded-xl bg-primary p-4  font-bold text-secondary ">
+        <h2 className="z-10 text-lg font-bold">جمع</h2>
+
+        <span className="z-10">{sumOfValues}</span>
+      </div>
     </div>
   );
 }
