@@ -6,6 +6,7 @@ import { InferGetStaticPropsType, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { use, useEffect, useState } from "react";
+import { ResponsiveContainer } from "recharts";
 import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
 import { CITIES } from "~/constants";
@@ -305,25 +306,27 @@ export default function CityPage({ children, city }) {
           )}
         >
           <H2>نمای کلی شهر {getEnglishToPersianCity(city)}</H2>
-          <AreaChart
-            data={fullData}
-            dir="rtl"
-            index="key"
-            categories={[
-              "ثبت اولیه اسناد",
-              "پذیرش و ثبت اولیه اسناد",
-              "ارزیابی اسناد بیمارستانی مستقیم",
-              "ارزیابی اسناد بیمارستانی غیر مستقیم",
-              "ارزیابی اسناد دندان و پارا مستقیم",
-              "ارزیابی اسناد دندان و پارا غیر مستقیم",
-              "ارزیابی اسناد دارو مستقیم",
-              "ارزیابی اسناد دارو غیر مستقیم",
-              "ثبت ارزیابی با اسکن مدارک",
-              "ثبت ارزیابی بدون اسکن مدارک",
-              "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
-              "عملکرد",
-            ]}
-          />
+          <ResponsiveContainer width="99%" height={"100%"}>
+            <AreaChart
+              data={fullData}
+              dir="rtl"
+              index="key"
+              categories={[
+                "ثبت اولیه اسناد",
+                "پذیرش و ثبت اولیه اسناد",
+                "ارزیابی اسناد بیمارستانی مستقیم",
+                "ارزیابی اسناد بیمارستانی غیر مستقیم",
+                "ارزیابی اسناد دندان و پارا مستقیم",
+                "ارزیابی اسناد دندان و پارا غیر مستقیم",
+                "ارزیابی اسناد دارو مستقیم",
+                "ارزیابی اسناد دارو غیر مستقیم",
+                "ثبت ارزیابی با اسکن مدارک",
+                "ثبت ارزیابی بدون اسکن مدارک",
+                "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+                "عملکرد",
+              ]}
+            />
+          </ResponsiveContainer>
         </div>
       </div>
     </CitiesPage>
