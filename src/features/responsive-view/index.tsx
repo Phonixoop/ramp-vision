@@ -16,25 +16,24 @@ export default function ResponsiveView({
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <div className={twMerge(className, "flex sm:hidden")} dir={dir}>
-        <Button
-          className={twMerge(btnClassName, "mx-auto flex w-fit sm:hidden")}
-          onClick={() => setIsOpen(true)}
-        >
-          {icon}
-        </Button>
-        <Modal
-          isOpen={isOpen}
-          onClose={() => {
-            setIsOpen(false);
-          }}
-          title={title}
-        >
-          <div className={twMerge(className, "flex sm:hidden")} dir={dir}>
-            {children}
-          </div>
-        </Modal>
-      </div>
+      <Button
+        className={twMerge(btnClassName, "mx-auto flex w-fit sm:hidden")}
+        onClick={() => setIsOpen(true)}
+      >
+        {icon}
+      </Button>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          setIsOpen(false);
+        }}
+        title={title}
+      >
+        <div className={twMerge(className, "flex sm:hidden")} dir={dir}>
+          {children}
+        </div>
+      </Modal>
+
       <div className={twMerge(className, "hidden sm:flex")} dir={dir}>
         {children}
       </div>

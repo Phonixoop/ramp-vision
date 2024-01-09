@@ -666,10 +666,11 @@ function PersonnelPerformanceTable({ sessionData }) {
             hasClickAction
             clickedRowIndex=""
             onClick={(row) => {
-              toast(row.NameFamily, {
+              const original = row.original;
+              toast(original.NameFamily, {
                 description: `
-                عملکرد : ${Math.round(row.TotalPerformance)} | ${
-                  getPerformanceMetric(row.TotalPerformance).tooltip.text
+                عملکرد : ${Math.round(original.TotalPerformance)} | ${
+                  getPerformanceMetric(original.TotalPerformance).tooltip.text
                 }
                 `,
                 action: {
