@@ -37,6 +37,7 @@ type Props = {
   data: any[];
   initialFilters?: any;
   clickedRowIndex?: string;
+  hasClickAction?: boolean;
   onClick?: (cell: any) => void;
   renderChild?: (rows: any[]) => JSX.Element;
   renderInFilterView?: () => JSX.Element;
@@ -48,6 +49,7 @@ export default function Table({
   data = [],
   initialFilters = undefined,
   clickedRowIndex = "",
+  hasClickAction = false,
   onClick = (cell) => {},
   renderChild = (rows) => <></>,
   renderInFilterView = undefined,
@@ -286,14 +288,19 @@ export default function Table({
                       // Apply the row props
                       <tr
                         style={{ overflowAnchor: "none" }}
-                        onClick={() => onClick(row)}
+                        onClick={() => onClick(row.original)}
                         key={index}
                         // {...restRowProps}
-                        className={` ${
+
+                        className={twMerge(
+                          "group",
                           index.toString() === clickedRowIndex
                             ? "bg-primary/20 hover:bg-primary/25"
-                            : "hover:bg-primary/5"
-                        } `}
+                            : "hover:bg-primary/5",
+                          hasClickAction
+                            ? "cursor-pointer hover:bg-primary/80 "
+                            : "",
+                        )}
                       >
                         {
                           //@ts-ignore
@@ -305,12 +312,12 @@ export default function Table({
                             //@ts-ignore
                             const width = cell.column.columnDef.width;
 
-                            const widthTw = `w-[${width}px]`;
+                            //  const widthTw = `w-[${width}px]`;
                             return (
                               <td
                                 key={cell.id}
                                 className={twMerge(
-                                  " z-10 border-l border-primary/50 bg-secondary text-center text-primary last:border-0 ",
+                                  " z-10 border-l border-primary/50 bg-secondary text-center text-primary  last:border-0 group-hover:bg-secondary/90  ",
                                   isSticky ? "lg:sticky " : "",
                                 )}
                                 style={{

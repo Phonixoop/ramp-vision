@@ -40,8 +40,8 @@ const subs = [
   },
 ];
 export default function LineGauge({ value }) {
-  const { color, tooltip } =
-    subs.find((sub) => value <= sub.limit) || subs[subs.length - 1];
+  // const { color, tooltip } =
+  //   subs.find((sub) => value <= sub.limit) || subs[subs.length - 1];
 
   return (
     <>

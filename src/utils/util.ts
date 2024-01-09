@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import moment from "jalali-moment";
 import { CITIES } from "~/constants";
+import { performanceMetrics } from "~/constants/personnel-performance";
 import { Permission } from "~/types";
 
 export function hashPassword(password: string) {
@@ -516,4 +517,12 @@ export function getPersianToEnglishCity(cityName: string) {
 }
 export function getEnglishToPersianCity(cityName: string) {
   return EnglishKeyToPersianValueMap[cityName] || cityName;
+}
+
+export function getPerformanceMetric(performance: number) {
+  console.log({ performanceMetrics });
+  return (
+    performanceMetrics.find((metric) => performance < metric.limit) ||
+    performanceMetrics[performanceMetrics.length - 1]
+  );
 }

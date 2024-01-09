@@ -312,6 +312,18 @@ input[type="number"] {
   }
 }
 
+@keyframes intro_width_100 {
+  0% {
+    opacity: 1;
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+
 @keyframes intro_width_215 {
   0% {
     opacity: 1;
@@ -320,6 +332,18 @@ input[type="number"] {
 
   to {
     width: 215%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes intro_height_100 {
+  0% {
+    opacity: 1;
+    height: 0%;
+  }
+
+  to {
+    height: 100%;
     opacity: 0.6;
   }
 }
@@ -354,6 +378,14 @@ input[type="number"] {
   }
 }
 
+.line_width_animation_100 {
+  --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --a-duration: 1.08s;
+  --a-delay: 0.15s;
+  animation: intro_width_100 var(--a-duration) var(--a-easing) forwards;
+  animation-delay: calc(var(--a-delay) + 0.1s);
+}
+
 .line_width_animation_140 {
   --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
   --a-duration: 1.08s;
@@ -367,6 +399,14 @@ input[type="number"] {
   --a-duration: 1.08s;
   --a-delay: 0.15s;
   animation: intro_width_215 var(--a-duration) var(--a-easing) forwards;
+  animation-delay: calc(var(--a-delay) + 0.1s);
+}
+
+.line_height_animation_100 {
+  --a-easing: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --a-duration: 1.08s;
+  --a-delay: 0.15s;
+  animation: intro_height_100 var(--a-duration) var(--a-easing) forwards;
   animation-delay: calc(var(--a-delay) + 0.1s);
 }
 

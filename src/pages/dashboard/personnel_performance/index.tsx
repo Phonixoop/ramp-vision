@@ -50,6 +50,7 @@ import {
   countColumnValues,
   en,
   getEnglishToPersianCity,
+  getPerformanceMetric,
   getPerformanceText,
   getPersianToEnglishCity,
   getServiceNameColor,
@@ -662,6 +663,21 @@ function PersonnelPerformanceTable({ sessionData }) {
       >
         <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
+            hasClickAction
+            clickedRowIndex=""
+            onClick={(row) => {
+              toast(row.NameFamily, {
+                description: `
+                عملکرد : ${Math.round(row.TotalPerformance)} | ${
+                  getPerformanceMetric(row.TotalPerformance).tooltip.text
+                }
+                `,
+                action: {
+                  label: "باشه",
+                  onClick: () => {},
+                },
+              });
+            }}
             isLoading={personnelPerformance.isLoading}
             data={DistinctData(personnelPerformance.data?.result ?? [])}
             columns={columns}
@@ -771,9 +787,11 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
-                      <div className="flex w-full  flex-col items-center justify-between gap-5 xl:flex-row">
-                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-1/2 xl:p-5">
-                          <H2>تعداد پرسنل به تفکیک سمت</H2>
+                      <div className="flex w-full  flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn/50 xl:flex-row">
+                        <div className="flex flex-col  justify-center gap-10 rounded-2xl  bg-secbuttn  xl:w-1/2 xl:p-5">
+                          <H2 className="text-xl font-bold">
+                            تعداد پرسنل به تفکیک سمت
+                          </H2>
                           <MyBarList
                             data={(roleData ?? []).map((row) => {
                               return {
@@ -787,7 +805,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                           />
                         </div>
                         <div className="flex w-full flex-col items-center  justify-between gap-5 rounded-2xl xl:w-1/2">
-                          <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
+                          <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl py-5 xl:w-auto  xl:p-5">
                             <H2>عملکرد</H2>
 
                             <Gauge value={totalPerformance} />

@@ -65,7 +65,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Bar } from "react-chartjs-2";
 import RadarGauge from "~/features/radar";
 import TestPage from "~/pages/test";
-import { ServiceNames } from "~/constants/depo";
+import { ServiceNames, ShortServiceNames } from "~/constants/depo";
 import ReBarChart from "~/features/rechart-ui/bar";
 import { ResponsiveContainer } from "recharts";
 import InputIcon from "react-multi-date-picker/components/input_icon";
@@ -547,6 +547,10 @@ function DeposTable({ sessionData }) {
                   return accumulator + currentObject.DepoCompleteTime;
                 }, 0) / flatRows.length;
 
+              const maxDepoTime = Math.max(
+                ...flatRows.map((row) => calculateDepoCompleteTime(row)),
+              );
+
               const entryBaseOnSabt = sumColumnBasedOnRowValue(
                 flatRows,
                 "EntryCount",
@@ -576,6 +580,10 @@ function DeposTable({ sessionData }) {
                 {
                   name: "رسیدگی",
                   value: capacityBaseOnSabt,
+                },
+                {
+                  name: "مانده",
+                  value: entryBaseOnSabt - capacityBaseOnSabt,
                 },
               ];
 
@@ -636,7 +644,7 @@ function DeposTable({ sessionData }) {
                               showAnimation={true}
                               data={(serviceData ?? []).map((row) => {
                                 return {
-                                  name: row.key,
+                                  name: ShortServiceNames[row.key],
                                   "تعداد دپو": row.DepoCount,
                                   "تعداد ورودی": row.EntryCount,
                                   "تعداد رسیدگی": row.Capicity,
@@ -648,10 +656,11 @@ function DeposTable({ sessionData }) {
                                 "تعداد ورودی",
                                 "تعداد رسیدگی",
                               ]}
-                              colors={["rose", "cyan", "emerald"]}
+                              colors={["cyan", "rose", "emerald"]}
                               valueFormatter={commify}
                               yAxisWidth={20}
                               showXAxis
+                              showGridLines={false}
                               noDataText={Text.noData.fa}
                               intervalType="preserveStartEnd"
                             />
@@ -726,89 +735,86 @@ function DeposTable({ sessionData }) {
 
                             {/* <RadarGauge CityName={trackerFilter.cities} /> */}
                             <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
-                              <div className="relative flex w-full flex-col gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:flex-row ">
-                                <div className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2 ">
-                                  <H2>تعداد ورودی و رسیدگی شده</H2>
-                                  <ResponsiveContainer
-                                    width="99%"
-                                    height={"100%"}
-                                  >
-                                    <DonutChart
-                                      label={
-                                        depo.data?.result.length > 0
-                                          ? " مانده : " +
-                                            commify(
-                                              entryBaseOnSabt -
-                                                capacityBaseOnSabt,
-                                            ).toString()
-                                          : "داده ای موجود نیست"
-                                      }
-                                      data={entry_capacity}
-                                      category="value"
-                                      index="name"
-                                      colors={["rose", "emerald"]}
-                                      valueFormatter={commify}
-                                      noDataText={Text.noData.fa}
-                                    />
-                                  </ResponsiveContainer>
+                              <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2 ">
+                                <H2>تعداد ورودی و رسیدگی شده</H2>
+                                <ResponsiveContainer
+                                  width="99%"
+                                  height={"100%"}
+                                >
+                                  <DonutChart
+                                    label={
+                                      // depo.data?.result.length > 0
+                                      //   ? " مانده : " +
+                                      //     commify(
+                                      //       entryBaseOnSabt -
+                                      //         capacityBaseOnSabt,
+                                      //     ).toString()
+                                      //   : "داده ای موجود نیست"
+                                      " "
+                                    }
+                                    data={entry_capacity}
+                                    category="value"
+                                    index="name"
+                                    colors={["rose", "emerald", "lime"]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
+                                  />
+                                </ResponsiveContainer>
 
-                                  <div className="flex justify-stretch gap-2 ">
-                                    <div className=" flex w-full justify-between rounded-xl bg-rose-200 p-2 text-center font-bold text-accent ">
-                                      <span className="text-rose-900">
-                                        ورودی
-                                      </span>
-                                      <span className="text-rose-900">
-                                        {commify(entryBaseOnSabt)}
-                                      </span>
-                                    </div>
-                                    <div className=" flex w-full justify-between rounded-xl bg-emerald-200 p-2 text-center font-bold text-accent ">
-                                      <span className="  text-emerald-900">
-                                        رسیدگی شده
-                                      </span>
-                                      <span className="text-emerald-900">
-                                        {commify(capacityBaseOnSabt)}
-                                      </span>
-                                    </div>
+                                <div className="flex justify-stretch gap-2 ">
+                                  <div className=" flex w-full justify-between rounded-xl bg-rose-200 p-2 text-center font-bold text-accent ">
+                                    <span className="text-rose-900">ورودی</span>
+                                    <span className="text-rose-900">
+                                      {commify(entryBaseOnSabt)}
+                                    </span>
                                   </div>
-                                </div>
-
-                                <div className="flex w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-2">
-                                  <H2>تعداد دپو</H2>
-                                  <ResponsiveContainer
-                                    width="99%"
-                                    height={"100%"}
-                                  >
-                                    <DonutChart
-                                      data={depo_BaseOnSabt}
-                                      category="value"
-                                      index="name"
-                                      colors={["fuchsia", "cyan"]}
-                                      valueFormatter={commify}
-                                      noDataText={Text.noData.fa}
-                                    />
-                                  </ResponsiveContainer>
-                                  <div className="flex justify-stretch gap-2 ">
-                                    <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
-                                      <span className="text-fuchsia-900">
-                                        دپو مستقیم
-                                      </span>
-                                      <span className="text-fuchsia-900">
-                                        {commify(depoBaseOnSabtDirect)}
-                                      </span>
-                                    </div>
-                                    <div className=" flex w-full justify-between rounded-xl bg-cyan-200 p-2 text-center font-bold text-accent ">
-                                      <span className="  text-cyan-900">
-                                        دپو غیر مستقیم
-                                      </span>
-                                      <span className="text-cyan-900">
-                                        {commify(depoBaseOnSabtInDirect)}
-                                      </span>
-                                    </div>
+                                  <div className=" flex w-full justify-between rounded-xl bg-emerald-200 p-2 text-center font-bold text-accent ">
+                                    <span className="  text-emerald-900">
+                                      رسیدگی شده
+                                    </span>
+                                    <span className="text-emerald-900">
+                                      {commify(capacityBaseOnSabt)}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
 
-                              <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 p-5 xl:max-w-md">
+                              <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2">
+                                <H2>تعداد دپو</H2>
+                                <ResponsiveContainer
+                                  width="99%"
+                                  height={"100%"}
+                                >
+                                  <DonutChart
+                                    data={depo_BaseOnSabt}
+                                    category="value"
+                                    index="name"
+                                    colors={["fuchsia", "cyan"]}
+                                    valueFormatter={commify}
+                                    noDataText={Text.noData.fa}
+                                  />
+                                </ResponsiveContainer>
+                                <div className="flex justify-stretch gap-2 ">
+                                  <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
+                                    <span className="text-fuchsia-900">
+                                      دپو مستقیم
+                                    </span>
+                                    <span className="text-fuchsia-900">
+                                      {commify(depoBaseOnSabtDirect)}
+                                    </span>
+                                  </div>
+                                  <div className=" flex w-full justify-between rounded-xl bg-cyan-200 p-2 text-center font-bold text-accent ">
+                                    <span className="  text-cyan-900">
+                                      دپو غیر مستقیم
+                                    </span>
+                                    <span className="text-cyan-900">
+                                      {commify(depoBaseOnSabtInDirect)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md">
                                 <H2>
                                   زمان کلی اتمام دپو{" "}
                                   {depo.data?.periodType && (
@@ -844,11 +850,13 @@ function DeposTable({ sessionData }) {
                                 {depo.data?.periodType && totalComplete > 0 && (
                                   <p className="w-full">
                                     <span className="text-accent">
-                                      {humanizeDuration(
-                                        totalComplete,
+                                      {Math.round(maxDepoTime)}{" "}
+                                      {Reports_Period[depo.data?.periodType]}{" "}
+                                      {/* {humanizeDuration(
+                                        maxDepoTime,
                                         Reports_Period[depo.data?.periodType],
-                                      )}
-                                    </span>{" "}
+                                      )} */}
+                                    </span>
                                     <span className="text-primary">
                                       تا اتمام دپو
                                     </span>

@@ -93,7 +93,16 @@ export default {
         accent: withOpacity("--accent"),
         ...colors,
       },
-
+      patterns: {
+        colors: {
+          primary: withOpacity("--primary"),
+          secondary: withOpacity("--secondary"),
+          primbuttn: withOpacity("--primbuttn"),
+          secbuttn: withOpacity("--secbuttn"),
+          accent: withOpacity("--accent"),
+          ...colors,
+        },
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -268,5 +277,6 @@ export default {
   plugins: [
     require("tailwind-scrollbar")({ nocompatible: true }),
     require("@headlessui/tailwindcss"),
+    require("tailwindcss-bg-patterns"),
   ],
 } satisfies Config;
