@@ -157,7 +157,7 @@ export default function Table({
 
       <div
         className={twMerge(
-          " px-5 2xl:px-0 ",
+          " px-2 2xl:px-0 ",
           renderInFilterView ? "w-full xl:w-9/12" : "w-full",
         )}
       >

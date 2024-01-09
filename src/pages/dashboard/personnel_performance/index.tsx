@@ -787,8 +787,8 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
-                      <div className="flex w-full  flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn/50 xl:flex-row">
-                        <div className="flex flex-col  justify-center gap-10 rounded-2xl  bg-secbuttn  xl:w-1/2 xl:p-5">
+                      <div className="flex w-full  flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn/50 py-4 sm:py-0 xl:flex-row">
+                        <div className="flex flex-col justify-center gap-10 rounded-2xl py-4  sm:bg-secbuttn  xl:w-1/2 xl:p-5">
                           <H2 className="text-xl font-bold">
                             تعداد پرسنل به تفکیک سمت
                           </H2>
