@@ -384,6 +384,7 @@ export default function CitiesPage({ children }) {
                       : "bg-secondary",
                     "top-24",
                   )}
+                  scroll={false}
                   href={`/dashboard/personnel_performance/cities/${item.CityName_En}`}
                 >
                   <div className=" flex w-full items-center justify-between gap-2 px-2 text-right text-primary">
