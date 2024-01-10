@@ -126,8 +126,6 @@ export default function DeposPage() {
       </Head>
       <BlurBackground />
       <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000 ">
-        <Header />
-
         <div className="w-full sm:p-0  xl:w-11/12">
           <DeposTable sessionData={sessionData} />
         </div>

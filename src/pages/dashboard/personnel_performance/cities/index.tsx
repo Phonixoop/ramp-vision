@@ -132,7 +132,6 @@ export default function CitiesPage({ children }) {
       <BlurBackground />
 
       <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
-        <Header />
         <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-xl p-2 sm:flex-col sm:bg-primbuttn/10">
           <H2 className="hidden text-xl sm:flex">فیلترها</H2>
 

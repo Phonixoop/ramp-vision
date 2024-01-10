@@ -312,7 +312,6 @@ export default function GaugesPage() {
         className="flex min-h-screen w-full flex-col gap-5 bg-secondary"
         dir="rtl"
       >
-        <Header />
         <div className="mx-auto flex w-11/12 flex-col-reverse items-center justify-between  gap-5  py-5 md:flex-row-reverse md:items-start">
           <Table
             isLoading={getPersonnls.isLoading}

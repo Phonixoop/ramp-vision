@@ -49,7 +49,6 @@ export default function AdminMainLayout({ children }: any): any {
       dir="rtl"
       className="m-auto flex min-h-screen w-full max-w-[1920px] flex-col items-center bg-secondary"
     >
-      <Header />
       <Container className="flex w-full items-center justify-center ">
         <BlurBackground />
 

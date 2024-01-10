@@ -24,7 +24,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <BlurBackground />
-      <Header />
+
       <div className=" flex min-h-screen w-full  flex-col items-center justify-between gap-5 overflow-hidden bg-secondary transition-colors duration-1000 ">
         <section
           dir="rtl"
