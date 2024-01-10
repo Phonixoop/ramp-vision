@@ -333,7 +333,7 @@ export default function CityPage({ children, city }) {
   );
 }
 
-export async function getStaticProps(ctx) {
+export async function getServerSideProps(ctx) {
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx,
@@ -359,13 +359,12 @@ export async function getStaticProps(ctx) {
       trpcState: helpers.dehydrate(),
       city,
     },
-    revalidate: 1,
   };
 }
 
-export async function getStaticPaths() {
-  return {
-    paths: [],
-    fallback: "blocking",
-  };
-}
+// export async function getStaticPaths() {
+//   return {
+//     paths: [],
+//     fallback: "blocking",
+//   };
+// }
