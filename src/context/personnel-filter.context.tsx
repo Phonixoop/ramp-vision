@@ -48,10 +48,10 @@ export function PersonnelFilterProvider({
     moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   ]);
 
-  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("ماهانه");
 
   const [filters, setFilters] = useState<FilterType>({
-    periodType: "روزانه",
+    periodType: "ماهانه",
     filter: {
       Start_Date: selectedDates,
     },
