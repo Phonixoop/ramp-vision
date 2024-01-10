@@ -525,3 +525,29 @@ export function getPerformanceMetric(performance: number) {
     performanceMetrics[performanceMetrics.length - 1]
   );
 }
+
+export function analyzePerformanceTrend(
+  values: number[],
+): "Up" | "Stable" | "Down" {
+  let growing = 0;
+  let goingDown = 0;
+  let stable = 0;
+
+  for (let i = 1; i < values.length; i++) {
+    if (values[i] > values[i - 1]) {
+      growing++;
+    } else if (values[i] < values[i - 1]) {
+      goingDown++;
+    } else {
+      stable++;
+    }
+  }
+
+  if (growing > goingDown && growing > stable) {
+    return "Up";
+  } else if (goingDown > growing && goingDown > stable) {
+    return "Down";
+  } else {
+    return "Stable";
+  }
+}

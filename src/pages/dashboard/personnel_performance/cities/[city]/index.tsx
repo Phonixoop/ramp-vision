@@ -1,7 +1,13 @@
 import { AreaChart, BarChart, SparkAreaChart } from "@tremor/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import moment from "jalali-moment";
-import { Contact2Icon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import {
+  Contact2Icon,
+  MinusIcon,
+  MinusSquareIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+} from "lucide-react";
 import { InferGetStaticPropsType, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -21,6 +27,7 @@ import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
 import Gauge from "~/features/gauge";
+import { TrendDecider } from "~/features/trend-decider";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
@@ -31,6 +38,7 @@ import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import { api } from "~/utils/api";
 import {
   DistinctData,
+  analyzePerformanceTrend,
   commify,
   getEnglishToPersianCity,
   getPerformanceText,
@@ -168,6 +176,12 @@ export default function CityPage({ children, city }) {
               </div>
             );
           const isActive = user.NationalCode === selectedPerson?.NationalCode;
+          const userPerformances = getAll?.data?.result
+            .filter((x) => x.NameFamily === user.NameFamily)
+            .map((m) => {
+              return m.TotalPerformance;
+            });
+
           // ||
           // user.NationalCode === router.query.personnel;
           return (
@@ -196,11 +210,7 @@ export default function CityPage({ children, city }) {
                     <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
                   </div>
                   <div className="flex flex-col items-center justify-center">
-                    {user.TotalPerformance < 50 ? (
-                      <TrendingDownIcon className="h-5 w-5 stroke-red-700" />
-                    ) : (
-                      <TrendingUpIcon className="h-5 w-5 stroke-emerald-700" />
-                    )}
+                    <TrendDecider values={userPerformances} />
                     {user.TotalPerformance.toFixed(0)}
                     {"%"}
                   </div>

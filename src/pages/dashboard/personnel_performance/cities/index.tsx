@@ -24,7 +24,11 @@ import { CITIES, Reports_Period } from "~/constants";
 import AdvancedList from "~/features/advanced-list";
 import moment from "jalali-moment";
 
-import { en, getEnglishToPersianCity } from "~/utils/util";
+import {
+  en,
+  getEnglishToPersianCity,
+  getPersianToEnglishCity,
+} from "~/utils/util";
 import {
   defaultProjectTypes,
   defualtContractTypes,
@@ -37,6 +41,7 @@ import H2 from "~/ui/heading/h2";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 import ResponsiveView from "~/features/responsive-view";
+import { TrendDecider } from "~/features/trend-decider";
 
 type CityWithPerformanceData = {
   CityName_En: string;
@@ -131,7 +136,7 @@ export default function CitiesPage({ children }) {
     <>
       <BlurBackground />
 
-      <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary">
+      <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary py-2">
         <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-xl p-2 sm:flex-col sm:bg-primbuttn/10">
           <H2 className="hidden text-xl sm:flex">فیلترها</H2>
 
@@ -373,6 +378,15 @@ export default function CitiesPage({ children }) {
               // ).EnglishName;
 
               const isActive = item.CityName_En === router.query.city;
+
+              const cityPerformances = getCitiesWithPerformance?.data
+                .filter(
+                  (x) =>
+                    getPersianToEnglishCity(x.CityName) === item.CityName_En,
+                )
+                .map((m) => {
+                  return m.TotalPerformance;
+                });
               return (
                 <Link
                   key={i}
@@ -391,11 +405,7 @@ export default function CitiesPage({ children }) {
                       <ChevronLeftIcon className="h-4 w-4" />
                     </div>
                     <div className="flex flex-col items-center justify-center">
-                      {item.TotalPerformance < 50 ? (
-                        <TrendingDownIcon className="h-5 w-5 stroke-red-700" />
-                      ) : (
-                        <TrendingUpIcon className="h-5 w-5 stroke-emerald-700" />
-                      )}
+                      <TrendDecider values={cityPerformances} />
                       {item.TotalPerformance.toFixed(0)}
                       {"%"}
                     </div>
