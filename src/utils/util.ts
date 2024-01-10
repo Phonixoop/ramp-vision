@@ -520,7 +520,6 @@ export function getEnglishToPersianCity(cityName: string) {
 }
 
 export function getPerformanceMetric(performance: number) {
-  console.log({ performanceMetrics });
   return (
     performanceMetrics.find((metric) => performance < metric.limit) ||
     performanceMetrics[performanceMetrics.length - 1]

@@ -236,7 +236,7 @@ function DeposTable({ sessionData }) {
                         const canFilterCities = cities
                           .filter((city) =>
                             initialFilters.data.Cities.map((initCity) =>
-                              getEnglishToPersianCity(initCity.CityName),
+                              getPersianToEnglishCity(initCity.CityName),
                             ).includes(city),
                           )
                           .map((cf) => getEnglishToPersianCity(cf));

@@ -238,7 +238,6 @@ function assignColorsToItems(items) {
   return result;
 }
 export default function RadarGauge({ CityName = [] }) {
-  console.log({ CityName });
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
