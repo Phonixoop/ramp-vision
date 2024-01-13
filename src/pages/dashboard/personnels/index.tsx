@@ -285,7 +285,7 @@ export default function GaugesPage() {
                 </span>
                 <SelectColumnFilter
                   column={column}
-                  initialFilters={["1402/03/31"]}
+                  singleSelect
                   data={getPersonnls.data}
                   onChange={(filter) => {
                     // setDataFilters((prev) => {

@@ -132,6 +132,13 @@ export default function CitiesPage({ children }) {
   const getInitialFilters =
     api.personnelPerformance.getInitialFilters.useQuery();
 
+  const DateInfos = [
+    ...new Set(
+      getInitialFilters?.data?.usersInfo
+        ?.map((a) => a.DateInfo)
+        .filter((a) => a),
+    ),
+  ];
   return (
     <>
       <BlurBackground />
@@ -301,22 +308,20 @@ export default function CitiesPage({ children }) {
                 <SelectControlled
                   withSelectAll
                   title={"تاریخ گزارش پرنسل"}
-                  list={[
-                    ...new Set(
-                      getInitialFilters?.data?.usersInfo
-                        ?.map((a) => a.DateInfo)
-                        .filter((a) => a),
-                    ),
-                  ]}
-                  value={filters.filter.DateInfo ?? defualtDateInfos}
+                  list={DateInfos}
+                  value={
+                    filters.filter.DateInfo ?? [DateInfos[DateInfos.length - 1]]
+                  }
                   onChange={(values) => {
+                    let _values = values;
+                    _values = [values[values.length - 1]];
                     //@ts-ignore
                     setFilters((prev) => {
                       return {
                         periodType: reportPeriod,
                         filter: {
                           ...prev.filter,
-                          DateInfo: values,
+                          DateInfo: _values,
                         },
                       };
                     });

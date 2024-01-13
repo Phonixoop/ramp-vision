@@ -74,6 +74,13 @@ export default function GaugesPage() {
     { fieldName: "Start_Date", operation: "array" },
   ];
 
+  const DateInfos = [
+    ...new Set(
+      getInitialFilters?.data?.usersInfo
+        ?.map((a) => a.DateInfo)
+        .filter((a) => a),
+    ),
+  ];
   const result = calculateAggregateByFields(
     getCitiesWithPerformance?.data,
     operations,
@@ -279,22 +286,17 @@ export default function GaugesPage() {
                     </span>
                     <SelectControlled
                       title={"تاریخ گزارش پرنسل"}
-                      list={[
-                        ...new Set(
-                          getInitialFilters?.data?.usersInfo
-                            ?.map((a) => a.DateInfo)
-                            .filter((a) => a),
-                        ),
-                      ]}
-                      value={filters.filter.DateInfo ?? ["1402/03/31"]}
+                      list={DateInfos}
+                      value={DateInfos[DateInfos.length - 1]}
                       onChange={(values) => {
+                        let _values = values[values.length - 1];
                         //@ts-ignore
                         setFilters((prev) => {
                           return {
                             periodType: reportPeriod,
                             filter: {
                               ...prev.filter,
-                              DateInfo: values,
+                              DateInfo: _values,
                             },
                           };
                         });

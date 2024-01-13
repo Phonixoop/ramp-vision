@@ -9,13 +9,11 @@ import {
   extractYearAndMonth,
   getDatesForLastMonth,
   getEnglishToPersianCity,
-  getFirstSaturdayOfLastWeekOfMonth,
   getWeekOfMonth,
 } from "~/utils/util";
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
-import { CITIES } from "~/constants";
 
 const config = {
   user: process.env.SQL_USER,
@@ -28,6 +26,7 @@ const config = {
     trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
   },
 };
+
 await sql.connect(config);
 export const personnelPerformanceRouter = createTRPCRouter({
   getAll: protectedProcedure
@@ -47,7 +46,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish().default(["1402/03/31"]),
+          DateInfo: z.array(z.string()).nullish().default(["1402/09/30"]),
         }),
       }),
     )
@@ -70,10 +69,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
 
         if (filter.CityName.length <= 0) filter.CityName = cities;
-        if (input.periodType === "ماهانه" && filter.CityName.length > 3)
-          throw new Error(
-            "more than 3 cities in monthly filter is not allowed",
-          );
+        // if (input.periodType === "ماهانه" && filter.CityName.length > 3)
+        //   throw new Error(
+        //     "more than 3 cities in monthly filter is not allowed",
+        //   );
 
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
@@ -178,7 +177,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -229,7 +228,6 @@ export const personnelPerformanceRouter = createTRPCRouter({
               };
             }) ?? [],
         };
-        // Respond with the fetched data
       } catch (error) {
         console.error("Error fetching data:", error.message);
         return error;
@@ -246,7 +244,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
         .map((permission) => permission.enLabel);
 
       const whereClause = generateWhereClause({ CityName: cities });
-      const query = `SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
+      const query = `
+      SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
 
       SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
 
@@ -257,6 +256,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       // console.log(result.recordsets);
       return {
         usersInfo: result.recordsets[0],
+
         Cities: result.recordsets[1]
           .filter((c) => c.CityName !== "")
           .map((c) => {
@@ -408,7 +408,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish().default(["1402/03/31"]),
+          DateInfo: z.array(z.string()).nullish().default(["1402/09/30"]),
         }),
       }),
     )
@@ -476,7 +476,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
         else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        // console.log(queryCities);
+        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;

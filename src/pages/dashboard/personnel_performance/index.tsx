@@ -72,6 +72,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 
 import { toast } from "sonner";
+import { defualtDateInfos } from "~/constants/personnel-performance";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -130,9 +131,9 @@ export default function PersonnelPerformancePage() {
 }
 
 function PersonnelPerformanceTable({ sessionData }) {
-  const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
-  ]);
+  // const [selectedDates, setSelectedDates] = useState<string[]>([
+  //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+  // ]);
 
   const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
 
@@ -164,6 +165,9 @@ function PersonnelPerformanceTable({ sessionData }) {
     },
   );
 
+  const DateInfos: string[] = initialFilters?.data?.usersInfo.map(
+    (a) => a.DateInfo,
+  );
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
@@ -219,22 +223,22 @@ function PersonnelPerformanceTable({ sessionData }) {
                             );
                           } else setFilterValue(canFilterCities);
 
-                          if (
-                            (canFilterCities.length <= 0 ||
-                              canFilterCities.length > 3) &&
-                            reportPeriod === "ماهانه" &&
-                            initialFilters.data.Cities.length > 1
-                          ) {
-                            toast("فیلتر غیر مجاز", {
-                              description:
-                                "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
-                              action: {
-                                label: "باشه",
-                                onClick: () => {},
-                              },
-                            });
-                            return;
-                          }
+                          // if (
+                          //   (canFilterCities.length <= 0 ||
+                          //     canFilterCities.length > 3) &&
+                          //   reportPeriod === "ماهانه" &&
+                          //   initialFilters.data.Cities.length > 1
+                          // ) {
+                          //   toast("فیلتر غیر مجاز", {
+                          //     description:
+                          //       "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+                          //     action: {
+                          //       label: "باشه",
+                          //       onClick: () => {},
+                          //     },
+                          //   });
+                          //   //  return;
+                          // }
                           setDataFilters((prev) => {
                             return {
                               ...prev,
@@ -255,26 +259,27 @@ function PersonnelPerformanceTable({ sessionData }) {
                   column={column}
                   data={initialFilters.data?.Cities}
                   onChange={(filter) => {
-                    if (
-                      (filter.values.length <= 0 || filter.values.length > 3) &&
-                      reportPeriod === "ماهانه" &&
-                      initialFilters.data.Cities.length > 1
-                    ) {
-                      toast("فیلتر غیر مجاز", {
-                        description:
-                          "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
-                        action: {
-                          label: "باشه",
-                          onClick: () => {},
-                        },
-                      });
-                      return;
-                    }
+                    // if (
+                    //   (filter.values.length <= 0 || filter.values.length > 3) &&
+                    //   reportPeriod === "ماهانه" &&
+                    //   initialFilters.data.Cities.length > 1
+                    // ) {
+                    //   toast("فیلتر غیر مجاز", {
+                    //     description:
+                    //       "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+                    //     action: {
+                    //       label: "باشه",
+                    //       onClick: () => {},
+                    //     },
+                    //   });
+                    //   // return;
+                    // }
                     //@ts-ignore
                     setDataFilters((prev) => {
                       return {
                         ...prev,
                         filter: {
+                          ...prev.filter,
                           CityName: filter.values.map(getPersianToEnglishCity),
                           Start_Date: prev.filter.Start_Date,
                         },
@@ -627,22 +632,28 @@ function PersonnelPerformanceTable({ sessionData }) {
           accessorKey: "DateInfo",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
+            if (initialFilters.isLoading) return;
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">
                   تاریخ گزارش پرسنل
                 </span>
+
                 <SelectColumnFilter
+                  singleSelect
                   column={column}
-                  initialFilters={["1402/03/31"]}
-                  data={personnelPerformance.data?.result}
+                  initialFilters={[DateInfos[DateInfos.length - 1]]}
+                  data={initialFilters?.data?.usersInfo}
                   onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
+                    setDataFilters((prev) => {
+                      return {
+                        ...prev,
+                        filter: {
+                          ...prev.filter,
+                          [filter.id]: filter.values,
+                        },
+                      };
+                    });
                   }}
                 />
               </div>

@@ -1,4 +1,7 @@
 import { Permission } from "~/types";
+// csvUtils.js
+import fastCsv from "fast-csv";
+import fs from "fs";
 
 export async function getPermission({ ctx }): Promise<Permission[]> {
   const role = await ctx.db.role.findFirst({
@@ -41,3 +44,27 @@ export function generateWhereClause(
       )}`
     : "";
 }
+
+// import { EOL } from "os";
+// import { parse } from "@fast-csv/parse";
+
+// export function dataToCsvStream(data: Array<any>, headers: string[]) {
+//   const mappedData = data.map((item) => {
+//     const keyValuePairs = Object.entries(item);
+//     const formattedString = keyValuePairs
+//       .map(([key, value]) => `${key},${value}`)
+//       .join(",");
+//     return formattedString;
+//   });
+//   const CSV_STRING = mappedData.join(EOL);
+
+//   const stream = parse({ headers })
+//     .on("error", (error) => console.error(error))
+//     .on("data", (row) => console.log(row))
+//     .on("end", (rowCount: number) => console.log(`Parsed ${rowCount} rows`));
+
+//   stream.write(CSV_STRING);
+//   stream.end();
+
+//   return stream;
+// }

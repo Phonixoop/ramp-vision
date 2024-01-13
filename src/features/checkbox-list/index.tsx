@@ -34,6 +34,7 @@ export function SelectControlled({
   value,
   onChange,
   title,
+
   withSelectAll = false,
 }) {
   const selectAllState = value.length < list.length;
@@ -83,7 +84,8 @@ export function SelectColumnFilter({
   data,
   initialFilters = [],
   onChange,
-  translate = undefined,
+  withSelectAll = true,
+  singleSelect = false,
 }) {
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -93,7 +95,7 @@ export function SelectColumnFilter({
     setFilterValue(initialFilters);
   }, []);
 
-  if (!data || data.length === 0) return "";
+  if (!data || data.length === 0) return <></>;
   const unique = [...new Set(data.map((a) => a[column.id]))]
     .filter((item) => item != undefined)
     .toSorted();
@@ -102,41 +104,46 @@ export function SelectColumnFilter({
   const selectAllState = selectedCount < unique.length;
   return (
     <>
-      <Button
-        className={twMerge(
-          "font-bold",
-          selectAllState
-            ? "bg-emerald-200 text-emerald-900"
-            : "bg-rose-400 text-rose-900",
-        )}
-        onClick={() => {
-          if (selectedCount == unique.length) {
-            setFilterValue([]);
-            onChange({
-              id: column.id,
-              values: [],
-            });
-          } else {
-            setFilterValue(unique);
-            onChange({
-              id: column.id,
-              values: unique,
-            });
-          }
-        }}
-      >
-        {selectAllState ? "انتخاب همه" : "پاک کردن همه"}
-      </Button>
+      {withSelectAll && !singleSelect && (
+        <Button
+          className={twMerge(
+            "font-bold",
+            selectAllState
+              ? "bg-emerald-200 text-emerald-900"
+              : "bg-rose-400 text-rose-900",
+          )}
+          onClick={() => {
+            if (selectedCount == unique.length) {
+              setFilterValue([]);
+              onChange({
+                id: column.id,
+                values: [],
+              });
+            } else {
+              setFilterValue(unique);
+              onChange({
+                id: column.id,
+                values: unique,
+              });
+            }
+          }}
+        >
+          {selectAllState ? "انتخاب همه" : "پاک کردن همه"}
+        </Button>
+      )}
       <SelectControlled
         title={column.columnDef.header}
         list={unique}
         value={getFilterValue() ?? []}
         onChange={(values) => {
-          setFilterValue(values);
+          let _values = values;
+          if (singleSelect) _values = [values[values.length - 1]];
+
+          setFilterValue(_values);
 
           onChange({
             id: column.id,
-            values: values,
+            values: _values,
           });
         }}
       />
