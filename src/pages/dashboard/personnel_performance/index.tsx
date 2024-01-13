@@ -72,7 +72,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 
 import { toast } from "sonner";
-import { defualtDateInfos } from "~/constants/personnel-performance";
+import {
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtDateInfos,
+} from "~/constants/personnel-performance";
 
 function CustomInput({ value, openCalendar }) {
   return (
@@ -330,7 +334,7 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
                 <SelectColumnFilter
-                  initialFilters={["جبران"]}
+                  initialFilters={defaultProjectTypes}
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {

@@ -27,6 +27,7 @@ import H2 from "~/ui/heading/h2";
 import Gauge from "~/features/gauge";
 import Table from "~/features/table";
 import { ColumnDef } from "@tanstack/react-table";
+import { defaultProjectTypes } from "~/constants/personnel-performance";
 export default function GaugesPage() {
   const [filters, setFilters] = useState({
     filter: {
@@ -176,7 +177,7 @@ export default function GaugesPage() {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
                 <SelectColumnFilter
-                  initialFilters={["جبران"]}
+                  initialFilters={defaultProjectTypes}
                   column={column}
                   data={getPersonnls.data}
                   onChange={(filter) => {

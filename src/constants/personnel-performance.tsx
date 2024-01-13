@@ -56,7 +56,7 @@ export const defualtRoles = [
   "کارشناس ثبت اسناد خسارت",
 ];
 
-export const defaultProjectTypes = ["جبران"];
+export const defaultProjectTypes = ["ارزیابی"];
 
 export const defualtContractTypes = ["تمام وقت"];
 
