@@ -42,7 +42,6 @@ import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import {
-  calculateDepoCompleteTime,
   commify,
   convertNumberToBetterFormat,
   en,
@@ -72,6 +71,7 @@ import InputIcon from "react-multi-date-picker/components/input_icon";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 import { date } from "zod";
 import { twMerge } from "tailwind-merge";
+import { calculateDepoCompleteTime } from "~/utils/date-utils";
 
 const chartdata = [
   {
@@ -760,18 +760,26 @@ function DeposTable({ sessionData }) {
                                 </ResponsiveContainer>
 
                                 <div className="flex justify-stretch gap-2 ">
-                                  <div className=" flex w-full justify-between rounded-xl bg-rose-200 p-2 text-center font-bold text-accent ">
+                                  <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
                                     <span className="text-rose-900">ورودی</span>
                                     <span className="text-rose-900">
                                       {commify(entryBaseOnSabt)}
                                     </span>
                                   </div>
-                                  <div className=" flex w-full justify-between rounded-xl bg-emerald-200 p-2 text-center font-bold text-accent ">
+                                  <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-emerald-200 p-1 text-center font-bold text-accent ">
                                     <span className="  text-emerald-900">
                                       رسیدگی شده
                                     </span>
                                     <span className="text-emerald-900">
                                       {commify(capacityBaseOnSabt)}
+                                    </span>
+                                  </div>
+                                  <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-lime-200 p-1 text-center font-bold text-accent ">
+                                    <span className="text-lime-900">مانده</span>
+                                    <span className="text-lime-900">
+                                      {commify(
+                                        entryBaseOnSabt - capacityBaseOnSabt,
+                                      )}
                                     </span>
                                   </div>
                                 </div>

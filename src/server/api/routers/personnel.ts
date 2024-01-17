@@ -8,13 +8,13 @@ import {
   calculateDepoCompleteTime,
   extractYearAndMonth,
   getDatesForLastMonth,
-  getEnglishToPersianCity,
   getFirstSaturdayOfLastWeekOfMonth,
   getWeekOfMonth,
-} from "~/utils/util";
+} from "~/utils/date-utils";
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
+import { getEnglishToPersianCity } from "~/utils/util";
 
 const config = {
   user: process.env.SQL_USER,

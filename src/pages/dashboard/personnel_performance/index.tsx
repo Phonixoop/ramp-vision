@@ -44,7 +44,6 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import {
   DistinctData,
-  calculateDepoCompleteTime,
   commify,
   convertNumberToBetterFormat,
   countColumnValues,
@@ -171,6 +170,11 @@ function PersonnelPerformanceTable({ sessionData }) {
 
   const DateInfos: string[] = initialFilters?.data?.usersInfo.map(
     (a) => a.DateInfo,
+  );
+
+  const distincedData = useMemo(
+    () => DistinctData(personnelPerformance.data?.result ?? []),
+    [personnelPerformance.data?.result],
   );
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
@@ -677,7 +681,6 @@ function PersonnelPerformanceTable({ sessionData }) {
         <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
             hasClickAction
-            clickedRowIndex=""
             onClick={(row) => {
               const original = row.original;
               toast(original.NameFamily, {
@@ -693,7 +696,11 @@ function PersonnelPerformanceTable({ sessionData }) {
               });
             }}
             isLoading={personnelPerformance.isLoading}
-            data={DistinctData(personnelPerformance.data?.result ?? [])}
+            data={
+              reportPeriod === "روزانه"
+                ? personnelPerformance.data.result
+                : distincedData
+            }
             columns={columns}
             renderInFilterView={() => {
               return (

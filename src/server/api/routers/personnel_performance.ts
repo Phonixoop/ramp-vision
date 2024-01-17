@@ -7,13 +7,14 @@ import moment from "jalali-moment";
 import {
   calculateDepoCompleteTime,
   extractYearAndMonth,
+  getDatesBetweenTwoDates,
   getDatesForLastMonth,
-  getEnglishToPersianCity,
   getWeekOfMonth,
-} from "~/utils/util";
+} from "~/utils/date-utils";
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
+import { getEnglishToPersianCity } from "~/utils/util";
 
 const config = {
   user: process.env.SQL_USER,
@@ -105,9 +106,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "هفتگی") {
-          dbName1 = "RAMP_Weekly.dbo.personnel_performance";
+          dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
-          filter.Start_Date = [filter.Start_Date[0]];
+          filter.Start_Date = getDatesBetweenTwoDates(
+            filter.Start_Date[0],
+            filter.Start_Date[1],
+          );
 
           whereClause = generateWhereClause(filter);
           whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
@@ -177,7 +181,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        console.log(query);
+
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -400,7 +404,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
   getCitiesWithPerformance: protectedProcedure
     .input(
       z.object({
-        periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("روزانه"),
+        periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("ماهانه"),
         filter: z.object({
           CityName: z.array(z.string()).nullish().default([]),
           Start_Date: z.array(z.string()).nullish(),
@@ -443,40 +447,42 @@ export const personnelPerformanceRouter = createTRPCRouter({
         FROM dbName.dbo.personnel_performance as p
         JOIN
         RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-            ${whereClause}
+        whereClause
 
         group by CityName,p.Start_Date ORDER BY CityName ASC
         `;
 
         if (input.periodType === "هفتگی") {
-          filter.Start_Date = [filter.Start_Date[0]];
+          filter.Start_Date = getDatesBetweenTwoDates(
+            filter.Start_Date[0],
+            filter.Start_Date[1],
+          );
 
           whereClause = generateWhereClause(filter);
         }
         if (input.periodType === "ماهانه") {
+          console.log("here monthly");
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
           const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
+
           queryCities = `
-          
-          
+                
           SELECT DISTINCT CityName,SUM(TotalPerformance) / Count(CityName) as TotalPerformance,p.Start_Date 
           FROM dbName.dbo.personnel_performance as p
           JOIN
           RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-              ${whereClause} AND Start_Date LIKE '${date[0]}/${date[1]}%'
+          whereClause AND Start_Date LIKE '${date[0]}/${date[1]}%'
   
           group by CityName,p.Start_Date ORDER BY CityName ASC
           `;
         }
+        queryCities = queryCities.replace("whereClause", whereClause);
+        queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        if (input.periodType === "هفتگی")
-          queryCities = queryCities.replaceAll("dbName", "RAMP_Weekly");
-        else queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-
-        console.log(queryCities);
+        //console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;

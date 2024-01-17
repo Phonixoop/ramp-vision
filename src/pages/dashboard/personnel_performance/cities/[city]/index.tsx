@@ -300,7 +300,7 @@ export default function CityPage({ children, city }) {
                 <div className="col-span-2  flex  w-full flex-col items-center justify-center   ">
                   <H2>عملکرد</H2>
 
-                  <Gauge value={selectedPerson?.TotalPerformance} />
+                  <Gauge value={Math.round(selectedPerson?.TotalPerformance)} />
                   <p className="text-accent">
                     {getPerformanceText(selectedPerson?.TotalPerformance)}
                   </p>

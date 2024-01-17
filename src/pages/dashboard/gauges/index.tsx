@@ -115,7 +115,7 @@ export default function GaugesPage() {
                       <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
                         <H2>{getEnglishToPersianCity(city.CityName)}</H2>
 
-                        <Gauge value={city.TotalPerformance} />
+                        <Gauge value={Math.round(city.TotalPerformance)} />
                         <p className="text-accent">
                           {getPerformanceText(city.TotalPerformance)}
                         </p>

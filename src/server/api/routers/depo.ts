@@ -4,20 +4,20 @@ import sql from "mssql";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import moment from "jalali-moment";
-import {
-  calculateDepoCompleteTime,
-  extractYearAndMonth,
-  getDatesForLastMonth,
-  getEnglishToPersianCity,
-  getFirstSaturdayOfLastWeekOfMonth,
-  getSecondOrLaterDayOfNextMonth,
-  getWeekOfMonth,
-} from "~/utils/util";
+import { getEnglishToPersianCity } from "~/utils/util";
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
-import { CITIES, validDateBeforeToScrewThem } from "~/constants";
+
 import { ServiceNames } from "~/constants/depo";
+import {
+  calculateDepoCompleteTime,
+  extractYearAndMonth,
+  getDatesBetweenTwoDates,
+  getDatesForLastMonth,
+  getSecondOrLaterDayOfNextMonth,
+  getWeekOfMonth,
+} from "~/utils/date-utils";
 
 const config = {
   user: process.env.SQL_USER,
@@ -93,11 +93,23 @@ export const depoRouter = createTRPCRouter({
           whereClause = generateWhereClause(filter);
           whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date ORDER BY CityName,Start_Date`;
         } else if (input.periodType === "هفتگی") {
-          dbName = "RAMP_Weekly.dbo.depos";
-          filter.Start_Date = [filter.Start_Date[0]];
+          dbName = "RAMP_Daily.dbo.depos";
+
+          queryStart = `SELECT DISTINCT 
+          ServiceName
+         ,CityName
+         ,DocumentType
+         ,SUM(depos.EntryCount) AS EntryCount
+         ,SUM(depos.Capicity) AS Capicity,
+          SUM(depos.DepoCount) AS DepoCount FROM `;
+
+          filter.Start_Date = getDatesBetweenTwoDates(
+            filter.Start_Date[0],
+            filter.Start_Date[1],
+          );
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,ServiceName,DocumentType,Start_Date ORDER BY CityName,Start_Date`;
+          whereClause += ` Group By CityName,ServiceName,DocumentType,Start_Date ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
           dbName = "RAMP_Daily.dbo.depos";
 
@@ -153,7 +165,7 @@ export const depoRouter = createTRPCRouter({
         ${dbName} 
         ${whereClause}
         `;
-
+        // console.log(query);
         const result = await sql.query(query);
 
         if (input.periodType === "روزانه") {
