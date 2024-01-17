@@ -97,11 +97,11 @@ export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
 
 export function getDatesBetweenTwoDates(startDate, endDate) {
   let dates = [];
-  let currentDate = moment(startDate, "YYYY/MM/DD");
-  const stopDate = moment(endDate, "YYYY/MM/DD");
+  let currentDate = moment(startDate, "jYYYY/jMM/jDD");
+  const stopDate = moment(endDate, "jYYYY/jMM/jDD");
 
   while (currentDate <= stopDate) {
-    dates.push(currentDate.format("YYYY/jMM/jDD"));
+    dates.push(currentDate.format("jYYYY/jMM/jDD"));
     currentDate.add(1, "days");
   }
 

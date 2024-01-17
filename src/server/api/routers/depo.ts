@@ -107,7 +107,7 @@ export const depoRouter = createTRPCRouter({
             filter.Start_Date[0],
             filter.Start_Date[1],
           );
-
+          console.log({ dates: filter.Start_Date });
           whereClause = generateWhereClause(filter);
           whereClause += ` Group By CityName,ServiceName,DocumentType,Start_Date ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
@@ -165,7 +165,7 @@ export const depoRouter = createTRPCRouter({
         ${dbName} 
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
 
         if (input.periodType === "روزانه") {
