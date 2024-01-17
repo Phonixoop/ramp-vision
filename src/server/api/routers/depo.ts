@@ -107,9 +107,9 @@ export const depoRouter = createTRPCRouter({
             filter.Start_Date[0],
             filter.Start_Date[1],
           );
-          console.log({ dates: filter.Start_Date });
+
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,ServiceName,DocumentType,Start_Date ORDER BY CityName`;
+          whereClause += ` Group By CityName,ServiceName,DocumentType ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
           dbName = "RAMP_Daily.dbo.depos";
 

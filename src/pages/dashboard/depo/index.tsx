@@ -73,34 +73,6 @@ import { date } from "zod";
 import { twMerge } from "tailwind-merge";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 
-const chartdata = [
-  {
-    name: "Amphibians",
-    "Number of threatened species": 2488,
-  },
-  {
-    name: "Birds",
-    "Number of threatened species": 1445,
-  },
-  {
-    name: "Crustaceans",
-    "Number of threatened species": 743,
-  },
-];
-
-const dataFormatter = (number: number) => {
-  return "$ " + Intl.NumberFormat("us").format(number).toString();
-};
-
-// function filterColumn(rows, id, filterValue) {
-//   if (rows.length <= 0) return [];
-//   return rows.filter((row) => {
-//     const rowValue = row.values[id];
-//     // console.log(rowValue, filterValue);
-//     return filterValue.includes(rowValue);
-//   });
-// }
-
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {
     return false;
@@ -135,11 +107,9 @@ export default function DeposPage() {
 }
 
 function DeposTable({ sessionData }) {
-  const utils = api.useContext();
-
-  const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
-  ]);
+  // const [selectedDates, setSelectedDates] = useState<string[]>([
+  //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+  // ]);
 
   const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
 
