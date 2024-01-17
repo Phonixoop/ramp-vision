@@ -698,7 +698,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             isLoading={personnelPerformance.isLoading}
             data={
               reportPeriod === "روزانه"
-                ? personnelPerformance.data.result
+                ? personnelPerformance?.data?.result
                 : distincedData
             }
             columns={columns}
