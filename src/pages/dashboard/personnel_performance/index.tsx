@@ -202,66 +202,63 @@ function PersonnelPerformanceTable({ sessionData }) {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">استان</span>
-                {initialFilters.data?.Cities &&
-                  initialFilters.data.Cities > 1 && (
-                    <LayoutGroup id="CityLevelMenu">
-                      <InPageMenu
-                        list={City_Levels.map((a) => a.name)}
-                        startIndex={-1}
-                        onChange={(value) => {
-                          const { setFilterValue } = column;
-                          const cities = City_Levels.find(
-                            (a) => a.name === value.item.name,
-                          ).cities;
+                {
+                  <LayoutGroup id="CityLevelMenu">
+                    <InPageMenu
+                      list={City_Levels.map((a) => a.name)}
+                      startIndex={-1}
+                      onChange={(value) => {
+                        const { setFilterValue } = column;
+                        const cities = City_Levels.find(
+                          (a) => a.name === value.item.name,
+                        ).cities;
 
-                          // beacuse our system is permission based we need to only filter allowed cities.
-                          const canFilterCities = cities
-                            .filter((city) =>
-                              initialFilters.data.Cities.map((initCity) =>
-                                getPersianToEnglishCity(initCity.CityName),
-                              ).includes(city),
-                            )
-                            .map((cityName) =>
-                              getEnglishToPersianCity(cityName),
-                            );
+                        // beacuse our system is permission based we need to only filter allowed cities.
+                        const canFilterCities = cities
+                          .filter((city) =>
+                            initialFilters.data.Cities.map((initCity) =>
+                              getPersianToEnglishCity(initCity.CityName),
+                            ).includes(city),
+                          )
+                          .map((cityName) => getEnglishToPersianCity(cityName));
 
-                          if (cities.length <= 0) {
-                            setFilterValue(
-                              initialFilters.data.Cities.map((a) => a.CityName),
-                            );
-                          } else setFilterValue(canFilterCities);
+                        if (cities.length <= 0) {
+                          setFilterValue(
+                            initialFilters.data.Cities.map((a) => a.CityName),
+                          );
+                        } else setFilterValue(canFilterCities);
 
-                          // if (
-                          //   (canFilterCities.length <= 0 ||
-                          //     canFilterCities.length > 3) &&
-                          //   reportPeriod === "ماهانه" &&
-                          //   initialFilters.data.Cities.length > 1
-                          // ) {
-                          //   toast("فیلتر غیر مجاز", {
-                          //     description:
-                          //       "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
-                          //     action: {
-                          //       label: "باشه",
-                          //       onClick: () => {},
-                          //     },
-                          //   });
-                          //   //  return;
-                          // }
-                          setDataFilters((prev) => {
-                            return {
-                              ...prev,
-                              filter: {
-                                CityName: canFilterCities.map(
-                                  getPersianToEnglishCity,
-                                ),
-                                Start_Date: prev.filter.Start_Date,
-                              },
-                            };
-                          });
-                        }}
-                      />
-                    </LayoutGroup>
-                  )}
+                        // if (
+                        //   (canFilterCities.length <= 0 ||
+                        //     canFilterCities.length > 3) &&
+                        //   reportPeriod === "ماهانه" &&
+                        //   initialFilters.data.Cities.length > 1
+                        // ) {
+                        //   toast("فیلتر غیر مجاز", {
+                        //     description:
+                        //       "به دلیل حجم بالای دیتا، لطفا در گزارش ماهانه، بیش از 3 شهر فیلتر نکنید",
+                        //     action: {
+                        //       label: "باشه",
+                        //       onClick: () => {},
+                        //     },
+                        //   });
+                        //   //  return;
+                        // }
+                        setDataFilters((prev) => {
+                          return {
+                            ...prev,
+                            filter: {
+                              CityName: canFilterCities.map(
+                                getPersianToEnglishCity,
+                              ),
+                              Start_Date: prev.filter.Start_Date,
+                            },
+                          };
+                        });
+                      }}
+                    />
+                  </LayoutGroup>
+                }
 
                 <SelectColumnFilter
                   column={column}

@@ -100,3 +100,23 @@ export const performanceMetrics = [
     },
   },
 ];
+
+export const Indicators = {
+  ArzyabiAsanadBimarsetaniDirect: 35, // ارزیابی اسناد بیمارستانی مستقیم
+  ArzyabiAsnadDaroDirect: 250, // ارزیابی اسناد دارو مستقیم
+  ArzyabiAsnadDandanVaParaDirect: 200, // ارزیابی اسناد دندانپزشکی + پاراکلینیکی مستقیم
+
+  PazireshVaSabtAvalieAsnad: 100, // پذیرش و ثبت اولیه اسناد مستقیم
+  // SabtAvalieAsnad : 350, // ثبت اولیه اسناد مستقیم
+  SabtAvalieAsnad: 100, // ثبت اولیه اسناد مستقیم
+
+  WithScanCount: 35, // ثبت ارزیابی با اسکن مدارک مستقیم
+  WithoutScanCount: 300, // ثبت ارزیابی بدون اسکن مدارک مستقیم
+
+  //InDirect
+  WithoutScanInDirectCount: 450, // ثبت ارزیابی بدون اسکن مدارک غیر مستقیم
+
+  ArzyabiAsnadBimarestaniIndirect: 35, // ارزیابی اسناد بیمارستانی غیر مستقیم
+  ArzyabiAsnadDaroIndirect: 375, // ارزیابی اسناد دارو  غیر مستقیم
+  ArzyabiAsnadDandanVaParaIndirect: 300, // ارزیابی اسناد دندانپزشکی + پاراکلینیکی مستقیم
+};
