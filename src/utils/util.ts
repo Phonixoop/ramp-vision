@@ -4,6 +4,7 @@ import { CITIES } from "~/constants";
 import { performanceMetrics } from "~/constants/personnel-performance";
 import { Permission } from "~/types";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
+import { calculatePerformance } from "~/utils/personnel-performance";
 
 export function hashPassword(password: string) {
   return createHash("sha256").update(password).digest("hex");
@@ -327,7 +328,7 @@ export function updateDynamicPermissions(
   return updatedDynamicPermissions;
 }
 
-export function DistinctData(data = []) {
+export function DistinctData(data = [], dateLength) {
   const result = Object.values(
     data.reduce((acc, item) => {
       const key = item.NameFamily;
@@ -355,8 +356,11 @@ export function DistinctData(data = []) {
 
   result.forEach((item) => {
     //@ts-ignore
-    item.TotalPerformance = item.TotalPerformance / item.count;
+    console.log({ item }, { CCC: item.count });
+    //@ts-ignore
+    item.TotalPerformance = calculatePerformance(item, item.count);
   });
+  console.log({ distinctResult: result });
 
   return result;
 }

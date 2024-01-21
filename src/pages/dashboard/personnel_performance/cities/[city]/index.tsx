@@ -36,6 +36,7 @@ import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 
 import { api } from "~/utils/api";
+import { calculatePerformance } from "~/utils/personnel-performance";
 import {
   DistinctData,
   analyzePerformanceTrend,
@@ -75,7 +76,7 @@ export default function CityPage({ children, city }) {
     {
       onSuccess: (data) => {
         setSelectedPerson(undefined);
-        setUpdatedList(DistinctData(data.result));
+        setUpdatedList(DistinctData(data.result, data?.dateLength));
       },
       refetchOnWindowFocus: false,
     },
@@ -119,7 +120,7 @@ export default function CityPage({ children, city }) {
       d.TotalPerformance /
         getAll?.data?.result.map((a) => a.Start_Date === d.key).length ?? 1
     ).toFixed(0);
-
+    // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
     const translatedData = {};
     for (const key in d) {
       if (PersonnelPerformanceTranslate[key]) {
@@ -130,6 +131,9 @@ export default function CityPage({ children, city }) {
     }
 
     return translatedData;
+  });
+  console.log({
+    fullData,
   });
 
   useEffect(() => {
@@ -149,7 +153,7 @@ export default function CityPage({ children, city }) {
         }
         isLoading={getAll.isLoading}
         disabled={!!!updatedList}
-        list={DistinctData(getAll?.data?.result)}
+        list={DistinctData(getAll?.data?.result, getAll?.data?.dateLength)}
         filteredList={
           !getAll.isLoading
             ? updatedList

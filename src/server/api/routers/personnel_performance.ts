@@ -224,6 +224,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         return {
           periodType: input.periodType,
+          dateLength: new Set(result.recordsets[0].map((a) => a.Start_Date))
+            .size,
           result:
             finalResult.map((cf) => {
               return {
@@ -461,7 +463,6 @@ export const personnelPerformanceRouter = createTRPCRouter({
           whereClause = generateWhereClause(filter);
         }
         if (input.periodType === "ماهانه") {
-          console.log("here monthly");
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
@@ -470,7 +471,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
           queryCities = `
                 
-          SELECT DISTINCT CityName,SUM(TotalPerformance) / Count(CityName) as TotalPerformance,p.Start_Date 
+          SELECT DISTINCT CityName,
+          
+          
+          SUM(TotalPerformance) / Count(CityName) as TotalPerformance
+          
+          ,p.Start_Date 
           FROM dbName.dbo.personnel_performance as p
           JOIN
           RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
@@ -482,7 +488,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        //console.log(queryCities);
+        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
