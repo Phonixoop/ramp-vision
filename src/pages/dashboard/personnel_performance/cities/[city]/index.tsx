@@ -11,7 +11,7 @@ import {
 import { InferGetStaticPropsType, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import { ResponsiveContainer } from "recharts";
 import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
@@ -99,40 +99,40 @@ export default function CityPage({ children, city }) {
     (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
   );
 
-  const fullData: CityWithPerformanceData[] = processDataForChart(
-    getAll?.data?.result ?? [],
-    "Start_Date",
-    [
-      "SabtAvalieAsnad",
-      "PazireshVaSabtAvalieAsnad",
-      "ArzyabiAsanadBimarsetaniDirect",
-      "ArzyabiAsnadBimarestaniIndirect",
-      "ArzyabiAsnadDandanVaParaDirect",
-      "ArzyabiAsnadDandanVaParaIndirect",
-      "ArzyabiAsnadDaroDirect",
-      "ArzyabiAsnadDaroIndirect",
-      "WithScanCount",
-      "WithoutScanCount",
-      "WithoutScanInDirectCount",
-      "TotalPerformance",
-    ],
-  ).map((d) => {
-    d.TotalPerformance = (
-      d.TotalPerformance /
-        getAll?.data?.result.map((a) => a.Start_Date === d.key).length ?? 1
-    ).toFixed(0);
-    // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
-    const translatedData = {};
-    for (const key in d) {
-      if (PersonnelPerformanceTranslate[key]) {
-        translatedData[PersonnelPerformanceTranslate[key]] = d[key];
-      } else {
-        translatedData[key] = d[key];
-      }
-    }
+  const fullData: CityWithPerformanceData[] = useMemo(
+    () =>
+      processDataForChart(getAll?.data?.result ?? [], "Start_Date", [
+        "SabtAvalieAsnad",
+        "PazireshVaSabtAvalieAsnad",
+        "ArzyabiAsanadBimarsetaniDirect",
+        "ArzyabiAsnadBimarestaniIndirect",
+        "ArzyabiAsnadDandanVaParaDirect",
+        "ArzyabiAsnadDandanVaParaIndirect",
+        "ArzyabiAsnadDaroDirect",
+        "ArzyabiAsnadDaroIndirect",
+        "WithScanCount",
+        "WithoutScanCount",
+        "WithoutScanInDirectCount",
+        "TotalPerformance",
+      ]).map((d) => {
+        d.TotalPerformance = (
+          d.TotalPerformance /
+            getAll?.data?.result.map((a) => a.Start_Date === d.key).length ?? 1
+        ).toFixed(0);
+        // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
+        const translatedData = {};
+        for (const key in d) {
+          if (PersonnelPerformanceTranslate[key]) {
+            translatedData[PersonnelPerformanceTranslate[key]] = d[key];
+          } else {
+            translatedData[key] = d[key];
+          }
+        }
 
-    return translatedData;
-  });
+        return translatedData;
+      }),
+    [getAll?.data?.result],
+  );
 
   useEffect(() => {
     setSelectedPerson(undefined);

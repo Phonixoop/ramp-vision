@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import Header from "~/features/header";
 import BlurBackground from "~/ui/blur-backgrounds";
@@ -173,6 +173,10 @@ export default function CitiesPage({ children }) {
     ),
   ];
 
+  const distincedData = useMemo(
+    () => DistinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
+    [getCitiesWithPerformance.data],
+  );
   return (
     <>
       <BlurBackground />
@@ -386,9 +390,7 @@ export default function CitiesPage({ children }) {
             }
             isLoading={getCitiesWithPerformance.isLoading}
             disabled={!!!updatedList}
-            list={DistinctDataAndCalculatePerformance(
-              getCitiesWithPerformance.data,
-            )}
+            list={distincedData}
             filteredList={
               !getCitiesWithPerformance.isLoading
                 ? updatedList
