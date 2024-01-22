@@ -173,7 +173,6 @@ export default function CitiesPage({ children }) {
     ),
   ];
 
-  console.log({ updatedList });
   return (
     <>
       <BlurBackground />
