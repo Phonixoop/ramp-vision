@@ -173,7 +173,11 @@ function PersonnelPerformanceTable({ sessionData }) {
   );
 
   const distincedData = useMemo(
-    () => DistinctData(personnelPerformance.data?.result ?? []),
+    () =>
+      DistinctData(
+        personnelPerformance.data?.result ?? [],
+        personnelPerformance?.data?.dateLength,
+      ),
     [personnelPerformance.data?.result],
   );
   // const depo.data: any = useMemo(() => {
