@@ -86,7 +86,7 @@ export default function Gauge({ value }) {
             ],
           },
         }}
-        value={Math.trunc(Number.isNaN(value) ? 0 : value)}
+        value={Math.round(Number.isNaN(value) ? 0 : value)}
       />
     </div>
   );

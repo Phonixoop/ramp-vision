@@ -33,3 +33,9 @@ export type Permission = {
 };
 
 export type User = PrismaUser & { role?: Role };
+
+export type CityWithPerformanceData = {
+  CityName_En: string;
+  CityName_Fa: string;
+  TotalPerformance: number;
+};

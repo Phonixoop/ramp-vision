@@ -28,6 +28,7 @@ import {
   en,
   getEnglishToPersianCity,
   getPersianToEnglishCity,
+  processDataForChart,
 } from "~/utils/util";
 import {
   defaultProjectTypes,
@@ -42,37 +43,68 @@ import { usePersonnelFilter } from "~/context/personnel-filter.context";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 import ResponsiveView from "~/features/responsive-view";
 import { TrendDecider } from "~/features/trend-decider";
+import { calculatePerformance } from "~/utils/personnel-performance";
+import { CityWithPerformanceData } from "~/types";
 
-type CityWithPerformanceData = {
-  CityName_En: string;
-  CityName_Fa: string;
-  TotalPerformance: number;
-};
+// function DistinctDataForCity(data = []): CityWithPerformanceData[] {
+//   const cityMap = new Map();
+//   data?.forEach((item) => {
+//     if (!cityMap.has(item.CityName)) {
+//       cityMap.set(item.CityName, { total: 0, count: 0 });
+//     }
+//     const city = cityMap.get(item.CityName);
+//     city.total += item.TotalPerformance;
+//     city.count++;
+//   });
 
-function DistinctData(data = []): CityWithPerformanceData[] {
-  const cityMap = new Map();
-  data?.forEach((item) => {
-    if (!cityMap.has(item.CityName)) {
-      cityMap.set(item.CityName, { total: 0, count: 0 });
-    }
-    const city = cityMap.get(item.CityName);
-    city.total += item.TotalPerformance;
-    city.count++;
+//   const averageTotalPerformance: CityWithPerformanceData[] = Array.from(
+//     cityMap,
+//     ([city, { total, count }]) => {
+//       if (!getEnglishToPersianCity(city)) return;
+//       return {
+//         CityName_En: city,
+//         CityName_Fa: CITIES.find((a) => a.EnglishName === city).PersianName,
+//         TotalPerformance: total / count,
+//       };
+//     },
+//   );
+
+//   return averageTotalPerformance;
+// }
+
+function DistinctDataAndCalculatePerformance(data): CityWithPerformanceData[] {
+  const citiesWithPerformanceData = processDataForChart(
+    data?.result ?? [],
+    ["CityName"],
+    [
+      "SabtAvalieAsnad",
+      "PazireshVaSabtAvalieAsnad",
+      "ArzyabiAsanadBimarsetaniDirect",
+      "ArzyabiAsnadBimarestaniIndirect",
+      "ArzyabiAsnadDandanVaParaDirect",
+      "ArzyabiAsnadDandanVaParaIndirect",
+      "ArzyabiAsnadDaroDirect",
+      "ArzyabiAsnadDaroIndirect",
+      "WithScanCount",
+      "WithoutScanCount",
+      "WithoutScanInDirectCount",
+      "TotalPerformance",
+    ],
+  ).map((item) => {
+    return {
+      CityName_En: item.key,
+      CityName_Fa: getEnglishToPersianCity(item.key),
+      TotalPerformance:
+        calculatePerformance(item, data?.dateLength) /
+        Math.max(
+          ...data?.result
+            .filter((a) => a.CityName === item.key)
+            .map((a) => a.COUNT),
+        ),
+    };
   });
 
-  const averageTotalPerformance: CityWithPerformanceData[] = Array.from(
-    cityMap,
-    ([city, { total, count }]) => {
-      if (!getEnglishToPersianCity(city)) return;
-      return {
-        CityName_En: city,
-        CityName_Fa: CITIES.find((a) => a.EnglishName === city).PersianName,
-        TotalPerformance: total / count,
-      };
-    },
-  );
-
-  return averageTotalPerformance;
+  return citiesWithPerformanceData;
 }
 
 export default function CitiesPage({ children }) {
@@ -101,7 +133,7 @@ export default function CitiesPage({ children }) {
       },
       {
         onSuccess: (data) => {
-          setUpdatedList(DistinctData(data));
+          setUpdatedList(DistinctDataAndCalculatePerformance(data));
         },
         refetchOnWindowFocus: false,
       },
@@ -118,7 +150,8 @@ export default function CitiesPage({ children }) {
   //   };
   // });
   const [updatedList, setUpdatedList] = useState(
-    getCitiesWithPerformance?.data ?? [],
+    () =>
+      DistinctDataAndCalculatePerformance(getCitiesWithPerformance.data) ?? [],
   );
 
   // const intersection = CITIES.filter((city) => {
@@ -139,6 +172,8 @@ export default function CitiesPage({ children }) {
         .filter((a) => a),
     ),
   ];
+
+  console.log({ updatedList });
   return (
     <>
       <BlurBackground />
@@ -352,7 +387,9 @@ export default function CitiesPage({ children }) {
             }
             isLoading={getCitiesWithPerformance.isLoading}
             disabled={!!!updatedList}
-            list={DistinctData(getCitiesWithPerformance.data)}
+            list={DistinctDataAndCalculatePerformance(
+              getCitiesWithPerformance.data,
+            )}
             filteredList={
               !getCitiesWithPerformance.isLoading
                 ? updatedList
@@ -384,7 +421,7 @@ export default function CitiesPage({ children }) {
 
               const isActive = item.CityName_En === router.query.city;
 
-              const cityPerformances = getCitiesWithPerformance?.data
+              const cityPerformances = getCitiesWithPerformance?.data?.result
                 .filter(
                   (x) =>
                     getPersianToEnglishCity(x.CityName) === item.CityName_En,
@@ -411,18 +448,18 @@ export default function CitiesPage({ children }) {
                     </div>
                     <div className="flex flex-col items-center justify-center">
                       <TrendDecider values={cityPerformances} />
-                      {item.TotalPerformance.toFixed(0)}
+                      {Math.round(item.TotalPerformance)}
                       {"%"}
                     </div>
                     <div className="flex w-full  items-center justify-center">
                       <SparkAreaChart
-                        data={getCitiesWithPerformance.data
+                        data={getCitiesWithPerformance.data.result
                           ?.filter((a) => a.CityName === item.CityName_En)
                           .map((a) => {
                             return {
                               TotalPerformance: a.TotalPerformance,
                               Start_Date: a.Start_Date,
-                              Benchmark: 50,
+                              Benchmark: 80,
                             };
                           })}
                         categories={["TotalPerformance", "Benchmark"]}

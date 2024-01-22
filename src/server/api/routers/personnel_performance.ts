@@ -445,7 +445,27 @@ export const personnelPerformanceRouter = createTRPCRouter({
         let queryCities = `
           
           
-        SELECT DISTINCT CityName,SUM(TotalPerformance) / Count(CityName) as TotalPerformance,p.Start_Date 
+       
+        SELECT
+        CityName,
+        p.Start_Date,
+        COUNT(*) AS COUNT,
+        AVG(TotalPerformance) AS TotalPerformance,
+		
+	  	  
+        SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
+        SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+        SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+        SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+        SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+        SUM(WithScanCount) as WithScanCount,
+        SUM(WithoutScanCount) as WithoutScanCount,
+        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
+
+
         FROM dbName.dbo.personnel_performance as p
         JOIN
         RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
@@ -471,12 +491,26 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
           queryCities = `
                 
-          SELECT DISTINCT CityName,
+          SELECT
+          CityName,
+          p.Start_Date,
+          COUNT(*) AS COUNT,
+          AVG(TotalPerformance) AS TotalPerformance,
+      
           
+          SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
+          SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+          SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+          SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+          SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+          SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+          SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+          SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+          SUM(WithScanCount) as WithScanCount,
+          SUM(WithoutScanCount) as WithoutScanCount,
+          SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
           
-          SUM(TotalPerformance) / Count(CityName) as TotalPerformance
-          
-          ,p.Start_Date 
+        
           FROM dbName.dbo.personnel_performance as p
           JOIN
           RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
@@ -488,18 +522,15 @@ export const personnelPerformanceRouter = createTRPCRouter({
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
 
-        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
-        // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-        // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+        return {
+          dateLength: new Set(
+            resultOfCities.recordsets[0].map((a) => a.Start_Date),
+          ).size,
 
-        // const result = {
-        //   Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
-        // };
-
-        return resultOfCities.recordsets[0];
+          result: resultOfCities.recordsets[0],
+        };
         // Respond with the fetched data
       } catch (error) {
         console.error("Error fetching data:", error.message);

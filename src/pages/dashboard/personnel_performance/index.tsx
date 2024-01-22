@@ -800,11 +800,11 @@ function PersonnelPerformanceTable({ sessionData }) {
                 "کارشناس ثبت اسناد خسارت",
               ]);
 
-              const sumOfperformances = flatRows.reduce((acc, row) => {
+              const sumOfPerformances = flatRows.reduce((acc, row) => {
                 return acc + row.TotalPerformance;
               }, 0);
 
-              const totalPerformance = sumOfperformances / flatRows.length;
+              const totalPerformance = sumOfPerformances / flatRows.length;
               return (
                 <>
                   <div className="flex w-full flex-col items-center justify-center gap-5">

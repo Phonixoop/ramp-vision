@@ -31,6 +31,7 @@ import { TrendDecider } from "~/features/trend-decider";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
+import { CityWithPerformanceData } from "~/types";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
@@ -98,7 +99,7 @@ export default function CityPage({ children, city }) {
     (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
   );
 
-  const fullData = processDataForChart(
+  const fullData: CityWithPerformanceData[] = processDataForChart(
     getAll?.data?.result ?? [],
     "Start_Date",
     [
