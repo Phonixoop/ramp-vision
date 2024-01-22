@@ -43,7 +43,10 @@ import { usePersonnelFilter } from "~/context/personnel-filter.context";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 import ResponsiveView from "~/features/responsive-view";
 import { TrendDecider } from "~/features/trend-decider";
-import { calculatePerformance } from "~/utils/personnel-performance";
+import {
+  DistinctDataAndCalculatePerformance,
+  calculatePerformance,
+} from "~/utils/personnel-performance";
 import { CityWithPerformanceData } from "~/types";
 
 // function DistinctDataForCity(data = []): CityWithPerformanceData[] {
@@ -71,41 +74,6 @@ import { CityWithPerformanceData } from "~/types";
 
 //   return averageTotalPerformance;
 // }
-
-function DistinctDataAndCalculatePerformance(data): CityWithPerformanceData[] {
-  const citiesWithPerformanceData = processDataForChart(
-    data?.result ?? [],
-    ["CityName"],
-    [
-      "SabtAvalieAsnad",
-      "PazireshVaSabtAvalieAsnad",
-      "ArzyabiAsanadBimarsetaniDirect",
-      "ArzyabiAsnadBimarestaniIndirect",
-      "ArzyabiAsnadDandanVaParaDirect",
-      "ArzyabiAsnadDandanVaParaIndirect",
-      "ArzyabiAsnadDaroDirect",
-      "ArzyabiAsnadDaroIndirect",
-      "WithScanCount",
-      "WithoutScanCount",
-      "WithoutScanInDirectCount",
-      "TotalPerformance",
-    ],
-  ).map((item) => {
-    return {
-      CityName_En: item.key,
-      CityName_Fa: getEnglishToPersianCity(item.key),
-      TotalPerformance:
-        calculatePerformance(item, data?.dateLength) /
-        Math.max(
-          ...data?.result
-            .filter((a) => a.CityName === item.key)
-            .map((a) => a.COUNT),
-        ),
-    };
-  });
-
-  return citiesWithPerformanceData;
-}
 
 export default function CitiesPage({ children }) {
   const {
@@ -344,7 +312,6 @@ export default function CitiesPage({ children }) {
                   تاریخ گزارش پرسنل
                 </span>
                 <SelectControlled
-                  withSelectAll
                   title={"تاریخ گزارش پرنسل"}
                   list={DateInfos}
                   value={

@@ -1,4 +1,6 @@
 import { Indicators } from "~/constants/personnel-performance";
+import { CityWithPerformanceData } from "~/types";
+import { getEnglishToPersianCity, processDataForChart } from "~/utils/util";
 
 export function calculatePerformance(item: any, dateLenght: number): number {
   // console.log({ item, dateLenght });
@@ -24,4 +26,41 @@ export function calculatePerformance(item: any, dateLenght: number): number {
       (dateLenght * Indicators.WithoutScanInDirectCount);
 
   return performance * 100;
+}
+
+export function DistinctDataAndCalculatePerformance(
+  data,
+): CityWithPerformanceData[] {
+  const citiesWithPerformanceData = processDataForChart(
+    data?.result ?? [],
+    ["CityName"],
+    [
+      "SabtAvalieAsnad",
+      "PazireshVaSabtAvalieAsnad",
+      "ArzyabiAsanadBimarsetaniDirect",
+      "ArzyabiAsnadBimarestaniIndirect",
+      "ArzyabiAsnadDandanVaParaDirect",
+      "ArzyabiAsnadDandanVaParaIndirect",
+      "ArzyabiAsnadDaroDirect",
+      "ArzyabiAsnadDaroIndirect",
+      "WithScanCount",
+      "WithoutScanCount",
+      "WithoutScanInDirectCount",
+      "TotalPerformance",
+    ],
+  ).map((item) => {
+    return {
+      CityName_En: item.key,
+      CityName_Fa: getEnglishToPersianCity(item.key),
+      TotalPerformance:
+        calculatePerformance(item, data?.dateLength) /
+        Math.max(
+          ...data?.result
+            .filter((a) => a.CityName === item.key)
+            .map((a) => a.COUNT),
+        ),
+    };
+  });
+
+  return citiesWithPerformanceData;
 }

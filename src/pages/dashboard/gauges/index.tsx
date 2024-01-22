@@ -34,17 +34,17 @@ import {
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 import { FilterIcon } from "lucide-react";
 import ResponsiveView from "~/features/responsive-view";
-export default function GaugesPage() {
-  const [selectedDates, setSelectedDates] = useState<string[]>([
-    moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
-  ]);
+import { DistinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
 
+export default function GaugesPage() {
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
 
   const [filters, setFilters] = useState<FilterType>({
     periodType: "روزانه",
     filter: {
-      Start_Date: selectedDates,
+      Start_Date: [
+        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+      ],
     },
   });
 
@@ -81,9 +81,8 @@ export default function GaugesPage() {
         .filter((a) => a),
     ),
   ];
-  const result = calculateAggregateByFields(
+  const result = DistinctDataAndCalculatePerformance(
     getCitiesWithPerformance?.data,
-    operations,
   );
   return (
     <>
@@ -99,21 +98,27 @@ export default function GaugesPage() {
               <>
                 {Array.from(
                   Array(getInitialFilters?.data?.Cities?.lenght ?? 31).keys(),
-                ).map((a) => {
+                ).map((a, i) => {
                   return (
                     <>
-                      <div className="flex h-36 w-36  flex-col items-center justify-between  gap-5 rounded-2xl bg-secbuttn "></div>
+                      <div
+                        key={i}
+                        className="flex h-36 w-36  flex-col items-center justify-between  gap-5 rounded-2xl bg-secbuttn "
+                      />
                     </>
                   );
                 })}
               </>
             ) : (
-              result.map((city: any) => {
+              result.map((city: any, i) => {
                 return (
                   <>
-                    <div className="flex w-full  flex-col items-center  justify-between gap-5 rounded-2xl ">
+                    <div
+                      key={i}
+                      className="flex w-full  flex-col items-center  justify-between gap-5 rounded-2xl "
+                    >
                       <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
-                        <H2>{getEnglishToPersianCity(city.CityName)}</H2>
+                        <H2>{getEnglishToPersianCity(city.CityName_Fa)}</H2>
 
                         <Gauge value={Math.round(city.TotalPerformance)} />
                         <p className="text-accent">
@@ -287,9 +292,14 @@ export default function GaugesPage() {
                     <SelectControlled
                       title={"تاریخ گزارش پرنسل"}
                       list={DateInfos}
-                      value={DateInfos[DateInfos.length - 1]}
+                      value={
+                        filters.filter.DateInfo ?? [
+                          DateInfos[DateInfos.length - 1],
+                        ]
+                      }
                       onChange={(values) => {
-                        let _values = values[values.length - 1];
+                        let _values = values;
+                        _values = [values[values.length - 1]];
                         //@ts-ignore
                         setFilters((prev) => {
                           return {
