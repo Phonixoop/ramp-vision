@@ -356,11 +356,11 @@ export function DistinctData(data = [], dateLength) {
 
   result.forEach((item) => {
     //@ts-ignore
-    console.log({ item }, { CCC: item.count });
+    // console.log({ item }, { CCC: item.count });
     //@ts-ignore
-    item.TotalPerformance = calculatePerformance(item, item.count);
+    item.TotalPerformance = calculatePerformance(item, dateLength);
   });
-  console.log({ distinctResult: result });
+  // console.log({ distinctResult: result });
 
   return result;
 }

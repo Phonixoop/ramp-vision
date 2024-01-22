@@ -1,7 +1,7 @@
 import { Indicators } from "~/constants/personnel-performance";
 
 export function calculatePerformance(item: any, dateLenght: number): number {
-  console.log({ item, dateLenght });
+  // console.log({ item, dateLenght });
   const performance =
     item.SabtAvalieAsnad / (dateLenght * Indicators.SabtAvalieAsnad) +
     item.PazireshVaSabtAvalieAsnad /

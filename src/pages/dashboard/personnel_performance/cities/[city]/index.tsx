@@ -132,9 +132,6 @@ export default function CityPage({ children, city }) {
 
     return translatedData;
   });
-  console.log({
-    fullData,
-  });
 
   useEffect(() => {
     setSelectedPerson(undefined);
