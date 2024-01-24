@@ -224,13 +224,18 @@ export default function CityPage({ children, city }) {
                           return {
                             TotalPerformance: a.TotalPerformance,
                             Start_Date: a.Start_Date,
-
-                            Middle: 80,
+                            Benchmark: 75,
+                            Benchmark2: 120,
                           };
                         })}
-                      categories={["TotalPerformance", "Middle"]}
+                      categories={[
+                        "TotalPerformance",
+                        "Benchmark",
+                        "Benchmark2",
+                        "Benchmark3",
+                      ]}
                       index={"Start_Date"}
-                      colors={["purple", "cyan"]}
+                      colors={["purple", "rose", "cyan"]}
                       className="h-10 w-36 cursor-pointer"
                     />
                   </div>

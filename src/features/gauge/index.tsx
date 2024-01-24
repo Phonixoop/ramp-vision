@@ -29,7 +29,7 @@ export default function Gauge({ value }) {
           padding: 0.02,
           subArcs: [
             {
-              limit: 80,
+              limit: 75,
               color: "#B12B1D",
               tooltip: {
                 text: "ضعیف",
@@ -37,21 +37,21 @@ export default function Gauge({ value }) {
             },
 
             {
-              limit: 100,
+              limit: 90,
               color: "#7BB11B",
               tooltip: {
                 text: "متوسط",
               },
             },
             {
-              limit: 150,
+              limit: 120,
               color: "#7BB11B",
               tooltip: {
                 text: "خوب",
               },
             },
             {
-              limit: 200,
+              limit: 180,
               color: "#16B13D",
               tooltip: {
                 text: "عالی",
@@ -78,10 +78,10 @@ export default function Gauge({ value }) {
           tickLabels: {
             type: "outer",
             ticks: [
-              { value: 80 },
-              { value: 100 },
-              { value: 150 },
-              { value: 200 },
+              { value: 75 },
+              { value: 90 },
+              { value: 120 },
+              { value: 180 },
               { value: 500 },
             ],
           },
