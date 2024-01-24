@@ -521,7 +521,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         }
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-        console.log(queryCities);
+        // console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         return {
