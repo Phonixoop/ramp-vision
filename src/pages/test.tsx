@@ -83,7 +83,8 @@ const menuItems = [
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
-    <div className="h-screen">
+    <div className="h-screen text-primary">
+      {moment("1402/11/05", "jYYYY/jMM/jDD").jDay() === 5 ? "پنجشنبه" : "no"}
       {/* <Menu menuItems={menuItems} className="flex" /> */}
     </div>
   );

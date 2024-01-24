@@ -1,29 +1,36 @@
+import moment from "jalali-moment";
 import { Indicators } from "~/constants/personnel-performance";
 import { CityWithPerformanceData } from "~/types";
 import { getEnglishToPersianCity, processDataForChart } from "~/utils/util";
 
-export function calculatePerformance(item: any, dateLenght: number): number {
+export function calculatePerformance(
+  item: any,
+  dateLenght: number,
+  devideBy: number = 1,
+): number {
   // console.log({ item, dateLenght });
   const performance =
-    item.SabtAvalieAsnad / (dateLenght * Indicators.SabtAvalieAsnad) +
+    item.SabtAvalieAsnad /
+      ((dateLenght * Indicators.SabtAvalieAsnad) / devideBy) +
     item.PazireshVaSabtAvalieAsnad /
-      (dateLenght * Indicators.PazireshVaSabtAvalieAsnad) +
+      ((dateLenght * Indicators.PazireshVaSabtAvalieAsnad) / devideBy) +
     item.ArzyabiAsanadBimarsetaniDirect /
-      (dateLenght * Indicators.ArzyabiAsanadBimarsetaniDirect) +
+      ((dateLenght * Indicators.ArzyabiAsanadBimarsetaniDirect) / devideBy) +
     item.ArzyabiAsnadBimarestaniIndirect /
-      (dateLenght * Indicators.ArzyabiAsnadBimarestaniIndirect) +
+      ((dateLenght * Indicators.ArzyabiAsnadBimarestaniIndirect) / devideBy) +
     item.ArzyabiAsnadDandanVaParaDirect /
-      (dateLenght * Indicators.ArzyabiAsnadDandanVaParaDirect) +
+      ((dateLenght * Indicators.ArzyabiAsnadDandanVaParaDirect) / devideBy) +
     item.ArzyabiAsnadDandanVaParaIndirect /
-      (dateLenght * Indicators.ArzyabiAsnadDandanVaParaIndirect) +
+      ((dateLenght * Indicators.ArzyabiAsnadDandanVaParaIndirect) / devideBy) +
     item.ArzyabiAsnadDaroDirect /
-      (dateLenght * Indicators.ArzyabiAsnadDaroDirect) +
+      ((dateLenght * Indicators.ArzyabiAsnadDaroDirect) / devideBy) +
     item.ArzyabiAsnadDaroIndirect /
-      (dateLenght * Indicators.ArzyabiAsnadDaroIndirect) +
-    item.WithScanCount / (dateLenght * Indicators.WithScanCount) +
-    item.WithoutScanCount / (dateLenght * Indicators.WithoutScanCount) +
+      ((dateLenght * Indicators.ArzyabiAsnadDaroIndirect) / devideBy) +
+    item.WithScanCount / ((dateLenght * Indicators.WithScanCount) / devideBy) +
+    item.WithoutScanCount /
+      ((dateLenght * Indicators.WithoutScanCount) / devideBy) +
     item.WithoutScanInDirectCount /
-      (dateLenght * Indicators.WithoutScanInDirectCount);
+      ((dateLenght * Indicators.WithoutScanInDirectCount) / devideBy);
 
   return performance * 100;
 }
@@ -31,6 +38,16 @@ export function calculatePerformance(item: any, dateLenght: number): number {
 export function DistinctDataAndCalculatePerformance(
   data,
 ): CityWithPerformanceData[] {
+  // const dataWithThurdsdayEdit = data?.result?.map((item) => {
+  //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+  //   return {
+  //     ...item,
+  //     TotalPerformance: isThursday
+  //       ? calculatePerformance(item, 1, 2)
+  //       : item.TotalPerformance,
+  //   };
+  // });
+
   const citiesWithPerformanceData = processDataForChart(
     data?.result ?? [],
     ["CityName"],
@@ -49,18 +66,24 @@ export function DistinctDataAndCalculatePerformance(
       "TotalPerformance",
     ],
   ).map((item) => {
+    // const personnelCount = Math.max(
+    //   ...data?.result
+    //     .filter((a) => a.CityName === item.key)
+    //     .map((a) => a.COUNT),
+    // );
     return {
       CityName_En: item.key,
       CityName_Fa: getEnglishToPersianCity(item.key),
-      TotalPerformance:
-        calculatePerformance(item, data?.dateLength) /
-        Math.max(
-          ...data?.result
-            .filter((a) => a.CityName === item.key)
-            .map((a) => a.COUNT),
-        ),
+      TotalPerformance: item.TotalPerformance / data?.dateLength,
+
+      // calculatePerformance(item, data?.dateLength) /
+      // Math.max(
+      //   ...data?.result
+      //     .filter((a) => a.CityName === item.key)
+      //     .map((a) => a.COUNT),
+      // ),
     };
   });
-
+  console.log({ citiesWithPerformanceData });
   return citiesWithPerformanceData;
 }

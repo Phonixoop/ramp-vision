@@ -337,15 +337,17 @@ export default function CitiesPage({ children }) {
           )}
         </div>
         <div className="mx-auto flex w-11/12 items-center justify-end">
-          <div className="flex items-center justify-center gap-1 rounded-xl p-2 text-primbuttn">
-            <span> {selectedPerson?.NameFamily}</span>
-            {selectedPerson && <span>{"/"}</span>}
-            <span>
-              {Array.isArray(router.query?.city)
-                ? ""
-                : getEnglishToPersianCity(router.query?.city ?? "")}
-            </span>
-          </div>
+          {router.query?.city && (
+            <div className="flex items-center justify-center gap-1 rounded-xl p-2 text-primbuttn">
+              <span> {selectedPerson?.NameFamily}</span>
+              {selectedPerson && <span>{"/"}</span>}
+              <span>
+                {Array.isArray(router.query?.city)
+                  ? ""
+                  : getEnglishToPersianCity(router.query?.city ?? "")}
+              </span>
+            </div>
+          )}
         </div>
         <div className="m-auto flex w-11/12 flex-col justify-start gap-5  pb-10 xl:flex-row-reverse">
           <AdvancedList

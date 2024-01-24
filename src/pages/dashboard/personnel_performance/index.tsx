@@ -442,7 +442,26 @@ function PersonnelPerformanceTable({ sessionData }) {
             );
           },
         },
-
+        {
+          header: "عملکرد",
+          accessorKey: "TotalPerformance",
+          cell: ({ row }) => (
+            <span>{row.original.TotalPerformance.toFixed(2)}</span>
+          ),
+          footer: ({ table }) =>
+            commify(
+              Math.round(
+                table
+                  .getFilteredRowModel()
+                  .rows.reduce(
+                    (total, row) =>
+                      (total as number) +
+                      (row.getValue("TotalPerformance") as number),
+                    0,
+                  ),
+              ),
+            ),
+        },
         {
           header: "ثبت اولیه اسناد",
           accessorKey: "SabtAvalieAsnad",
@@ -611,26 +630,6 @@ function PersonnelPerformanceTable({ sessionData }) {
             ),
         },
 
-        {
-          header: "عملکرد",
-          accessorKey: "TotalPerformance",
-          cell: ({ row }) => (
-            <span>{row.original.TotalPerformance.toFixed(2)}</span>
-          ),
-          footer: ({ table }) =>
-            commify(
-              Math.round(
-                table
-                  .getFilteredRowModel()
-                  .rows.reduce(
-                    (total, row) =>
-                      (total as number) +
-                      (row.getValue("TotalPerformance") as number),
-                    0,
-                  ),
-              ),
-            ),
-        },
         {
           header: "بازه گزارش",
           accessorKey: "Start_Date",
