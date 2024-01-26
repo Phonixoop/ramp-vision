@@ -84,6 +84,6 @@ export function DistinctDataAndCalculatePerformance(
       // ),
     };
   });
-  console.log({ citiesWithPerformanceData });
+
   return citiesWithPerformanceData;
 }

@@ -6,6 +6,7 @@ export type PeriodType = "روزانه" | "هفتگی" | "ماهانه";
 export type FilterType = {
   periodType: PeriodType;
   filter: {
+    CityName?: string[];
     Start_Date: string[];
     ProjectType?: string[];
     ContractType?: string[];

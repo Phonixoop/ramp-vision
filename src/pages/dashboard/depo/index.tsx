@@ -72,6 +72,10 @@ import DatePickerPeriodic from "~/features/date-picker-periodic";
 import { date } from "zod";
 import { twMerge } from "tailwind-merge";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
+import { FilterType, PeriodType } from "~/context/personnel-filter.context";
+import { DistinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
+import CitiesPerformanceBarChart from "~/features/cities-performance-chart";
+import CustomBarChart from "~/features/custom-charts/bar-chart";
 
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {
@@ -111,7 +115,7 @@ function DeposTable({ sessionData }) {
   //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   // ]);
 
-  const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
 
   const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
@@ -607,7 +611,7 @@ function DeposTable({ sessionData }) {
                               "تعداد رسیدگی",
                             ]}
                           /> */}
-                          <ResponsiveContainer width="99%" height={300}>
+                          {/* <ResponsiveContainer width="99%" height={300}>
                             <BarChart
                               showAnimation={true}
                               data={(serviceData ?? []).map((row) => {
@@ -631,6 +635,47 @@ function DeposTable({ sessionData }) {
                               showGridLines={false}
                               noDataText={Text.noData.fa}
                               intervalType="preserveStartEnd"
+                            />
+                          </ResponsiveContainer> */}
+                          <ResponsiveContainer width="99%" height={300}>
+                            <CustomBarChart
+                              width={500}
+                              height={300}
+                              data={(serviceData ?? []).map((row) => {
+                                return {
+                                  name: ShortServiceNames[row.key],
+                                  "تعداد دپو": row.DepoCount,
+                                  "تعداد ورودی": row.EntryCount,
+                                  "تعداد رسیدگی": row.Capicity,
+                                };
+                              })}
+                              bars={[
+                                {
+                                  name: "تعداد دپو",
+                                  className: "fill-cyan-600",
+                                  labelClassName: "fill-primary",
+                                  position: "centerTop",
+                                  angle: 0,
+                                },
+                                {
+                                  name: "تعداد ورودی",
+                                  className: "fill-rose-600",
+                                  labelClassName: "fill-primary",
+                                  position: "centerTop",
+                                  angle: 0,
+                                },
+                                {
+                                  name: "تعداد رسیدگی",
+                                  className: "fill-emerald-600",
+                                  labelClassName: "fill-primary",
+                                  position: "centerTop",
+                                  angle: 0,
+                                },
+                              ]}
+                              keys={["name"]}
+                              nameClassName="fill-accent text-accent"
+                              customYTick
+                              formatter={commify}
                             />
                           </ResponsiveContainer>
                         </div>
@@ -845,6 +890,13 @@ function DeposTable({ sessionData }) {
                       </div>
                     </div>
                   </div>
+                </>
+              );
+            }}
+            renderAfterTable={(flatRows) => {
+              return (
+                <>
+                  <CitiesPerformanceBarChart filters={filters} />
                 </>
               );
             }}

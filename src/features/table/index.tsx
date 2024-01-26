@@ -40,6 +40,7 @@ type Props = {
   hasClickAction?: boolean;
   onClick?: (cell: any) => void;
   renderChild?: (rows: any[]) => JSX.Element;
+  renderAfterTable?: (rows: any[]) => JSX.Element;
   renderInFilterView?: () => JSX.Element;
   renderAfterFilterView?: (rows: Row<any>[]) => JSX.Element;
 };
@@ -52,6 +53,7 @@ export default function Table({
   hasClickAction = false,
   onClick = (cell) => {},
   renderChild = (rows) => <></>,
+  renderAfterTable = (rows) => <></>,
   renderInFilterView = undefined,
   renderAfterFilterView = (rows) => <></>,
 }: Props) {
@@ -392,6 +394,7 @@ export default function Table({
             </table>
           </div>
         </div>
+        {renderAfterTable(flatRows)}
       </div>
     </div>
   );
