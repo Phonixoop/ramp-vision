@@ -1,18 +1,22 @@
+import { SquircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
   ComposedChart,
   LabelList,
+  Legend,
   Line,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { twMerge } from "tailwind-merge";
 import { commify } from "~/utils/util";
 
 type BarType = {
   name: string;
+
   className?: string;
   labelClassName?: string;
   position?:
@@ -94,7 +98,10 @@ export default function CustomBarChart({
                   <LabelList
                     formatter={formatter}
                     dataKey={bar.name}
-                    className={bar?.labelClassName ?? "fill-cyan-400"}
+                    className={twMerge(
+                      bar?.labelClassName ?? "fill-cyan-400 text-sm",
+                      "text-sm",
+                    )}
                     position={bar?.position ?? "centerTop"}
                     angle={bar?.angle ?? -90}
                   />
@@ -108,7 +115,7 @@ export default function CustomBarChart({
           return (
             <>
               <XAxis
-                height={customXTick ? 160 : 50}
+                height={customXTick ? 160 : 80}
                 interval={0}
                 orientation="bottom"
                 dataKey={key}
@@ -130,20 +137,67 @@ export default function CustomBarChart({
           orientation="right"
           tick={customYTick ? <CustomizedYAxisTick /> : null}
         />
-
+        <Legend content={<CustomLegend bars={bars} />} />
         <Tooltip
-          content={<CustomToolTip />}
-          formatter={(value, index) => formatter(value)}
+          content={<CustomTooltip bars={bars} />}
+          labelFormatter={(value, index) => formatter(value)}
         />
       </BarChart>
     </div>
   );
 }
-function CustomToolTip({ ...rest }) {
-  console.log({ rest: rest.content });
-  // label
-  //formatter
-  return <>{rest.content}</>;
+
+function CustomLegend({ bars = [], ...rest }) {
+  return (
+    <div className="flex items-center justify-center gap-5 ">
+      {bars.map((bar) => {
+        return (
+          <>
+            <div className="flex items-center justify-center gap-2">
+              <SquircleIcon className={twMerge("stroke-none", bar.className)} />
+              <span className="text-primary">{bar.name}</span>
+            </div>
+          </>
+        );
+      })}
+    </div>
+  );
+}
+
+function CustomTooltip({ bars = [], ...rest }) {
+  const { active, payload, label, labelFormatter } = rest;
+  if (active && payload && payload.length) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border-[0.5px] border-primary/10 bg-secondary p-2  text-primary">
+        <div className="border-b border-primary/10 ">
+          <p className=" py-2 text-primary ">{label}</p>
+        </div>
+        <div className="flex w-full flex-col items-center justify-center gap-2 pb-3 ">
+          {payload.map((p) => {
+            const theBar = bars.find((b) => b.name === p.name);
+            const valueFormat = labelFormatter
+              ? labelFormatter(p.value)
+              : p.value;
+            return (
+              <>
+                <div className="flex w-full items-center justify-between gap-5 ">
+                  <span className="text-primary">{valueFormat}</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-primary">{p.name}</span>
+                    <SquircleIcon
+                      className={twMerge("stroke-none", theBar.className)}
+                    />
+                  </div>
+                </div>
+              </>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return undefined;
 }
 
 function CustomizedXAxisTick({ className = "", customXTick = false, ...rest }) {
