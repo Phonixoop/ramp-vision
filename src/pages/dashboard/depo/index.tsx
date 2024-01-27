@@ -74,7 +74,9 @@ import { twMerge } from "tailwind-merge";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { FilterType, PeriodType } from "~/context/personnel-filter.context";
 import { DistinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
-import CitiesPerformanceBarChart from "~/features/cities-performance-chart";
+import CitiesPerformanceBarChart, {
+  CitiesWithDatesPerformanceBarChart,
+} from "~/features/cities-performance-chart";
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 
 const filterColumn = (row, columnId, value, addMeta) => {
@@ -115,7 +117,7 @@ function DeposTable({ sessionData }) {
   //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   // ]);
 
-  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("ماهانه");
 
   const initialFilters = api.depo.getInitialFilters.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
@@ -127,7 +129,7 @@ function DeposTable({ sessionData }) {
   const [filters, setDataFilters] = useState({
     periodType: reportPeriod,
     filter: {
-      CityName: initialFilters.data?.Cities.map((a) => a.CityName),
+      CityName: initialFilters.data?.Cities?.map((a) => a.CityName),
       DocumentType: undefined,
       ServiceName: undefined,
       Start_Date: [
@@ -507,11 +509,11 @@ function DeposTable({ sessionData }) {
               //   "EntryCount",
               //   "Capicity",
               // ]);
-              const serviceData = processDataForChart(flatRows, "ServiceName", [
-                "DepoCount",
-                "EntryCount",
-                "Capicity",
-              ]);
+              const serviceData = processDataForChart(
+                flatRows,
+                ["ServiceName"],
+                ["DepoCount", "EntryCount", "Capicity"],
+              );
               const depoCompletionTime = processDepoCompleteTimeData(flatRows);
 
               const totalComplete =
@@ -643,7 +645,7 @@ function DeposTable({ sessionData }) {
                               height={300}
                               data={(serviceData ?? []).map((row) => {
                                 return {
-                                  name: ShortServiceNames[row.key],
+                                  name: ShortServiceNames[row.key.ServiceName],
                                   "تعداد دپو": row.DepoCount,
                                   "تعداد ورودی": row.EntryCount,
                                   "تعداد رسیدگی": row.Capicity,
@@ -895,9 +897,24 @@ function DeposTable({ sessionData }) {
             }}
             renderAfterTable={(flatRows) => {
               return (
-                <>
+                <div className="flex w-full flex-col items-center justify-center gap-5">
                   <CitiesPerformanceBarChart filters={filters} />
-                </>
+                  <CitiesWithDatesPerformanceBarChart
+                    filters={{
+                      ...filters,
+                      filter: {
+                        ...filters.filter,
+                        CityName: [
+                          ...new Set(
+                            flatRows.map((a) =>
+                              getPersianToEnglishCity(a.CityName),
+                            ),
+                          ),
+                        ],
+                      },
+                    }}
+                  />
+                </div>
               );
             }}
           />

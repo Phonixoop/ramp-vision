@@ -53,8 +53,8 @@ export default function MultiStep({
                     y2="28"
                     gradientUnits="userSpaceOnUse"
                   >
-                    <stop stop-color="var(--accent)"></stop>
-                    <stop offset="1" stop-color="var(--accent)"></stop>
+                    <stop stopColor="var(--accent)"></stop>
+                    <stop offset="1" stopColor="var(--accent)"></stop>
                   </linearGradient>
                   <linearGradient
                     id="klujyhsertd9087645uigh"
@@ -64,9 +64,9 @@ export default function MultiStep({
                     y2="28"
                     gradientUnits="userSpaceOnUse"
                   >
-                    <stop offset="0" stop-color="var(--accent)"></stop>
-                    <stop offset="0.1" stop-color="var(--bg-purple)"></stop>
-                    <stop offset="1" stop-color="var(--bg-primary)"></stop>
+                    <stop offset="0" stopColor="var(--accent)"></stop>
+                    <stop offset="0.1" stopColor="var(--bg-purple)"></stop>
+                    <stop offset="1" stopColor="var(--bg-primary)"></stop>
                   </linearGradient>
                 </defs>
               </svg>

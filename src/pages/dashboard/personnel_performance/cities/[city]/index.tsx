@@ -37,7 +37,10 @@ import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 
 import { api } from "~/utils/api";
-import { calculatePerformance } from "~/utils/personnel-performance";
+import {
+  DistinctPersonnelPerformanceData,
+  calculatePerformance,
+} from "~/utils/personnel-performance";
 import {
   DistinctData,
   analyzePerformanceTrend,
@@ -101,24 +104,9 @@ export default function CityPage({ children, city }) {
 
   const fullData: CityWithPerformanceData[] = useMemo(
     () =>
-      processDataForChart(getAll?.data?.result ?? [], "Start_Date", [
-        "SabtAvalieAsnad",
-        "PazireshVaSabtAvalieAsnad",
-        "ArzyabiAsanadBimarsetaniDirect",
-        "ArzyabiAsnadBimarestaniIndirect",
-        "ArzyabiAsnadDandanVaParaDirect",
-        "ArzyabiAsnadDandanVaParaIndirect",
-        "ArzyabiAsnadDaroDirect",
-        "ArzyabiAsnadDaroIndirect",
-        "WithScanCount",
-        "WithoutScanCount",
-        "WithoutScanInDirectCount",
-        "TotalPerformance",
+      DistinctPersonnelPerformanceData(getAll?.data?.result ?? [], [
+        "Start_Date",
       ]).map((d) => {
-        d.TotalPerformance = (
-          d.TotalPerformance /
-            getAll?.data?.result.map((a) => a.Start_Date === d.key).length ?? 1
-        ).toFixed(0);
         // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
         const translatedData = {};
         for (const key in d) {

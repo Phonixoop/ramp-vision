@@ -28,7 +28,6 @@ import {
   en,
   getEnglishToPersianCity,
   getPersianToEnglishCity,
-  processDataForChart,
 } from "~/utils/util";
 import {
   defaultProjectTypes,

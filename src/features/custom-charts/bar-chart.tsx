@@ -3,15 +3,19 @@ import { useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
+  Brush,
+  CartesianGrid,
   ComposedChart,
   LabelList,
   Legend,
   Line,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import { twMerge } from "tailwind-merge";
+import { Performance_Levels } from "~/constants/personnel-performance";
 import { commify } from "~/utils/util";
 
 type BarType = {
@@ -54,8 +58,10 @@ type CustomBarChartOptions = {
   data: any[];
   bars: BarType[];
   keys: string[];
+  refrenceLines?: { name: string; number: number; color: string }[];
   customXTick?: boolean;
   customYTick?: boolean;
+  brushKey?: string;
   formatter?: Function;
 };
 export default function CustomBarChart({
@@ -65,8 +71,10 @@ export default function CustomBarChart({
   data = [],
   bars = [],
   keys = [],
+  refrenceLines = [],
   customXTick = false,
   customYTick = false,
+  brushKey,
   formatter = (num: number) => "",
 }: CustomBarChartOptions) {
   const container = useRef<HTMLDivElement>(undefined);
@@ -89,7 +97,31 @@ export default function CustomBarChart({
   }, []); // Empty dependency array ensures that the effect runs only once on mount
   return (
     <div ref={container} className="h-full w-full">
-      <BarChart width={containerWidth ?? width} height={height} data={data}>
+      <BarChart
+        width={containerWidth ?? width}
+        height={height}
+        data={data.map((item) => {
+          return {
+            ...item,
+            first: 75,
+            second: 120,
+          };
+        })}
+      >
+        {refrenceLines &&
+          refrenceLines.map((line) => {
+            return (
+              <>
+                <ReferenceLine
+                  y={line.number}
+                  label={line.name}
+                  stroke={line.color}
+                  strokeDasharray="3 3"
+                />
+              </>
+            );
+          })}
+
         {bars.map((bar) => {
           return (
             <>
@@ -110,7 +142,6 @@ export default function CustomBarChart({
             </>
           );
         })}
-
         {keys.map((key) => {
           return (
             <>
@@ -133,15 +164,20 @@ export default function CustomBarChart({
           );
         })}
         <YAxis
+          width={80}
           tickFormatter={(value, index) => formatter(value)}
           orientation="right"
-          tick={customYTick ? <CustomizedYAxisTick /> : null}
+          tick={
+            customYTick ? <CustomizedYAxisTick formatter={formatter} /> : null
+          }
         />
+
         <Legend content={<CustomLegend bars={bars} />} />
         <Tooltip
           content={<CustomTooltip bars={bars} />}
           labelFormatter={(value, index) => formatter(value)}
         />
+        {brushKey && <Brush dataKey={brushKey} height={30} />}
       </BarChart>
     </div>
   );
@@ -219,13 +255,19 @@ function CustomizedXAxisTick({ className = "", customXTick = false, ...rest }) {
   );
 }
 
-function CustomizedYAxisTick({ ...rest }) {
+function CustomizedYAxisTick({ formatter, ...rest }) {
   const { x, y, payload } = rest;
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={0} className="fill-primary" textAnchor="end">
-        {payload.value}
+      <text
+        x={0}
+        y={0}
+        dy={0}
+        className="fill-primary text-sm"
+        textAnchor="end"
+      >
+        {formatter ? formatter(payload.value) : payload.value}
       </text>
     </g>
   );

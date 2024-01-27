@@ -120,3 +120,42 @@ export const Indicators = {
   ArzyabiAsnadDaroIndirect: 375, // ارزیابی اسناد دارو  غیر مستقیم
   ArzyabiAsnadDandanVaParaIndirect: 300, // ارزیابی اسناد دندانپزشکی + پاراکلینیکی مستقیم
 };
+
+export const Performance_Levels = [
+  {
+    limit: 75,
+    color: "#B12B1D",
+    tooltip: {
+      text: "ضعیف",
+    },
+  },
+
+  {
+    limit: 90,
+    color: "#7BB11B",
+    tooltip: {
+      text: "متوسط",
+    },
+  },
+  {
+    limit: 120,
+    color: "#7BB11B",
+    tooltip: {
+      text: "خوب",
+    },
+  },
+  {
+    limit: 180,
+    color: "#16B13D",
+    tooltip: {
+      text: "عالی",
+    },
+  },
+  {
+    limit: 500,
+    color: "#B1671E",
+    tooltip: {
+      text: "نیاز به بررسی",
+    },
+  },
+];

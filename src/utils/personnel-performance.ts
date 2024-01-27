@@ -37,44 +37,101 @@ export function calculatePerformance(
 
 export function DistinctDataAndCalculatePerformance(
   data,
-): CityWithPerformanceData[] {
-  // const dataWithThurdsdayEdit = data?.result?.map((item) => {
-  //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
-  //   return {
-  //     ...item,
-  //     TotalPerformance: isThursday
-  //       ? calculatePerformance(item, 1, 2)
-  //       : item.TotalPerformance,
-  //   };
-  // });
+  groupBy = ["CityName"],
+  values = [
+    "SabtAvalieAsnad",
+    "PazireshVaSabtAvalieAsnad",
+    "ArzyabiAsanadBimarsetaniDirect",
+    "ArzyabiAsnadBimarestaniIndirect",
+    "ArzyabiAsnadDandanVaParaDirect",
+    "ArzyabiAsnadDandanVaParaIndirect",
+    "ArzyabiAsnadDaroDirect",
+    "ArzyabiAsnadDaroIndirect",
+    "WithScanCount",
+    "WithoutScanCount",
+    "WithoutScanInDirectCount",
+    "TotalPerformance",
+  ],
+  where = {},
+) {
+  const dataWithThurdsdayEdit = data?.result?.map((item) => {
+    const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+    return {
+      ...item,
+      TotalPerformance: isThursday
+        ? calculatePerformance(item, 1, 2)
+        : item.TotalPerformance,
+    };
+  });
 
   const citiesWithPerformanceData = processDataForChart(
-    data?.result ?? [],
-    ["CityName"],
-    [
-      "SabtAvalieAsnad",
-      "PazireshVaSabtAvalieAsnad",
-      "ArzyabiAsanadBimarsetaniDirect",
-      "ArzyabiAsnadBimarestaniIndirect",
-      "ArzyabiAsnadDandanVaParaDirect",
-      "ArzyabiAsnadDandanVaParaIndirect",
-      "ArzyabiAsnadDaroDirect",
-      "ArzyabiAsnadDaroIndirect",
-      "WithScanCount",
-      "WithoutScanCount",
-      "WithoutScanInDirectCount",
-      "TotalPerformance",
-    ],
+    dataWithThurdsdayEdit ?? [],
+    groupBy,
+    values,
+    where,
+  );
+
+  return mapToCitiesWithPerformance({
+    dateLength: data?.dateLength,
+    result: citiesWithPerformanceData,
+  });
+}
+
+export function DistinctPersonnelPerformanceData(
+  data,
+  groupBy = ["CityName"],
+  values = [
+    "SabtAvalieAsnad",
+    "PazireshVaSabtAvalieAsnad",
+    "ArzyabiAsanadBimarsetaniDirect",
+    "ArzyabiAsnadBimarestaniIndirect",
+    "ArzyabiAsnadDandanVaParaDirect",
+    "ArzyabiAsnadDandanVaParaIndirect",
+    "ArzyabiAsnadDaroDirect",
+    "ArzyabiAsnadDaroIndirect",
+    "WithScanCount",
+    "WithoutScanCount",
+    "WithoutScanInDirectCount",
+    "TotalPerformance",
+  ],
+  where = {},
+) {
+  const dataWithThurdsdayEdit = data?.result?.map((item) => {
+    const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+    return {
+      ...item,
+      TotalPerformance: isThursday
+        ? calculatePerformance(item, 1, 2)
+        : item.TotalPerformance,
+    };
+  });
+
+  return processDataForChart(
+    dataWithThurdsdayEdit ?? [],
+    groupBy,
+    values,
+    where,
   ).map((item) => {
+    return {
+      ...item,
+      TotalPerformance: item.TotalPerformance / data.dateLength,
+    };
+  });
+}
+function mapToCitiesWithPerformance({
+  dateLength,
+  result,
+}): CityWithPerformanceData[] {
+  return result.map((item) => {
     // const personnelCount = Math.max(
     //   ...data?.result
     //     .filter((a) => a.CityName === item.key)
     //     .map((a) => a.COUNT),
     // );
     return {
-      CityName_En: item.key,
-      CityName_Fa: getEnglishToPersianCity(item.key),
-      TotalPerformance: item.TotalPerformance / data?.dateLength,
+      CityName_En: item.key.CityName,
+      CityName_Fa: getEnglishToPersianCity(item.key.CityName),
+      TotalPerformance: item.TotalPerformance / dateLength,
 
       // calculatePerformance(item, data?.dateLength) /
       // Math.max(
@@ -84,6 +141,4 @@ export function DistinctDataAndCalculatePerformance(
       // ),
     };
   });
-
-  return citiesWithPerformanceData;
 }

@@ -51,19 +51,106 @@ export function en(inputString): string {
   return inputString.replace(/[۰-۹]/g, (match) => persianToEnglishMap[match]);
 }
 
-export function processDataForChart(rawData, groupBy, values = []) {
+// export function processDataForChart(rawData, groupBy, values = []) {
+//   return rawData.reduce((acc, current) => {
+//     const groupByKey = current[groupBy];
+
+//     const existingGroup = acc.find((item) => item.key === groupByKey);
+
+//     if (existingGroup) {
+//       for (const value of values) {
+//         existingGroup[value] =
+//           (existingGroup[value] || 0) + (current[value] || 0);
+//       }
+//     } else {
+//       const group = { key: groupByKey };
+//       for (const value of values) {
+//         group[value] = current[value] || 0;
+//       }
+//       acc.push(group);
+//     }
+
+//     return acc;
+//   }, []);
+// }
+
+// export function processDataForChart(rawData, groupBy, values = [], where = {}) {
+//   return rawData.reduce((acc, current) => {
+//     const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
+
+//     // Check if the current item meets the 'where' conditions
+//     const meetsConditions = Object.entries(where).every(
+//       ([conditionKey, conditionValues]) => {
+//         if (Array.isArray(conditionValues)) {
+//           return conditionValues.includes(current[conditionKey]);
+//         }
+//         return current[conditionKey] === conditionValues;
+//       },
+//     );
+
+//     if (!meetsConditions) {
+//       return acc; // Skip current item if it doesn't meet conditions
+//     }
+
+//     const groupByKey = groupByKeys.map((key) => current[key]);
+
+//     const existingGroupIndex = acc.findIndex((item) =>
+//       groupByKeys.every((key, index) => item.key[key] === groupByKey[index]),
+//     );
+
+//     if (existingGroupIndex !== -1) {
+//       for (const value of values) {
+//         acc[existingGroupIndex][value] =
+//           (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
+//       }
+//     } else {
+//       const group = { key: {} };
+//       groupByKeys.forEach((key, index) => {
+//         group.key[key] = groupByKey[index];
+//       });
+//       for (const value of values) {
+//         group[value] = current[value] || 0;
+//       }
+//       acc.push(group);
+//     }
+
+//     return acc;
+//   }, []);
+// }
+
+export function processDataForChart(rawData, groupBy, values = [], where = {}) {
   return rawData.reduce((acc, current) => {
-    const groupByKey = current[groupBy];
+    const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
 
-    const existingGroup = acc.find((item) => item.key === groupByKey);
+    // Check if the current item meets the 'where' conditions
+    const meetsConditions = Object.entries(where).every(
+      ([conditionKey, conditionValues]) => {
+        if (Array.isArray(conditionValues)) {
+          return conditionValues.includes(current[conditionKey]);
+        }
+        return current[conditionKey] === conditionValues;
+      },
+    );
 
-    if (existingGroup) {
+    if (!meetsConditions) {
+      return acc; // Skip current item if it doesn't meet conditions
+    }
+
+    const groupByKey = groupByKeys.map((key) => current[key]);
+
+    const existingGroupIndex = acc.findIndex((item) =>
+      groupByKeys.every((key, index) => item.key[key] === groupByKey[index]),
+    );
+
+    if (existingGroupIndex !== -1) {
       for (const value of values) {
-        existingGroup[value] =
-          (existingGroup[value] || 0) + (current[value] || 0);
+        acc[existingGroupIndex][value] += current[value] || 0;
       }
     } else {
-      const group = { key: groupByKey };
+      const group = { key: {} };
+      groupByKeys.forEach((key, index) => {
+        group.key[key] = groupByKey[index];
+      });
       for (const value of values) {
         group[value] = current[value] || 0;
       }
@@ -73,7 +160,6 @@ export function processDataForChart(rawData, groupBy, values = []) {
     return acc;
   }, []);
 }
-
 export function countColumnValues(data, column, values) {
   const countMap = {};
 
