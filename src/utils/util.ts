@@ -118,7 +118,63 @@ export function en(inputString): string {
 //   }, []);
 // }
 
-export function processDataForChart(rawData, groupBy, values = [], where = {}) {
+// export function processDataForChart(rawData, groupBy, values = [], where = {}) {
+//   return rawData.reduce((acc, current) => {
+//     const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
+
+//     // Check if the current item meets the 'where' conditions
+//     const meetsConditions = Object.entries(where).every(
+//       ([conditionKey, conditionValues]) => {
+//         if (Array.isArray(conditionValues)) {
+//           return conditionValues.includes(current[conditionKey]);
+//         }
+//         return current[conditionKey] === conditionValues;
+//       },
+//     );
+
+//     if (!meetsConditions) {
+//       return acc; // Skip current item if it doesn't meet conditions
+//     }
+
+//     const groupByKey = groupByKeys.map((key) => current[key]);
+
+//     const existingGroupIndex = acc.findIndex((item) =>
+//       groupByKeys.every((key, index) => item.key[key] === groupByKey[index]),
+//     );
+
+//     if (existingGroupIndex !== -1) {
+//       for (const value of values) {
+//         // my code
+//         if (typeof acc[existingGroupIndex][value] === "string") {
+//           if (acc[existingGroupIndex][value] === current[value]) continue;
+
+//           acc[existingGroupIndex][value] += ","; // my code
+//         }
+
+//         acc[existingGroupIndex][value] += current[value] || 0;
+//       }
+//     } else {
+//       const group = { key: {} };
+//       groupByKeys.forEach((key, index) => {
+//         group.key[key] = groupByKey[index];
+//       });
+//       for (const value of values) {
+//         group[value] = current[value] || 0;
+//       }
+//       acc.push(group);
+//     }
+
+//     return acc;
+//   }, []);
+// }
+
+export function processDataForChart(
+  rawData,
+  groupBy,
+  values = [],
+  where = {},
+  options = { max: [] },
+) {
   return rawData.reduce((acc, current) => {
     const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
 
@@ -144,7 +200,23 @@ export function processDataForChart(rawData, groupBy, values = [], where = {}) {
 
     if (existingGroupIndex !== -1) {
       for (const value of values) {
-        acc[existingGroupIndex][value] += current[value] || 0;
+        if (options.max && options.max.includes(value)) {
+          // If it's in the max array, keep the maximum value
+          acc[existingGroupIndex][value] = Math.max(
+            acc[existingGroupIndex][value] || 0,
+            current[value] || 0,
+          );
+        } else {
+          // Otherwise, sum the values
+
+          // my code
+          if (typeof acc[existingGroupIndex][value] === "string") {
+            if (acc[existingGroupIndex][value] === current[value]) continue;
+            acc[existingGroupIndex][value] += ","; // my code
+          }
+          acc[existingGroupIndex][value] =
+            (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
+        }
       }
     } else {
       const group = { key: {} };
@@ -160,6 +232,7 @@ export function processDataForChart(rawData, groupBy, values = [], where = {}) {
     return acc;
   }, []);
 }
+
 export function countColumnValues(data, column, values) {
   const countMap = {};
 

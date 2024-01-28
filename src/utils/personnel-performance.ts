@@ -50,16 +50,19 @@ export function DistinctDataAndCalculatePerformance(
     "WithScanCount",
     "WithoutScanCount",
     "WithoutScanInDirectCount",
+    "COUNT",
     "TotalPerformance",
   ],
   where = {},
 ) {
+  console.log({ data });
   const dataWithThurdsdayEdit = data?.result?.map((item) => {
     const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+
     return {
       ...item,
       TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2)
+        ? calculatePerformance(item, 1, 2) / item.COUNT
         : item.TotalPerformance,
     };
   });
@@ -70,7 +73,7 @@ export function DistinctDataAndCalculatePerformance(
     values,
     where,
   );
-
+  console.log({ citiesWithPerformanceData });
   return mapToCitiesWithPerformance({
     dateLength: data?.dateLength,
     result: citiesWithPerformanceData,
@@ -98,6 +101,7 @@ export function DistinctPersonnelPerformanceData(
 ) {
   const dataWithThurdsdayEdit = data?.result?.map((item) => {
     const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+
     return {
       ...item,
       TotalPerformance: isThursday
@@ -123,11 +127,10 @@ function mapToCitiesWithPerformance({
   result,
 }): CityWithPerformanceData[] {
   return result.map((item) => {
-    // const personnelCount = Math.max(
-    //   ...data?.result
-    //     .filter((a) => a.CityName === item.key)
-    //     .map((a) => a.COUNT),
-    // );
+    // const personnelCount = result.find(
+    //   (a) => a.key.CityName === item.key.CityName,
+    // ).COUNT;
+
     return {
       CityName_En: item.key.CityName,
       CityName_Fa: getEnglishToPersianCity(item.key.CityName),
@@ -141,4 +144,25 @@ function mapToCitiesWithPerformance({
       // ),
     };
   });
+}
+
+export function sparkChartForPersonnelAndCity(
+  data,
+  propertyToCheck,
+  valueToCheck,
+) {
+  return data
+    .filter((a) => a[propertyToCheck] === valueToCheck)
+    .map((item) => {
+      const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+
+      return {
+        TotalPerformance: isThursday
+          ? calculatePerformance(item, 1, 2)
+          : item.TotalPerformance,
+        Start_Date: item.Start_Date,
+        Benchmark: 75,
+        Benchmark2: 120,
+      };
+    });
 }

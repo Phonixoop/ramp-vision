@@ -39,7 +39,7 @@ import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import { api } from "~/utils/api";
 import {
   DistinctPersonnelPerformanceData,
-  calculatePerformance,
+  sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import {
   DistinctData,
@@ -80,12 +80,38 @@ export default function CityPage({ children, city }) {
     {
       onSuccess: (data) => {
         setSelectedPerson(undefined);
-        setUpdatedList(DistinctData(data.result, data?.dateLength));
+        setUpdatedList(
+          DistinctPersonnelPerformanceData(
+            data ?? [],
+            ["NationalCode", "NameFamily"],
+            [
+              "NationalCode",
+              "NameFamily",
+              "SabtAvalieAsnad",
+              "PazireshVaSabtAvalieAsnad",
+              "ArzyabiAsanadBimarsetaniDirect",
+              "ArzyabiAsnadBimarestaniIndirect",
+              "ArzyabiAsnadDandanVaParaDirect",
+              "ArzyabiAsnadDandanVaParaIndirect",
+              "ArzyabiAsnadDaroDirect",
+              "ArzyabiAsnadDaroIndirect",
+              "WithScanCount",
+              "WithoutScanCount",
+              "WithoutScanInDirectCount",
+              "Role",
+              "RoleType",
+              "ContractType",
+              "ProjectType",
+              "TotalPerformance",
+              "Start_Date",
+            ],
+          ),
+        );
       },
       refetchOnWindowFocus: false,
     },
   );
-  const [updatedList, setUpdatedList] = useState(getAll.data?.result ?? []);
+  const [updatedList, setUpdatedList] = useState([]);
 
   const numericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "number",
@@ -104,21 +130,21 @@ export default function CityPage({ children, city }) {
 
   const fullData: CityWithPerformanceData[] = useMemo(
     () =>
-      DistinctPersonnelPerformanceData(getAll?.data?.result ?? [], [
-        "Start_Date",
-      ]).map((d) => {
-        // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
-        const translatedData = {};
-        for (const key in d) {
-          if (PersonnelPerformanceTranslate[key]) {
-            translatedData[PersonnelPerformanceTranslate[key]] = d[key];
-          } else {
-            translatedData[key] = d[key];
+      DistinctPersonnelPerformanceData(getAll?.data ?? [], ["Start_Date"]).map(
+        (d) => {
+          // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
+          const translatedData = {};
+          for (const key in d) {
+            if (PersonnelPerformanceTranslate[key]) {
+              translatedData[PersonnelPerformanceTranslate[key]] = d[key];
+            } else {
+              translatedData[key] = d[key];
+            }
           }
-        }
 
-        return translatedData;
-      }),
+          return translatedData;
+        },
+      ),
     [getAll?.data?.result],
   );
 
@@ -139,7 +165,31 @@ export default function CityPage({ children, city }) {
         }
         isLoading={getAll.isLoading}
         disabled={!!!updatedList}
-        list={DistinctData(getAll?.data?.result, getAll?.data?.dateLength)}
+        list={DistinctPersonnelPerformanceData(
+          getAll?.data ?? [],
+          ["NationalCode", "NameFamily"],
+          [
+            "NationalCode",
+            "NameFamily",
+            "SabtAvalieAsnad",
+            "PazireshVaSabtAvalieAsnad",
+            "ArzyabiAsanadBimarsetaniDirect",
+            "ArzyabiAsnadBimarestaniIndirect",
+            "ArzyabiAsnadDandanVaParaDirect",
+            "ArzyabiAsnadDandanVaParaIndirect",
+            "ArzyabiAsnadDaroDirect",
+            "ArzyabiAsnadDaroIndirect",
+            "WithScanCount",
+            "WithoutScanCount",
+            "WithoutScanInDirectCount",
+            "Role",
+            "RoleType",
+            "ContractType",
+            "ProjectType",
+            "TotalPerformance",
+            "Start_Date",
+          ],
+        )}
         filteredList={
           !getAll.isLoading
             ? updatedList
@@ -206,16 +256,11 @@ export default function CityPage({ children, city }) {
                   </div>
                   <div className="flex w-full items-center justify-center">
                     <SparkAreaChart
-                      data={getAll?.data?.result
-                        .filter((a) => a.NameFamily === user.NameFamily)
-                        .map((a) => {
-                          return {
-                            TotalPerformance: a.TotalPerformance,
-                            Start_Date: a.Start_Date,
-                            Benchmark: 75,
-                            Benchmark2: 120,
-                          };
-                        })}
+                      data={sparkChartForPersonnelAndCity(
+                        getAll?.data?.result,
+                        "NameFamily",
+                        user.NameFamily,
+                      )}
                       categories={[
                         "TotalPerformance",
                         "Benchmark",
@@ -315,7 +360,7 @@ export default function CityPage({ children, city }) {
             <AreaChart
               data={fullData}
               dir="rtl"
-              index="key"
+              index="key.Start_Date"
               categories={[
                 "ثبت اولیه اسناد",
                 "پذیرش و ثبت اولیه اسناد",

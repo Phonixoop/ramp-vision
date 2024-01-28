@@ -181,7 +181,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-
+        //console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -239,6 +239,140 @@ export const personnelPerformanceRouter = createTRPCRouter({
         return error;
       }
     }),
+  getCitiesWithPerformance: protectedProcedure
+    .input(
+      z.object({
+        periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("ماهانه"),
+        filter: z.object({
+          CityName: z.array(z.string()).nullish().default([]),
+          Start_Date: z.array(z.string()).nullish(),
+          ProjectType: z.array(z.string()).nullish(),
+          ContractType: z.array(z.string()).nullish(),
+          Role: z.array(z.string()).nullish(),
+          RoleType: z.array(z.string()).nullish(),
+          DateInfo: z.array(z.string()).nullish().default(["1402/09/30"]),
+        }),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        // Connect to SQL Server
+        let filter = input.filter;
+        const permissions = await getPermission({ ctx });
+        const cities = permissions
+          .find((permission) => permission.id === "ViewCities")
+          .subPermissions.filter((permission) => permission.isActive)
+          .map((permission) => permission.enLabel);
+
+        let whereClause = generateWhereClause({
+          ...filter,
+          CityName: cities,
+          Start_Date: input.filter.Start_Date,
+        });
+
+        if (filter.CityName?.length > 0)
+          filter.CityName = cities.filter((value) =>
+            filter.CityName.includes(value),
+          );
+        if (filter.CityName.length <= 0) filter.CityName = cities;
+        // let queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
+        // `;
+
+        let queryCities = `
+        
+        
+     
+      SELECT
+      CityName,
+      p.Start_Date,
+      COUNT(*) AS COUNT,
+      AVG(TotalPerformance) AS TotalPerformance,
+  
+      
+      SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
+      SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+      SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+      SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+      SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+      SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+      SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+      SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+      SUM(WithScanCount) as WithScanCount,
+      SUM(WithoutScanCount) as WithoutScanCount,
+      SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
+
+
+      FROM dbName.dbo.personnel_performance as p
+      JOIN
+      RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
+      whereClause
+
+      group by CityName,p.Start_Date ORDER BY CityName ASC
+      `;
+
+        if (input.periodType === "هفتگی") {
+          filter.Start_Date = getDatesBetweenTwoDates(
+            filter.Start_Date[0],
+            filter.Start_Date[1],
+          );
+
+          whereClause = generateWhereClause(filter);
+        }
+        if (input.periodType === "ماهانه") {
+          filter.Start_Date = filter.Start_Date.map((d) => {
+            return extractYearAndMonth(d);
+          });
+          const date = filter.Start_Date[0].split("/");
+          whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
+
+          queryCities = `
+              
+        SELECT
+        CityName,
+        p.Start_Date,
+        COUNT(*) AS COUNT,
+        AVG(TotalPerformance) AS TotalPerformance,
+    
+        
+        SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
+        SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+        SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+        SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+        SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+        SUM(WithScanCount) as WithScanCount,
+        SUM(WithoutScanCount) as WithoutScanCount,
+        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
+        
+      
+        FROM dbName.dbo.personnel_performance as p
+        JOIN
+        RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
+        whereClause AND Start_Date LIKE '${date[0]}/${date[1]}%'
+
+        group by CityName,p.Start_Date ORDER BY CityName ASC
+        `;
+        }
+        queryCities = queryCities.replace("whereClause", whereClause);
+        queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
+        // console.log(queryCities);
+        const resultOfCities = await sql.query(queryCities);
+
+        return {
+          dateLength: new Set(
+            resultOfCities.recordsets[0].map((a) => a.Start_Date),
+          ).size,
+
+          result: resultOfCities.recordsets[0],
+        };
+        // Respond with the fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+        return error;
+      }
+    }),
   getInitialFilters: protectedProcedure.query(async ({ ctx }) => {
     try {
       // Connect to SQL Server
@@ -277,6 +411,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       return error;
     }
   }),
+
   get30DaysTrack: protectedProcedure
     .input(
       z.object({
@@ -403,140 +538,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       return error;
     }
   }),
-  getCitiesWithPerformance: protectedProcedure
-    .input(
-      z.object({
-        periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]).default("ماهانه"),
-        filter: z.object({
-          CityName: z.array(z.string()).nullish().default([]),
-          Start_Date: z.array(z.string()).nullish(),
-          ProjectType: z.array(z.string()).nullish(),
-          ContractType: z.array(z.string()).nullish(),
-          Role: z.array(z.string()).nullish(),
-          RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish().default(["1402/09/30"]),
-        }),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      try {
-        // Connect to SQL Server
-        let filter = input.filter;
-        const permissions = await getPermission({ ctx });
-        const cities = permissions
-          .find((permission) => permission.id === "ViewCities")
-          .subPermissions.filter((permission) => permission.isActive)
-          .map((permission) => permission.enLabel);
 
-        let whereClause = generateWhereClause({
-          ...filter,
-          CityName: cities,
-          Start_Date: input.filter.Start_Date,
-        });
-
-        if (filter.CityName?.length > 0)
-          filter.CityName = cities.filter((value) =>
-            filter.CityName.includes(value),
-          );
-        if (filter.CityName.length <= 0) filter.CityName = cities;
-        // let queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
-        // `;
-
-        let queryCities = `
-          
-          
-       
-        SELECT
-        CityName,
-        p.Start_Date,
-        COUNT(*) AS COUNT,
-        AVG(TotalPerformance) AS TotalPerformance,
-		
-	  	  
-        SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-        SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-        SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-        SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-        SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-        SUM(WithScanCount) as WithScanCount,
-        SUM(WithoutScanCount) as WithoutScanCount,
-        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
-
-
-        FROM dbName.dbo.personnel_performance as p
-        JOIN
-        RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-        whereClause
-
-        group by CityName,p.Start_Date ORDER BY CityName ASC
-        `;
-
-        if (input.periodType === "هفتگی") {
-          filter.Start_Date = getDatesBetweenTwoDates(
-            filter.Start_Date[0],
-            filter.Start_Date[1],
-          );
-
-          whereClause = generateWhereClause(filter);
-        }
-        if (input.periodType === "ماهانه") {
-          filter.Start_Date = filter.Start_Date.map((d) => {
-            return extractYearAndMonth(d);
-          });
-          const date = filter.Start_Date[0].split("/");
-          whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
-
-          queryCities = `
-                
-          SELECT
-          CityName,
-          p.Start_Date,
-          COUNT(*) AS COUNT,
-          AVG(TotalPerformance) AS TotalPerformance,
-      
-          
-          SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-          SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-          SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-          SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-          SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-          SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-          SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-          SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-          SUM(WithScanCount) as WithScanCount,
-          SUM(WithoutScanCount) as WithoutScanCount,
-          SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
-          
-        
-          FROM dbName.dbo.personnel_performance as p
-          JOIN
-          RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-          whereClause AND Start_Date LIKE '${date[0]}/${date[1]}%'
-  
-          group by CityName,p.Start_Date ORDER BY CityName ASC
-          `;
-        }
-        queryCities = queryCities.replace("whereClause", whereClause);
-        queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-        // console.log(queryCities);
-        const resultOfCities = await sql.query(queryCities);
-
-        return {
-          dateLength: new Set(
-            resultOfCities.recordsets[0].map((a) => a.Start_Date),
-          ).size,
-
-          result: resultOfCities.recordsets[0],
-        };
-        // Respond with the fetched data
-      } catch (error) {
-        console.error("Error fetching data:", error.message);
-        return error;
-      }
-    }),
   getUsersByCityName: protectedProcedure
     .input(
       z.object({

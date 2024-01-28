@@ -70,7 +70,9 @@ export function SelectControlled({
         {list.map((item) => {
           return (
             <MultiSelectItem key={item} value={item}>
-              <p className=" px-2 text-right">{item}</p>
+              <p className="px-2 text-right text-primary hover:text-accent">
+                {item}
+              </p>
             </MultiSelectItem>
           );
         })}

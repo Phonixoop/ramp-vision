@@ -45,6 +45,7 @@ import { TrendDecider } from "~/features/trend-decider";
 import {
   DistinctDataAndCalculatePerformance,
   calculatePerformance,
+  sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import { CityWithPerformanceData } from "~/types";
 
@@ -422,16 +423,11 @@ export default function CitiesPage({ children }) {
                     </div>
                     <div className="flex w-full  items-center justify-center">
                       <SparkAreaChart
-                        data={getCitiesWithPerformance.data.result
-                          ?.filter((a) => a.CityName === item.CityName_En)
-                          .map((a) => {
-                            return {
-                              TotalPerformance: a.TotalPerformance,
-                              Start_Date: a.Start_Date,
-                              Benchmark: 75,
-                              Benchmark2: 120,
-                            };
-                          })}
+                        data={sparkChartForPersonnelAndCity(
+                          getCitiesWithPerformance.data.result,
+                          "CityName",
+                          item.CityName_En,
+                        )}
                         categories={[
                           "TotalPerformance",
                           "Benchmark",
