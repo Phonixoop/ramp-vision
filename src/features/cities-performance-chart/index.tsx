@@ -4,14 +4,16 @@ import { api } from "~/utils/api";
 import {
   DistinctDataAndCalculatePerformance,
   DistinctPersonnelPerformanceData,
+  getPerformanceMetric,
 } from "~/utils/personnel-performance";
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 
-import { ResponsiveContainer } from "recharts";
+import { Cell, ResponsiveContainer } from "recharts";
 
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 import { Performance_Levels } from "~/constants/personnel-performance";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
+import { twMerge } from "tailwind-merge";
 
 export default function CitiesPerformanceBarChart({
   filters,
@@ -62,23 +64,41 @@ export default function CitiesPerformanceBarChart({
               },
             ]}
             keys={["شهر"]}
-            refrenceLines={Performance_Levels.map((level) => {
-              const max = Math.max(
-                ...getCitiesWithPerformance.data.map((a) => a.TotalPerformance),
-              );
-              return {
-                name: level.tooltip.text,
-                number:
-                  level.limit > 180 && max > 180 && max <= 500
-                    ? max
-                    : level.limit,
-                color: level.color,
-              };
-            })}
+            // refrenceLines={Performance_Levels.map((level) => {
+            //   const max = Math.max(
+            //     ...getCitiesWithPerformance.data.map((a) => a.TotalPerformance),
+            //   );
+            //   return {
+            //     name: level.tooltip.text,
+            //     number:
+            //       level.limit > 180 && max > 180 && max <= 500
+            //         ? max
+            //         : level.limit,
+            //     color: level.color,
+            //   };
+            // })}
             nameClassName="fill-primary"
             customXTick
             customYTick
             formatter={commify}
+            customBars={(data) => {
+              if (data.length <= 0) return <></>;
+
+              return (
+                <>
+                  {data.map((item, index) => {
+                    return (
+                      <>
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={getPerformanceMetric(item["عملکرد"]).color}
+                        />
+                      </>
+                    );
+                  })}
+                </>
+              );
+            }}
           />
         </div>
       </ResponsiveContainer>
@@ -155,23 +175,41 @@ export function CitiesWithDatesPerformanceBarChart({
             ]}
             keys={["تاریخ"]}
             brushKey="تاریخ"
-            refrenceLines={Performance_Levels.map((level) => {
-              const max = Math.max(
-                ...getCitiesWithPerformance.data.map((a) => a.TotalPerformance),
-              );
-              return {
-                name: level.tooltip.text,
-                number:
-                  level.limit > 180 && max > 180 && max <= 500
-                    ? max
-                    : level.limit,
-                color: level.color,
-              };
-            })}
+            // refrenceLines={Performance_Levels.map((level) => {
+            //   const max = Math.max(
+            //     ...getCitiesWithPerformance.data.map((a) => a.TotalPerformance),
+            //   );
+            //   return {
+            //     name: level.tooltip.text,
+            //     number:
+            //       level.limit > 180 && max > 180 && max <= 500
+            //         ? max
+            //         : level.limit,
+            //     color: level.color,
+            //   };
+            // })}
             nameClassName="fill-primary"
             customXTick
             customYTick
             formatter={commify}
+            customBars={(data) => {
+              if (data.length <= 0) return <></>;
+
+              return (
+                <>
+                  {data.map((item, index) => {
+                    return (
+                      <>
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={getPerformanceMetric(item["عملکرد"]).color}
+                        />
+                      </>
+                    );
+                  })}
+                </>
+              );
+            }}
           />
         </div>
       </ResponsiveContainer>

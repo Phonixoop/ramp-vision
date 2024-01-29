@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import moment from "jalali-moment";
 import { CITIES } from "~/constants";
-import { performanceMetrics } from "~/constants/personnel-performance";
+import { Performance_Levels } from "~/constants/personnel-performance";
 import { Permission } from "~/types";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { calculatePerformance } from "~/utils/personnel-performance";
@@ -589,13 +589,6 @@ export function getEnglishToPersianCity(cityName: string) {
   return EnglishKeyToPersianValueMap[cityName] || cityName;
 }
 
-export function getPerformanceMetric(performance: number) {
-  return (
-    performanceMetrics.find((metric) => performance < metric.limit) ||
-    performanceMetrics[performanceMetrics.length - 1]
-  );
-}
-
 export function analyzePerformanceTrend(
   values: number[],
 ): "Up" | "Stable" | "Down" {
@@ -603,7 +596,7 @@ export function analyzePerformanceTrend(
   let goingDown = 0;
   let stable = 0;
 
-  for (let i = 1; i < values.length; i++) {
+  for (let i = 1; i < values?.length; i++) {
     if (values[i] > values[i - 1]) {
       growing++;
     } else if (values[i] < values[i - 1]) {

@@ -1,10 +1,11 @@
 import { SquircleIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
   Brush,
   CartesianGrid,
+  Cell,
   ComposedChart,
   LabelList,
   Legend,
@@ -15,9 +16,60 @@ import {
   YAxis,
 } from "recharts";
 import { twMerge } from "tailwind-merge";
-import { Performance_Levels } from "~/constants/personnel-performance";
-import { commify } from "~/utils/util";
 
+const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
+
+const getPath = (x, y, width, height) => {
+  return `M${x},${y + height}C${x + width / 3},${y + height} ${x + width / 2},${
+    y + height / 3
+  }
+  ${x + width / 2}, ${y}
+  C${x + width / 2},${y + height / 3} ${x + (2 * width) / 3},${y + height} ${
+    x + width
+  }, ${y + height}
+  Z`;
+};
+
+const TriangleBar = (props) => {
+  const { fill, x, y, width, height } = props;
+
+  return <path d={getPath(x, y, width, height)} stroke="none" fill={fill} />;
+};
+
+function getPathRectangle(
+  x,
+  y,
+  width,
+  height,
+  topLeftRadius,
+  topRightRadius,
+  bottomRightRadius,
+  bottomLeftRadius,
+) {
+  return `
+  M${x + topLeftRadius},${y}
+  H${x + width - topRightRadius}
+  Q${x + width},${y} ${x + width},${y + topRightRadius}
+  V${y + height - bottomRightRadius}
+  Q${x + width},${y + height} ${x + width - bottomRightRadius},${y + height}
+  H${x + bottomLeftRadius}
+  Q${x},${y + height} ${x},${y + height - bottomLeftRadius}
+  V${y + topLeftRadius}
+  Q${x},${y} ${x + topLeftRadius},${y}
+  Z`;
+}
+
+const RectangleBar = (props) => {
+  const { fill, x, y, width, height } = props;
+
+  return (
+    <path
+      d={getPathRectangle(x, y, width, height, 10, 10, 0, 0)}
+      stroke="none"
+      fill={fill}
+    />
+  );
+};
 type BarType = {
   name: string;
 
@@ -63,6 +115,7 @@ type CustomBarChartOptions = {
   customYTick?: boolean;
   brushKey?: string;
   formatter?: Function;
+  customBars?: (data) => ReactNode;
 };
 export default function CustomBarChart({
   nameClassName = "",
@@ -76,6 +129,7 @@ export default function CustomBarChart({
   customYTick = false,
   brushKey,
   formatter = (num: number) => "",
+  customBars = undefined,
 }: CustomBarChartOptions) {
   const container = useRef<HTMLDivElement>(undefined);
 
@@ -125,7 +179,13 @@ export default function CustomBarChart({
         {bars.map((bar) => {
           return (
             <>
-              <Bar dataKey={bar.name} className={bar.className}>
+              <Bar
+                dataKey={bar.name}
+                className={bar.className}
+                shape={<RectangleBar />}
+              >
+                {customBars && customBars(data)}
+
                 {bar.labelClassName && (
                   <LabelList
                     formatter={formatter}

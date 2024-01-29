@@ -62,45 +62,6 @@ export const defualtContractTypes = ["تمام وقت"];
 
 export const defualtDateInfos = ["1402/03/31"];
 
-export const performanceMetrics = [
-  {
-    limit: 80,
-    color: "#B12B1D",
-    tooltip: {
-      text: "ضعیف",
-    },
-  },
-
-  {
-    limit: 100,
-    color: "#7BB11B",
-    tooltip: {
-      text: "متوسط",
-    },
-  },
-  {
-    limit: 150,
-    color: "#7BB11B",
-    tooltip: {
-      text: "خوب",
-    },
-  },
-  {
-    limit: 200,
-    color: "#16B13D",
-    tooltip: {
-      text: "عالی",
-    },
-  },
-  {
-    limit: 500,
-    color: "#B1671E",
-    tooltip: {
-      text: "نیاز به بررسی",
-    },
-  },
-];
-
 export const Indicators = {
   ArzyabiAsanadBimarsetaniDirect: 35, // ارزیابی اسناد بیمارستانی مستقیم
   ArzyabiAsnadDaroDirect: 250, // ارزیابی اسناد دارو مستقیم
@@ -132,7 +93,7 @@ export const Performance_Levels = [
 
   {
     limit: 90,
-    color: "#7BB11B",
+    color: "#4ee975",
     tooltip: {
       text: "متوسط",
     },

@@ -613,12 +613,12 @@ function DeposTable({ sessionData }) {
                               "تعداد رسیدگی",
                             ]}
                           /> */}
-                          {/* <ResponsiveContainer width="99%" height={300}>
+                          <ResponsiveContainer width="99%" height={300}>
                             <BarChart
                               showAnimation={true}
                               data={(serviceData ?? []).map((row) => {
                                 return {
-                                  name: ShortServiceNames[row.key],
+                                  name: ShortServiceNames[row.key.ServiceName],
                                   "تعداد دپو": row.DepoCount,
                                   "تعداد ورودی": row.EntryCount,
                                   "تعداد رسیدگی": row.Capicity,
@@ -638,8 +638,8 @@ function DeposTable({ sessionData }) {
                               noDataText={Text.noData.fa}
                               intervalType="preserveStartEnd"
                             />
-                          </ResponsiveContainer> */}
-                          <ResponsiveContainer width="99%" height={300}>
+                          </ResponsiveContainer>
+                          {/* <ResponsiveContainer width="99%" height={300}>
                             <CustomBarChart
                               width={500}
                               height={300}
@@ -679,7 +679,7 @@ function DeposTable({ sessionData }) {
                               customYTick
                               formatter={commify}
                             />
-                          </ResponsiveContainer>
+                          </ResponsiveContainer> */}
                         </div>
                         {/* <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
                           <H2>نمودار زمانی</H2>

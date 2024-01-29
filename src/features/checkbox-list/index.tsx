@@ -1,11 +1,17 @@
 import { Column } from "@tanstack/react-table";
 import { MultiSelect, MultiSelectItem } from "@tremor/react";
+import { ListXIcon, ListChecksIcon } from "lucide-react";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ServiceNamesType } from "~/constants/depo";
 import Button from "~/ui/buttons";
 import { api } from "~/utils/api";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 export default function CheckboxList({ checkboxes, onCheckboxChange }) {
   const handleCheckboxChange = (id) => {
     onCheckboxChange(id);
@@ -34,33 +40,19 @@ export function SelectControlled({
   value,
   onChange,
   title,
-
+  className = "",
   withSelectAll = false,
 }) {
   const selectAllState = value.length < list.length;
   return (
-    <div className=" flex w-full flex-col items-center justify-center gap-2 px-2 text-center sm:px-0 ">
-      {withSelectAll && (
-        <Button
-          className={twMerge(
-            "font-bold",
-            selectAllState
-              ? "bg-emerald-200 text-emerald-900"
-              : "bg-rose-400 text-rose-900",
-          )}
-          onClick={() => {
-            if (value.length == list.length) {
-              onChange([]);
-            } else {
-              onChange(list);
-            }
-          }}
-        >
-          {selectAllState ? "انتخاب همه" : "پاک کردن همه"}
-        </Button>
+    <div
+      className={twMerge(
+        " flex w-full   items-center justify-center gap-2 px-2 text-center sm:px-0 ",
+        className,
       )}
+    >
       <MultiSelect
-        className="min-w-full"
+        className="min-w-0"
         placeholder={title}
         placeholderSearch="جستجو..."
         defaultValue={list}
@@ -77,6 +69,36 @@ export function SelectControlled({
           );
         })}
       </MultiSelect>
+      {withSelectAll && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                className={twMerge(
+                  "font-bold",
+                  selectAllState
+                    ? "border border-primary/20  p-1.5 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20"
+                    : "border border-primary/20  bg-primary/10 p-1.5 text-rose-600 transition-all duration-300 hover:bg-primary/20",
+                )}
+                onClick={() => {
+                  if (value.length == list.length) {
+                    onChange([]);
+                  } else {
+                    onChange(list);
+                  }
+                }}
+              >
+                {selectAllState ? <ListChecksIcon /> : <ListXIcon />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-primary">
+              <p className="text-secondary">
+                {selectAllState ? "انتخاب همه" : "پاک کردن انتخاب ها"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
     </div>
   );
 }
@@ -105,35 +127,9 @@ export function SelectColumnFilter({
   const selectedCount = getFilterValue() ? (getFilterValue() as any).length : 0;
   const selectAllState = selectedCount < unique.length;
   return (
-    <>
-      {withSelectAll && !singleSelect && (
-        <Button
-          className={twMerge(
-            "font-bold",
-            selectAllState
-              ? "bg-emerald-200 text-emerald-900"
-              : "bg-rose-400 text-rose-900",
-          )}
-          onClick={() => {
-            if (selectedCount == unique.length) {
-              setFilterValue([]);
-              onChange({
-                id: column.id,
-                values: [],
-              });
-            } else {
-              setFilterValue(unique);
-              onChange({
-                id: column.id,
-                values: unique,
-              });
-            }
-          }}
-        >
-          {selectAllState ? "انتخاب همه" : "پاک کردن همه"}
-        </Button>
-      )}
+    <div className=" flex w-full  items-center justify-center gap-2 px-2 text-center sm:px-0 ">
       <SelectControlled
+        className="min-w-0"
         title={column.columnDef.header}
         list={unique}
         value={getFilterValue() ?? []}
@@ -149,6 +145,44 @@ export function SelectColumnFilter({
           });
         }}
       />
-    </>
+      {withSelectAll && !singleSelect && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                className={twMerge(
+                  "font-bold",
+                  selectAllState
+                    ? "border border-primary/20  p-1.5 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20"
+                    : "border border-primary/20  bg-primary/10 p-1.5 text-rose-600 transition-all duration-300 hover:bg-primary/20",
+                )}
+                onClick={() => {
+                  if (selectedCount == unique.length) {
+                    setFilterValue([]);
+                    onChange({
+                      id: column.id,
+                      values: [],
+                    });
+                  } else {
+                    setFilterValue(unique);
+                    onChange({
+                      id: column.id,
+                      values: unique,
+                    });
+                  }
+                }}
+              >
+                {selectAllState ? <ListChecksIcon /> : <ListXIcon />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-primary">
+              <p className="text-secondary">
+                {selectAllState ? "انتخاب همه" : "پاک کردن انتخاب ها"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+    </div>
   );
 }

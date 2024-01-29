@@ -198,7 +198,7 @@ export default function CitiesPage({ children }) {
                 />
               </div>
 
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2 sm:w-[23rem]">
+              <div className="flex  max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2 sm:w-[25rem]">
                 <span className="font-bold text-primary">سمت</span>
                 <SelectControlled
                   withSelectAll
@@ -424,7 +424,7 @@ export default function CitiesPage({ children }) {
                     <div className="flex w-full  items-center justify-center">
                       <SparkAreaChart
                         data={sparkChartForPersonnelAndCity(
-                          getCitiesWithPerformance.data.result,
+                          getCitiesWithPerformance?.data?.result ?? [],
                           "CityName",
                           item.CityName_En,
                         )}

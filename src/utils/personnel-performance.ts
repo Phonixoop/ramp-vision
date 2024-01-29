@@ -1,5 +1,8 @@
 import moment from "jalali-moment";
-import { Indicators } from "~/constants/personnel-performance";
+import {
+  Indicators,
+  Performance_Levels,
+} from "~/constants/personnel-performance";
 import { CityWithPerformanceData } from "~/types";
 import { getEnglishToPersianCity, processDataForChart } from "~/utils/util";
 
@@ -55,14 +58,13 @@ export function DistinctDataAndCalculatePerformance(
   ],
   where = {},
 ) {
-  console.log({ data });
   const dataWithThurdsdayEdit = data?.result?.map((item) => {
     const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
-
+    const count = item.COUNT > 0 ? item.COUNT : 1;
     return {
       ...item,
       TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2) / item.COUNT
+        ? calculatePerformance(item, 1, 2) / count
         : item.TotalPerformance,
     };
   });
@@ -73,7 +75,7 @@ export function DistinctDataAndCalculatePerformance(
     values,
     where,
   );
-  console.log({ citiesWithPerformanceData });
+
   return mapToCitiesWithPerformance({
     dateLength: data?.dateLength,
     result: citiesWithPerformanceData,
@@ -102,10 +104,11 @@ export function DistinctPersonnelPerformanceData(
   const dataWithThurdsdayEdit = data?.result?.map((item) => {
     const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
+    const count = item.COUNT > 0 ? item.COUNT : 1;
     return {
       ...item,
       TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2)
+        ? calculatePerformance(item, 1, 2) / count
         : item.TotalPerformance,
     };
   });
@@ -166,3 +169,13 @@ export function sparkChartForPersonnelAndCity(
       };
     });
 }
+
+export const getPerformanceMetric = (limit) => {
+  // Find the first metric that matches the condition
+  const selectedMetric = Performance_Levels.find(
+    (metric) => limit <= metric.limit,
+  );
+
+  // If nothing is found, return the last metric
+  return selectedMetric || Performance_Levels[Performance_Levels.length - 1];
+};

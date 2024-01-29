@@ -49,7 +49,6 @@ import {
   countColumnValues,
   en,
   getEnglishToPersianCity,
-  getPerformanceMetric,
   getPerformanceText,
   getPersianToEnglishCity,
   getServiceNameColor,
@@ -76,6 +75,7 @@ import {
   defualtContractTypes,
   defualtDateInfos,
 } from "~/constants/personnel-performance";
+import { getPerformanceMetric } from "~/utils/personnel-performance";
 
 function CustomInput({ value, openCalendar }) {
   return (
