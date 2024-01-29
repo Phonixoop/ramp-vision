@@ -5,7 +5,7 @@ import {
 } from "~/constants/personnel-performance";
 import { PeriodType } from "~/context/personnel-filter.context";
 import { CityWithPerformanceData } from "~/types";
-import { getWeekOfMonth } from "~/utils/date-utils";
+import { getMonthName, getWeekOfMonth } from "~/utils/date-utils";
 import { getEnglishToPersianCity, processDataForChart } from "~/utils/util";
 
 export function calculatePerformance(
@@ -191,25 +191,13 @@ export function getMonthNamesFromJOINED_date_strings(
   if (reportPeriod === "هفتگی") {
     const date = dates.split(",")[1];
 
-    const monthName = moment()
-      .locale("fa")
-      .month(parseInt(date.split("/")[1]) - 1)
-      .format("MMMM");
-
     const weekNumber = getWeekOfMonth(date);
-    const weekName = `هفته ${weekNumber} ${monthName}`;
+    const weekName = `هفته ${weekNumber} ${getMonthName(date)}`;
 
     return weekName;
   }
 
-  const resultArray = dates.split(",").map((date) => {
-    const monthName = moment()
-      .locale("fa")
-      .month(parseInt(date.split("/")[1]) - 1)
-      .format("MMMM");
-
-    return monthName;
-  });
+  const resultArray = dates.split(",").map(getMonthName);
 
   return [...new Set(resultArray)].join(",");
 }

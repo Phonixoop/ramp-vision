@@ -2,6 +2,7 @@ import { AreaChart, Card, Title } from "@tremor/react";
 import moment from "jalali-moment";
 import { twMerge } from "tailwind-merge";
 import { validDateBeforeToScrewThem } from "~/constants";
+import Calender from "~/features/calender";
 
 import H2 from "~/ui/heading/h2";
 import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
@@ -84,9 +85,23 @@ const menuItems = [
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
-    <div className="h-screen text-primary">
+    <div className="flex h-screen items-center justify-center text-primary">
       {/* {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")} */}
-
+      {/* <div dir="rtl" className="max-w-sm">
+        <Calender
+          onDate={(date, monthNumber) => (
+            <>
+              {parseInt(date.format("M")) !== monthNumber + 1 ? (
+                <span className="text-sm text-primary/50">
+                  {date.format("D")}
+                </span>
+              ) : (
+                <span>{date.format("D")}</span>
+              )}
+            </>
+          )}
+        />
+      </div> */}
       {/* <Menu menuItems={menuItems} className="flex" /> */}
     </div>
   );

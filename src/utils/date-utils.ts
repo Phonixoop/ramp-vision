@@ -107,3 +107,16 @@ export function getDatesBetweenTwoDates(startDate, endDate) {
 
   return dates;
 }
+export function getMonthName(date: string) {
+  return moment()
+    .locale("fa")
+    .month(parseInt(date.split("/")[1]) - 1)
+    .format("MMMM");
+}
+
+export function getMonthNumber(date: string) {
+  return moment()
+    .locale("fa")
+    .month(parseInt(date.split("/")[1]) - 1)
+    .month();
+}

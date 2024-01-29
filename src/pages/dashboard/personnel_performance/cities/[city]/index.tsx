@@ -26,7 +26,9 @@ import {
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
+import Calender from "~/features/calender";
 import Gauge from "~/features/gauge";
+import ToolTipSimple from "~/features/tooltip-simple-use";
 import { TrendDecider } from "~/features/trend-decider";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
@@ -37,9 +39,11 @@ import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 
 import { api } from "~/utils/api";
+import { getMonthNumber } from "~/utils/date-utils";
 import {
   DistinctPersonnelPerformanceData,
   getMonthNamesFromJOINED_date_strings,
+  getPerformanceMetric,
   sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import {
@@ -226,6 +230,12 @@ export default function CityPage({ children, city }) {
 
           // ||
           // user.NationalCode === router.query.personnel;
+
+          const sparkData = sparkChartForPersonnelAndCity(
+            getAll?.data?.result,
+            "NameFamily",
+            user.NameFamily,
+          );
           return (
             <>
               <Button
@@ -244,7 +254,14 @@ export default function CityPage({ children, city }) {
                   //     shallow: true,
                   //   },
                   // );
-                  setSelectedPerson(user);
+                  setSelectedPerson({
+                    ...user,
+                    sparkData: sparkChartForPersonnelAndCity(
+                      getAll?.data?.result,
+                      "NameFamily",
+                      user.NameFamily,
+                    ),
+                  });
                 }}
               >
                 <div className=" flex w-full flex-row-reverse items-center justify-between gap-2  px-2 text-right ">
@@ -258,11 +275,7 @@ export default function CityPage({ children, city }) {
                   </div>
                   <div className="flex w-full items-center justify-center">
                     <SparkAreaChart
-                      data={sparkChartForPersonnelAndCity(
-                        getAll?.data?.result,
-                        "NameFamily",
-                        user.NameFamily,
-                      )}
+                      data={sparkData}
                       categories={[
                         "TotalPerformance",
                         "Benchmark",
@@ -348,6 +361,89 @@ export default function CityPage({ children, city }) {
                     </>
                   );
                 })}
+                <div className="col-span-2 w-full">
+                  <Calender
+                    defaultMonth={getMonthNumber(
+                      selectedPerson.sparkData[0].Start_Date,
+                    )}
+                    onDate={(date, monthNumber) => {
+                      const userCalData = selectedPerson.sparkData.find(
+                        (d) => d.Start_Date === date.format("YYYY/MM/DD"),
+                      );
+                      const userMetric = getPerformanceMetric(
+                        userCalData?.TotalPerformance,
+                      );
+
+                      return (
+                        <>
+                          {parseInt(date.format("M")) !== monthNumber + 1 ? (
+                            <ToolTipSimple
+                              className="bg-secondary"
+                              tooltip={
+                                <span
+                                  style={{
+                                    color: userCalData
+                                      ? userMetric.color
+                                      : undefined,
+                                  }}
+                                  className="text-base "
+                                >
+                                  {userCalData?.TotalPerformance.toFixed(2)}
+                                </span>
+                              }
+                            >
+                              <span
+                                className={twMerge(
+                                  "flex items-center justify-center text-xs text-primary/50 ",
+
+                                  `h-6 w-6 rounded-full `,
+                                )}
+                                style={{
+                                  backgroundColor: userCalData
+                                    ? userMetric.color
+                                    : undefined,
+                                }}
+                              >
+                                {date.format("D")}
+                              </span>
+                            </ToolTipSimple>
+                          ) : (
+                            <ToolTipSimple
+                              className="bg-secondary"
+                              tooltip={
+                                <span
+                                  style={{
+                                    color: userCalData
+                                      ? userMetric.color
+                                      : undefined,
+                                  }}
+                                  className="text-base "
+                                >
+                                  {userCalData?.TotalPerformance.toFixed(2)}
+                                </span>
+                              }
+                            >
+                              <span
+                                className={twMerge(
+                                  "flex items-center justify-center text-xs text-primary ",
+
+                                  `h-6 w-6 rounded-full `,
+                                )}
+                                style={{
+                                  backgroundColor: userCalData
+                                    ? userMetric.color
+                                    : undefined,
+                                }}
+                              >
+                                {date.format("D")}
+                              </span>
+                            </ToolTipSimple>
+                          )}
+                        </>
+                      );
+                    }}
+                  />
+                </div>
                 <div className="col-span-2  flex  w-full flex-col items-center justify-center   ">
                   <H2>عملکرد</H2>
 

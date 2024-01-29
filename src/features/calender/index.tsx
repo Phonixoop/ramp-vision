@@ -42,7 +42,14 @@ const MONTHS = [
   "بهمن",
   "اسفند",
 ];
-
+// const defaultWeekdays = Array.apply(null, Array(7)).map(function (_, i) {
+//   return moment(i, "e")
+//     .locale("fa")
+//     .startOf("week")
+//     .isoWeekday(i - 1)
+//     .format("dd");
+// });
+const defaultWeekdays = ["شن", "یک", "دو", "سه", "چهار", "پنج", "جم"];
 type Props = {
   onDate?: (
     date: Moment,
@@ -50,42 +57,58 @@ type Props = {
   ) => React.ReactNode | string | undefined;
   onMonthChange?: (startDate: Moment, endDate: Moment) => unknown;
   onClick?: (date: Moment) => unknown;
+  withMonthMenu?: boolean;
+  showCurrentDay?: boolean;
+  defaultMonth?: number;
+  customData?: any[];
 };
 
 export default function Calender({
   onDate,
   onMonthChange,
   onClick = () => {},
+  withMonthMenu = false,
+  showCurrentDay = false,
+  defaultMonth = -1,
+  customData = undefined,
 }: Props) {
-  const [calendar, setCalender] = useState(getMonthDays(moment().locale("fa")));
+  const [calendar, setCalender] = useState(
+    getMonthDays(
+      defaultMonth >= 0
+        ? moment().jMonth(defaultMonth).locale("fa")
+        : moment().locale("fa"),
+    ),
+  );
   return (
-    <div className="grid  max-w-7xl  gap-10 px-2 py-10">
-      <LayoutGroup id="months-InPageMenu">
-        <InPageMenu
-          className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
-          startIndex={moment().locale("fa").month()}
-          list={MONTHS}
-          onChange={(monthNumber) => {
-            const newCalendar = getMonthDays(
-              moment().jMonth(monthNumber).locale("fa"),
-            );
-            setCalender(newCalendar);
-            onMonthChange(
-              newCalendar.at(0),
-              newCalendar.at(newCalendar.length - 1),
-            );
-          }}
-        />
-      </LayoutGroup>
+    <div className="grid w-full  gap-10 px-2 py-10">
+      {withMonthMenu && (
+        <LayoutGroup id="months-InPageMenu">
+          <InPageMenu
+            className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
+            startIndex={moment().locale("fa").month()}
+            list={MONTHS}
+            onChange={(monthNumber) => {
+              const newCalendar = getMonthDays(
+                moment().jMonth(monthNumber).locale("fa"),
+              );
+              setCalender(newCalendar);
+              onMonthChange(
+                newCalendar.at(0),
+                newCalendar.at(newCalendar.length - 1),
+              );
+            }}
+          />
+        </LayoutGroup>
+      )}
 
-      <div className="grid grid-cols-7 text-center text-xs text-primary md:text-base">
-        <span>شنبه</span>
-        <span>یک شنبه</span>
-        <span>دو شنبه</span>
-        <span>سه شنبه</span>
-        <span>چهار شنبه</span>
-        <span>پنج شنبه</span>
-        <span>جمعه</span>
+      <div className="grid grid-cols-7 gap-3 text-center text-xs text-primary md:text-base">
+        {defaultWeekdays.map((week) => {
+          return (
+            <>
+              <span className="w-full ">{week}</span>
+            </>
+          );
+        })}
       </div>
       <div className="grid  grid-cols-7 gap-2">
         {calendar.map((item: Moment, i) => {
@@ -101,10 +124,10 @@ export default function Calender({
                   .clone()
                   .isBefore(moment().locale("fa").subtract(1, "day"))}
                 className={twMerge(
-                  "text-centerd group relative flex cursor-pointer items-center justify-center",
+                  "text-centerd group relative flex w-full cursor-pointer items-center justify-center",
                 )}
               >
-                {isItemToday && (
+                {showCurrentDay && isItemToday && (
                   <span className="absolute flex  h-3 w-3 md:right-2 ">
                     <span className="relative inline-flex h-3 w-3 rounded-full bg-accent/30"></span>
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/75  "></span>
