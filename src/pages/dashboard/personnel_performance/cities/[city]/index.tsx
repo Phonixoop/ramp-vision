@@ -289,7 +289,7 @@ export default function CityPage({ children, city }) {
                 dir="rtl"
               >
                 {numericItems.map(([key, value], index, array) => {
-                  const isLastItem = index === array.length - 1;
+                  // const isLastItem = index === array.length - 1;
                   if (!PersonnelPerformanceIcons[key]) return;
                   return (
                     <>
@@ -306,7 +306,11 @@ export default function CityPage({ children, city }) {
                             {PersonnelPerformanceTranslate[key]}
                           </span>
                           <span className="text-accent">
-                            {commify((value as number).toFixed(0))}
+                            {commify(
+                              Number.isInteger(value)
+                                ? value
+                                : (value as number).toFixed(2),
+                            )}
                           </span>
                         </div>
                       </div>

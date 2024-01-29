@@ -104,11 +104,11 @@ export function DistinctPersonnelPerformanceData(
   const dataWithThurdsdayEdit = data?.result?.map((item) => {
     const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
-    const count = item.COUNT > 0 ? item.COUNT : 1;
+    // const count = item.COUNT > 0 ? item.COUNT : 1;
     return {
       ...item,
       TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2) / count
+        ? calculatePerformance(item, 1, 2)
         : item.TotalPerformance,
     };
   });
