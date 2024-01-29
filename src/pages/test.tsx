@@ -85,7 +85,7 @@ export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
     <div className="h-screen text-primary">
-      {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")}
+      {/* {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")} */}
 
       {/* <Menu menuItems={menuItems} className="flex" /> */}
     </div>
