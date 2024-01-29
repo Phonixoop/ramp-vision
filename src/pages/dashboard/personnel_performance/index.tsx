@@ -149,6 +149,7 @@ function PersonnelPerformanceTable({ sessionData }) {
         });
 
         return {
+          periodType: data.periodType,
           dateLength: data.dateLength,
           result: dataWithThurdsdayEdit,
         };
@@ -627,7 +628,10 @@ function PersonnelPerformanceTable({ sessionData }) {
           cell: ({ row }) => {
             return (
               <>
-                {getMonthNamesFromJOINED_date_strings(row.original.Start_Date)}
+                {getMonthNamesFromJOINED_date_strings(
+                  row.original.Start_Date,
+                  personnelPerformance.data.periodType,
+                )}
               </>
             );
           },
