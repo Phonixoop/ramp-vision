@@ -3,7 +3,9 @@ import {
   Indicators,
   Performance_Levels,
 } from "~/constants/personnel-performance";
+import { PeriodType } from "~/context/personnel-filter.context";
 import { CityWithPerformanceData } from "~/types";
+import { getWeekOfMonth } from "~/utils/date-utils";
 import { getEnglishToPersianCity, processDataForChart } from "~/utils/util";
 
 export function calculatePerformance(
@@ -60,11 +62,11 @@ export function DistinctDataAndCalculatePerformance(
 ) {
   const dataWithThurdsdayEdit = data?.result?.map((item) => {
     const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
-    const count = item.COUNT > 0 ? item.COUNT : 1;
+    // const count = item.COUNT > 0 ? item.COUNT : 1;
     return {
       ...item,
       TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2) / count
+        ? calculatePerformance(item, 1, 2)
         : item.TotalPerformance,
     };
   });
@@ -137,7 +139,7 @@ function mapToCitiesWithPerformance({
     return {
       CityName_En: item.key.CityName,
       CityName_Fa: getEnglishToPersianCity(item.key.CityName),
-      TotalPerformance: item.TotalPerformance / dateLength,
+      TotalPerformance: item.TotalPerformance / item.COUNT,
 
       // calculatePerformance(item, data?.dateLength) /
       // Math.max(
@@ -179,3 +181,35 @@ export const getPerformanceMetric = (limit) => {
   // If nothing is found, return the last metric
   return selectedMetric || Performance_Levels[Performance_Levels.length - 1];
 };
+
+export function getMonthNamesFromJOINED_date_strings(
+  dates: string,
+  reportPeriod: PeriodType,
+) {
+  if (typeof dates !== "string") return "";
+
+  if (reportPeriod === "هفتگی") {
+    const date = dates.split(",")[1];
+
+    const monthName = moment()
+      .locale("fa")
+      .month(parseInt(date.split("/")[1]) - 1)
+      .format("MMMM");
+
+    const weekNumber = getWeekOfMonth(date);
+    const weekName = `هفته ${weekNumber} ${monthName}`;
+
+    return weekName;
+  }
+
+  const resultArray = dates.split(",").map((date) => {
+    const monthName = moment()
+      .locale("fa")
+      .month(parseInt(date.split("/")[1]) - 1)
+      .format("MMMM");
+
+    return monthName;
+  });
+
+  return [...new Set(resultArray)].join(",");
+}

@@ -517,7 +517,7 @@ export function DistinctData(data = [], dateLength) {
     //@ts-ignore
     // console.log({ item }, { CCC: item.count });
     //@ts-ignore
-    item.TotalPerformance = calculatePerformance(item, dateLength);
+    item.TotalPerformance = item.TotalPerformance / item.count;
   });
   // console.log({ distinctResult: result });
 

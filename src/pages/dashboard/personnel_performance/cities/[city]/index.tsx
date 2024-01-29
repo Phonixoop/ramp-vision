@@ -39,6 +39,7 @@ import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import { api } from "~/utils/api";
 import {
   DistinctPersonnelPerformanceData,
+  getMonthNamesFromJOINED_date_strings,
   sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import {
@@ -80,6 +81,7 @@ export default function CityPage({ children, city }) {
     {
       onSuccess: (data) => {
         setSelectedPerson(undefined);
+
         setUpdatedList(
           DistinctPersonnelPerformanceData(
             data ?? [],
@@ -128,7 +130,7 @@ export default function CityPage({ children, city }) {
     (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
   );
 
-  const fullData: CityWithPerformanceData[] = useMemo(
+  const fullData = useMemo(
     () =>
       DistinctPersonnelPerformanceData(getAll?.data ?? [], ["Start_Date"]).map(
         (d) => {
@@ -321,8 +323,13 @@ export default function CityPage({ children, city }) {
               <div className="grid  gap-4 " dir="rtl">
                 {noneNumericItems.map(([key, value], index, array) => {
                   const isLastItem = index === array.length - 1;
-
+                  let _value = value;
                   if (key === "DateInfo") return;
+                  if (key === "Start_Date")
+                    _value = getMonthNamesFromJOINED_date_strings(
+                      value as string,
+                      getAll?.data?.periodType,
+                    );
                   return (
                     <>
                       <div
@@ -335,7 +342,7 @@ export default function CityPage({ children, city }) {
                         )}
                       >
                         <span className="break-words text-center font-bold text-accent">
-                          {value as string}
+                          {_value as string}
                         </span>
                       </div>
                     </>
@@ -362,9 +369,14 @@ export default function CityPage({ children, city }) {
           <H2>نمای کلی شهر {getEnglishToPersianCity(city)}</H2>
           <ResponsiveContainer width="99%" height={"100%"}>
             <AreaChart
-              data={fullData}
+              data={fullData.map((item) => {
+                return {
+                  ...item,
+                  Start_Date: item.key.Start_Date.split("/")[2],
+                };
+              })}
               dir="rtl"
-              index="key.Start_Date"
+              index="Start_Date"
               categories={[
                 "ثبت اولیه اسناد",
                 "پذیرش و ثبت اولیه اسناد",

@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { validDateBeforeToScrewThem } from "~/constants";
 
 import H2 from "~/ui/heading/h2";
+import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
 
 const chartdata = [
   {
@@ -84,7 +85,8 @@ export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
     <div className="h-screen text-primary">
-      {moment("1402/11/05", "jYYYY/jMM/jDD").jDay() === 5 ? "پنجشنبه" : "no"}
+      {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")}
+
       {/* <Menu menuItems={menuItems} className="flex" /> */}
     </div>
   );

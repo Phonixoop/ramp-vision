@@ -19,18 +19,7 @@ import { Container } from "~/ui/containers";
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { RouterOutputs, api } from "~/utils/api";
-import {
-  Title,
-  BarChart,
-  AreaChart,
-  DonutChart,
-  Tracker,
-  Card,
-  Metric,
-  CategoryBar,
-  Legend,
-  BarList,
-} from "@tremor/react";
+
 import CheckboxList, {
   SelectColumnFilter,
   SelectControlled,
@@ -75,31 +64,12 @@ import {
   defualtContractTypes,
   defualtDateInfos,
 } from "~/constants/personnel-performance";
-import { getPerformanceMetric } from "~/utils/personnel-performance";
-
-function CustomInput({ value, openCalendar }) {
-  return (
-    <>
-      <Button className="w-full text-center" onClick={openCalendar}>
-        {value ? value : "انتخاب کنید"}
-      </Button>
-    </>
-  );
-}
-const chartdata = [
-  {
-    name: "Amphibians",
-    "Number of threatened species": 2488,
-  },
-  {
-    name: "Birds",
-    "Number of threatened species": 1445,
-  },
-  {
-    name: "Crustaceans",
-    "Number of threatened species": 743,
-  },
-];
+import {
+  DistinctPersonnelPerformanceData,
+  calculatePerformance,
+  getMonthNamesFromJOINED_date_strings,
+  getPerformanceMetric,
+} from "~/utils/personnel-performance";
 
 const dataFormatter = (number: number) => {
   return "$ " + Intl.NumberFormat("us").format(number).toString();
@@ -164,7 +134,26 @@ function PersonnelPerformanceTable({ sessionData }) {
     deferredFilter,
     {
       enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
-      refetchOnWindowFocus: false,
+      select: (data) => {
+        const dataWithThurdsdayEdit = data?.result?.map((item) => {
+          const isThursday =
+            moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+
+          // const count = item.COUNT > 0 ? item.COUNT : 1;
+          return {
+            ...item,
+            TotalPerformance: isThursday
+              ? calculatePerformance(item, 1, 2)
+              : item.TotalPerformance,
+          };
+        });
+
+        return {
+          dateLength: data.dateLength,
+          result: dataWithThurdsdayEdit,
+        };
+      },
+      refetchOnWindowFocus: true,
     },
   );
 
@@ -219,16 +208,17 @@ function PersonnelPerformanceTable({ sessionData }) {
 
                         // beacuse our system is permission based we need to only filter allowed cities.
                         const canFilterCities = cities
-                          .filter((city) =>
-                            initialFilters.data.Cities.map((initCity) =>
-                              getPersianToEnglishCity(initCity.CityName),
-                            ).includes(city),
+                          .filter(
+                            (city) =>
+                              initialFilters?.data?.Cities.map((initCity) =>
+                                getPersianToEnglishCity(initCity.CityName),
+                              ).includes(city),
                           )
                           .map((cityName) => getEnglishToPersianCity(cityName));
 
                         if (cities.length <= 0) {
                           setFilterValue(
-                            initialFilters.data.Cities.map((a) => a.CityName),
+                            initialFilters?.data?.Cities.map((a) => a.CityName),
                           );
                         } else setFilterValue(canFilterCities);
 
@@ -634,6 +624,13 @@ function PersonnelPerformanceTable({ sessionData }) {
           header: "بازه گزارش",
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
+          cell: ({ row }) => {
+            return (
+              <>
+                {getMonthNamesFromJOINED_date_strings(row.original.Start_Date)}
+              </>
+            );
+          },
         },
         {
           header: "تاریخ گزارش پرسنل",

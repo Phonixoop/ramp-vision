@@ -88,6 +88,10 @@ export default function Gauge({ value }) {
         }}
         value={Math.round(Number.isNaN(value) ? 0 : value)}
       />
+      <span className="text-primary">
+        {" "}
+        {(Number.isNaN(value) ? 0 : value).toFixed(2)}
+      </span>
     </div>
   );
 }

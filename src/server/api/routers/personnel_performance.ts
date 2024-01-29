@@ -188,38 +188,40 @@ export const personnelPerformanceRouter = createTRPCRouter({
           finalResult = result.recordsets[0];
         }
         if (input.periodType === "هفتگی") {
-          const date = filter.Start_Date[0].split("/");
+          // const date = filter.Start_Date[0].split("/");
 
-          const monthName = moment()
-            .locale("fa")
-            .month(parseInt(date[1]) - 1)
-            .format("MMMM");
+          // const monthName = moment()
+          //   .locale("fa")
+          //   .month(parseInt(date[1]) - 1)
+          //   .format("MMMM");
 
-          const weekNumber = getWeekOfMonth(filter.Start_Date[0]);
-          const weekName = `هفته ${weekNumber} ${monthName}`;
+          // const weekNumber = getWeekOfMonth(filter.Start_Date[0]);
+          // const weekName = `هفته ${weekNumber} ${monthName}`;
 
-          finalResult = result.recordsets[0].map((record) => {
-            return {
-              ...record,
-              Start_Date: weekName,
-            };
-          });
+          // finalResult = result.recordsets[0].map((record) => {
+          //   return {
+          //     ...record,
+          //     Start_Date: weekName,
+          //   };
+          // });
+          finalResult = result.recordsets[0];
         }
 
         if (input.periodType === "ماهانه") {
-          const date = filter.Start_Date[0].split("/");
+          // const date = filter.Start_Date[0].split("/");
 
-          const monthName = moment()
-            .locale("fa")
-            .month(parseInt(date[1]) - 1)
-            .format("MMMM");
+          // const monthName = moment()
+          //   .locale("fa")
+          //   .month(parseInt(date[1]) - 1)
+          //   .format("MMMM");
 
-          finalResult = result.recordsets[0].map((record) => {
-            return {
-              ...record,
-              Start_Date: monthName,
-            };
-          });
+          // finalResult = result.recordsets[0].map((record) => {
+          //   return {
+          //     ...record,
+          //     Start_Date: monthName,
+          //   };
+          // });
+          finalResult = result.recordsets[0];
         }
 
         return {
@@ -286,7 +288,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       CityName,
       p.Start_Date,
       COUNT(*) AS COUNT,
-      AVG(TotalPerformance) AS TotalPerformance,
+      SUM(TotalPerformance) AS TotalPerformance,
   
       
       SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
@@ -331,7 +333,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         CityName,
         p.Start_Date,
         COUNT(*) AS COUNT,
-        AVG(TotalPerformance) AS TotalPerformance,
+        SUM(TotalPerformance) AS TotalPerformance,
     
         
         SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
