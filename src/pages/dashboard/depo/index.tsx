@@ -73,7 +73,7 @@ import { date } from "zod";
 import { twMerge } from "tailwind-merge";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { FilterType, PeriodType } from "~/context/personnel-filter.context";
-import { DistinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
+import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
 import CitiesPerformanceBarChart, {
   CitiesWithDatesPerformanceBarChart,
 } from "~/features/cities-performance-chart";

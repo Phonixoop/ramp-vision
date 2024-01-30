@@ -441,3 +441,9 @@ input[type="number"] {
   /* @apply overflow-y-auto; */
   padding: 0;
 }
+
+/* recharts */
+
+.recharts-rectangle.recharts-tooltip-cursor {
+  fill: #00000049;
+}

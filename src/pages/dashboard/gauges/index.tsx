@@ -34,7 +34,7 @@ import {
 import DatePickerPeriodic from "~/features/date-picker-periodic";
 import { FilterIcon } from "lucide-react";
 import ResponsiveView from "~/features/responsive-view";
-import { DistinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
+import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
 
 export default function GaugesPage() {
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
@@ -81,7 +81,7 @@ export default function GaugesPage() {
         .filter((a) => a),
     ),
   ];
-  const result = DistinctDataAndCalculatePerformance(
+  const result = distinctDataAndCalculatePerformance(
     getCitiesWithPerformance?.data,
   );
   return (

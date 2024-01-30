@@ -65,7 +65,7 @@ import {
   defualtDateInfos,
 } from "~/constants/personnel-performance";
 import {
-  DistinctPersonnelPerformanceData,
+  distinctPersonnelPerformanceData,
   calculatePerformance,
   getMonthNamesFromJOINED_date_strings,
   getPerformanceMetric,

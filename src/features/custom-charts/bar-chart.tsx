@@ -191,6 +191,7 @@ export default function CustomBarChart({
 
                 {bar.labelClassName && (
                   <LabelList
+                    style={{ pointerEvents: "none" }}
                     formatter={formatter}
                     dataKey={bar.name}
                     className={twMerge(
@@ -213,8 +214,8 @@ export default function CustomBarChart({
                 interval={0}
                 orientation="bottom"
                 dataKey={key}
-                scale="point"
-                padding={{ left: bars.length * 35, right: bars.length * 35 }}
+                scale="auto"
+                //  padding={{ left: bars.length * 35, right: bars.length * 35 }}
                 tickFormatter={(value, index) => formatter(value)}
                 tick={
                   <CustomizedXAxisTick
@@ -299,11 +300,19 @@ function CustomTooltip({ bars = [], ...rest }) {
   return undefined;
 }
 
-function CustomizedXAxisTick({ className = "", customXTick = false, ...rest }) {
+function CustomizedXAxisTick({
+  className = "",
+  customXTick = false,
+  onClick = (payload) => {},
+  ...rest
+}) {
   const { x, y, payload } = rest;
 
   return (
-    <g transform={`translate(${x},${y})`}>
+    <g
+      transform={`translate(${x},${y})`}
+      onClick={() => onClick(payload.value)}
+    >
       <text
         x={customXTick ? 0 : -50}
         y={customXTick ? 0 : 40}

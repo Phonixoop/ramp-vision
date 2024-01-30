@@ -43,7 +43,7 @@ import DatePickerPeriodic from "~/features/date-picker-periodic";
 import ResponsiveView from "~/features/responsive-view";
 import { TrendDecider } from "~/features/trend-decider";
 import {
-  DistinctDataAndCalculatePerformance,
+  distinctDataAndCalculatePerformance,
   calculatePerformance,
   sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
@@ -101,7 +101,7 @@ export default function CitiesPage({ children }) {
       },
       {
         onSuccess: (data) => {
-          setUpdatedList(DistinctDataAndCalculatePerformance(data));
+          setUpdatedList(distinctDataAndCalculatePerformance(data));
         },
         refetchOnWindowFocus: false,
       },
@@ -119,7 +119,7 @@ export default function CitiesPage({ children }) {
   // });
   const [updatedList, setUpdatedList] = useState(
     () =>
-      DistinctDataAndCalculatePerformance(getCitiesWithPerformance.data) ?? [],
+      distinctDataAndCalculatePerformance(getCitiesWithPerformance.data) ?? [],
   );
 
   // const intersection = CITIES.filter((city) => {
@@ -142,7 +142,7 @@ export default function CitiesPage({ children }) {
   ];
 
   const distincedData = useMemo(
-    () => DistinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
+    () => distinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
     [getCitiesWithPerformance.data],
   );
   return (

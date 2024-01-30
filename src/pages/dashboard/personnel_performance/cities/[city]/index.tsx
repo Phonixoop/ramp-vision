@@ -41,7 +41,7 @@ import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import { api } from "~/utils/api";
 import { getMonthNumber } from "~/utils/date-utils";
 import {
-  DistinctPersonnelPerformanceData,
+  distinctPersonnelPerformanceData,
   getMonthNamesFromJOINED_date_strings,
   getPerformanceMetric,
   sparkChartForPersonnelAndCity,
@@ -87,7 +87,7 @@ export default function CityPage({ children, city }) {
         setSelectedPerson(undefined);
 
         setUpdatedList(
-          DistinctPersonnelPerformanceData(
+          distinctPersonnelPerformanceData(
             data ?? [],
             ["NationalCode", "NameFamily"],
             [
@@ -136,7 +136,7 @@ export default function CityPage({ children, city }) {
 
   const fullData = useMemo(
     () =>
-      DistinctPersonnelPerformanceData(getAll?.data ?? [], ["Start_Date"]).map(
+      distinctPersonnelPerformanceData(getAll?.data ?? [], ["Start_Date"]).map(
         (d) => {
           // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
           const translatedData = {};
@@ -171,7 +171,7 @@ export default function CityPage({ children, city }) {
         }
         isLoading={getAll.isLoading}
         disabled={!!!updatedList}
-        list={DistinctPersonnelPerformanceData(
+        list={distinctPersonnelPerformanceData(
           getAll?.data ?? [],
           ["NationalCode", "NameFamily"],
           [

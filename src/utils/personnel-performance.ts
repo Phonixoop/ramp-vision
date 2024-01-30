@@ -40,7 +40,7 @@ export function calculatePerformance(
   return performance * 100;
 }
 
-export function DistinctDataAndCalculatePerformance(
+export function distinctDataAndCalculatePerformance(
   data,
   groupBy = ["CityName"],
   values = [
@@ -84,8 +84,12 @@ export function DistinctDataAndCalculatePerformance(
   });
 }
 
-export function DistinctPersonnelPerformanceData(
-  data,
+export function distinctPersonnelPerformanceData(
+  data = {
+    periodType: "",
+    dateLength: 0,
+    result: [],
+  },
   groupBy = ["CityName"],
   values = [
     "SabtAvalieAsnad",
