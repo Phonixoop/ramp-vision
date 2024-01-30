@@ -14,6 +14,7 @@ import CustomBarChart from "~/features/custom-charts/bar-chart";
 import { Performance_Levels } from "~/constants/personnel-performance";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/router";
 
 export default function CitiesPerformanceBarChart({
   filters,
@@ -35,6 +36,7 @@ export default function CitiesPerformanceBarChart({
         refetchOnWindowFocus: false,
       },
     );
+  const router = useRouter();
   if (getCitiesWithPerformance.isLoading)
     return (
       <>
@@ -49,8 +51,15 @@ export default function CitiesPerformanceBarChart({
           <CustomBarChart
             width={500}
             height={500}
+            onBarClick={(data, index) => {
+              window.open(
+                "/dashboard/personnel_performance/cities/" + data.CityName_En,
+                "_blank",
+              );
+            }}
             data={(getCitiesWithPerformance?.data ?? []).map((row) => {
               return {
+                CityName_En: row.CityName_En,
                 شهر: row.CityName_Fa,
                 عملکرد: Math.round(row.TotalPerformance),
               };
@@ -58,7 +67,7 @@ export default function CitiesPerformanceBarChart({
             bars={[
               {
                 name: "عملکرد",
-                className: "fill-primary",
+                className: "fill-primary cursor-pointer",
                 labelClassName: "fill-secondary",
                 angle: 0,
               },

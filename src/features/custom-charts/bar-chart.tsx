@@ -116,6 +116,7 @@ type CustomBarChartOptions = {
   brushKey?: string;
   formatter?: Function;
   customBars?: (data) => ReactNode;
+  onBarClick?: (data, index) => void;
 };
 export default function CustomBarChart({
   nameClassName = "",
@@ -130,6 +131,7 @@ export default function CustomBarChart({
   brushKey,
   formatter = (num: number) => "",
   customBars = undefined,
+  onBarClick = (data, index) => {},
 }: CustomBarChartOptions) {
   const container = useRef<HTMLDivElement>(undefined);
 
@@ -182,6 +184,7 @@ export default function CustomBarChart({
               <Bar
                 dataKey={bar.name}
                 className={bar.className}
+                onClick={(data, index) => onBarClick(data, index)}
                 shape={<RectangleBar />}
               >
                 {customBars && customBars(data)}
