@@ -287,7 +287,7 @@ export function processDepoCompleteTimeData(
   }, []);
 
   return groupedData.map((a) => {
-    const depoT = Math.round(a.TotalDepoCompleteTime / a.Count);
+    const depoT = Math.round(a.TotalDepoCompleteTime);
     return {
       ServiceName: a.ServiceName,
       DepoCompleteTime: depoT >= 0 ? depoT : 0,

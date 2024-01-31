@@ -8,7 +8,7 @@ import Table from "~/features/table";
 import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { memo, useDeferredValue, useMemo, useState } from "react";
 import { RouterOutputs, api } from "~/utils/api";
 import { BarChart, DonutChart } from "@tremor/react";
 import { SelectColumnFilter } from "~/features/checkbox-list";
@@ -485,426 +485,12 @@ function DeposTable({ sessionData }) {
               );
             }}
             renderChild={(flatRows) => {
-              // const dateDate = processDataForChart(flatRows, "Start_Date", [
-              //   "DepoCount",
-              //   "EntryCount",
-              //   "Capicity",
-              // ]);
-              const serviceData = processDataForChart(
-                flatRows,
-                ["ServiceName"],
-                ["DepoCount", "EntryCount", "Capicity"],
-              );
-              const depoCompletionTime = processDepoCompleteTimeData(flatRows);
-
-              const totalComplete =
-                depoCompletionTime.reduce((accumulator, currentObject) => {
-                  return accumulator + currentObject.DepoCompleteTime;
-                }, 0) / flatRows.length;
-
-              const maxDepoTime = Math.max(
-                ...flatRows.map((row) => calculateDepoCompleteTime(row)),
-              );
-
-              const entryBaseOnSabt = sumColumnBasedOnRowValue(
-                flatRows,
-                "EntryCount",
-                "ServiceName",
-                [
-                  ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
-                ],
-              );
-
-              const capacityBaseOnSabt = sumColumnBasedOnRowValue(
-                flatRows,
-                "Capicity",
-                "ServiceName",
-                [
-                  ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
-                ],
-              );
-              const entry_capacity = [
-                {
-                  name: "ورودی",
-                  value: entryBaseOnSabt,
-                },
-                {
-                  name: "رسیدگی",
-                  value: capacityBaseOnSabt,
-                },
-                {
-                  name: "مانده",
-                  value: entryBaseOnSabt - capacityBaseOnSabt,
-                },
-              ];
-
-              const depoBaseOnSabtDirect = sumColumnBasedOnRowValue(
-                flatRows,
-                "DepoCount",
-                "ServiceName",
-                [
-                  ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-                  ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-                ],
-              );
-              const depoBaseOnSabtInDirect = sumColumnBasedOnRowValue(
-                flatRows,
-                "DepoCount",
-                "ServiceName",
-                [ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"]],
-              );
-
-              const depo_BaseOnSabt = [
-                {
-                  name: "مستقیم",
-                  value: depoBaseOnSabtDirect,
-                },
-                {
-                  name: "غیر مستقیم",
-                  value: depoBaseOnSabtInDirect,
-                },
-              ];
-
               return (
                 <>
-                  <div className="flex w-full flex-col items-center justify-center gap-5">
-                    <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
-                      <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-                        <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
-                          <H2 className="text-lg font-bold">
-                            نمودار به تفکیک فعالیت
-                          </H2>
-                          {/* <ReBarChart
-                            data={(serviceData ?? []).map((row) => {
-                              return {
-                                name: row.key,
-                                "تعداد دپو": row.DepoCount,
-                                "تعداد ورودی": row.EntryCount,
-                                "تعداد رسیدگی": row.Capicity,
-                              };
-                            })}
-                            index="name"
-                            categories={[
-                              "تعداد دپو",
-                              "تعداد ورودی",
-                              "تعداد رسیدگی",
-                            ]}
-                          /> */}
-                          <Loading
-                            isLoading={depo.isLoading}
-                            LoadingComponent={BarChartSkeletonLoading}
-                          >
-                            <ResponsiveContainer width="99%" height={300}>
-                              <BarChart
-                                showAnimation={true}
-                                data={(serviceData ?? []).map((row) => {
-                                  return {
-                                    name: ShortServiceNames[
-                                      row.key.ServiceName
-                                    ],
-                                    "تعداد دپو": row.DepoCount,
-                                    "تعداد ورودی": row.EntryCount,
-                                    "تعداد رسیدگی": row.Capicity,
-                                  };
-                                })}
-                                index="name"
-                                categories={[
-                                  "تعداد دپو",
-                                  "تعداد ورودی",
-                                  "تعداد رسیدگی",
-                                ]}
-                                colors={["cyan", "rose", "emerald"]}
-                                valueFormatter={commify}
-                                yAxisWidth={20}
-                                showXAxis
-                                showGridLines={false}
-                                noDataText={Text.noData.fa}
-                                intervalType="preserveStartEnd"
-                              />
-                            </ResponsiveContainer>
-                          </Loading>
-
-                          {/* <ResponsiveContainer width="99%" height={300}>
-                            <CustomBarChart
-                              width={500}
-                              height={300}
-                              data={(serviceData ?? []).map((row) => {
-                                return {
-                                  name: ShortServiceNames[row.key.ServiceName],
-                                  "تعداد دپو": row.DepoCount,
-                                  "تعداد ورودی": row.EntryCount,
-                                  "تعداد رسیدگی": row.Capicity,
-                                };
-                              })}
-                              bars={[
-                                {
-                                  name: "تعداد دپو",
-                                  className: "fill-cyan-600",
-                                  labelClassName: "fill-primary",
-                                  position: "centerTop",
-                                  angle: 0,
-                                },
-                                {
-                                  name: "تعداد ورودی",
-                                  className: "fill-rose-600",
-                                  labelClassName: "fill-primary",
-                                  position: "centerTop",
-                                  angle: 0,
-                                },
-                                {
-                                  name: "تعداد رسیدگی",
-                                  className: "fill-emerald-600",
-                                  labelClassName: "fill-primary",
-                                  position: "centerTop",
-                                  angle: 0,
-                                },
-                              ]}
-                              keys={["name"]}
-                              nameClassName="fill-accent text-accent"
-                              customYTick
-                              formatter={commify}
-                            />
-                          </ResponsiveContainer> */}
-                        </div>
-                        {/* <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
-                          <H2>نمودار زمانی</H2>
-                          <AreaChart
-                            showAnimation={true}
-                            data={(dateDate ?? []).map((row) => {
-                              return {
-                                date: row.key,
-
-                                "تعداد دپو": row.DepoCount,
-                                "تعداد ورودی": row.EntryCount,
-                                "تعداد رسیدگی": row.Capicity,
-                              };
-                            })}
-                            index="date"
-                            //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
-                            categories={[
-                              "تعداد دپو",
-                              "تعداد ورودی",
-                              "تعداد رسیدگی",
-                            ]}
-                            colors={["blue", "red", "green"]}
-                            valueFormatter={commify}
-                            noDataText={Text.noData.fa}
-                          />
-                        </div> */}
-                      </div>
-                    </div>
-
-                    {/* <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                      <div className="flex w-full  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
-                        <H2>
-                          زمان اتمام دپو |{" "}
-                          <span className="text-primbuttn">{reportPeriod}</span>
-                        </H2>
-                        <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
-                          {depoCompletionTime.map((t) => {
-                            return (
-                              <>
-                                <div
-                                  dir="ltr"
-                                  className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/10 bg-secondary/50 p-5"
-                                >
-                                  <H2>{t.ServiceName}</H2>
-                                  <DonutChart
-                                    data={[t]}
-                                    category={"DepoCompleteTime"}
-                                    index="ServiceName"
-                                    colors={[
-                                      getServiceNameColor(t.ServiceName),
-                                    ]}
-                                    valueFormatter={commify}
-                                    noDataText={Text.noData.fa}
-                                  />
-                                </div>
-                              </>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div> */}
-
-                    <div className="flex w-full flex-col items-center justify-center gap-5">
-                      <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
-                        <div className="flex w-full  flex-col items-center justify-between gap-5">
-                          <>
-                            {/* <TrackerView data={getTracker.data ?? []} /> */}
-
-                            {/* <RadarGauge CityName={trackerFilter.cities} /> */}
-                            <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
-                              <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2 ">
-                                <H2>تعداد ورودی و رسیدگی شده</H2>
-                                <Loading
-                                  isLoading={depo.isLoading}
-                                  LoadingComponent={
-                                    EntryHandlingSkeletonLoading
-                                  }
-                                >
-                                  <ResponsiveContainer
-                                    width="99%"
-                                    height={"100%"}
-                                  >
-                                    <DonutChart
-                                      label={
-                                        // depo.data?.result.length > 0
-                                        //   ? " مانده : " +
-                                        //     commify(
-                                        //       entryBaseOnSabt -
-                                        //         capacityBaseOnSabt,
-                                        //     ).toString()
-                                        //   : "داده ای موجود نیست"
-                                        " "
-                                      }
-                                      data={entry_capacity}
-                                      category="value"
-                                      index="name"
-                                      colors={["rose", "emerald", "lime"]}
-                                      valueFormatter={commify}
-                                      noDataText={Text.noData.fa}
-                                    />
-                                  </ResponsiveContainer>
-
-                                  <div className="flex justify-stretch gap-2 ">
-                                    <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
-                                      <span className="text-rose-900">
-                                        ورودی
-                                      </span>
-                                      <span className="text-rose-900">
-                                        {commify(entryBaseOnSabt)}
-                                      </span>
-                                    </div>
-                                    <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-emerald-200 p-1 text-center font-bold text-accent ">
-                                      <span className="  text-emerald-900">
-                                        رسیدگی شده
-                                      </span>
-                                      <span className="text-emerald-900">
-                                        {commify(capacityBaseOnSabt)}
-                                      </span>
-                                    </div>
-                                    <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-lime-200 p-1 text-center font-bold text-accent ">
-                                      <span className="text-lime-900">
-                                        مانده
-                                      </span>
-                                      <span className="text-lime-900">
-                                        {commify(
-                                          entryBaseOnSabt - capacityBaseOnSabt,
-                                        )}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </Loading>
-                              </div>
-                              <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2">
-                                <H2>تعداد دپو</H2>
-                                <Loading
-                                  isLoading={depo.isLoading}
-                                  LoadingComponent={DepoSkeletonLoading}
-                                >
-                                  <ResponsiveContainer
-                                    width="99%"
-                                    height={"100%"}
-                                  >
-                                    <DonutChart
-                                      data={depo_BaseOnSabt}
-                                      category="value"
-                                      index="name"
-                                      colors={["fuchsia", "cyan"]}
-                                      valueFormatter={commify}
-                                      noDataText={Text.noData.fa}
-                                    />
-                                  </ResponsiveContainer>
-                                  <div className="flex justify-stretch gap-2 ">
-                                    <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
-                                      <span className="text-fuchsia-900">
-                                        دپو مستقیم
-                                      </span>
-                                      <span className="text-fuchsia-900">
-                                        {commify(depoBaseOnSabtDirect)}
-                                      </span>
-                                    </div>
-                                    <div className=" flex w-full justify-between rounded-xl bg-cyan-200 p-2 text-center font-bold text-accent ">
-                                      <span className="  text-cyan-900">
-                                        دپو غیر مستقیم
-                                      </span>
-                                      <span className="text-cyan-900">
-                                        {commify(depoBaseOnSabtInDirect)}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </Loading>
-                              </div>
-                              <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md">
-                                <H2>
-                                  زمان کلی اتمام دپو{" "}
-                                  {depo.data?.periodType && (
-                                    <>
-                                      |{" "}
-                                      <span className="text-primbuttn">
-                                        {depo.data?.periodType}
-                                      </span>
-                                    </>
-                                  )}
-                                </H2>
-                                <Loading
-                                  isLoading={depo.isLoading}
-                                  LoadingComponent={DepoTimeSkeletonLoading}
-                                >
-                                  <ResponsiveContainer
-                                    width="99%"
-                                    height={"100%"}
-                                  >
-                                    <DonutChart
-                                      label={maxDepoTime.toFixed(2)}
-                                      data={depoCompletionTime}
-                                      category={"DepoCompleteTime"}
-                                      index="ServiceName"
-                                      colors={[
-                                        "emerald",
-                                        "yellow",
-                                        "cyan",
-                                        "red",
-                                        "orange",
-                                        "fuchsia",
-                                      ]}
-                                      valueFormatter={commify}
-                                      noDataText={Text.noData.fa}
-                                    />
-                                  </ResponsiveContainer>
-                                  {depo.data?.periodType &&
-                                    totalComplete > 0 && (
-                                      <p className="w-full">
-                                        <span className="text-accent">
-                                          {Math.round(maxDepoTime)}{" "}
-                                          {
-                                            Reports_Period[
-                                              depo.data?.periodType
-                                            ]
-                                          }{" "}
-                                          {/* {humanizeDuration(
-                                        maxDepoTime,
-                                        Reports_Period[depo.data?.periodType],
-                                      )} */}
-                                        </span>
-                                        <span className="text-primary">
-                                          تا اتمام دپو
-                                        </span>
-                                      </p>
-                                    )}
-                                </Loading>
-                              </div>
-                            </div>
-                          </>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <Child //@ts-ignore
+                    flatRows={flatRows}
+                    depo={depo}
+                  />
                 </>
               );
             }}
@@ -979,3 +565,392 @@ function DeposTable({ sessionData }) {
 //     </>
 //   );
 // }
+//@ts-ignore
+const Child = memo(function Child({ children, flatRows = [], depo }) {
+  // const dateDate = processDataForChart(flatRows, "Start_Date", [
+  //   "DepoCount",
+  //   "EntryCount",
+  //   "Capicity",
+  // ]);
+  const serviceData = processDataForChart(
+    flatRows,
+    ["ServiceName"],
+    ["DepoCount", "EntryCount", "Capicity"],
+  );
+  const depoCompletionTime = processDepoCompleteTimeData(flatRows);
+  console.log({ depoCompletionTime });
+  const totalComplete =
+    depoCompletionTime.reduce((accumulator, currentObject) => {
+      return accumulator + currentObject.DepoCompleteTime;
+    }, 0) / flatRows.length;
+
+  const maxDepoTime = Math.max(
+    ...flatRows.map((row) => calculateDepoCompleteTime(row)),
+  );
+
+  const entryBaseOnSabt = sumColumnBasedOnRowValue(
+    flatRows,
+    "EntryCount",
+    "ServiceName",
+    [
+      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
+    ],
+  );
+
+  const capacityBaseOnSabt = sumColumnBasedOnRowValue(
+    flatRows,
+    "Capicity",
+    "ServiceName",
+    [
+      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
+    ],
+  );
+  const entry_capacity = [
+    {
+      name: "ورودی",
+      value: entryBaseOnSabt,
+    },
+    {
+      name: "رسیدگی",
+      value: capacityBaseOnSabt,
+    },
+    {
+      name: "مانده",
+      value: entryBaseOnSabt - capacityBaseOnSabt,
+    },
+  ];
+
+  const depoBaseOnSabtDirect = sumColumnBasedOnRowValue(
+    flatRows,
+    "DepoCount",
+    "ServiceName",
+    [
+      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+    ],
+  );
+  const depoBaseOnSabtInDirect = sumColumnBasedOnRowValue(
+    flatRows,
+    "DepoCount",
+    "ServiceName",
+    [ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"]],
+  );
+
+  const depo_BaseOnSabt = [
+    {
+      name: "مستقیم",
+      value: depoBaseOnSabtDirect,
+    },
+    {
+      name: "غیر مستقیم",
+      value: depoBaseOnSabtInDirect,
+    },
+  ];
+
+  return (
+    <>
+      <div className="flex w-full flex-col items-center justify-center gap-5">
+        <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
+          <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
+            <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
+              <H2 className="text-lg font-bold">نمودار به تفکیک فعالیت</H2>
+              {/* <ReBarChart
+                data={(serviceData ?? []).map((row) => {
+                  return {
+                    name: row.key,
+                    "تعداد دپو": row.DepoCount,
+                    "تعداد ورودی": row.EntryCount,
+                    "تعداد رسیدگی": row.Capicity,
+                  };
+                })}
+                index="name"
+                categories={[
+                  "تعداد دپو",
+                  "تعداد ورودی",
+                  "تعداد رسیدگی",
+                ]}
+              /> */}
+              <Loading
+                isLoading={depo.isLoading}
+                LoadingComponent={BarChartSkeletonLoading}
+              >
+                <ResponsiveContainer width="99%" height={300}>
+                  <BarChart
+                    showAnimation={true}
+                    data={(serviceData ?? []).map((row) => {
+                      return {
+                        name: ShortServiceNames[row.key.ServiceName],
+                        "تعداد دپو": row.DepoCount,
+                        "تعداد ورودی": row.EntryCount,
+                        "تعداد رسیدگی": row.Capicity,
+                      };
+                    })}
+                    index="name"
+                    categories={["تعداد دپو", "تعداد ورودی", "تعداد رسیدگی"]}
+                    colors={["cyan", "rose", "emerald"]}
+                    valueFormatter={commify}
+                    yAxisWidth={20}
+                    showXAxis
+                    showGridLines={false}
+                    noDataText={Text.noData.fa}
+                    intervalType="preserveStartEnd"
+                  />
+                </ResponsiveContainer>
+              </Loading>
+
+              {/* <ResponsiveContainer width="99%" height={300}>
+                <CustomBarChart
+                  width={500}
+                  height={300}
+                  data={(serviceData ?? []).map((row) => {
+                    return {
+                      name: ShortServiceNames[row.key.ServiceName],
+                      "تعداد دپو": row.DepoCount,
+                      "تعداد ورودی": row.EntryCount,
+                      "تعداد رسیدگی": row.Capicity,
+                    };
+                  })}
+                  bars={[
+                    {
+                      name: "تعداد دپو",
+                      className: "fill-cyan-600",
+                      labelClassName: "fill-primary",
+                      position: "centerTop",
+                      angle: 0,
+                    },
+                    {
+                      name: "تعداد ورودی",
+                      className: "fill-rose-600",
+                      labelClassName: "fill-primary",
+                      position: "centerTop",
+                      angle: 0,
+                    },
+                    {
+                      name: "تعداد رسیدگی",
+                      className: "fill-emerald-600",
+                      labelClassName: "fill-primary",
+                      position: "centerTop",
+                      angle: 0,
+                    },
+                  ]}
+                  keys={["name"]}
+                  nameClassName="fill-accent text-accent"
+                  customYTick
+                  formatter={commify}
+                />
+              </ResponsiveContainer> */}
+            </div>
+            {/* <div className="flex w-full flex-col gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
+              <H2>نمودار زمانی</H2>
+              <AreaChart
+                showAnimation={true}
+                data={(dateDate ?? []).map((row) => {
+                  return {
+                    date: row.key,
+
+                    "تعداد دپو": row.DepoCount,
+                    "تعداد ورودی": row.EntryCount,
+                    "تعداد رسیدگی": row.Capicity,
+                  };
+                })}
+                index="date"
+                //  categories={["پاراکلینیک", "بیمارستانی", "دارو"]}
+                categories={[
+                  "تعداد دپو",
+                  "تعداد ورودی",
+                  "تعداد رسیدگی",
+                ]}
+                colors={["blue", "red", "green"]}
+                valueFormatter={commify}
+                noDataText={Text.noData.fa}
+              />
+            </div> */}
+          </div>
+        </div>
+
+        {/* <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
+          <div className="flex w-full  flex-col items-stretch justify-between gap-5 rounded-2xl border border-dashed  border-accent/50 bg-secbuttn/50 p-5">
+            <H2>
+              زمان اتمام دپو |{" "}
+              <span className="text-primbuttn">{reportPeriod}</span>
+            </H2>
+            <div className="flex w-full items-stretch justify-between gap-5   laptopMax:flex-col">
+              {depoCompletionTime.map((t) => {
+                return (
+                  <>
+                    <div
+                      dir="ltr"
+                      className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/10 bg-secondary/50 p-5"
+                    >
+                      <H2>{t.ServiceName}</H2>
+                      <DonutChart
+                        data={[t]}
+                        category={"DepoCompleteTime"}
+                        index="ServiceName"
+                        colors={[
+                          getServiceNameColor(t.ServiceName),
+                        ]}
+                        valueFormatter={commify}
+                        noDataText={Text.noData.fa}
+                      />
+                    </div>
+                  </>
+                );
+              })}
+            </div>
+          </div>
+        </div> */}
+
+        <div className="flex w-full flex-col items-center justify-center gap-5">
+          <div className="flex w-full  items-center justify-center gap-5 laptopMax:flex-col">
+            <div className="flex w-full  flex-col items-center justify-between gap-5">
+              <>
+                {/* <TrackerView data={getTracker.data ?? []} /> */}
+
+                {/* <RadarGauge CityName={trackerFilter.cities} /> */}
+                <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
+                  <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2 ">
+                    <H2>تعداد ورودی و رسیدگی شده</H2>
+                    <Loading
+                      isLoading={depo.isLoading}
+                      LoadingComponent={EntryHandlingSkeletonLoading}
+                    >
+                      <ResponsiveContainer width="99%" height={"100%"}>
+                        <DonutChart
+                          label={
+                            // depo.data?.result.length > 0
+                            //   ? " مانده : " +
+                            //     commify(
+                            //       entryBaseOnSabt -
+                            //         capacityBaseOnSabt,
+                            //     ).toString()
+                            //   : "داده ای موجود نیست"
+                            " "
+                          }
+                          data={entry_capacity}
+                          category="value"
+                          index="name"
+                          colors={["rose", "emerald", "lime"]}
+                          valueFormatter={commify}
+                          noDataText={Text.noData.fa}
+                        />
+                      </ResponsiveContainer>
+
+                      <div className="flex justify-stretch gap-2 ">
+                        <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
+                          <span className="text-rose-900">ورودی</span>
+                          <span className="text-rose-900">
+                            {commify(entryBaseOnSabt)}
+                          </span>
+                        </div>
+                        <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-emerald-200 p-1 text-center font-bold text-accent ">
+                          <span className="  text-emerald-900">رسیدگی شده</span>
+                          <span className="text-emerald-900">
+                            {commify(capacityBaseOnSabt)}
+                          </span>
+                        </div>
+                        <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-lime-200 p-1 text-center font-bold text-accent ">
+                          <span className="text-lime-900">مانده</span>
+                          <span className="text-lime-900">
+                            {commify(entryBaseOnSabt - capacityBaseOnSabt)}
+                          </span>
+                        </div>
+                      </div>
+                    </Loading>
+                  </div>
+                  <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2">
+                    <H2>تعداد دپو</H2>
+                    <Loading
+                      isLoading={depo.isLoading}
+                      LoadingComponent={DepoSkeletonLoading}
+                    >
+                      <ResponsiveContainer width="99%" height={"100%"}>
+                        <DonutChart
+                          data={depo_BaseOnSabt}
+                          category="value"
+                          index="name"
+                          colors={["fuchsia", "cyan"]}
+                          valueFormatter={commify}
+                          noDataText={Text.noData.fa}
+                        />
+                      </ResponsiveContainer>
+                      <div className="flex justify-stretch gap-2 ">
+                        <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
+                          <span className="text-fuchsia-900">دپو مستقیم</span>
+                          <span className="text-fuchsia-900">
+                            {commify(depoBaseOnSabtDirect)}
+                          </span>
+                        </div>
+                        <div className=" flex w-full justify-between rounded-xl bg-cyan-200 p-2 text-center font-bold text-accent ">
+                          <span className="  text-cyan-900">
+                            دپو غیر مستقیم
+                          </span>
+                          <span className="text-cyan-900">
+                            {commify(depoBaseOnSabtInDirect)}
+                          </span>
+                        </div>
+                      </div>
+                    </Loading>
+                  </div>
+                  <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md">
+                    <H2>
+                      زمان کلی اتمام دپو{" "}
+                      {depo.data?.periodType && (
+                        <>
+                          |{" "}
+                          <span className="text-primbuttn">
+                            {depo.data?.periodType}
+                          </span>
+                        </>
+                      )}
+                    </H2>
+                    <Loading
+                      isLoading={depo.isLoading}
+                      LoadingComponent={DepoTimeSkeletonLoading}
+                    >
+                      <ResponsiveContainer width="99%" height={"100%"}>
+                        <DonutChart
+                          label={maxDepoTime.toFixed(2)}
+                          data={depoCompletionTime}
+                          category={"DepoCompleteTime"}
+                          index="ServiceName"
+                          colors={[
+                            "emerald",
+                            "yellow",
+                            "cyan",
+                            "red",
+                            "orange",
+                            "fuchsia",
+                          ]}
+                          valueFormatter={commify}
+                          noDataText={Text.noData.fa}
+                        />
+                      </ResponsiveContainer>
+                      {depo.data?.periodType && totalComplete > 0 && (
+                        <p className="w-full">
+                          <span className="text-accent">
+                            {Math.round(maxDepoTime)}{" "}
+                            {Reports_Period[depo.data?.periodType]}{" "}
+                            {/* {humanizeDuration(
+                            maxDepoTime,
+                            Reports_Period[depo.data?.periodType],
+                          )} */}
+                          </span>
+                          <span className="text-primary">تا اتمام دپو</span>
+                        </p>
+                      )}
+                    </Loading>
+                  </div>
+                </div>
+              </>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+});

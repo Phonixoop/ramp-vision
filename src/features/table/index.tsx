@@ -5,7 +5,14 @@ import {
   Loader2Icon,
   LoaderIcon,
 } from "lucide-react";
-import { RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  RefObject,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   ColumnDef,
@@ -60,7 +67,7 @@ export default function Table({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
-    data,
+    data: data,
     columns,
 
     state: {
@@ -75,9 +82,9 @@ export default function Table({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    debugTable: true,
-    debugHeaders: true,
-    debugColumns: false,
+    // debugTable: true,
+    // debugHeaders: true,
+    // debugColumns: false,
   });
 
   const { rows } = table.getRowModel();
@@ -85,7 +92,7 @@ export default function Table({
   // const { getTableProps, getTableBodyProps, headerGroups, prepareRow } =
   //   tableInstance;
 
-  const flatRows = rows.map((row) => row.original);
+  const flatRows = useMemo(() => rows.map((row) => row.original), [rows]);
 
   // const { rows } = table.getRowModel();
   const tableContainerRef = useRef<HTMLDivElement>(null);
