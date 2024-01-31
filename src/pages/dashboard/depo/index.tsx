@@ -48,6 +48,7 @@ import EntryHandlingSkeletonLoading from "~/features/loadings/depo/entry-handlin
 import { Loading } from "~/features/loadings/loading";
 import DepoSkeletonLoading from "~/features/loadings/depo/depo-box";
 import DepoTimeSkeletonLoading from "~/features/loadings/depo/depo-time-box";
+import CustomPieChart from "~/features/custom-charts/pie-chart";
 
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {
@@ -896,7 +897,10 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       </div>
                     </Loading>
                   </div>
-                  <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md">
+                  <div
+                    dir="ltr"
+                    className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md"
+                  >
                     <H2>
                       زمان کلی اتمام دپو{" "}
                       {depo.data?.periodType && (
