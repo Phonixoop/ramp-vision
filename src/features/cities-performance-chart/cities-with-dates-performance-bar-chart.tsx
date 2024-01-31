@@ -12,8 +12,7 @@ import { Cell, ResponsiveContainer } from "recharts";
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
-
-import BarChartSkeletonLoading from "~/features/cities-performance-chart/loading";
+import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,

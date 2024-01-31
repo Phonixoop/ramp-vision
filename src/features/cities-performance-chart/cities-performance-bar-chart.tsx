@@ -20,7 +20,7 @@ import {
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
-import BarChartSkeletonLoading from "~/features/cities-performance-chart/loading";
+import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 
 export function CitiesPerformanceBarChart({
   filters,

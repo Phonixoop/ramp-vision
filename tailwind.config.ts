@@ -278,5 +278,48 @@ export default {
     require("tailwind-scrollbar")({ nocompatible: true }),
     require("@headlessui/tailwindcss"),
     require("tailwindcss-bg-patterns"),
+    function ({ matchUtilities, addUtilities, theme }) {
+      matchUtilities({
+        "ss-text": (value) => {
+          const rows = [];
+          const rowItems = value.split("/");
+          rowItems.forEach((item) => {
+            const length = Number(item.trim());
+            // Unicode escape sequences joined by full-width spaces
+            rows.push(
+              Array.from({ length })
+                .map((_) => `\\3000`)
+                .join(""),
+            );
+          });
+          // Unicode escape sequences joined by newlines
+          const content = rows.join(`\\A`);
+          return {
+            "&:empty:before": {
+              "--tw-content": `"${content}"`,
+            },
+          };
+        },
+      });
+      addUtilities({
+        '[class*="ss-text-"]': {
+          "&:empty:before": {
+            content: "var(--tw-content)",
+            "background-color": "rgba(var(--primary),0.5)",
+            "white-space": "break-spaces",
+            "word-break": "break-all",
+            "border-radius": "10px",
+            "box-decoration-break": "clone",
+            "-webkit-box-decoration-break": "clone",
+          },
+          "&.truncate:empty:before": {
+            "white-space": "normal",
+          },
+        },
+        ".ss-object:empty": {
+          "background-color": "rgba(var(--primary),0.5)",
+        },
+      });
+    },
   ],
 } satisfies Config;
