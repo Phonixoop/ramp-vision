@@ -861,7 +861,7 @@ function DeposTable({ sessionData }) {
                                     height={"100%"}
                                   >
                                     <DonutChart
-                                      label={totalComplete.toFixed(2)}
+                                      label={maxDepoTime.toFixed(2)}
                                       data={depoCompletionTime}
                                       category={"DepoCompleteTime"}
                                       index="ServiceName"

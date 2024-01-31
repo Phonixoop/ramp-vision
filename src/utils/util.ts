@@ -290,7 +290,7 @@ export function processDepoCompleteTimeData(
     const depoT = Math.round(a.TotalDepoCompleteTime / a.Count);
     return {
       ServiceName: a.ServiceName,
-      DepoCompleteTime: Math.abs(depoT),
+      DepoCompleteTime: depoT >= 0 ? depoT : 0,
     };
   });
 }
