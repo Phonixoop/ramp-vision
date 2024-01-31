@@ -42,6 +42,7 @@ import { PeriodType } from "~/context/personnel-filter.context";
 
 import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
+import { InPageMenu } from "~/features/menu";
 
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {
