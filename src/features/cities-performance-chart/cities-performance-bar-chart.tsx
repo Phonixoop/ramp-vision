@@ -5,6 +5,7 @@ import {
   distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
+  sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 
@@ -21,6 +22,7 @@ import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
+import { useMemo } from "react";
 
 export function CitiesPerformanceBarChart({
   filters,
@@ -42,51 +44,6 @@ export function CitiesPerformanceBarChart({
       },
     );
 
-  const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
-    {
-      filter: {
-        CityName: [router.query.performance_CityName as string],
-        Start_Date: filters?.filter?.Start_Date,
-        ProjectType: defaultProjectTypes,
-        Role: defualtRoles,
-        ContractType: defualtContractTypes,
-        RoleType: undefined,
-        DateInfo: filters?.filter?.DateInfo,
-      },
-      periodType: filters.periodType,
-    },
-    {
-      select: (data) => {
-        return distinctPersonnelPerformanceData(
-          data,
-          ["NationalCode", "NameFamily"],
-          [
-            "NationalCode",
-            "NameFamily",
-            "SabtAvalieAsnad",
-            "PazireshVaSabtAvalieAsnad",
-            "ArzyabiAsanadBimarsetaniDirect",
-            "ArzyabiAsnadBimarestaniIndirect",
-            "ArzyabiAsnadDandanVaParaDirect",
-            "ArzyabiAsnadDandanVaParaIndirect",
-            "ArzyabiAsnadDaroDirect",
-            "ArzyabiAsnadDaroIndirect",
-            "WithScanCount",
-            "WithoutScanCount",
-            "WithoutScanInDirectCount",
-            "Role",
-            "RoleType",
-            "ContractType",
-            "ProjectType",
-            "TotalPerformance",
-          ],
-        );
-      },
-      enabled: !!router.query.performance_CityName,
-      refetchOnWindowFocus: false,
-    },
-  );
-
   return (
     <>
       {!getCitiesWithPerformance.isLoading ? (
@@ -104,7 +61,7 @@ export function CitiesPerformanceBarChart({
 
                 router.push(
                   {
-                    href: "/dashboard/depo",
+                    href: router.pathname,
                     query: {
                       performance_CityName: data.CityName_En,
                     },
@@ -178,8 +135,7 @@ export function CitiesPerformanceBarChart({
 
       {!!router.query.performance_CityName && (
         <CityPerformanceWithUsersChart
-          data={getCitysUsersPerformance.data}
-          isLoading={getCitysUsersPerformance.isLoading}
+          filters={filters}
           cityName_En={router.query.performance_CityName as string}
         />
       )}
@@ -187,19 +143,96 @@ export function CitiesPerformanceBarChart({
   );
 }
 
-function CityPerformanceWithUsersChart({ data, isLoading, cityName_En }) {
+function CityPerformanceWithUsersChart({ filters, cityName_En }) {
+  const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
+    {
+      filter: {
+        CityName: [cityName_En],
+        Start_Date: filters?.filter?.Start_Date,
+        ProjectType: defaultProjectTypes,
+        Role: defualtRoles,
+        ContractType: defualtContractTypes,
+        RoleType: undefined,
+        DateInfo: filters?.filter?.DateInfo,
+      },
+      periodType: filters.periodType,
+    },
+    {
+      enabled: !!cityName_En,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  const router = useRouter();
+
+  const distinctData = useMemo(() => {
+    return distinctPersonnelPerformanceData(
+      getCitysUsersPerformance?.data,
+      ["NationalCode", "NameFamily"],
+      [
+        "NationalCode",
+        "NameFamily",
+        "SabtAvalieAsnad",
+        "PazireshVaSabtAvalieAsnad",
+        "ArzyabiAsanadBimarsetaniDirect",
+        "ArzyabiAsnadBimarestaniIndirect",
+        "ArzyabiAsnadDandanVaParaDirect",
+        "ArzyabiAsnadDandanVaParaIndirect",
+        "ArzyabiAsnadDaroDirect",
+        "ArzyabiAsnadDaroIndirect",
+        "WithScanCount",
+        "WithoutScanCount",
+        "WithoutScanInDirectCount",
+        "Role",
+        "RoleType",
+        "ContractType",
+        "ProjectType",
+        "TotalPerformance",
+      ],
+    );
+  }, [getCitysUsersPerformance?.data]);
+
+  const selectedUserData = useMemo(() => {
+    return sparkChartForPersonnelAndCity(
+      getCitysUsersPerformance?.data?.result,
+      "NameFamily",
+      router.query.NameFamily,
+    );
+  }, [router.query.NameFamily]);
+
   return (
     <>
-      {!isLoading ? (
+      {!getCitysUsersPerformance.isLoading ? (
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
             <H2 className="font-bold">
               نمودار عملکرد پرسنل شهر {getEnglishToPersianCity(cityName_En)}
             </H2>
             <CustomBarChart
+              onBarClick={(data, index) => {
+                // window.open(
+                //   "/dashboard/personnel_performance/cities/" + data.CityName_En,
+                //   "_blank",
+                // );
+
+                router.push(
+                  {
+                    href: router.pathname,
+                    query: {
+                      ...router.query,
+                      NameFamily: data["نام"],
+                    },
+                  },
+                  undefined,
+                  {
+                    scroll: false,
+                    shallow: true,
+                  },
+                );
+              }}
               width={500}
               height={500}
-              data={(data ?? []).map((row) => {
+              data={(distinctData ?? []).map((row) => {
                 return {
                   نام: row.NameFamily,
                   عملکرد: Math.round(row.TotalPerformance),
@@ -244,6 +277,59 @@ function CityPerformanceWithUsersChart({ data, isLoading, cityName_En }) {
           <BarChartSkeletonLoading />
         </div>
       )}
+
+      <>
+        {router.query.NameFamily && (
+          <ResponsiveContainer width="99%" height="auto">
+            <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
+              <H2 className="font-bold">
+                نمودار زمانی عملکرد {router.query.NameFamily}
+              </H2>
+              <CustomBarChart
+                width={500}
+                height={500}
+                data={(selectedUserData ?? []).map((row) => {
+                  return {
+                    تاریخ: row.Start_Date,
+                    عملکرد: Math.round(row.TotalPerformance),
+                  };
+                })}
+                bars={[
+                  {
+                    name: "عملکرد",
+                    className: "fill-primary cursor-pointer",
+                    labelClassName: "fill-secondary",
+                    angle: 0,
+                  },
+                ]}
+                keys={["تاریخ"]}
+                nameClassName="fill-primary"
+                customXTick
+                customYTick
+                formatter={commify}
+                customBars={(data) => {
+                  if (data.length <= 0) return <></>;
+
+                  return (
+                    <>
+                      {data.map((item, index) => {
+                        return (
+                          <>
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={getPerformanceMetric(item["عملکرد"]).color}
+                            />
+                          </>
+                        );
+                      })}
+                    </>
+                  );
+                }}
+              />
+            </div>
+          </ResponsiveContainer>
+        )}
+      </>
     </>
   );
 }

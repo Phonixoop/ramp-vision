@@ -156,12 +156,12 @@ function mapToCitiesWithPerformance({
 }
 
 export function sparkChartForPersonnelAndCity(
-  data,
+  data = [],
   propertyToCheck,
   valueToCheck,
 ) {
   return data
-    .filter((a) => a[propertyToCheck] === valueToCheck)
+    ?.filter((a) => a[propertyToCheck] === valueToCheck)
     .map((item) => {
       const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 

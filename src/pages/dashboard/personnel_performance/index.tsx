@@ -70,6 +70,9 @@ import {
   getMonthNamesFromJOINED_date_strings,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
+import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
+import { FilterType, PeriodType } from "~/context/personnel-filter.context";
 
 const dataFormatter = (number: number) => {
   return "$ " + Intl.NumberFormat("us").format(number).toString();
@@ -108,7 +111,7 @@ function PersonnelPerformanceTable({ sessionData }) {
   //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   // ]);
 
-  const [reportPeriod, setReportPeriod] = useState<string>("روزانه");
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
 
   const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
     undefined,
@@ -118,7 +121,7 @@ function PersonnelPerformanceTable({ sessionData }) {
     },
   );
 
-  const [filters, setDataFilters] = useState({
+  const [filters, setDataFilters] = useState<FilterType>({
     periodType: reportPeriod,
     filter: {
       CityName: initialFilters.data?.Cities?.map((a) => a.CityName),
@@ -842,30 +845,41 @@ function PersonnelPerformanceTable({ sessionData }) {
                 </>
               );
             }}
+            renderAfterTable={(flatRows) => {
+              return (
+                <>
+                  <div className="flex w-full flex-col items-center justify-center gap-5">
+                    <CitiesPerformanceBarChart
+                      filters={{
+                        ...filters,
+                        filter: {
+                          ...filters.filter,
+                          CityName: [],
+                        },
+                      }}
+                    />
+                    <CitiesWithDatesPerformanceBarChart
+                      filters={{
+                        ...filters,
+                        filter: {
+                          ...filters.filter,
+                          CityName: [
+                            ...new Set(
+                              flatRows.map((a) =>
+                                getPersianToEnglishCity(a.CityName),
+                              ),
+                            ),
+                          ],
+                        },
+                      }}
+                    />
+                  </div>
+                </>
+              );
+            }}
           />
         </div>
       </div>
-    </>
-  );
-}
-
-function UsersSkeleton() {
-  return (
-    <>
-      {[...Array(11).keys()].map((i) => {
-        return (
-          <>
-            <span
-              key={i}
-              className="inline-block h-12 w-full animate-pulse rounded-xl bg-accent opacity-30"
-              style={{
-                animationDelay: `${i * 5}`,
-                animationDuration: "1s",
-              }}
-            />
-          </>
-        );
-      })}
     </>
   );
 }
