@@ -594,7 +594,10 @@ function DeposTable({ sessionData }) {
                               "تعداد رسیدگی",
                             ]}
                           /> */}
-                          {!depo.isLoading ? (
+                          <Loading
+                            isLoading={depo.isLoading}
+                            LoadingComponent={BarChartSkeletonLoading}
+                          >
                             <ResponsiveContainer width="99%" height={300}>
                               <BarChart
                                 showAnimation={true}
@@ -623,9 +626,8 @@ function DeposTable({ sessionData }) {
                                 intervalType="preserveStartEnd"
                               />
                             </ResponsiveContainer>
-                          ) : (
-                            <BarChartSkeletonLoading />
-                          )}
+                          </Loading>
+
                           {/* <ResponsiveContainer width="99%" height={300}>
                             <CustomBarChart
                               width={500}
@@ -737,12 +739,14 @@ function DeposTable({ sessionData }) {
 
                             {/* <RadarGauge CityName={trackerFilter.cities} /> */}
                             <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
-                              <Loading
-                                isLoading={depo.isLoading}
-                                LoadingComponent={EntryHandlingSkeletonLoading}
-                              >
-                                <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2 ">
-                                  <H2>تعداد ورودی و رسیدگی شده</H2>
+                              <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2 ">
+                                <H2>تعداد ورودی و رسیدگی شده</H2>
+                                <Loading
+                                  isLoading={depo.isLoading}
+                                  LoadingComponent={
+                                    EntryHandlingSkeletonLoading
+                                  }
+                                >
                                   <ResponsiveContainer
                                     width="99%"
                                     height={"100%"}
@@ -795,14 +799,14 @@ function DeposTable({ sessionData }) {
                                       </span>
                                     </div>
                                   </div>
-                                </div>
-                              </Loading>
-                              <Loading
-                                isLoading={depo.isLoading}
-                                LoadingComponent={DepoSkeletonLoading}
-                              >
-                                <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2">
-                                  <H2>تعداد دپو</H2>
+                                </Loading>
+                              </div>
+                              <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2">
+                                <H2>تعداد دپو</H2>
+                                <Loading
+                                  isLoading={depo.isLoading}
+                                  LoadingComponent={DepoSkeletonLoading}
+                                >
                                   <ResponsiveContainer
                                     width="99%"
                                     height={"100%"}
@@ -834,24 +838,24 @@ function DeposTable({ sessionData }) {
                                       </span>
                                     </div>
                                   </div>
-                                </div>
-                              </Loading>
-                              <Loading
-                                isLoading={depo.isLoading}
-                                LoadingComponent={DepoTimeSkeletonLoading}
-                              >
-                                <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md">
-                                  <H2>
-                                    زمان کلی اتمام دپو{" "}
-                                    {depo.data?.periodType && (
-                                      <>
-                                        |{" "}
-                                        <span className="text-primbuttn">
-                                          {depo.data?.periodType}
-                                        </span>
-                                      </>
-                                    )}
-                                  </H2>
+                                </Loading>
+                              </div>
+                              <div className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md">
+                                <H2>
+                                  زمان کلی اتمام دپو{" "}
+                                  {depo.data?.periodType && (
+                                    <>
+                                      |{" "}
+                                      <span className="text-primbuttn">
+                                        {depo.data?.periodType}
+                                      </span>
+                                    </>
+                                  )}
+                                </H2>
+                                <Loading
+                                  isLoading={depo.isLoading}
+                                  LoadingComponent={DepoTimeSkeletonLoading}
+                                >
                                   <ResponsiveContainer
                                     width="99%"
                                     height={"100%"}
@@ -893,8 +897,8 @@ function DeposTable({ sessionData }) {
                                         </span>
                                       </p>
                                     )}
-                                </div>
-                              </Loading>
+                                </Loading>
+                              </div>
                             </div>
                           </>
                         </div>
