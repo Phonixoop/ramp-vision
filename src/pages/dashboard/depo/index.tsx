@@ -1,83 +1,47 @@
-import {
-  ArrowDownRightIcon,
-  UserCog2,
-  DownloadCloudIcon,
-  FileBarChart2,
-} from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { DownloadCloudIcon, FileBarChart2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { CSVLink } from "react-csv";
-import Menu, { InPageMenu } from "~/features/menu";
 
 import Table from "~/features/table";
 
-import { ThemeBoxHovery } from "~/features/theme-box";
-
 import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
-import { Container } from "~/ui/containers";
 
 import { useDeferredValue, useMemo, useState } from "react";
 import { RouterOutputs, api } from "~/utils/api";
-import {
-  Title,
-  BarChart,
-  AreaChart,
-  DonutChart,
-  Tracker,
-  Card,
-  Metric,
-  CategoryBar,
-  Legend,
-} from "@tremor/react";
-import CheckboxList, {
-  SelectColumnFilter,
-  SelectControlled,
-} from "~/features/checkbox-list";
-import MultiBox from "~/ui/multi-box";
+import { BarChart, DonutChart } from "@tremor/react";
+import { SelectColumnFilter } from "~/features/checkbox-list";
+
 import moment from "jalali-moment";
-import DatePicker from "react-multi-date-picker";
-import "react-multi-date-picker/styles/layouts/mobile.css";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
-import DatePanel from "react-multi-date-picker/plugins/date_panel";
+
 import {
   commify,
-  convertNumberToBetterFormat,
   en,
   getEnglishToPersianCity,
   getPersianToEnglishCity,
-  getServiceNameColor,
-  humanizeDuration,
   processDataForChart,
   processDepoCompleteTimeData,
   sumColumnBasedOnRowValue,
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
-import TrackerView from "~/features/tracker";
-import { CITIES, City_Levels, Reports_Period, Text } from "~/constants";
-import { cn } from "~/lib/utils";
-import { Column } from "react-table";
-import Header from "~/features/header";
+
+import { City_Levels, Reports_Period, Text } from "~/constants";
+
 import { LayoutGroup } from "framer-motion";
 import { ColumnDef } from "@tanstack/react-table";
-import { Bar } from "react-chartjs-2";
-import RadarGauge from "~/features/radar";
-import TestPage from "~/pages/test";
+
 import { ServiceNames, ShortServiceNames } from "~/constants/depo";
-import ReBarChart from "~/features/rechart-ui/bar";
+
 import { ResponsiveContainer } from "recharts";
-import InputIcon from "react-multi-date-picker/components/input_icon";
+
 import DatePickerPeriodic from "~/features/date-picker-periodic";
-import { date } from "zod";
-import { twMerge } from "tailwind-merge";
+
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
-import { FilterType, PeriodType } from "~/context/personnel-filter.context";
-import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
-import CitiesPerformanceBarChart, {
-  CitiesWithDatesPerformanceBarChart,
-} from "~/features/cities-performance-chart";
-import CustomBarChart from "~/features/custom-charts/bar-chart";
+import { PeriodType } from "~/context/personnel-filter.context";
+
+import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {

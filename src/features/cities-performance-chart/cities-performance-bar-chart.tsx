@@ -22,7 +22,7 @@ import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
 import BarChartSkeletonLoading from "~/features/cities-performance-chart/loading";
 
-export default function CitiesPerformanceBarChart({
+export function CitiesPerformanceBarChart({
   filters,
 }: {
   filters: FilterType;
@@ -244,137 +244,22 @@ function CityPerformanceWithUsersChart({ data, isLoading, cityName_En }) {
   );
 }
 
-export function CitiesWithDatesPerformanceBarChart({
-  filters,
-}: {
-  filters: FilterType;
-}) {
-  const getCitiesWithPerformance =
-    api.personnelPerformance.getCitiesWithPerformance.useQuery(
-      {
-        ...filters,
-      },
-      {
-        select: (data) => {
-          const b = distinctPersonnelPerformanceData(
-            data,
-            ["Start_Date", "CityName"],
-            ["TotalPerformance"],
-            { CityName: filters.filter.CityName },
-          );
+// export function transformData(rawData) {
+//   const transformedData = rawData.reduce((acc, current) => {
+//     const { key, TotalPerformance } = current;
+//     const { Start_Date, CityName } = key;
+//     // Check if there's an existing object for the current Start_Date
+//     const existingObject = acc.find((item) => item.Start_Date === Start_Date);
 
-          return b;
-        },
-        refetchOnWindowFocus: false,
-      },
-    );
+//     if (existingObject) {
+//       existingObject[CityName] = TotalPerformance;
+//     } else {
+//       const newObject = { Start_Date, [CityName]: TotalPerformance };
+//       acc.push(newObject);
+//     }
 
-  if (
-    filters.filter.CityName.length <= 0 ||
-    filters.filter.CityName.length >= 2
-  )
-    return (
-      <>
-        <p className="rounded-xl bg-primary p-3 text-secondary">
-          برای نمایش نمودار زمانی فقط یک شهر را فیلتر کنید
-        </p>
-      </>
-    );
-  if (getCitiesWithPerformance.isLoading)
-    return (
-      <>
-        <ThreeDotsWave />
-      </>
-    );
-  return (
-    <>
-      {getCitiesWithPerformance.isLoading ? (
-        <ResponsiveContainer width="99%" height="auto">
-          <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
-            <H2 className="font-bold">
-              نمودار زمانی عملکرد شهر{" "}
-              {getEnglishToPersianCity(filters.filter.CityName[0])}
-            </H2>
-            <CustomBarChart
-              width={500}
-              height={500}
-              data={(getCitiesWithPerformance?.data ?? []).map((row) => {
-                return {
-                  تاریخ: row.key.Start_Date,
-                  عملکرد: Math.round(row.TotalPerformance),
-                };
-              })}
-              bars={[
-                {
-                  name: "عملکرد",
-                  className: "fill-primary",
-                  labelClassName: "fill-secondary",
-                  angle: 0,
-                },
-              ]}
-              keys={["تاریخ"]}
-              brushKey="تاریخ"
-              // refrenceLines={Performance_Levels.map((level) => {
-              //   const max = Math.max(
-              //     ...getCitiesWithPerformance.data.map((a) => a.TotalPerformance),
-              //   );
-              //   return {
-              //     name: level.tooltip.text,
-              //     number:
-              //       level.limit > 180 && max > 180 && max <= 500
-              //         ? max
-              //         : level.limit,
-              //     color: level.color,
-              //   };
-              // })}
-              nameClassName="fill-primary"
-              customXTick
-              customYTick
-              formatter={commify}
-              customBars={(data) => {
-                if (data.length <= 0) return <></>;
+//     return acc;
+//   }, []);
 
-                return (
-                  <>
-                    {data.map((item, index) => {
-                      return (
-                        <>
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={getPerformanceMetric(item["عملکرد"]).color}
-                          />
-                        </>
-                      );
-                    })}
-                  </>
-                );
-              }}
-            />
-          </div>
-        </ResponsiveContainer>
-      ) : (
-        <BarChartSkeletonLoading />
-      )}
-    </>
-  );
-}
-
-export function transformData(rawData) {
-  const transformedData = rawData.reduce((acc, current) => {
-    const { key, TotalPerformance } = current;
-    const { Start_Date, CityName } = key;
-    // Check if there's an existing object for the current Start_Date
-    const existingObject = acc.find((item) => item.Start_Date === Start_Date);
-
-    if (existingObject) {
-      existingObject[CityName] = TotalPerformance;
-    } else {
-      const newObject = { Start_Date, [CityName]: TotalPerformance };
-      acc.push(newObject);
-    }
-
-    return acc;
-  }, []);
-
-  return transformedData;
-}
+//   return transformedData;
+// }
