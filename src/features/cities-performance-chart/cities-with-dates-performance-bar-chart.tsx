@@ -4,6 +4,7 @@ import { api } from "~/utils/api";
 import {
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
+  sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 
@@ -11,8 +12,12 @@ import { Cell, ResponsiveContainer } from "recharts";
 
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 
-import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
+import {
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtRoles,
+} from "~/constants/personnel-performance";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
@@ -22,18 +27,25 @@ export function CitiesWithDatesPerformanceBarChart({
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
-        ...filters,
+        filter: {
+          CityName: filters.filter.CityName,
+          Start_Date: filters?.filter?.Start_Date,
+          ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
+          Role: filters?.filter?.Role ?? defualtRoles,
+          ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
+          RoleType: undefined,
+          DateInfo: filters?.filter?.DateInfo,
+        },
+        periodType: filters.periodType,
       },
       {
         select: (data) => {
-          const b = distinctPersonnelPerformanceData(
+          return distinctPersonnelPerformanceData(
             data,
-            ["Start_Date", "CityName"],
+            ["Start_Date", "CityName", "COUNT"],
             ["TotalPerformance"],
             { CityName: filters.filter.CityName },
           );
-
-          return b;
         },
         refetchOnWindowFocus: false,
       },

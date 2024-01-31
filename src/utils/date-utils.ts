@@ -110,7 +110,7 @@ export function getDatesBetweenTwoDates(startDate, endDate) {
 export function getMonthName(date: string) {
   return moment()
     .locale("fa")
-    .month(parseInt(date.split("/")[1]) - 1)
+    .month(parseInt(date?.split("/")[1]) - 1)
     .format("MMMM");
 }
 

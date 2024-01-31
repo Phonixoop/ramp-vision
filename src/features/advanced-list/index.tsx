@@ -9,6 +9,7 @@ import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
 
 export default function AdvancedList({
+  className = "",
   title = <></> || "",
   list = [],
   filteredList = [],
@@ -55,7 +56,12 @@ export default function AdvancedList({
   const myDisabled = filteredList.length <= 0 || disabled;
 
   return (
-    <div className="relative flex  w-full max-w-sm flex-col items-center justify-start gap-1">
+    <div
+      className={twMerge(
+        "relative flex  w-full max-w-sm flex-col items-center justify-start gap-1",
+        className,
+      )}
+    >
       {title && (
         <div className="w-full  rounded-lg bg-secbuttn p-3 text-center text-lg font-bold text-primary">
           {title}

@@ -363,6 +363,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         const resultOfCities = await sql.query(queryCities);
 
         return {
+          periodType: input.periodType,
           dateLength: new Set(
             resultOfCities.recordsets[0].map((a) => a.Start_Date),
           ).size,

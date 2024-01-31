@@ -23,6 +23,7 @@ import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 import { useMemo } from "react";
+import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 
 export function CitiesPerformanceBarChart({
   filters,
@@ -33,11 +34,24 @@ export function CitiesPerformanceBarChart({
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
-        ...filters,
+        filter: {
+          CityName: [],
+          Start_Date: filters?.filter?.Start_Date,
+          ProjectType: defaultProjectTypes,
+          Role: defualtRoles,
+          ContractType: defualtContractTypes,
+          RoleType: undefined,
+          DateInfo: filters?.filter?.DateInfo,
+        },
+        periodType: filters.periodType,
       },
+
       {
         select: (data) => {
-          return distinctDataAndCalculatePerformance(data);
+          return {
+            ...data,
+            result: distinctDataAndCalculatePerformance(data),
+          };
         },
 
         refetchOnWindowFocus: false,
@@ -50,6 +64,12 @@ export function CitiesPerformanceBarChart({
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
             <H2 className="font-bold">نمودار عملکرد شهر ها</H2>
+            <H2 className="font-bold">
+              {getCitiesWithPerformance?.data?.periodType}
+            </H2>
+            <H2 className="font-bold">
+              {getCitiesWithPerformance?.data?.dateLength} روز
+            </H2>
             <CustomBarChart
               width={500}
               height={500}
@@ -73,7 +93,7 @@ export function CitiesPerformanceBarChart({
                   },
                 );
               }}
-              data={(getCitiesWithPerformance?.data ?? []).map((row) => {
+              data={(getCitiesWithPerformance?.data.result ?? []).map((row) => {
                 return {
                   CityName_En: row.CityName_En,
                   شهر: row.CityName_Fa,
@@ -134,16 +154,28 @@ export function CitiesPerformanceBarChart({
       )}
 
       {!!router.query.performance_CityName && (
-        <CityPerformanceWithUsersChart
-          filters={filters}
-          cityName_En={router.query.performance_CityName as string}
-        />
+        <>
+          <CityPerformanceWithUsersChart
+            filters={filters}
+            cityName_En={router.query.performance_CityName as string}
+          />
+
+          <CitiesWithDatesPerformanceBarChart
+            filters={{
+              ...filters,
+              filter: {
+                ...filters.filter,
+                CityName: [router.query.performance_CityName as string],
+              },
+            }}
+          />
+        </>
       )}
     </>
   );
 }
 
-function CityPerformanceWithUsersChart({ filters, cityName_En }) {
+export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
   const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
@@ -218,6 +250,7 @@ function CityPerformanceWithUsersChart({ filters, cityName_En }) {
                 router.push(
                   {
                     href: router.pathname,
+
                     query: {
                       ...router.query,
                       NameFamily: data["نام"],

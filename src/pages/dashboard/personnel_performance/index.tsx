@@ -858,21 +858,6 @@ function PersonnelPerformanceTable({ sessionData }) {
                         },
                       }}
                     />
-                    <CitiesWithDatesPerformanceBarChart
-                      filters={{
-                        ...filters,
-                        filter: {
-                          ...filters.filter,
-                          CityName: [
-                            ...new Set(
-                              flatRows.map((a) =>
-                                getPersianToEnglishCity(a.CityName),
-                              ),
-                            ),
-                          ],
-                        },
-                      }}
-                    />
                   </div>
                 </>
               );

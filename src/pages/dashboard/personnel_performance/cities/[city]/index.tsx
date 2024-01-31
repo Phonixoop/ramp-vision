@@ -27,6 +27,11 @@ import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
 import Calender from "~/features/calender";
+import {
+  CitiesPerformanceBarChart,
+  CityPerformanceWithUsersChart,
+} from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import Gauge from "~/features/gauge";
 import ToolTipSimple from "~/features/tooltip-simple-use";
 import { TrendDecider } from "~/features/trend-decider";
@@ -456,7 +461,7 @@ export default function CityPage({ children, city }) {
             </div>
           </>
         )}
-        <div
+        {/* <div
           className={twMerge(
             "flex w-full  flex-col items-center justify-center gap-2  rounded-xl  p-5",
             selectedPerson ? "bg-secondary" : "",
@@ -489,6 +494,23 @@ export default function CityPage({ children, city }) {
               ]}
             />
           </ResponsiveContainer>
+        </div> */}
+        <div
+          dir="rtl"
+          className={twMerge(
+            "flex w-full  flex-col items-center justify-center gap-2  rounded-xl  p-5",
+            selectedPerson ? "" : "",
+          )}
+        >
+          <CitiesWithDatesPerformanceBarChart
+            filters={{
+              ...filters,
+              filter: {
+                ...filters.filter,
+                CityName: [router.query.city as string],
+              },
+            }}
+          />
         </div>
       </div>
     </CitiesPage>

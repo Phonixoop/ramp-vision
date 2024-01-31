@@ -127,7 +127,10 @@ export function distinctPersonnelPerformanceData(
   ).map((item) => {
     return {
       ...item,
-      TotalPerformance: item.TotalPerformance / data.dateLength,
+      TotalPerformance:
+        item.TotalPerformance /
+        (groupBy.includes("Start_Date") ? item.key.COUNT : data.dateLength),
+      // (groupBy.includes("Start_Date") ? item.key.COUNT : data.dateLength)
     };
   });
 }

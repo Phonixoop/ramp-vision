@@ -495,25 +495,10 @@ function DeposTable({ sessionData }) {
                 </>
               );
             }}
-            renderAfterTable={(flatRows) => {
+            renderAfterTable={() => {
               return (
                 <div className="flex w-full flex-col items-center justify-center gap-5">
                   <CitiesPerformanceBarChart filters={filters} />
-                  <CitiesWithDatesPerformanceBarChart
-                    filters={{
-                      ...filters,
-                      filter: {
-                        ...filters.filter,
-                        CityName: [
-                          ...new Set(
-                            flatRows.map((a) =>
-                              getPersianToEnglishCity(a.CityName),
-                            ),
-                          ),
-                        ],
-                      },
-                    }}
-                  />
                 </div>
               );
             }}

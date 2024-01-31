@@ -48,6 +48,8 @@ import {
   sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import { CityWithPerformanceData } from "~/types";
+import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 
 // function DistinctDataForCity(data = []): CityWithPerformanceData[] {
 //   const cityMap = new Map();
@@ -349,8 +351,9 @@ export default function CitiesPage({ children }) {
             </div>
           )}
         </div>
-        <div className="m-auto flex w-11/12 flex-col justify-start gap-5  pb-10 xl:flex-row-reverse">
+        <div className=" m-auto flex  w-11/12 flex-col items-center justify-center gap-5 pb-10 xl:flex-row-reverse  xl:items-stretch xl:justify-start">
           <AdvancedList
+            className="xl:sticky xl:top-20  xl:h-fit"
             title={
               <span className="flex items-center justify-center gap-2 text-primary">
                 استان
@@ -447,6 +450,15 @@ export default function CitiesPage({ children }) {
           />
 
           {children}
+        </div>
+        <div
+          dir="rtl"
+          className="mx-auto flex w-11/12 flex-col items-center justify-center gap-5 rounded-xl bg-secondary  p-2 "
+        >
+          <CityPerformanceWithUsersChart
+            filters={filters}
+            cityName_En={router.query.city}
+          />
         </div>
       </div>
     </>
