@@ -51,15 +51,10 @@ export function CitiesWithDatesPerformanceBarChart({
         </p>
       </>
     );
-  if (getCitiesWithPerformance.isLoading)
-    return (
-      <>
-        <ThreeDotsWave />
-      </>
-    );
+
   return (
     <>
-      {getCitiesWithPerformance.isLoading ? (
+      {!getCitiesWithPerformance.isLoading ? (
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
             <H2 className="font-bold">
@@ -124,7 +119,9 @@ export function CitiesWithDatesPerformanceBarChart({
           </div>
         </ResponsiveContainer>
       ) : (
-        <BarChartSkeletonLoading />
+        <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
+          <BarChartSkeletonLoading />
+        </div>
       )}
     </>
   );

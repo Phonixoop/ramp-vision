@@ -171,7 +171,9 @@ export function CitiesPerformanceBarChart({
           </div>
         </ResponsiveContainer>
       ) : (
-        <BarChartSkeletonLoading />
+        <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
+          <BarChartSkeletonLoading />
+        </div>
       )}
 
       {!!router.query.performance_CityName && (
@@ -192,7 +194,7 @@ function CityPerformanceWithUsersChart({ data, isLoading, cityName_En }) {
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
             <H2 className="font-bold">
-              نمودار عملکرد شهر {getEnglishToPersianCity(cityName_En)}
+              نمودار عملکرد پرسنل شهر {getEnglishToPersianCity(cityName_En)}
             </H2>
             <CustomBarChart
               width={500}
@@ -238,7 +240,9 @@ function CityPerformanceWithUsersChart({ data, isLoading, cityName_En }) {
           </div>
         </ResponsiveContainer>
       ) : (
-        <BarChartSkeletonLoading />
+        <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
+          <BarChartSkeletonLoading />
+        </div>
       )}
     </>
   );
