@@ -57,6 +57,7 @@ export const City_Levels: {
       "Khorasan, Razavi",
       "Khuzestan",
       "Mazandaran",
+      "Gilan",
     ],
   },
   {
@@ -65,7 +66,6 @@ export const City_Levels: {
       "Alborz",
       "Ardabil",
       "Bushehr",
-      "Gilan",
       "Golestan Province",
       "Ilam",
       "Kerman",
