@@ -196,15 +196,19 @@ export function getMonthNamesFromJOINED_date_strings(
   if (typeof dates !== "string") return "";
 
   if (reportPeriod === "هفتگی") {
-    const date = dates.split(",")[1];
+    const datesSplitted = dates.split(",");
+    // if (datesSplitted.length >= 2)
+    //   return `${datesSplitted[0]} ~ ${datesSplitted[datesSplitted.length - 1]}`;
+    // return dates;
+    const date = datesSplitted[datesSplitted.length - 1];
 
     const weekNumber = getWeekOfMonth(date);
     const weekName = `هفته ${weekNumber} ${getMonthName(date)}`;
 
     return weekName;
-  }
+  } else if (reportPeriod === "ماهانه") {
+    const resultArray = dates.split(",").map(getMonthName);
 
-  const resultArray = dates.split(",").map(getMonthName);
-
-  return [...new Set(resultArray)].join(",");
+    return [...new Set(resultArray)].join(",");
+  } else return dates;
 }

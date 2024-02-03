@@ -629,14 +629,28 @@ function PersonnelPerformanceTable({ sessionData }) {
           accessorKey: "Start_Date",
           filterFn: "arrIncludesSome",
           cell: ({ row }) => {
-            return (
-              <>
-                {getMonthNamesFromJOINED_date_strings(
-                  row.original.Start_Date,
-                  personnelPerformance.data.periodType,
-                )}
-              </>
-            );
+            if (personnelPerformance.data.periodType === "هفتگی")
+              return (
+                <>
+                  {getMonthNamesFromJOINED_date_strings(
+                    filters.filter.Start_Date.join(","),
+                    personnelPerformance.data.periodType,
+                  )}
+                </>
+              );
+
+            if (personnelPerformance.data.periodType === "ماهانه")
+              return (
+                <>
+                  {getMonthNamesFromJOINED_date_strings(
+                    row.original.Start_Date,
+                    personnelPerformance.data.periodType,
+                  )}
+                </>
+              );
+
+            if (personnelPerformance.data.periodType === "روزانه")
+              return <>{filters.filter.Start_Date.join(",")}</>;
           },
         },
         {

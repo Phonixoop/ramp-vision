@@ -41,6 +41,7 @@
     "formik": "^2.4.5",
     "framer-motion": "^10.12.16",
     "jalali-moment": "^3.3.11",
+    "knex": "^3.1.0",
     "lucide-react": "^0.316.0",
     "mssql": "^10.0.1",
     "next": "^13.4.19",
@@ -58,6 +59,7 @@
     "superjson": "^1.13.1",
     "tailwind-merge": "^1.12.0",
     "tailwindcss-animate": "^1.0.5",
+    "tedious": "^16.6.1",
     "vaul": "^0.8.0",
     "zod": "^3.21.4",
     "zod-formik-adapter": "^1.2.0"
