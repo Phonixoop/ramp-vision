@@ -859,23 +859,23 @@ function PersonnelPerformanceTable({ sessionData }) {
                 </>
               );
             }}
-            renderAfterTable={(flatRows) => {
-              return (
-                <>
-                  <div className="flex w-full flex-col items-center justify-center gap-5">
-                    <CitiesPerformanceBarChart
-                      filters={{
-                        ...filters,
-                        filter: {
-                          ...filters.filter,
-                          CityName: [],
-                        },
-                      }}
-                    />
-                  </div>
-                </>
-              );
-            }}
+            // renderAfterTable={(flatRows) => {
+            //   return (
+            //     <>
+            //       <div className="flex w-full flex-col items-center justify-center gap-5">
+            //         <CitiesPerformanceBarChart
+            //           filters={{
+            //             ...filters,
+            //             filter: {
+            //               ...filters.filter,
+            //               CityName: [],
+            //             },
+            //           }}
+            //         />
+            //       </div>
+            //     </>
+            //   );
+            // }}
           />
         </div>
       </div>
