@@ -98,7 +98,7 @@ export default function CitiesPage({ children }) {
           Role: filters?.filter?.Role ?? defualtRoles,
           ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
           RoleType: filters?.filter?.RoleType,
-          DateInfo: filters?.filter?.DateInfo,
+          DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
         },
       },
       {
@@ -132,17 +132,36 @@ export default function CitiesPage({ children }) {
 
   // const persianNames = intersection.map((city) => city.PersianName);
 
-  const getInitialFilters =
-    api.personnelPerformance.getInitialFilters.useQuery();
+  const getInitialFilters = api.personnelPerformance.getInitialFilters.useQuery(
+    {
+      filter: {
+        ProjectType: filters.filter.ProjectType,
+        DateInfo: filters.filter.DateInfo,
+      },
+    },
+  );
 
   const DateInfos = [
     ...new Set(
-      getInitialFilters?.data?.usersInfo
-        ?.map((a) => a.DateInfo)
-        .filter((a) => a),
+      getInitialFilters?.data?.DateInfos?.map((a) => a.DateInfo).filter(
+        (a) => a,
+      ),
     ),
   ];
 
+  const Roles = [
+    ...new Set(
+      getInitialFilters?.data?.usersInfo?.map((a) => a.Role).filter((a) => a),
+    ),
+  ];
+
+  const ContractTypes = [
+    ...new Set(
+      getInitialFilters?.data?.usersInfo
+        ?.map((a) => a.ContractType)
+        .filter((a) => a),
+    ),
+  ];
   const distincedData = useMemo(
     () => distinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
     [getCitiesWithPerformance.data],
@@ -202,17 +221,15 @@ export default function CitiesPage({ children }) {
 
               <div className="flex  max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2 sm:w-[25rem]">
                 <span className="font-bold text-primary">سمت</span>
+
                 <SelectControlled
                   withSelectAll
                   title={"سمت"}
-                  list={[
-                    ...new Set(
-                      getInitialFilters?.data?.usersInfo
-                        ?.map((a) => a.Role)
-                        .filter((a) => a),
-                    ),
-                  ]}
-                  value={filters.filter.Role ?? defualtRoles}
+                  list={Roles}
+                  value={
+                    filters.filter.Role ??
+                    defualtRoles.filter((item) => Roles.includes(item))
+                  }
                   onChange={(values) => {
                     //@ts-ignore
                     setFilters((prev) => {
@@ -229,16 +246,11 @@ export default function CitiesPage({ children }) {
               </div>
               <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
+
                 <SelectControlled
                   withSelectAll
                   title={"نوع پروژه"}
-                  list={[
-                    ...new Set(
-                      getInitialFilters?.data?.usersInfo
-                        ?.map((a) => a.ProjectType)
-                        .filter((a) => a),
-                    ),
-                  ]}
+                  list={getInitialFilters?.data?.ProjectTypes}
                   value={filters.filter.ProjectType ?? defaultProjectTypes}
                   onChange={(values) => {
                     //@ts-ignore
@@ -260,14 +272,14 @@ export default function CitiesPage({ children }) {
                 <SelectControlled
                   withSelectAll
                   title={"نوع قرار داد"}
-                  list={[
-                    ...new Set(
-                      getInitialFilters?.data?.usersInfo
-                        ?.map((a) => a.ContractType)
-                        .filter((a) => a),
-                    ),
-                  ]}
-                  value={filters.filter.ContractType ?? defualtContractTypes}
+                  list={ContractTypes}
+                  value={
+                    filters.filter.ContractType ??
+                    filters.filter.Role ??
+                    defualtContractTypes.filter((item) =>
+                      ContractTypes.includes(item),
+                    )
+                  }
                   onChange={(values) => {
                     //@ts-ignore
                     setFilters((prev) => {
@@ -316,9 +328,7 @@ export default function CitiesPage({ children }) {
                 <SelectControlled
                   title={"تاریخ گزارش پرنسل"}
                   list={DateInfos}
-                  value={
-                    filters.filter.DateInfo ?? [DateInfos[DateInfos.length - 1]]
-                  }
+                  value={filters.filter.DateInfo ?? [DateInfos[0]]}
                   onChange={(values) => {
                     let _values = values;
                     _values = [values[values.length - 1]];
@@ -328,7 +338,7 @@ export default function CitiesPage({ children }) {
                         periodType: reportPeriod,
                         filter: {
                           ...prev.filter,
-                          DateInfo: _values,
+                          DateInfo: _values.filter((a) => a),
                         },
                       };
                     });

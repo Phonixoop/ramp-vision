@@ -15,6 +15,10 @@ import {
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
 import { getEnglishToPersianCity } from "~/utils/util";
+import {
+  defaultProjectTypes,
+  defualtDateInfos,
+} from "~/constants/personnel-performance";
 
 const config = {
   user: process.env.SQL_USER,
@@ -47,7 +51,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish().default(["1402/09/30"]),
+          DateInfo: z
+            .array(z.string().nullish())
+            .nullish()
+            .default(defualtDateInfos),
         }),
       }),
     )
@@ -181,7 +188,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -252,7 +259,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z.array(z.string()).nullish().default(["1402/09/30"]),
+          DateInfo: z
+            .array(z.string().nullish())
+            .nullish()
+            .default(defualtDateInfos),
         }),
       }),
     )
@@ -359,7 +369,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         }
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-        // console.log(queryCities);
+        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         return {
@@ -376,44 +386,75 @@ export const personnelPerformanceRouter = createTRPCRouter({
         return error;
       }
     }),
-  getInitialFilters: protectedProcedure.query(async ({ ctx }) => {
-    try {
-      // Connect to SQL Server
-
-      const permissions = await getPermission({ ctx });
-      const cities = permissions
-        .find((permission) => permission.id === "ViewCities")
-        .subPermissions.filter((permission) => permission.isActive)
-        .map((permission) => permission.enLabel);
-
-      const whereClause = generateWhereClause({ CityName: cities });
-      const query = `
-      SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
-
-      SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
-
-      ${whereClause}
-      `;
-
-      const result = await sql.query(query);
-      // console.log(result.recordsets);
-      return {
-        usersInfo: result.recordsets[0],
-
-        Cities: result.recordsets[1]
-          .filter((c) => c.CityName !== "")
-          .map((c) => {
-            return {
-              CityName: getEnglishToPersianCity(c.CityName),
-            };
+  getInitialFilters: protectedProcedure
+    .input(
+      z
+        .object({
+          filter: z.object({
+            ProjectType: z
+              .array(z.string())
+              .nullish()
+              .default(defaultProjectTypes),
+            DateInfo: z.array(z.string()).nullish().default(defualtDateInfos),
           }),
-      };
-      // Respond with the fetched data
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-      return error;
-    }
-  }),
+        })
+        .optional(),
+    )
+    .query(async ({ input, ctx }) => {
+      try {
+        // Connect to SQL Server
+
+        const permissions = await getPermission({ ctx });
+        const cities = permissions
+          .find((permission) => permission.id === "ViewCities")
+          .subPermissions.filter((permission) => permission.isActive)
+          .map((permission) => permission.enLabel);
+
+        const whereClauseForRest = generateWhereClause({
+          DateInfo: input.filter.DateInfo,
+          ProjectType: input.filter.ProjectType,
+        });
+        const whereClauseForCity = generateWhereClause({
+          CityName: cities,
+        });
+
+        const query = `
+      SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
+      ${whereClauseForRest}
+
+      
+      SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
+      ${whereClauseForCity}
+
+
+      SELECT DISTINCT DateInfo FROM RAMP_Daily.dbo.users_info
+
+      SELECT DISTINCT ProjectType FROM RAMP_Daily.dbo.users_info WHERE ProjectType is not NULL AND ProjectType != ''
+
+
+      `;
+        // console.log(query);
+        const result = await sql.query(query);
+        // console.log(result.recordsets);
+        return {
+          usersInfo: result.recordsets[0],
+
+          Cities: result.recordsets[1]
+            .filter((c) => c.CityName !== "")
+            .map((c) => {
+              return {
+                CityName: getEnglishToPersianCity(c.CityName),
+              };
+            }),
+          DateInfos: result.recordsets[2],
+          ProjectTypes: result.recordsets[3].map((c) => c.ProjectType),
+        };
+        // Respond with the fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+        return error;
+      }
+    }),
 
   get30DaysTrack: protectedProcedure
     .input(
@@ -510,36 +551,36 @@ export const personnelPerformanceRouter = createTRPCRouter({
         return error;
       }
     }),
-  getCities: protectedProcedure.query(async ({ ctx }) => {
-    try {
-      // Connect to SQL Server
+  getInitialCities: protectedProcedure.query(async ({ ctx }) => {
+    const permissions = await getPermission({ ctx });
+    const cities = permissions
+      .find((permission) => permission.id === "ViewCities")
+      .subPermissions.filter((permission) => permission.isActive)
+      .map((permission) => permission.enLabel);
 
-      const permissions = await getPermission({ ctx });
-      const cities = permissions
-        .find((permission) => permission.id === "ViewCities")
-        .subPermissions.filter((permission) => permission.isActive)
-        .map((permission) => permission.enLabel);
+    const whereClauseForCity = generateWhereClause({
+      CityName: cities,
+    });
 
-      const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
-        `;
+    const query = `
 
-      const resultOfCities = await sql.query(queryCities);
+  
+  SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
+  ${whereClauseForCity}
 
-      // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-      // console.log(queryDocumentTypes);
-      // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
-      const result = {
-        Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
-      };
 
-      return result;
-      // Respond with the fetched data
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-      return error;
-    }
+  `;
+    // console.log(query);
+    const result = await sql.query(query);
+    // console.log(result.recordsets);
+    return {
+      Cities: result.recordsets[0]
+        .filter((c) => c.CityName !== "")
+        .map((c) => {
+          return getEnglishToPersianCity(c.CityName);
+        }),
+    };
   }),
 
   getUsersByCityName: protectedProcedure

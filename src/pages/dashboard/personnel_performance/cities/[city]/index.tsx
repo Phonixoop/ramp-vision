@@ -22,6 +22,7 @@ import {
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
+  defualtDateInfos,
 } from "~/constants/personnel-performance";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
@@ -83,7 +84,7 @@ export default function CityPage({ children, city }) {
         Role: filters?.filter?.Role ?? defualtRoles,
         ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
         RoleType: filters?.filter?.RoleType,
-        DateInfo: filters?.filter?.DateInfo,
+        DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
       },
       periodType: filters.periodType,
     },

@@ -107,7 +107,7 @@ export function SelectColumnFilter({
   column,
   data,
   initialFilters = [],
-  onChange,
+  onChange = (filter) => {},
   withSelectAll = true,
   singleSelect = false,
 }) {

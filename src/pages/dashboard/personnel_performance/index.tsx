@@ -63,6 +63,7 @@ import {
   defaultProjectTypes,
   defualtContractTypes,
   defualtDateInfos,
+  defualtRoles,
 } from "~/constants/personnel-performance";
 import {
   distinctPersonnelPerformanceData,
@@ -113,7 +114,7 @@ function PersonnelPerformanceTable({ sessionData }) {
 
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
 
-  const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
+  const getInitialCities = api.personnelPerformance.getInitialCities.useQuery(
     undefined,
     {
       enabled: sessionData?.user !== undefined,
@@ -124,13 +125,29 @@ function PersonnelPerformanceTable({ sessionData }) {
   const [filters, setDataFilters] = useState<FilterType>({
     periodType: reportPeriod,
     filter: {
-      CityName: initialFilters.data?.Cities?.map((a) => a.CityName),
+      CityName: getInitialCities.data?.Cities,
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
+      ProjectType: defaultProjectTypes,
+      Role: defualtRoles,
+      ContractType: defualtContractTypes,
+      RoleType: [],
+      DateInfo: defualtDateInfos,
     },
   });
-
+  const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
+    {
+      filter: {
+        DateInfo: filters.filter.DateInfo,
+        ProjectType: filters.filter.ProjectType,
+      },
+    },
+    {
+      enabled: sessionData?.user !== undefined,
+      refetchOnWindowFocus: false,
+    },
+  );
   const deferredFilter = useDeferredValue(filters);
 
   const personnelPerformance = api.personnelPerformance.getAll.useQuery(
@@ -161,9 +178,22 @@ function PersonnelPerformanceTable({ sessionData }) {
     },
   );
 
-  const DateInfos: string[] = initialFilters?.data?.usersInfo.map(
-    (a) => a.DateInfo,
-  );
+  const DateInfos: string[] =
+    initialFilters?.data?.DateInfos?.map((a) => a.DateInfo) ?? [];
+
+  const Roles = [
+    ...new Set(
+      initialFilters?.data?.usersInfo?.map((a) => a.Role).filter((a) => a),
+    ),
+  ];
+
+  const ContractTypes = [
+    ...new Set(
+      initialFilters?.data?.usersInfo
+        ?.map((a) => a.ContractType)
+        .filter((a) => a),
+    ),
+  ];
 
   const distincedData = useMemo(
     () =>
@@ -210,7 +240,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                           (a) => a.name === value.item.name,
                         ).cities;
 
-                        // beacuse our system is permission based we need to only filter allowed cities.
+                        // beacuse our system is permission based we need to show only allowed cities.
                         const canFilterCities = cities
                           .filter(
                             (city) =>
@@ -333,16 +363,25 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
                 <SelectColumnFilter
-                  initialFilters={defaultProjectTypes}
+                  initialFilters={
+                    filters.filter.ProjectType ?? defaultProjectTypes
+                  }
                   column={column}
-                  data={personnelPerformance.data?.result}
+                  data={initialFilters?.data?.ProjectTypes.map((a) => {
+                    return {
+                      ProjectType: a,
+                    };
+                  })}
                   onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
+                    setDataFilters((prev) => {
+                      return {
+                        ...prev,
+                        filter: {
+                          ...prev.filter,
+                          [filter.id]: filter.values,
+                        },
+                      };
+                    });
                   }}
                 />
               </div>
@@ -360,7 +399,12 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع قرارداد</span>
                 <SelectColumnFilter
-                  initialFilters={["تمام وقت"]}
+                  initialFilters={
+                    filters.filter.ContractType ??
+                    defualtContractTypes.filter((item) =>
+                      ContractTypes.includes(item),
+                    )
+                  }
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {
@@ -387,14 +431,10 @@ function PersonnelPerformanceTable({ sessionData }) {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">سمت</span>
                 <SelectColumnFilter
-                  initialFilters={[
-                    "کارشناس ارزیاب اسناد بیمارستانی",
-                    "کارشناس ارزیاب اسناد پاراکلینیکی",
-                    "کارشناس ارزیاب اسناد دارویی",
-                    "کارشناس ارزیاب اسناد دندانپزشکی",
-                    "کارشناس پذیرش اسناد",
-                    "کارشناس ثبت اسناد خسارت",
-                  ]}
+                  initialFilters={
+                    filters.filter.Role ??
+                    defualtRoles.filter((item) => Roles.includes(item))
+                  }
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {
@@ -668,15 +708,19 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <SelectColumnFilter
                   singleSelect
                   column={column}
-                  initialFilters={[DateInfos[DateInfos.length - 1]]}
-                  data={initialFilters?.data?.usersInfo}
+                  initialFilters={filters.filter.DateInfo ?? [DateInfos[0]]}
+                  data={DateInfos.map((a) => {
+                    return {
+                      DateInfo: a,
+                    };
+                  })}
                   onChange={(filter) => {
                     setDataFilters((prev) => {
                       return {
                         ...prev,
                         filter: {
                           ...prev.filter,
-                          [filter.id]: filter.values,
+                          [filter.id]: filter.values.filter((a) => a),
                         },
                       };
                     });

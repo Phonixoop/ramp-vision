@@ -36,11 +36,18 @@ export function generateWhereClause(
       conditions.push(condition);
     }
   }
-  return conditions.length > 0
-    ? `WHERE ${customWhere}  CityName is not NULL AND ${conditions.join(
-        " AND ",
-      )}`
-    : "";
+  if ("CityName" in filter)
+    return conditions.length > 0
+      ? `WHERE ${customWhere}  CityName is not NULL AND ${conditions.join(
+          " AND ",
+        )}`
+      : "";
+
+  if (customWhere)
+    return conditions.length > 0
+      ? `WHERE ${customWhere} AND ${conditions.join(" AND ")}`
+      : "";
+  else return conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 }
 
 // import { EOL } from "os";

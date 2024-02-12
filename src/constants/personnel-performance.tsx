@@ -60,7 +60,7 @@ export const defaultProjectTypes = ["ارزیابی"];
 
 export const defualtContractTypes = ["تمام وقت"];
 
-export const defualtDateInfos = ["1402/03/31"];
+export const defualtDateInfos = ["1402/09/30"];
 
 export const Indicators = {
   ArzyabiAsanadBimarsetaniDirect: 35, // ارزیابی اسناد بیمارستانی مستقیم
