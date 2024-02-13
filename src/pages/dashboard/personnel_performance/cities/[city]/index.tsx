@@ -322,16 +322,27 @@ export default function CityPage({ children, city }) {
                       <div
                         key={key}
                         className={twMerge(
-                          "group flex flex-col justify-center gap-2 p-2 last:bg-primary/80 md:col-span-1 ",
+                          "group flex flex-col justify-center gap-2  p-2 last:bg-primary/80 hover:opacity-100  md:col-span-1 ",
+                          (value as number) <= 0 ? "opacity-50" : "bg-secbuttn",
                           // isLastItem ? " md:col-span-2" : "md:col-span-1",
                         )}
                       >
                         <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl  p-2">
                           <span> {PersonnelPerformanceIcons[key]}</span>
-                          <span className="  text-primary group-last:text-secondary">
+                          <span
+                            className={twMerge(
+                              "  text-primary group-last:text-secondary",
+                              (value as number) > 0 ? "font-bold" : "text-sm",
+                            )}
+                          >
                             {PersonnelPerformanceTranslate[key]}
                           </span>
-                          <span className="text-primary group-last:text-secondary">
+                          <span
+                            className={twMerge(
+                              "  text-primary group-last:text-secondary",
+                              (value as number) > 0 ? "font-bold" : "text-sm",
+                            )}
+                          >
                             {commify(
                               Number.isInteger(value)
                                 ? value
