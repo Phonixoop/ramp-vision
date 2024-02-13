@@ -1,4 +1,5 @@
 import {
+  ArchiveIcon,
   BiohazardIcon,
   BrainCogIcon,
   FileCheckIcon,
@@ -19,9 +20,12 @@ export const PersonnelPerformanceTranslate = {
   ArzyabiAsnadDandanVaParaIndirect: "ارزیابی اسناد دندان و پارا غیر مستقیم",
   ArzyabiAsnadDaroDirect: "ارزیابی اسناد دارو مستقیم",
   ArzyabiAsnadDaroIndirect: "ارزیابی اسناد دارو غیر مستقیم",
+  ArchiveDirectCount: "بایگانی مستقیم",
+  ArchiveInDirectCount: "بایگانی غیر مستقیم",
   WithScanCount: "ثبت ارزیابی با اسکن مدارک",
   WithoutScanCount: "ثبت ارزیابی بدون اسکن مدارک",
   WithoutScanInDirectCount: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+
   TotalPerformance: "عملکرد",
 };
 
@@ -38,6 +42,9 @@ export const PersonnelPerformanceIcons = {
   ),
   ArzyabiAsnadDaroDirect: <SyringeIcon className="stroke-purple-500" />,
   ArzyabiAsnadDaroIndirect: <SyringeIcon className="stroke-purple-700" />,
+
+  ArchiveDirectCount: <ArchiveIcon className="stroke-violet-500" />,
+  ArchiveInDirectCount: <ArchiveIcon className="stroke-violet-900" />,
 
   WithScanCount: <FileScanIcon className="stroke-cyan-500" />,
   WithoutScanCount: <FileScanIcon className="stroke-cyan-700" />,

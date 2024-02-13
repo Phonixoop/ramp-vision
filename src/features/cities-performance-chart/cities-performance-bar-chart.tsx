@@ -215,6 +215,8 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
         "WithScanCount",
         "WithoutScanCount",
         "WithoutScanInDirectCount",
+        "ArchiveDirectCount",
+        "ArchiveInDirectCount",
         "Role",
         "RoleType",
         "ContractType",

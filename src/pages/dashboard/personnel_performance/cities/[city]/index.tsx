@@ -110,6 +110,8 @@ export default function CityPage({ children, city }) {
               "WithScanCount",
               "WithoutScanCount",
               "WithoutScanInDirectCount",
+              "ArchiveDirectCount",
+              "ArchiveInDirectCount",
               "Role",
               "RoleType",
               "ContractType",
@@ -140,25 +142,25 @@ export default function CityPage({ children, city }) {
     (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
   );
 
-  const fullData = useMemo(
-    () =>
-      distinctPersonnelPerformanceData(getAll?.data ?? [], ["Start_Date"]).map(
-        (d) => {
-          // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
-          const translatedData = {};
-          for (const key in d) {
-            if (PersonnelPerformanceTranslate[key]) {
-              translatedData[PersonnelPerformanceTranslate[key]] = d[key];
-            } else {
-              translatedData[key] = d[key];
-            }
-          }
+  // const fullData = useMemo(
+  //   () =>
+  //     distinctPersonnelPerformanceData(getAll?.data ?? [], ["Start_Date"]).map(
+  //       (d) => {
+  //         // d.TotalPerformance = calculatePerformance(d, getAll?.data?.dateLength);
+  //         const translatedData = {};
+  //         for (const key in d) {
+  //           if (PersonnelPerformanceTranslate[key]) {
+  //             translatedData[PersonnelPerformanceTranslate[key]] = d[key];
+  //           } else {
+  //             translatedData[key] = d[key];
+  //           }
+  //         }
 
-          return translatedData;
-        },
-      ),
-    [getAll?.data?.result],
-  );
+  //         return translatedData;
+  //       },
+  //     ),
+  //   [getAll?.data?.result],
+  // );
 
   useEffect(() => {
     setSelectedPerson(undefined);
@@ -194,6 +196,8 @@ export default function CityPage({ children, city }) {
             "WithScanCount",
             "WithoutScanCount",
             "WithoutScanInDirectCount",
+            "ArchiveDirectCount",
+            "ArchiveInDirectCount",
             "Role",
             "RoleType",
             "ContractType",
@@ -306,27 +310,28 @@ export default function CityPage({ children, city }) {
           <>
             <div className="flex w-full flex-col items-start justify-center gap-5 xl:flex-row">
               <div
-                className="grid  grid-cols-1  gap-4 md:grid-cols-2 "
+                className="grid grid-cols-1 divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn rounded-xl bg-secondary p-2  md:grid-cols-2 "
                 dir="rtl"
               >
                 {numericItems.map(([key, value], index, array) => {
                   // const isLastItem = index === array.length - 1;
+
                   if (!PersonnelPerformanceIcons[key]) return;
                   return (
                     <>
                       <div
                         key={key}
                         className={twMerge(
-                          "`p-2`  flex flex-col justify-center gap-2 rounded-2xl bg-secondary  p-2 md:col-span-1",
+                          "group flex flex-col justify-center gap-2 p-2 last:bg-primary/80 md:col-span-1 ",
                           // isLastItem ? " md:col-span-2" : "md:col-span-1",
                         )}
                       >
-                        <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl bg-secbuttn p-2">
+                        <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl  p-2">
                           <span> {PersonnelPerformanceIcons[key]}</span>
-                          <span className="text-primary">
+                          <span className="  text-primary group-last:text-secondary">
                             {PersonnelPerformanceTranslate[key]}
                           </span>
-                          <span className="text-accent">
+                          <span className="text-primary group-last:text-secondary">
                             {commify(
                               Number.isInteger(value)
                                 ? value

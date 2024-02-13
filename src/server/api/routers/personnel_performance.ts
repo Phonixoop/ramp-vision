@@ -96,6 +96,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SUM(WithScanCount) as WithScanCount,
         SUM(WithoutScanCount) as WithoutScanCount,
         SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
+        SUM(ArchiveDirectCount) as ArchiveDirectCount,
+        SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
         SUM(TotalPerformance) as TotalPerformance, 
         
         DateInfo,Start_Date from dbName1 as p
@@ -138,6 +140,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
           SUM(WithScanCount) as WithScanCount,
           SUM(WithoutScanCount) as WithoutScanCount,
           SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
+          SUM(ArchiveDirectCount) as ArchiveDirectCount,
+          SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
           SUM(TotalPerformance) as TotalPerformance,  DateInfo,Start_Date
           
           from dbName1 as p
@@ -188,7 +192,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -311,8 +315,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
       SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
       SUM(WithScanCount) as WithScanCount,
       SUM(WithoutScanCount) as WithoutScanCount,
-      SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
-
+      SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
+      SUM(ArchiveDirectCount) as ArchiveDirectCount,
+      SUM(ArchiveInDirectCount) as ArchiveInDirectCount
 
       FROM dbName.dbo.personnel_performance as p
       JOIN
@@ -356,7 +361,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
         SUM(WithScanCount) as WithScanCount,
         SUM(WithoutScanCount) as WithoutScanCount,
-        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount
+        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
+        SUM(ArchiveDirectCount) as ArchiveDirectCount,
+        SUM(ArchiveInDirectCount) as ArchiveInDirectCount
         
       
         FROM dbName.dbo.personnel_performance as p
@@ -611,6 +618,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
       SUM(WithScanCount) as WithScanCount,
       SUM(WithoutScanCount) as WithoutScanCount,
       SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
+      SUM(ArchiveDirectCount) as ArchiveDirectCount,
+      SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
       DateInfo,Start_Date from dbName1 as p
       JOIN dbName2 as u on p.NationalCode = u.NationalCode  
        `;

@@ -663,7 +663,36 @@ function PersonnelPerformanceTable({ sessionData }) {
                 ),
             ),
         },
-
+        {
+          header: "بایگانی مستقیم",
+          accessorKey: "ArchiveDirectCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArchiveDirectCount") as number),
+                  0,
+                ),
+            ),
+        },
+        {
+          header: "بایگانی غیر مستقیم",
+          accessorKey: "ArchiveInDirectCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArchiveInDirectCount") as number),
+                  0,
+                ),
+            ),
+        },
         {
           header: "بازه گزارش",
           accessorKey: "Start_Date",
