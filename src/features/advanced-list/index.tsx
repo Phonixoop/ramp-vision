@@ -71,8 +71,8 @@ export default function AdvancedList({
         className={twMerge(
           "flex  w-full  flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl  p-1",
           filteredList.length > 0
-            ? "max-h-[500px] min-h-[500px]  bg-secbuttn"
-            : "h-full min-h-[500px]",
+            ? "max-h-[580px] min-h-[580px]  bg-secbuttn"
+            : "h-full min-h-[580px]",
         )}
       >
         <div

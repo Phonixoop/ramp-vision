@@ -170,13 +170,13 @@ export default function CitiesPage({ children }) {
     <>
       <BlurBackground />
 
-      <div className="flex min-h-screen w-full flex-col gap-5 bg-secondary py-2">
-        <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-xl p-2 sm:flex-col sm:bg-primbuttn/10">
-          <H2 className="hidden text-xl sm:flex">فیلترها</H2>
+      <div className="flex min-h-screen w-full flex-col divide-y-2 divide-secbuttn  bg-secbuttn  py-2">
+        <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-t-2xl  bg-secondary  p-2 sm:flex-col ">
+          <H2 className="hidden py-2 text-xl sm:flex">فیلترها</H2>
 
           {!getInitialFilters.isLoading && (
             <ResponsiveView
-              className=" z-20 flex max-h-[100vh] flex-wrap items-stretch justify-center gap-1  sm:max-h-min sm:bg-transparent sm:py-0"
+              className=" z-20 flex max-h-[100vh] w-full flex-wrap items-stretch justify-center  bg-secondary sm:max-h-min sm:p-5"
               dir="rtl"
               btnClassName="bg-secondary text-primary"
               icon={
@@ -186,7 +186,7 @@ export default function CitiesPage({ children }) {
                 </>
               }
             >
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3  bg-secondary p-2">
                 <span className="font-bold text-primary">بازه گزارش</span>
                 <DatePickerPeriodic
                   filter={filters}
@@ -219,7 +219,7 @@ export default function CitiesPage({ children }) {
                 />
               </div>
 
-              <div className="flex  max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2 sm:w-[25rem]">
+              <div className="flex  max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2 sm:w-[25rem]">
                 <span className="font-bold text-primary">سمت</span>
 
                 <SelectControlled
@@ -244,7 +244,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3  bg-secondary p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
 
                 <SelectControlled
@@ -267,7 +267,7 @@ export default function CitiesPage({ children }) {
                 />
               </div>
 
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
                 <span className="font-bold text-primary">نوع قرار داد</span>
                 <SelectControlled
                   withSelectAll
@@ -294,7 +294,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
                 <span className="font-bold text-primary">نوع سمت</span>
                 <SelectControlled
                   withSelectAll
@@ -321,7 +321,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
                 <span className="font-bold text-primary">
                   تاریخ گزارش پرسنل
                 </span>
@@ -348,9 +348,9 @@ export default function CitiesPage({ children }) {
             </ResponsiveView>
           )}
         </div>
-        <div className="mx-auto flex w-11/12 items-center justify-end">
+        <div className="mx-auto flex w-11/12 items-center justify-end bg-secondary">
           {router.query?.city && (
-            <div className="flex items-center justify-center gap-1 rounded-xl p-2 text-primbuttn">
+            <div className="flex items-center justify-center gap-1 p-2 px-6 text-primbuttn">
               <span> {selectedPerson?.NameFamily}</span>
               {selectedPerson && <span>{"/"}</span>}
               <span>
@@ -361,9 +361,9 @@ export default function CitiesPage({ children }) {
             </div>
           )}
         </div>
-        <div className=" m-auto flex  w-11/12 flex-col items-center justify-center gap-5 pb-10 xl:flex-row-reverse  xl:items-stretch xl:justify-start">
+        <div className=" m-auto flex w-11/12 flex-col  items-center justify-center gap-5 bg-secondary p-5 pb-10 xl:flex-row-reverse  xl:items-stretch xl:justify-start">
           <AdvancedList
-            className="xl:sticky xl:top-20  xl:h-fit"
+            className=" xl:h-fit"
             title={
               <span className="flex items-center justify-center gap-2 text-primary">
                 استان
@@ -385,7 +385,7 @@ export default function CitiesPage({ children }) {
                 return (
                   <div
                     key={i}
-                    className=" flex  w-full animate-pulse flex-row-reverse items-center justify-between gap-2 rounded-xl bg-secondary/60 p-3 text-right text-primary"
+                    className=" flex  w-full animate-pulse flex-row-reverse items-center justify-between gap-2 rounded-xl  bg-secondary/60 p-3 text-right text-primary"
                   >
                     <span className="h-5 w-10 rounded-lg bg-secbuttn" />
 
@@ -416,7 +416,7 @@ export default function CitiesPage({ children }) {
                 <Link
                   key={i}
                   className={twMerge(
-                    "cursor-pointer rounded-xl py-2",
+                    "cursor-pointer rounded-xl  py-2",
                     isActive
                       ? "sticky z-20 bg-primary/30 text-secondary backdrop-blur-md "
                       : "bg-secondary",
@@ -463,7 +463,7 @@ export default function CitiesPage({ children }) {
         </div>
         <div
           dir="rtl"
-          className="mx-auto flex w-11/12 flex-col items-center justify-center gap-5 rounded-xl bg-secondary  p-2 "
+          className="mx-auto flex w-11/12 flex-col items-center justify-center gap-5 rounded-b-2xl  bg-secondary  p-2 py-5 "
         >
           <CityPerformanceWithUsersChart
             filters={filters}

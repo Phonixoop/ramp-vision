@@ -47,7 +47,7 @@ export function SelectControlled({
   return (
     <div
       className={twMerge(
-        " flex w-full   items-center justify-center gap-2 px-2 text-center sm:px-0 ",
+        " flex w-full   items-center justify-center gap-1 px-2 text-center sm:px-0 ",
         className,
       )}
     >
@@ -77,7 +77,7 @@ export function SelectControlled({
                 className={twMerge(
                   "font-bold",
                   selectAllState
-                    ? "border border-primary/20  p-1.5 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20"
+                    ? " border border-primary/20  p-1.5 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20"
                     : "border border-primary/20  bg-primary/10 p-1.5 text-rose-600 transition-all duration-300 hover:bg-primary/20",
                 )}
                 onClick={() => {
@@ -127,7 +127,7 @@ export function SelectColumnFilter({
   const selectedCount = getFilterValue() ? (getFilterValue() as any).length : 0;
   const selectAllState = selectedCount < unique.length;
   return (
-    <div className=" flex w-full  items-center justify-center gap-2 px-2 text-center sm:px-0 ">
+    <div className=" flex w-full items-center justify-center gap-2 px-2 text-center sm:px-0 ">
       <SelectControlled
         className="min-w-0"
         title={column.columnDef.header}
