@@ -201,6 +201,7 @@ function PersonnelPerformanceTable({ sessionData }) {
         personnelPerformance.data,
         ["NationalCode", "NameFamily"],
         [
+          "CityName",
           "NationalCode",
           "NameFamily",
           "SabtAvalieAsnad",
@@ -222,10 +223,12 @@ function PersonnelPerformanceTable({ sessionData }) {
           "ProjectType",
           "TotalPerformance",
           "Start_Date",
+          "DateInfo",
         ],
       ),
     [personnelPerformance.data],
   );
+
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
@@ -811,9 +814,9 @@ function PersonnelPerformanceTable({ sessionData }) {
             }}
             isLoading={personnelPerformance.isLoading}
             data={
-              reportPeriod === "روزانه"
+              personnelPerformance?.data?.periodType === "روزانه"
                 ? personnelPerformance?.data?.result
-                : personnelPerformance?.data?.result
+                : distincedData
             }
             columns={columns}
             renderInFilterView={() => {

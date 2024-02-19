@@ -214,8 +214,12 @@ export function processDataForChart(
             if (acc[existingGroupIndex][value] === current[value]) continue;
             acc[existingGroupIndex][value] += ","; // my code
           }
-          acc[existingGroupIndex][value] =
-            (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
+
+          if (typeof acc[existingGroupIndex][value] === "number")
+            acc[existingGroupIndex][value] =
+              (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
+
+          if (current[value] == null) acc[existingGroupIndex][value] = "";
         }
       }
     } else {
