@@ -67,9 +67,9 @@ export function CitiesPerformanceBarChart({
             <H2 className="font-bold">
               {getCitiesWithPerformance?.data?.periodType}
             </H2>
-            <H2 className="font-bold">
-              {getCitiesWithPerformance?.data?.dateLength} روز
-            </H2>
+            {/* <H2 className="font-bold">
+              {getCitiesWithPerformance?.data?.dateLength[""]} روز
+            </H2> */}
             <CustomBarChart
               width={500}
               height={500}
@@ -200,7 +200,7 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
   const distinctData = useMemo(() => {
     return distinctPersonnelPerformanceData(
       getCitysUsersPerformance?.data,
-      ["NationalCode", "NameFamily"],
+      ["NationalCode", "NameFamily", "CityName"],
       [
         "NationalCode",
         "NameFamily",

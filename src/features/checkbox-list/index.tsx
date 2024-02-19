@@ -69,7 +69,7 @@ export function SelectControlled({
           );
         })}
       </MultiSelect>
-      {withSelectAll && (
+      {withSelectAll && value.length > 0 && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
@@ -145,7 +145,7 @@ export function SelectColumnFilter({
           });
         }}
       />
-      {withSelectAll && !singleSelect && (
+      {withSelectAll && !singleSelect && unique.length > 0 && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>

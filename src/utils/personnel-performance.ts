@@ -6,7 +6,11 @@ import {
 import { PeriodType } from "~/context/personnel-filter.context";
 import { CityWithPerformanceData } from "~/types";
 import { getMonthName, getWeekOfMonth } from "~/utils/date-utils";
-import { getEnglishToPersianCity, processDataForChart } from "~/utils/util";
+import {
+  getEnglishToPersianCity,
+  getPersianToEnglishCity,
+  processDataForChart,
+} from "~/utils/util";
 
 export function calculatePerformance(
   item: any,
@@ -81,7 +85,7 @@ export function distinctDataAndCalculatePerformance(
   );
 
   return mapToCitiesWithPerformance({
-    dateLength: data?.dateLength,
+    dateLengthPerCity: data?.dateLength,
     result: citiesWithPerformanceData,
   });
 }
@@ -129,17 +133,22 @@ export function distinctPersonnelPerformanceData(
     values,
     where,
   ).map((item) => {
+    const city =
+      getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
+
     return {
       ...item,
       TotalPerformance:
         item.TotalPerformance /
-        (groupBy.includes("Start_Date") ? item.key.COUNT : data.dateLength),
+        (groupBy.includes("Start_Date")
+          ? item.key.COUNT
+          : data.dateLength[city]),
       // (groupBy.includes("Start_Date") ? item.key.COUNT : data.dateLength)
     };
   });
 }
 function mapToCitiesWithPerformance({
-  dateLength,
+  dateLengthPerCity,
   result,
 }): CityWithPerformanceData[] {
   return result.map((item) => {

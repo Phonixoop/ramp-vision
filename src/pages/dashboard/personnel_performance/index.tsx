@@ -199,7 +199,7 @@ function PersonnelPerformanceTable({ sessionData }) {
     () =>
       distinctPersonnelPerformanceData(
         personnelPerformance.data,
-        ["NationalCode", "NameFamily"],
+        ["NationalCode", "NameFamily", "CityName"],
         [
           "CityName",
           "NationalCode",
@@ -896,7 +896,39 @@ function PersonnelPerformanceTable({ sessionData }) {
                                 };
                               })
                               .filter((f) => f.key != "Id")}
-                            data={flatRows}
+                            data={flatRows.map((row: any) => {
+                              let Start_Date = "";
+                              if (
+                                personnelPerformance.data.periodType === "هفتگی"
+                              )
+                                Start_Date =
+                                  getMonthNamesFromJOINED_date_strings(
+                                    filters.filter.Start_Date.join(","),
+                                    personnelPerformance.data.periodType,
+                                  );
+
+                              if (
+                                personnelPerformance.data.periodType ===
+                                "ماهانه"
+                              )
+                                Start_Date =
+                                  getMonthNamesFromJOINED_date_strings(
+                                    row.Start_Date,
+                                    personnelPerformance.data.periodType,
+                                  );
+
+                              if (
+                                personnelPerformance.data.periodType ===
+                                "روزانه"
+                              )
+                                Start_Date =
+                                  filters.filter.Start_Date.join(",");
+
+                              return {
+                                ...row,
+                                Start_Date,
+                              };
+                            })}
                           >
                             دانلود دیتای فیلتر شده
                           </CSVLink>

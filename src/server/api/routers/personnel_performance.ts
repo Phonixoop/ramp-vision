@@ -235,10 +235,24 @@ export const personnelPerformanceRouter = createTRPCRouter({
           finalResult = result.recordsets[0];
         }
 
+        const uniqueData = result.recordsets[0].filter(
+          (obj, index, self) =>
+            index ===
+            self.findIndex(
+              (o) =>
+                o.CityName === obj.CityName && o.Start_Date === obj.Start_Date,
+            ),
+        );
+
+        const dateLengthPerCityName = uniqueData.reduce((acc, curr) => {
+          const cityName = curr.CityName;
+          acc[cityName] = (acc[cityName] || 0) + 1;
+          return acc;
+        }, {});
+
         return {
           periodType: input.periodType,
-          dateLength: new Set(result.recordsets[0].map((a) => a.Start_Date))
-            .size,
+          dateLength: dateLengthPerCityName,
           result:
             finalResult.map((cf) => {
               return {
@@ -379,11 +393,24 @@ export const personnelPerformanceRouter = createTRPCRouter({
         //  console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
+        const uniqueData = resultOfCities.recordsets[0].filter(
+          (obj, index, self) =>
+            index ===
+            self.findIndex(
+              (o) =>
+                o.CityName === obj.CityName && o.Start_Date === obj.Start_Date,
+            ),
+        );
+
+        const dateLengthPerCityName = uniqueData.reduce((acc, curr) => {
+          const cityName = curr.CityName;
+          acc[cityName] = (acc[cityName] || 0) + 1;
+          return acc;
+        }, {});
+
         return {
           periodType: input.periodType,
-          dateLength: new Set(
-            resultOfCities.recordsets[0].map((a) => a.Start_Date),
-          ).size,
+          dateLength: dateLengthPerCityName,
 
           result: resultOfCities.recordsets[0],
         };

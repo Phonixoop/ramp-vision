@@ -95,7 +95,7 @@ export default function CityPage({ children, city }) {
         setUpdatedList(
           distinctPersonnelPerformanceData(
             data ?? [],
-            ["NationalCode", "NameFamily"],
+            ["NationalCode", "NameFamily", "CityName"],
             [
               "NationalCode",
               "NameFamily",
@@ -181,7 +181,7 @@ export default function CityPage({ children, city }) {
         disabled={!!!updatedList}
         list={distinctPersonnelPerformanceData(
           getAll?.data ?? [],
-          ["NationalCode", "NameFamily"],
+          ["NationalCode", "NameFamily", "CityName"],
           [
             "NationalCode",
             "NameFamily",

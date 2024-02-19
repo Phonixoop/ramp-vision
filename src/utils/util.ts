@@ -210,16 +210,20 @@ export function processDataForChart(
           // Otherwise, sum the values
 
           // my code
-          if (typeof acc[existingGroupIndex][value] === "string") {
-            if (acc[existingGroupIndex][value] === current[value]) continue;
-            acc[existingGroupIndex][value] += ","; // my code
-          }
+          // if (
+          //   typeof acc[existingGroupIndex][value] === "string" &&
+          //   typeof current[value] === "string"
+          // ) {
+          //   if (acc[existingGroupIndex][value] === current[value]) continue;
+          //   acc[existingGroupIndex][value] += ","; // my code
+          // }
 
-          if (typeof acc[existingGroupIndex][value] === "number")
+          if (
+            typeof current[value] === "number" &&
+            acc[existingGroupIndex][value] === "number"
+          )
             acc[existingGroupIndex][value] =
               (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
-
-          if (current[value] == null) acc[existingGroupIndex][value] = "";
         }
       }
     } else {
@@ -228,7 +232,7 @@ export function processDataForChart(
         group.key[key] = groupByKey[index];
       });
       for (const value of values) {
-        group[value] = current[value] || 0;
+        group[value] = current[value];
       }
       acc.push(group);
     }
