@@ -275,7 +275,6 @@ export default function CitiesPage({ children }) {
                   list={ContractTypes}
                   value={
                     filters.filter.ContractType ??
-                    filters.filter.Role ??
                     defualtContractTypes.filter((item) =>
                       ContractTypes.includes(item),
                     )

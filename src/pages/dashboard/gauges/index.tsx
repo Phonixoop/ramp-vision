@@ -1,6 +1,6 @@
 import { LayoutGroup } from "framer-motion";
 import moment from "jalali-moment";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import DatePicker from "react-multi-date-picker";
 import { CITIES, Reports_Period } from "~/constants";
 import {
@@ -67,22 +67,44 @@ export default function GaugesPage() {
       },
     );
 
-  const getInitialFilters =
-    api.personnelPerformance.getInitialFilters.useQuery();
-  const operations = [
-    { fieldName: "TotalPerformance", operation: "average" },
-    { fieldName: "Start_Date", operation: "array" },
-  ];
+  // const operations = [
+  //   { fieldName: "TotalPerformance", operation: "average" },
+  //   { fieldName: "Start_Date", operation: "array" },
+  // ];
+
+  const getInitialFilters = api.personnelPerformance.getInitialFilters.useQuery(
+    {
+      filter: {
+        ProjectType: filters.filter.ProjectType,
+        DateInfo: filters.filter.DateInfo,
+      },
+    },
+  );
 
   const DateInfos = [
     ...new Set(
+      getInitialFilters?.data?.DateInfos?.map((a) => a.DateInfo).filter(
+        (a) => a,
+      ),
+    ),
+  ];
+
+  const Roles = [
+    ...new Set(
+      getInitialFilters?.data?.usersInfo?.map((a) => a.Role).filter((a) => a),
+    ),
+  ];
+
+  const ContractTypes = [
+    ...new Set(
       getInitialFilters?.data?.usersInfo
-        ?.map((a) => a.DateInfo)
+        ?.map((a) => a.ContractType)
         .filter((a) => a),
     ),
   ];
-  const result = distinctDataAndCalculatePerformance(
-    getCitiesWithPerformance?.data,
+  const result = useMemo(
+    () => distinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
+    [getCitiesWithPerformance.data],
   );
   return (
     <>
@@ -120,7 +142,7 @@ export default function GaugesPage() {
                       <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
                         <H2>{getEnglishToPersianCity(city.CityName_Fa)}</H2>
 
-                        <Gauge value={Math.round(city.TotalPerformance)} />
+                        <Gauge value={city.TotalPerformance} />
                         <p className="text-accent">
                           {getPerformanceText(city.TotalPerformance)}
                         </p>
@@ -181,15 +203,13 @@ export default function GaugesPage() {
                   <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">سمت</span>
                     <SelectControlled
+                      withSelectAll
                       title={"سمت"}
-                      list={[
-                        ...new Set(
-                          getInitialFilters?.data?.usersInfo
-                            ?.map((a) => a.Role)
-                            .filter((a) => a),
-                        ),
-                      ]}
-                      value={filters.filter.Role ?? defualtRoles}
+                      list={Roles}
+                      value={
+                        filters.filter.Role ??
+                        defualtRoles.filter((item) => Roles.includes(item))
+                      }
                       onChange={(values) => {
                         //@ts-ignore
                         setFilters((prev) => {
@@ -207,14 +227,9 @@ export default function GaugesPage() {
                   <div className="flex min-w-[15rem] max-w-sm  flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">نوع پروژه</span>
                     <SelectControlled
+                      withSelectAll
                       title={"نوع پروژه"}
-                      list={[
-                        ...new Set(
-                          getInitialFilters?.data?.usersInfo
-                            ?.map((a) => a.ProjectType)
-                            .filter((a) => a),
-                        ),
-                      ]}
+                      list={getInitialFilters?.data?.ProjectTypes}
                       value={filters.filter.ProjectType ?? defaultProjectTypes}
                       onChange={(values) => {
                         //@ts-ignore
@@ -234,16 +249,14 @@ export default function GaugesPage() {
                   <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">نوع قرار داد</span>
                     <SelectControlled
+                      withSelectAll
                       title={"نوع قرار داد"}
-                      list={[
-                        ...new Set(
-                          getInitialFilters?.data?.usersInfo
-                            ?.map((a) => a.ContractType)
-                            .filter((a) => a),
-                        ),
-                      ]}
+                      list={ContractTypes}
                       value={
-                        filters.filter.ContractType ?? defualtContractTypes
+                        filters.filter.ContractType ??
+                        defualtContractTypes.filter((item) =>
+                          ContractTypes.includes(item),
+                        )
                       }
                       onChange={(values) => {
                         //@ts-ignore
@@ -262,6 +275,7 @@ export default function GaugesPage() {
                   <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">نوع سمت</span>
                     <SelectControlled
+                      withSelectAll
                       title={"نوع سمت"}
                       list={[
                         ...new Set(
@@ -292,14 +306,10 @@ export default function GaugesPage() {
                     <SelectControlled
                       title={"تاریخ گزارش پرنسل"}
                       list={DateInfos}
-                      value={
-                        filters.filter.DateInfo ?? [
-                          DateInfos[DateInfos.length - 1],
-                        ]
-                      }
+                      value={filters.filter.DateInfo ?? [DateInfos[0]]}
                       onChange={(values) => {
                         let _values = values;
-                        _values = [values[values.length - 1]];
+                        _values = [values[0]];
                         //@ts-ignore
                         setFilters((prev) => {
                           return {

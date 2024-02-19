@@ -197,11 +197,34 @@ function PersonnelPerformanceTable({ sessionData }) {
 
   const distincedData = useMemo(
     () =>
-      DistinctData(
-        personnelPerformance.data?.result ?? [],
-        personnelPerformance?.data?.dateLength,
+      distinctPersonnelPerformanceData(
+        personnelPerformance.data,
+        ["NationalCode", "NameFamily"],
+        [
+          "NationalCode",
+          "NameFamily",
+          "SabtAvalieAsnad",
+          "PazireshVaSabtAvalieAsnad",
+          "ArzyabiAsanadBimarsetaniDirect",
+          "ArzyabiAsnadBimarestaniIndirect",
+          "ArzyabiAsnadDandanVaParaDirect",
+          "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDaroDirect",
+          "ArzyabiAsnadDaroIndirect",
+          "WithScanCount",
+          "WithoutScanCount",
+          "WithoutScanInDirectCount",
+          "ArchiveDirectCount",
+          "ArchiveInDirectCount",
+          "Role",
+          "RoleType",
+          "ContractType",
+          "ProjectType",
+          "TotalPerformance",
+          "Start_Date",
+        ],
       ),
-    [personnelPerformance.data?.result],
+    [personnelPerformance.data],
   );
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
@@ -790,7 +813,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             data={
               reportPeriod === "روزانه"
                 ? personnelPerformance?.data?.result
-                : distincedData
+                : personnelPerformance?.data?.result
             }
             columns={columns}
             renderInFilterView={() => {
@@ -881,14 +904,11 @@ function PersonnelPerformanceTable({ sessionData }) {
               );
             }}
             renderChild={(flatRows) => {
-              const roleData = countColumnValues(flatRows, "Role", [
-                "کارشناس ارزیاب اسناد بیمارستانی",
-                "کارشناس ارزیاب اسناد پاراکلینیکی",
-                "کارشناس ارزیاب اسناد دارویی",
-                "کارشناس ارزیاب اسناد دندانپزشکی",
-                "کارشناس پذیرش اسناد",
-                "کارشناس ثبت اسناد خسارت",
-              ]);
+              const roleData = countColumnValues(
+                flatRows,
+                "Role",
+                defualtRoles,
+              );
 
               const sumOfPerformances = flatRows.reduce((acc, row) => {
                 return acc + row.TotalPerformance;
