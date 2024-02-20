@@ -878,7 +878,42 @@ function PersonnelPerformanceTable({ sessionData }) {
                                 };
                               })
                               .filter((f) => f.key != "Id")}
-                            data={personnelPerformance.data.result}
+                            data={personnelPerformance.data.result.map(
+                              (row: any) => {
+                                let Start_Date = "";
+                                if (
+                                  personnelPerformance.data.periodType ===
+                                  "هفتگی"
+                                )
+                                  Start_Date =
+                                    getMonthNamesFromJOINED_date_strings(
+                                      filters.filter.Start_Date.join(","),
+                                      personnelPerformance.data.periodType,
+                                    );
+
+                                if (
+                                  personnelPerformance.data.periodType ===
+                                  "ماهانه"
+                                )
+                                  Start_Date =
+                                    getMonthNamesFromJOINED_date_strings(
+                                      row.Start_Date,
+                                      personnelPerformance.data.periodType,
+                                    );
+
+                                if (
+                                  personnelPerformance.data.periodType ===
+                                  "روزانه"
+                                )
+                                  Start_Date =
+                                    filters.filter.Start_Date.join(",");
+
+                                return {
+                                  ...row,
+                                  Start_Date,
+                                };
+                              },
+                            )}
                           >
                             دانلود دیتای کامل
                           </CSVLink>

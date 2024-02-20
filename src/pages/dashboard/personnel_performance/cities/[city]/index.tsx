@@ -92,35 +92,35 @@ export default function CityPage({ children, city }) {
       onSuccess: (data) => {
         setSelectedPerson(undefined);
 
-        setUpdatedList(
-          distinctPersonnelPerformanceData(
-            data ?? [],
-            ["NationalCode", "NameFamily", "CityName"],
-            [
-              "NationalCode",
-              "NameFamily",
-              "SabtAvalieAsnad",
-              "PazireshVaSabtAvalieAsnad",
-              "ArzyabiAsanadBimarsetaniDirect",
-              "ArzyabiAsnadBimarestaniIndirect",
-              "ArzyabiAsnadDandanVaParaDirect",
-              "ArzyabiAsnadDandanVaParaIndirect",
-              "ArzyabiAsnadDaroDirect",
-              "ArzyabiAsnadDaroIndirect",
-              "WithScanCount",
-              "WithoutScanCount",
-              "WithoutScanInDirectCount",
-              "ArchiveDirectCount",
-              "ArchiveInDirectCount",
-              "Role",
-              "RoleType",
-              "ContractType",
-              "ProjectType",
-              "TotalPerformance",
-              "Start_Date",
-            ],
-          ),
+        const result = distinctPersonnelPerformanceData(
+          data ?? [],
+          ["NationalCode", "NameFamily", "CityName"],
+          [
+            "NationalCode",
+            "NameFamily",
+            "SabtAvalieAsnad",
+            "PazireshVaSabtAvalieAsnad",
+            "ArzyabiAsanadBimarsetaniDirect",
+            "ArzyabiAsnadBimarestaniIndirect",
+            "ArzyabiAsnadDandanVaParaDirect",
+            "ArzyabiAsnadDandanVaParaIndirect",
+            "ArzyabiAsnadDaroDirect",
+            "ArzyabiAsnadDaroIndirect",
+            "WithScanCount",
+            "WithoutScanCount",
+            "WithoutScanInDirectCount",
+            "ArchiveDirectCount",
+            "ArchiveInDirectCount",
+            "Role",
+            "RoleType",
+            "ContractType",
+            "ProjectType",
+            "TotalPerformance",
+            "Start_Date",
+          ],
         );
+        console.log({ result });
+        setUpdatedList(result);
       },
       refetchOnWindowFocus: false,
     },

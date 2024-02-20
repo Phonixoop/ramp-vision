@@ -208,19 +208,18 @@ export function processDataForChart(
           );
         } else {
           // Otherwise, sum the values
-
+          if (acc[existingGroupIndex][value] === null)
+            acc[existingGroupIndex][value] = "";
           // my code
-          // if (
-          //   typeof acc[existingGroupIndex][value] === "string" &&
-          //   typeof current[value] === "string"
-          // ) {
-          //   if (acc[existingGroupIndex][value] === current[value]) continue;
-          //   acc[existingGroupIndex][value] += ","; // my code
-          // }
-
           if (
-            typeof current[value] === "number" &&
-            acc[existingGroupIndex][value] === "number"
+            typeof acc[existingGroupIndex][value] === "string" &&
+            typeof current[value] === "string"
+          ) {
+            if (acc[existingGroupIndex][value] === current[value]) continue;
+            acc[existingGroupIndex][value] += ","; // my code
+          } else if (
+            typeof acc[existingGroupIndex][value] === "number" &&
+            typeof current[value] === "number"
           )
             acc[existingGroupIndex][value] =
               (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
