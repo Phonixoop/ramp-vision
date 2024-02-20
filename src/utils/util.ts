@@ -225,8 +225,9 @@ export function processDataForChart(
               (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
         }
       }
+      acc[existingGroupIndex].key.rowCount++;
     } else {
-      const group = { key: {} };
+      const group = { key: { rowCount: 1 } };
       groupByKeys.forEach((key, index) => {
         group.key[key] = groupByKey[index];
       });

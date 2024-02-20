@@ -117,6 +117,7 @@ export default function CityPage({ children, city }) {
             "ProjectType",
             "TotalPerformance",
             "Start_Date",
+            "COUNT",
           ],
         );
         console.log({ result });

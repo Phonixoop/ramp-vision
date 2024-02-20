@@ -5,7 +5,10 @@ import { validDateBeforeToScrewThem } from "~/constants";
 import Calender from "~/features/calender";
 
 import H2 from "~/ui/heading/h2";
-import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
+import {
+  distinctPersonnelPerformanceData,
+  getMonthNamesFromJOINED_date_strings,
+} from "~/utils/personnel-performance";
 
 const chartdata = [
   {
@@ -82,6 +85,41 @@ const menuItems = [
     link: "/contact",
   },
 ];
+
+const data = [
+  {
+    CityName: "a",
+    Start_Date: "5",
+    TotalPerformance: 10,
+    COUNT: 0,
+  },
+  {
+    CityName: "a",
+    Start_Date: "6",
+    TotalPerformance: 40,
+  },
+  {
+    CityName: "b",
+    Start_Date: "5",
+    TotalPerformance: 7,
+  },
+];
+const result = distinctPersonnelPerformanceData(
+  {
+    periodType: "ماهانه",
+    dateLength: {
+      a: 2,
+      b: 1,
+    },
+
+    result: data,
+  },
+  ["CityName"],
+  ["TotalPerformance"],
+);
+
+console.log(JSON.stringify(result, null, 2));
+
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (

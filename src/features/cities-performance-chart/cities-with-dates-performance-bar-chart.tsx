@@ -42,7 +42,7 @@ export function CitiesWithDatesPerformanceBarChart({
         select: (data) => {
           return distinctPersonnelPerformanceData(
             data,
-            ["Start_Date", "CityName", "COUNT"],
+            ["Start_Date", "CityName"],
             ["TotalPerformance"],
             { CityName: filters.filter.CityName },
           );

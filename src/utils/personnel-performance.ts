@@ -93,7 +93,7 @@ export function distinctDataAndCalculatePerformance(
 export function distinctPersonnelPerformanceData(
   data = {
     periodType: "",
-    dateLength: 0,
+    dateLength: {},
     result: [],
   },
   groupBy = ["CityName"],
@@ -121,6 +121,7 @@ export function distinctPersonnelPerformanceData(
     // const count = item.COUNT > 0 ? item.COUNT : 1;
     return {
       ...item,
+
       TotalPerformance: isThursday
         ? calculatePerformance(item, 1, 2)
         : item.TotalPerformance,
@@ -138,11 +139,10 @@ export function distinctPersonnelPerformanceData(
 
     return {
       ...item,
-      TotalPerformance:
-        item.TotalPerformance /
-        (groupBy.includes("Start_Date")
-          ? item.key.COUNT
-          : data.dateLength[city]),
+      TotalPerformance: item.TotalPerformance / item.key.rowCount,
+      // (groupBy.includes("Start_Date")
+      //   ? item.key.COUNT
+      //   : data.dateLength[city]),
       // (groupBy.includes("Start_Date") ? item.key.COUNT : data.dateLength)
     };
   });
