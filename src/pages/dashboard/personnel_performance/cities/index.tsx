@@ -443,6 +443,8 @@ export default function CitiesPage({ children }) {
                     startTransition(() => {
                       router.push(
                         `/dashboard/personnel_performance/cities/${item.CityName_En}`,
+                        undefined,
+                        { scroll: false, shallow: true },
                       );
                     });
                   }}
