@@ -428,6 +428,12 @@ input[type="number"] {
   animation-delay: calc(var(--a-delay) + 0.1s);
 }
 
+/*  svg animtion */
+
+.animate-path {
+  stroke-dasharray: 7;
+}
+
 /* guage */
 
 .tick-value > text,

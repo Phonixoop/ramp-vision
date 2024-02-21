@@ -4,10 +4,18 @@ import {
   ChevronLeftIcon,
   BuildingIcon,
   FilterIcon,
+  CircleDashedIcon,
+  CircleDotDashedIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { twMerge } from "tailwind-merge";
 import Header from "~/features/header";
 import BlurBackground from "~/ui/blur-backgrounds";
@@ -50,6 +58,8 @@ import {
 import { CityWithPerformanceData } from "~/types";
 import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
+import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
+import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
 
 // function DistinctDataForCity(data = []): CityWithPerformanceData[] {
 //   const cityMap = new Map();
@@ -88,6 +98,8 @@ export default function CitiesPage({ children }) {
     selectedPerson,
   } = usePersonnelFilter();
 
+  const [isPending, startTransition] = useTransition();
+  const [whichTranistion, setWhichTranistion] = useState("");
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -411,22 +423,42 @@ export default function CitiesPage({ children }) {
                 .map((m) => {
                   return m.TotalPerformance;
                 });
+
+              const isTransitioning =
+                isPending && whichTranistion === item.CityName_En;
               return (
                 <Link
                   key={i}
                   className={twMerge(
-                    "cursor-pointer rounded-xl  py-2",
+                    "cursor-pointer rounded-xl py-2 transition-opacity duration-500",
                     isActive
                       ? "sticky z-20 bg-primary/30 text-secondary backdrop-blur-md "
                       : "bg-secondary",
+
                     "top-24",
                   )}
                   scroll={false}
+                  onClick={() => {
+                    setWhichTranistion(item.CityName_En);
+                    startTransition(() => {
+                      router.push(
+                        `/dashboard/personnel_performance/cities/${item.CityName_En}`,
+                      );
+                    });
+                  }}
                   href={`/dashboard/personnel_performance/cities/${item.CityName_En}`}
                 >
-                  <div className=" flex w-full items-center justify-between gap-2 px-2 text-right text-primary">
+                  <div
+                    className={twMerge(
+                      "relative flex w-full  items-center justify-between gap-2 px-2 text-right text-primary duration-1000",
+                    )}
+                  >
                     <div className=" w-10">
-                      <ChevronLeftIcon className="h-4 w-4" />
+                      {isTransitioning || isActive ? (
+                        <BarChart3Loading />
+                      ) : (
+                        <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
+                      )}
                     </div>
                     <div className="flex flex-col items-center justify-center">
                       <TrendDecider values={cityPerformances} />
@@ -448,9 +480,15 @@ export default function CitiesPage({ children }) {
                         ]}
                         index={"Start_Date"}
                         colors={["purple", "rose", "cyan"]}
-                        className="h-10 w-36 cursor-pointer"
+                        className={twMerge(
+                          " dash-a h-10 w-36  cursor-pointer",
+                          isTransitioning || isActive
+                            ? "animate-path animate-[move_100s_linear_infinite]"
+                            : "",
+                        )}
                       />
                     </div>
+
                     <span className="w-full text-sm">{item.CityName_Fa}</span>
                   </div>
                 </Link>

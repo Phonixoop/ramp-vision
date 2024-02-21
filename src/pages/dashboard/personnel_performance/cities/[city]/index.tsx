@@ -43,6 +43,7 @@ import { CityWithPerformanceData } from "~/types";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
+import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
 
 import { api } from "~/utils/api";
 import { getMonthNumber } from "~/utils/date-utils";
@@ -277,7 +278,11 @@ export default function CityPage({ children, city }) {
               >
                 <div className=" flex w-full flex-row-reverse items-center justify-between gap-2  px-2 text-right ">
                   <div className=" w-10">
-                    <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
+                    {isActive ? (
+                      <BarChart3Loading />
+                    ) : (
+                      <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
+                    )}
                   </div>
                   <div className="flex flex-col items-center justify-center">
                     <TrendDecider values={userPerformances} />
@@ -295,7 +300,12 @@ export default function CityPage({ children, city }) {
                       ]}
                       index={"Start_Date"}
                       colors={["purple", "rose", "cyan"]}
-                      className="h-10 w-36 cursor-pointer"
+                      className={twMerge(
+                        " dash-a h-10 w-36  cursor-pointer",
+                        isActive
+                          ? "animate-path animate-[move_100s_linear_infinite]"
+                          : "",
+                      )}
                     />
                   </div>
                   <span className="w-full text-sm ">{user.NameFamily}</span>
@@ -329,7 +339,15 @@ export default function CityPage({ children, city }) {
                         )}
                       >
                         <div className="flex h-full w-full items-center justify-between  gap-4 rounded-xl  p-2">
-                          <span> {PersonnelPerformanceIcons[key]}</span>
+                          <span
+                            className={twMerge(
+                              (value as number) > 0
+                                ? "animate-path animate-[move_200s_linear_infinite]"
+                                : "",
+                            )}
+                          >
+                            {PersonnelPerformanceIcons[key]}
+                          </span>
                           <span
                             className={twMerge(
                               "  text-primary group-last:text-secondary",
