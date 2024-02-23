@@ -376,6 +376,7 @@ export default function CityPage({ children, city }) {
               </div>
               <div className="grid  gap-4 " dir="rtl">
                 {noneNumericItems.map(([key, value], index, array) => {
+                  if (!value) return;
                   const isLastItem = index === array.length - 1;
                   let _value = value;
                   if (key === "DateInfo") return;
