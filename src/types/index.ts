@@ -39,3 +39,8 @@ export type CityWithPerformanceData = {
   CityName_Fa: string;
   TotalPerformance: number;
 };
+
+export type TableJson = {
+  title: string;
+  table: { [key: string]: string[] };
+};

@@ -73,7 +73,7 @@ export function Switch({
 
       <IconRight
         className={cn(
-          `absolute right-0 top-1/2  h-3 w-3 -translate-x-[2px] -translate-y-1/2 stroke-accent transition-all duration-500`,
+          `absolute right-0 top-1/2  h-3 w-3 -translate-x-[2px] -translate-y-1/2 stroke-primary transition-all duration-500`,
           checked && !middle
             ? ""
             : "right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 -rotate-180 scale-0",
@@ -82,7 +82,7 @@ export function Switch({
 
       <IconLeft
         className={cn(
-          `absolute right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 stroke-accent  transition-all  duration-500`,
+          `absolute right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 stroke-primary  transition-all  duration-500`,
           !checked && !middle
             ? ""
             : "right-0 top-1/2 h-3 w-3 -translate-x-[2px] -translate-y-1/2 -rotate-180 scale-0",

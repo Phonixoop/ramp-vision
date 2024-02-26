@@ -71,7 +71,8 @@
   /* --primbuttn: 141, 165, 163; */
   --secbuttn: 16, 18, 20;
   /* --secbuttn: 10, 10, 10; */
-  --accent: 190, 255, 255;
+  /* --accent: 190, 255, 255; */
+  --accent: 85, 119, 97;
 }
 
 .theme-dark-2 {
@@ -454,4 +455,27 @@ input[type="number"] {
 
 .recharts-rectangle.recharts-tooltip-cursor {
   fill: #00000049;
+}
+
+/* guide__page */
+.guide__page {
+  @apply flex flex-col justify-center gap-4;
+}
+.guide__page strong {
+  @apply bg-secondary text-2xl leading-10 text-accent;
+}
+.guide__page p {
+  @apply leading-10;
+}
+.guide__page ul {
+  @apply list-disc;
+}
+.cross_hatch_pattern {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgb(var(--accent), 0.3) 10px,
+    rgb(var(--accent), 0.5) 11px
+  );
 }

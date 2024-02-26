@@ -7,6 +7,10 @@ export const MENU = [
     link: "/",
   },
   {
+    value: "راهنما",
+    link: "/guide",
+  },
+  {
     value: "درباره RAMP",
     link: "/about",
   },
