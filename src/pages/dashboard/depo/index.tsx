@@ -817,7 +817,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
 
                 {/* <RadarGauge CityName={trackerFilter.cities} /> */}
                 <div className="flex w-full flex-col items-stretch justify-between 2xl:flex-row">
-                  <div className="flex  flex-col justify-between gap-5 rounded-2xl  p-2 ">
+                  <div className="flex  w-full flex-col justify-between gap-5 rounded-2xl  p-2 ">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={EntryHandlingSkeletonLoading}
@@ -848,11 +848,13 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                           table: dataAsTable(entry_capacity),
                         }}
                       >
-                        <CustomPieChart
-                          className="rounded-xl bg-secondary"
-                          data={entry_capacity}
-                          index="value"
-                        />
+                        <ResponsiveContainer width={"100%"} height={"50%"}>
+                          <CustomPieChart
+                            className="rounded-xl bg-secondary"
+                            data={entry_capacity}
+                            index="value"
+                          />
+                        </ResponsiveContainer>
                       </SimpleTable>
                       <div className="flex justify-center gap-2 ">
                         {/* <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
@@ -876,7 +878,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       </div>
                     </Loading>
                   </div>
-                  <div className="flex flex-col justify-between gap-5 rounded-2xl  p-2">
+                  <div className="flex w-full flex-col justify-between gap-5 rounded-2xl  p-2">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoSkeletonLoading}
@@ -888,11 +890,13 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                           table: dataAsTable(depo_BaseOnSabt),
                         }}
                       >
-                        <CustomPieChart
-                          className="rounded-xl bg-secondary "
-                          data={depo_BaseOnSabt}
-                          index="value"
-                        />
+                        <ResponsiveContainer width={"100%"} height={"50%"}>
+                          <CustomPieChart
+                            className="rounded-xl bg-secondary "
+                            data={depo_BaseOnSabt}
+                            index="value"
+                          />
+                        </ResponsiveContainer>
                       </SimpleTable>
 
                       {/* <div className="flex justify-stretch gap-2 ">
@@ -913,7 +917,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       </div> */}
                     </Loading>
                   </div>
-                  <div className="flex  flex-col  justify-center gap-5 rounded-2xl  p-5 xl:max-w-md">
+                  <div className="flex w-full  flex-col  justify-center gap-5 rounded-2xl  p-5 xl:max-w-md">
                     <H2>
                       زمان کلی اتمام دپو{" "}
                       {depo.data?.periodType && (
