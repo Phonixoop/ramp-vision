@@ -72,14 +72,14 @@ const renderActiveShape = (props) => {
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
         textAnchor={textAnchor}
-        fill="#333"
+        fill={fill}
       >{`${value}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
         dy={18}
         textAnchor={textAnchor}
-        fill="#999"
+        fill={fill}
       >
         {`(${(percent * 100).toFixed(2)}%)`}
       </text>
@@ -112,12 +112,12 @@ export default function CustomPieChart({ data = [], index }) {
       ) : (
         <PieChart width={450} height={300}>
           <Pie
-            activeIndex={activeBar.index}
+            activeIndex={[activeBar.index]}
             activeShape={renderActiveShape}
             data={data}
             cx="50%"
             cy="50%"
-            stroke="#0000000"
+            stroke="#00000000"
             innerRadius={60}
             outerRadius={80}
             dataKey={"value"}

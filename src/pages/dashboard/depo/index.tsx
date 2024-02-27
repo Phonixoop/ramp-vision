@@ -599,17 +599,17 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "ورودی",
       value: entryBaseOnSabt,
-      fill: "rgb(136 19 55)",
+      fill: "#be123c",
     },
     {
       name: "رسیدگی",
       value: capacityBaseOnSabt,
-      fill: "rgb(6 78 59)",
+      fill: "#047857",
     },
     {
       name: "مانده",
       value: entryBaseOnSabt - capacityBaseOnSabt,
-      fill: "rgb(54 83 20)",
+      fill: "#4d7c0f",
     },
   ];
 
@@ -633,12 +633,12 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "مستقیم",
       value: depoBaseOnSabtDirect,
-      fill: "rgb(112 26 117)",
+      fill: "#a21caf",
     },
     {
       name: "غیر مستقیم",
       value: depoBaseOnSabtInDirect,
-      fill: "rgb(22 78 99)",
+      fill: "#0e7490",
     },
   ];
 
