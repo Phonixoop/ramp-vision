@@ -602,23 +602,23 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "ورودی",
       value: entryBaseOnSabt,
-      fill: "#be123c",
-      headClassName: "text-xl text-rose-900 bg-secondary rounded-tr-xl ",
-      rowClassName: "text-xl  text-rose-900 bg-secondary rounded-br-xl",
+      fill: "#e11d48",
+      headClassName: "text-lg text-rose-600 bg-secondary rounded-tr-xl",
+      rowClassName: "text-lg  text-rose-600 bg-secondary rounded-br-xl",
     },
     {
       name: "رسیدگی",
       value: capacityBaseOnSabt,
-      fill: "#047857",
-      headClassName: "text-xl text-emerald-900 bg-secondary ",
-      rowClassName: "text-xl  text-emerald-900 bg-secondary",
+      fill: "#059669",
+      headClassName: "text-lg text-emerald-600 bg-secondary",
+      rowClassName: "text-lg  text-emerald-600 bg-secondary",
     },
     {
       name: "مانده",
       value: entryBaseOnSabt - capacityBaseOnSabt,
-      fill: "#4d7c0f",
-      headClassName: "text-xl text-lime-900 bg-secondary rounded-tl-xl ",
-      rowClassName: "text-xl  text-lime-900 bg-secondary rounded-bl-xl",
+      fill: "#65a30d",
+      headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
+      rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
     },
   ];
 
@@ -642,16 +642,16 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "مستقیم",
       value: depoBaseOnSabtDirect,
-      fill: "#a21caf",
-      headClassName: "text-xl text-fuchsia-900 bg-secondary rounded-tr-xl ",
-      rowClassName: "text-xl  text-fuchsia-900 bg-secondary rounded-br-xl",
+      fill: "#c026d3",
+      headClassName: "text-lg text-fuchsia-600 bg-secondary rounded-tr-xl ",
+      rowClassName: "text-lg  text-fuchsia-600 bg-secondary rounded-br-xl",
     },
     {
       name: "غیر مستقیم",
       value: depoBaseOnSabtInDirect,
-      fill: "#0e7490",
-      headClassName: "text-xl text-cyan-900 bg-secondary rounded-tl-xl ",
-      rowClassName: "text-xl  text-cyan-900 bg-secondary rounded-bl-xl",
+      fill: "#0d9488",
+      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tl-xl ",
+      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-bl-xl",
     },
   ];
 
@@ -917,52 +917,54 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       </div> */}
                     </Loading>
                   </div>
-                  <div className="flex w-full  flex-col  justify-center gap-5 rounded-2xl  p-5 xl:max-w-md">
-                    <H2>
-                      زمان کلی اتمام دپو{" "}
-                      {depo.data?.periodType && (
-                        <>
-                          |{" "}
-                          <span className="text-primbuttn">
-                            {depo.data?.periodType}
-                          </span>
-                        </>
-                      )}
-                    </H2>
+                  <div className="flex w-full flex-col justify-between  gap-5 rounded-2xl  p-5 xl:max-w-md">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoTimeSkeletonLoading}
                     >
-                      <DonutChart
-                        label={maxDepoTime.toFixed(2)}
-                        data={depoCompletionTime}
-                        category={"DepoCompleteTime"}
-                        index="ServiceName"
-                        colors={[
-                          "emerald",
-                          "yellow",
-                          "cyan",
-                          "red",
-                          "orange",
-                          "fuchsia",
-                        ]}
-                        valueFormatter={commify}
-                        noDataText={Text.noData.fa}
-                      />
+                      <div className="flex h-full w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn  p-5 xl:max-w-md">
+                        <H2>
+                          زمان کلی اتمام دپو{" "}
+                          {depo.data?.periodType && (
+                            <>
+                              |{" "}
+                              <span className="text-primbuttn">
+                                {depo.data?.periodType}
+                              </span>
+                            </>
+                          )}
+                        </H2>
+                        <DonutChart
+                          label={maxDepoTime.toFixed(2)}
+                          data={depoCompletionTime}
+                          category={"DepoCompleteTime"}
+                          index="ServiceName"
+                          colors={[
+                            "emerald",
+                            "yellow",
+                            "cyan",
+                            "red",
+                            "orange",
+                            "fuchsia",
+                          ]}
+                          valueFormatter={commify}
+                          noDataText={Text.noData.fa}
+                        />
 
-                      {depo.data?.periodType && totalComplete > 0 && (
-                        <p className="w-full">
-                          <span className="text-accent">
-                            {Math.round(maxDepoTime)}{" "}
-                            {Reports_Period[depo.data?.periodType]}{" "}
-                            {/* {humanizeDuration(
+                        {depo.data?.periodType && totalComplete > 0 && (
+                          <p className="w-full">
+                            <span className="text-accent">
+                              {Math.round(maxDepoTime)}{" "}
+                              {Reports_Period[depo.data?.periodType]}{" "}
+                              {/* {humanizeDuration(
                             maxDepoTime,
                             Reports_Period[depo.data?.periodType],
                           )} */}
-                          </span>
-                          <span className="text-primary">تا اتمام دپو</span>
-                        </p>
-                      )}
+                            </span>
+                            <span className="text-primary">تا اتمام دپو</span>
+                          </p>
+                        )}
+                      </div>
                     </Loading>
                   </div>
                 </div>
