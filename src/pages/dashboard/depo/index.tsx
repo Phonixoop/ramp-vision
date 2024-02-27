@@ -413,7 +413,7 @@ function DeposTable({ sessionData }) {
             renderAfterFilterView={(flatRows) => {
               return (
                 <>
-                  {!depo.isLoading && depo.data.result.length > 0 && (
+                  {!depo.isLoading && depo.data.result?.length > 0 && (
                     <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn p-5 xl:flex-row">
                       <FileBarChart2 className="stroke-accent" />
                       <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-sm  font-semibold text-emerald-900">
@@ -564,7 +564,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     ["DepoCount", "EntryCount", "Capicity"],
   );
   const depoCompletionTime = processDepoCompleteTimeData(flatRows);
-  console.log({ depoCompletionTime });
+  //console.log({ depoCompletionTime });
   const totalComplete =
     depoCompletionTime.reduce((accumulator, currentObject) => {
       return accumulator + currentObject.DepoCompleteTime;
@@ -599,14 +599,17 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "ورودی",
       value: entryBaseOnSabt,
+      fill: "rgb(136 19 55)",
     },
     {
       name: "رسیدگی",
       value: capacityBaseOnSabt,
+      fill: "rgb(6 78 59)",
     },
     {
       name: "مانده",
       value: entryBaseOnSabt - capacityBaseOnSabt,
+      fill: "rgb(54 83 20)",
     },
   ];
 
@@ -630,10 +633,12 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "مستقیم",
       value: depoBaseOnSabtDirect,
+      fill: "rgb(112 26 117)",
     },
     {
       name: "غیر مستقیم",
       value: depoBaseOnSabtInDirect,
+      fill: "rgb(22 78 99)",
     },
   ];
 
@@ -805,8 +810,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       isLoading={depo.isLoading}
                       LoadingComponent={EntryHandlingSkeletonLoading}
                     >
-                      <ResponsiveContainer width="99%" height={"100%"}>
-                        <DonutChart
+                      {/* <DonutChart
                           label={
                             // depo.data?.result.length > 0
                             //   ? " مانده : " +
@@ -823,25 +827,26 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                           colors={["rose", "emerald", "lime"]}
                           valueFormatter={commify}
                           noDataText={Text.noData.fa}
-                        />
-                      </ResponsiveContainer>
+                        /> */}
+
+                      <CustomPieChart data={entry_capacity} index="value" />
 
                       <div className="flex justify-stretch gap-2 ">
                         <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
                           <span className="text-rose-900">ورودی</span>
-                          <span className="text-rose-900">
+                          <span dir="ltr" className="text-rose-900">
                             {commify(entryBaseOnSabt)}
                           </span>
                         </div>
                         <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-emerald-200 p-1 text-center font-bold text-accent ">
                           <span className="  text-emerald-900">رسیدگی شده</span>
-                          <span className="text-emerald-900">
+                          <span dir="ltr" className="text-emerald-900">
                             {commify(capacityBaseOnSabt)}
                           </span>
                         </div>
                         <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-lime-200 p-1 text-center font-bold text-accent ">
                           <span className="text-lime-900">مانده</span>
-                          <span className="text-lime-900">
+                          <span dir="ltr" className="text-lime-900">
                             {commify(entryBaseOnSabt - capacityBaseOnSabt)}
                           </span>
                         </div>
@@ -854,16 +859,8 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoSkeletonLoading}
                     >
-                      <ResponsiveContainer width="99%" height={"100%"}>
-                        <DonutChart
-                          data={depo_BaseOnSabt}
-                          category="value"
-                          index="name"
-                          colors={["fuchsia", "cyan"]}
-                          valueFormatter={commify}
-                          noDataText={Text.noData.fa}
-                        />
-                      </ResponsiveContainer>
+                      <CustomPieChart data={depo_BaseOnSabt} index="value" />
+
                       <div className="flex justify-stretch gap-2 ">
                         <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
                           <span className="text-fuchsia-900">دپو مستقیم</span>

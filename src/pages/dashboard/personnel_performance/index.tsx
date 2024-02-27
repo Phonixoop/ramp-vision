@@ -129,11 +129,6 @@ function PersonnelPerformanceTable({ sessionData }) {
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
       ],
-      ProjectType: defaultProjectTypes,
-      Role: defualtRoles,
-      ContractType: defualtContractTypes,
-      RoleType: [],
-      DateInfo: defualtDateInfos,
     },
   });
   const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
@@ -145,6 +140,16 @@ function PersonnelPerformanceTable({ sessionData }) {
     },
     {
       enabled: sessionData?.user !== undefined,
+      onSuccess: (data) => {
+        // setDataFilters((prev) => {
+        //   return {
+        //     ...prev,
+        //     Role:
+        //       data?.usersInfo?.map((a) => a.Role).filter((a) => a) ??
+        //       defualtRoles,
+        //   };
+        // });
+      },
       refetchOnWindowFocus: false,
     },
   );
@@ -456,11 +461,11 @@ function PersonnelPerformanceTable({ sessionData }) {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">سمت</span>
+
                 <SelectColumnFilter
-                  initialFilters={
-                    filters.filter.Role ??
-                    defualtRoles.filter((item) => Roles.includes(item))
-                  }
+                  initialFilters={personnelPerformance.data?.result.filter(
+                    (a) => a.Role,
+                  )}
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {

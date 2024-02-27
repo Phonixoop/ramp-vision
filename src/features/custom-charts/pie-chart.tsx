@@ -1,5 +1,11 @@
-import React, { PureComponent, useState } from "react";
-import { PieChart, Pie, Sector, ResponsiveContainer } from "recharts";
+import React, { useState } from "react";
+import { Pie, Sector, ResponsiveContainer } from "recharts";
+import dynamic from "next/dynamic";
+
+const PieChart = dynamic(
+  () => import("recharts").then((recharts) => recharts.PieChart),
+  { ssr: false },
+);
 
 const dataa = [
   { name: "Group A", value: 400 },
@@ -67,7 +73,7 @@ const renderActiveShape = (props) => {
         y={ey}
         textAnchor={textAnchor}
         fill="#333"
-      >{`PV ${value}`}</text>
+      >{`${value}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
@@ -75,42 +81,55 @@ const renderActiveShape = (props) => {
         textAnchor={textAnchor}
         fill="#999"
       >
-        {`(Rate ${(percent * 100).toFixed(2)}%)`}
+        {`(${(percent * 100).toFixed(2)}%)`}
       </text>
     </g>
   );
 };
 
-export default function CustomPieChart({
-  data,
-  label,
-  category,
-  index,
-  valueFormatter,
-}) {
-  const [activeIndex, setActiveIndex] = useState(0);
+export default function CustomPieChart({ data = [], index }) {
+  const [activeBar, setActiveBar] = useState({
+    index: 0,
+    name: data[0].name,
+  });
 
-  function onPieEnter(_, index) {
-    setActiveIndex(index);
+  function onPieEnter(data, index) {
+    setActiveBar({
+      index,
+      name: data.name,
+    });
   }
-
+  // function onPieLeave() {
+  //   setActiveIndex(-1);
+  // }
+  const isEmpty = data.filter(({ value }) => value > 0).length <= 0;
   return (
-    <div className="h-full ">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
+    <div dir="ltr" className="flex  w-full items-center justify-center">
+      {isEmpty ? (
+        <span className="w-full text-center text-primary">
+          دیتا ای وجود ندارد
+        </span>
+      ) : (
+        <PieChart width={450} height={300}>
           <Pie
-            activeIndex={activeIndex}
+            activeIndex={activeBar.index}
             activeShape={renderActiveShape}
             data={data}
             cx="50%"
             cy="50%"
+            stroke="#0000000"
             innerRadius={60}
             outerRadius={80}
-            dataKey={index}
+            dataKey={"value"}
             onMouseEnter={onPieEnter}
+            // onMouseLeave={onPieLeave}
+            // label={activeIndex === -1}
+            label={(entry) =>
+              `${entry.name === activeBar.name ? "" : `${entry.value}`}`
+            }
           />
         </PieChart>
-      </ResponsiveContainer>
+      )}
     </div>
   );
 }

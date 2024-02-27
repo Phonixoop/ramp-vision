@@ -3,6 +3,7 @@ import moment from "jalali-moment";
 import { twMerge } from "tailwind-merge";
 import { validDateBeforeToScrewThem } from "~/constants";
 import Calender from "~/features/calender";
+import CustomPieChart from "~/features/custom-charts/pie-chart";
 
 import H2 from "~/ui/heading/h2";
 import {
@@ -123,9 +124,11 @@ console.log(JSON.stringify(result, null, 2));
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
-    <div className="flex h-screen items-center justify-center text-primary">
-      {/* {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")} */}
-      {/* <div dir="rtl" className="max-w-sm">
+    <>
+      <CustomPieChart data={[]} index={"value"} />
+      <div className="flex h-screen items-center justify-center text-primary">
+        {/* {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")} */}
+        {/* <div dir="rtl" className="max-w-sm">
         <Calender
           onDate={(date, monthNumber) => (
             <>
@@ -140,8 +143,9 @@ export default function TestPage() {
           )}
         />
       </div> */}
-      {/* <Menu menuItems={menuItems} className="flex" /> */}
-    </div>
+        {/* <Menu menuItems={menuItems} className="flex" /> */}
+      </div>
+    </>
   );
 }
 
