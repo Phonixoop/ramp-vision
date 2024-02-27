@@ -119,13 +119,13 @@ const result = distinctPersonnelPerformanceData(
   ["TotalPerformance"],
 );
 
-console.log(JSON.stringify(result, null, 2));
+// console.log(JSON.stringify(result, null, 2));
 
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
     <>
-      <CustomPieChart data={[]} index={"value"} />
+      {/* <CustomPieChart data={[]} index={"value"} /> */}
       <div className="flex h-screen items-center justify-center text-primary">
         {/* {getMonthNamesFromJOINED_date_strings("1402/10/02", "هفتگی")} */}
         {/* <div dir="rtl" className="max-w-sm">
