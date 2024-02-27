@@ -622,3 +622,22 @@ export function analyzePerformanceTrend(
     return "Stable";
   }
 }
+
+export function dataAsTable(data) {
+  const result = {};
+
+  data.forEach((item) => {
+    result[item.name] = {
+      data: [item.value],
+      textColor: item.fill,
+      rowClassName: item.rowClassName,
+      headClassName: item.headClassName,
+    };
+  });
+
+  return result;
+}
+
+export const isNumber = (value) => {
+  return typeof value === "number" && !isNaN(value);
+};

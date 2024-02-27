@@ -1,5 +1,5 @@
 import React from "react";
-import GuideTable from "~/features/guide-table";
+import SimpleTable from "~/features/guide-table";
 import {
   direct_Table_Hospital,
   direct_Table_Daro,
@@ -260,23 +260,23 @@ export default function GuidePage() {
         <div className="flex flex-col items-center justify-center gap-6">
           <H2 className="text-2xl">اسناد مستقیم</H2>
           <div className="flex flex-wrap gap-2">
-            <GuideTable data={direct_Table_Hospital} />
-            <GuideTable data={direct_Table_Daro} />
-            <GuideTable data={direct_Table_Paziresh_Sabt_Avalie} />
-            <GuideTable data={direct_Table_Sabt_Avalie_BedoneBime} />
-            <GuideTable data={direct_Table_WithScan} />
-            <GuideTable data={direct_Table_WithoutScan} />
-            <GuideTable data={direct_Table_Para_Dandan} />
+            <SimpleTable data={direct_Table_Hospital} />
+            <SimpleTable data={direct_Table_Daro} />
+            <SimpleTable data={direct_Table_Paziresh_Sabt_Avalie} />
+            <SimpleTable data={direct_Table_Sabt_Avalie_BedoneBime} />
+            <SimpleTable data={direct_Table_WithScan} />
+            <SimpleTable data={direct_Table_WithoutScan} />
+            <SimpleTable data={direct_Table_Para_Dandan} />
             <div className="cross_hatch_pattern hidden w-full max-w-sm rounded-xl sm:block"></div>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center gap-6">
           <H2 className="text-2xl">اسناد غیر مستقیم</H2>
           <div className="flex flex-wrap gap-2">
-            <GuideTable data={indirect_Table_Hospital} />
-            <GuideTable data={inDirect_Table_Daro} />
-            <GuideTable data={inDirect_Table_WithoutScan} />
-            <GuideTable data={inDirect_Table_Para_Dandan} />
+            <SimpleTable data={indirect_Table_Hospital} />
+            <SimpleTable data={inDirect_Table_Daro} />
+            <SimpleTable data={inDirect_Table_WithoutScan} />
+            <SimpleTable data={inDirect_Table_Para_Dandan} />
           </div>
         </div>
       </>

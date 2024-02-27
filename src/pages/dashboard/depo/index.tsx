@@ -17,6 +17,7 @@ import moment from "jalali-moment";
 
 import {
   commify,
+  dataAsTable,
   en,
   getEnglishToPersianCity,
   getPersianToEnglishCity,
@@ -49,6 +50,7 @@ import { Loading } from "~/features/loadings/loading";
 import DepoSkeletonLoading from "~/features/loadings/depo/depo-box";
 import DepoTimeSkeletonLoading from "~/features/loadings/depo/depo-time-box";
 import CustomPieChart from "~/features/custom-charts/pie-chart";
+import SimpleTable from "~/features/guide-table";
 
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {
@@ -595,21 +597,28 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
       ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
     ],
   );
+
   const entry_capacity = [
     {
       name: "ورودی",
       value: entryBaseOnSabt,
       fill: "#be123c",
+      headClassName: "text-xl text-rose-900 bg-secondary rounded-tr-xl ",
+      rowClassName: "text-xl  text-rose-900 bg-secondary rounded-br-xl",
     },
     {
       name: "رسیدگی",
       value: capacityBaseOnSabt,
       fill: "#047857",
+      headClassName: "text-xl text-emerald-900 bg-secondary ",
+      rowClassName: "text-xl  text-emerald-900 bg-secondary",
     },
     {
       name: "مانده",
       value: entryBaseOnSabt - capacityBaseOnSabt,
       fill: "#4d7c0f",
+      headClassName: "text-xl text-lime-900 bg-secondary rounded-tl-xl ",
+      rowClassName: "text-xl  text-lime-900 bg-secondary rounded-bl-xl",
     },
   ];
 
@@ -634,11 +643,15 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
       name: "مستقیم",
       value: depoBaseOnSabtDirect,
       fill: "#a21caf",
+      headClassName: "text-xl text-fuchsia-900 bg-secondary rounded-tr-xl ",
+      rowClassName: "text-xl  text-fuchsia-900 bg-secondary rounded-br-xl",
     },
     {
       name: "غیر مستقیم",
       value: depoBaseOnSabtInDirect,
       fill: "#0e7490",
+      headClassName: "text-xl text-cyan-900 bg-secondary rounded-tl-xl ",
+      rowClassName: "text-xl  text-cyan-900 bg-secondary rounded-bl-xl",
     },
   ];
 
@@ -647,7 +660,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
       <div className="flex w-full flex-col items-center justify-center gap-5">
         <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
           <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-            <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:p-5">
+            <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secondary py-5 xl:p-5">
               <H2 className="text-lg font-bold">نمودار به تفکیک فعالیت</H2>
               {/* <ReBarChart
                 data={(serviceData ?? []).map((row) => {
@@ -803,9 +816,8 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                 {/* <TrackerView data={getTracker.data ?? []} /> */}
 
                 {/* <RadarGauge CityName={trackerFilter.cities} /> */}
-                <div className="flex w-full flex-col items-stretch justify-between gap-5 2xl:flex-row">
-                  <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2 ">
-                    <H2>تعداد ورودی و رسیدگی شده</H2>
+                <div className="flex w-full flex-col items-stretch justify-between 2xl:flex-row">
+                  <div className="flex  flex-col justify-between gap-5 rounded-2xl  p-2 ">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={EntryHandlingSkeletonLoading}
@@ -829,10 +841,21 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                           noDataText={Text.noData.fa}
                         /> */}
 
-                      <CustomPieChart data={entry_capacity} index="value" />
-
-                      <div className="flex justify-stretch gap-2 ">
-                        <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
+                      <SimpleTable
+                        className="flex  justify-start border-none"
+                        data={{
+                          title: "تعداد ورودی و رسیدگی شده",
+                          table: dataAsTable(entry_capacity),
+                        }}
+                      >
+                        <CustomPieChart
+                          className="rounded-xl bg-secondary"
+                          data={entry_capacity}
+                          index="value"
+                        />
+                      </SimpleTable>
+                      <div className="flex justify-center gap-2 ">
+                        {/* <div className=" flex w-full flex-col justify-between gap-2 rounded-xl bg-rose-200 p-1 text-center font-bold text-accent ">
                           <span className="text-rose-900">ورودی</span>
                           <span dir="ltr" className="text-rose-900">
                             {commify(entryBaseOnSabt)}
@@ -849,19 +872,30 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                           <span dir="ltr" className="text-lime-900">
                             {commify(entryBaseOnSabt - capacityBaseOnSabt)}
                           </span>
-                        </div>
+                        </div> */}
                       </div>
                     </Loading>
                   </div>
-                  <div className="flex w-full flex-col justify-between gap-5 rounded-2xl border border-dashed border-primary bg-secbuttn p-2">
-                    <H2>تعداد دپو</H2>
+                  <div className="flex flex-col justify-between gap-5 rounded-2xl  p-2">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoSkeletonLoading}
                     >
-                      <CustomPieChart data={depo_BaseOnSabt} index="value" />
+                      <SimpleTable
+                        className="flex  justify-start border-none"
+                        data={{
+                          title: "تعداد دپو",
+                          table: dataAsTable(depo_BaseOnSabt),
+                        }}
+                      >
+                        <CustomPieChart
+                          className="rounded-xl bg-secondary "
+                          data={depo_BaseOnSabt}
+                          index="value"
+                        />
+                      </SimpleTable>
 
-                      <div className="flex justify-stretch gap-2 ">
+                      {/* <div className="flex justify-stretch gap-2 ">
                         <div className=" flex w-full justify-between rounded-xl bg-fuchsia-200 p-2 text-center font-bold text-accent ">
                           <span className="text-fuchsia-900">دپو مستقیم</span>
                           <span className="text-fuchsia-900">
@@ -876,13 +910,10 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                             {commify(depoBaseOnSabtInDirect)}
                           </span>
                         </div>
-                      </div>
+                      </div> */}
                     </Loading>
                   </div>
-                  <div
-                    dir="ltr"
-                    className="flex w-full flex-col  justify-between gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md"
-                  >
+                  <div className="flex  flex-col  justify-center gap-5 rounded-2xl  p-5 xl:max-w-md">
                     <H2>
                       زمان کلی اتمام دپو{" "}
                       {depo.data?.periodType && (

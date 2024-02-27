@@ -42,5 +42,13 @@ export type CityWithPerformanceData = {
 
 export type TableJson = {
   title: string;
-  table: { [key: string]: string[] };
+  table: {
+    [key: string]: {
+      data: string[];
+      bgColor?: string;
+      textColor?: string;
+      rowClassName?: string;
+      headClassName?: string;
+    };
+  };
 };

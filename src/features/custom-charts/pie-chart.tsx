@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Pie, Sector, ResponsiveContainer } from "recharts";
 import dynamic from "next/dynamic";
+import { commify } from "~/utils/util";
+import { twMerge } from "tailwind-merge";
 
 const PieChart = dynamic(
   () => import("recharts").then((recharts) => recharts.PieChart),
@@ -73,7 +75,7 @@ const renderActiveShape = (props) => {
         y={ey}
         textAnchor={textAnchor}
         fill={fill}
-      >{`${value}`}</text>
+      >{`${commify(value)}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
@@ -87,7 +89,7 @@ const renderActiveShape = (props) => {
   );
 };
 
-export default function CustomPieChart({ data = [], index }) {
+export default function CustomPieChart({ className = "", data = [], index }) {
   const [activeBar, setActiveBar] = useState({
     index: 0,
     name: data[0].name,
@@ -104,11 +106,14 @@ export default function CustomPieChart({ data = [], index }) {
   // }
   const isEmpty = data.filter(({ value }) => value > 0).length <= 0;
   return (
-    <div dir="ltr" className="flex  w-full items-center justify-center">
+    <div
+      dir="ltr"
+      className={twMerge("flex  w-full items-center justify-center", className)}
+    >
       {isEmpty ? (
-        <span className="w-full text-center text-primary">
-          دیتا ای وجود ندارد
-        </span>
+        <div className="flex h-[300px] w-full items-center justify-center p-2 text-center text-primary">
+          <span>دیتا ای وجود ندارد</span>
+        </div>
       ) : (
         <PieChart width={450} height={300}>
           <Pie
@@ -125,7 +130,9 @@ export default function CustomPieChart({ data = [], index }) {
             // onMouseLeave={onPieLeave}
             // label={activeIndex === -1}
             label={(entry) =>
-              `${entry.name === activeBar.name ? "" : `${entry.value}`}`
+              `${
+                entry.name === activeBar.name ? "" : `${commify(entry.value)}`
+              }`
             }
           />
         </PieChart>
