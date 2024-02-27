@@ -12,8 +12,8 @@ import {
   inDirect_Table_Daro,
   inDirect_Table_WithoutScan,
   inDirect_Table_Para_Dandan,
-} from "~/pages/guide/data";
-import BlurBackground from "~/ui/blur-backgrounds";
+} from "~/constants/guide-page-data";
+
 import H2 from "~/ui/heading/h2";
 
 export default function GuidePage() {
