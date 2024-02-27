@@ -881,7 +881,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                   </div>
                   <div
                     dir="ltr"
-                    className="flex w-full flex-col  justify-center gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md"
+                    className="flex w-full flex-col  justify-between gap-5 rounded-2xl border  bg-secbuttn/50 p-5 xl:max-w-md"
                   >
                     <H2>
                       زمان کلی اتمام دپو{" "}
@@ -898,24 +898,23 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoTimeSkeletonLoading}
                     >
-                      <ResponsiveContainer width="99%" height={"100%"}>
-                        <DonutChart
-                          label={maxDepoTime.toFixed(2)}
-                          data={depoCompletionTime}
-                          category={"DepoCompleteTime"}
-                          index="ServiceName"
-                          colors={[
-                            "emerald",
-                            "yellow",
-                            "cyan",
-                            "red",
-                            "orange",
-                            "fuchsia",
-                          ]}
-                          valueFormatter={commify}
-                          noDataText={Text.noData.fa}
-                        />
-                      </ResponsiveContainer>
+                      <DonutChart
+                        label={maxDepoTime.toFixed(2)}
+                        data={depoCompletionTime}
+                        category={"DepoCompleteTime"}
+                        index="ServiceName"
+                        colors={[
+                          "emerald",
+                          "yellow",
+                          "cyan",
+                          "red",
+                          "orange",
+                          "fuchsia",
+                        ]}
+                        valueFormatter={commify}
+                        noDataText={Text.noData.fa}
+                      />
+
                       {depo.data?.periodType && totalComplete > 0 && (
                         <p className="w-full">
                           <span className="text-accent">
