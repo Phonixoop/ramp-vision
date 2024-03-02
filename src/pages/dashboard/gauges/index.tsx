@@ -304,7 +304,7 @@ export default function GaugesPage() {
                       تاریخ گزارش پرسنل
                     </span>
                     <SelectControlled
-                      title={"تاریخ گزارش پرنسل"}
+                      title={"تاریخ گزارش پرسنل"}
                       list={DateInfos}
                       value={filters.filter.DateInfo ?? [DateInfos[0]]}
                       onChange={(values) => {
