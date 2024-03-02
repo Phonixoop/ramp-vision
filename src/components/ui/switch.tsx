@@ -18,17 +18,20 @@ export function Switch({
     <div
       data-state={checked ? "checked" : "unchecked"}
       className={cn(
-        `focus-visible:ring-ring
-    peer
-     relative 
-     inline-flex h-[20px] w-[36px]
-      shrink-0 cursor-pointer items-center 
-      rounded-full border-2
-      border-transparent shadow-sm 
-      transition-colors data-[state=checked]:bg-primbuttn/50 
+        `peer
+        relative
+        inline-flex
+    h-[20px]
+     w-[36px] 
+     shrink-0 cursor-pointer items-center
+      rounded-full border-2 border-transparent 
+      shadow-xl
+      ring-primary transition-colors 
+      data-[state=checked]:bg-secbuttn
       data-[state=unchecked]:bg-secbuttn 
       focus-visible:outline-none 
       focus-visible:ring-2 
+      focus-visible:ring-accent 
       focus-visible:ring-offset-2 
       focus-visible:ring-offset-primary
        disabled:cursor-not-allowed 
@@ -49,7 +52,7 @@ export function Switch({
        ring-0 
           
        transition-transform
-        data-[state=checked]:bg-primbuttn 
+        data-[state=checked]:bg-primary/20 
         data-[state=unchecked]:bg-primary/20`,
           middle
             ? `w-6 translate-x-1 

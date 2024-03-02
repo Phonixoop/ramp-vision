@@ -431,10 +431,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <span className="font-bold text-primary">نوع قرارداد</span>
                 <SelectColumnFilter
                   initialFilters={
-                    filters.filter.ContractType ??
-                    defualtContractTypes.filter((item) =>
-                      ContractTypes.includes(item),
-                    )
+                    filters.filter.ContractType ?? defualtContractTypes
                   }
                   column={column}
                   data={personnelPerformance.data?.result}
@@ -463,9 +460,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <span className="font-bold text-primary">سمت</span>
 
                 <SelectColumnFilter
-                  initialFilters={personnelPerformance.data?.result.filter(
-                    (a) => a.Role,
-                  )}
+                  initialFilters={defualtRoles}
                   column={column}
                   data={personnelPerformance.data?.result}
                   onChange={(filter) => {
