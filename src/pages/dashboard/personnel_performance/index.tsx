@@ -1,57 +1,33 @@
-import {
-  ArrowDownRightIcon,
-  UserCog2,
-  DownloadCloudIcon,
-  FileBarChart2,
-} from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { DownloadCloudIcon, FileBarChart2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { CSVLink } from "react-csv";
-import Menu, { InPageMenu } from "~/features/menu";
+import { InPageMenu } from "~/features/menu";
 
 import Table from "~/features/table";
 
-import { ThemeBoxHovery } from "~/features/theme-box";
-
 import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
-import { Container } from "~/ui/containers";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
-import { RouterOutputs, api } from "~/utils/api";
+import { useDeferredValue, useMemo, useState } from "react";
+import { api } from "~/utils/api";
 
-import CheckboxList, {
-  SelectColumnFilter,
-  SelectControlled,
-} from "~/features/checkbox-list";
-import MultiBox from "~/ui/multi-box";
+import { SelectColumnFilter } from "~/features/checkbox-list";
+
 import moment from "jalali-moment";
-import DatePicker from "react-multi-date-picker";
-import { default as DatePickerButton } from "react-multi-date-picker/components/button";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
-import DatePanel from "react-multi-date-picker/plugins/date_panel";
+
 import {
-  DistinctData,
   commify,
-  convertNumberToBetterFormat,
   countColumnValues,
   en,
   getEnglishToPersianCity,
   getPerformanceText,
   getPersianToEnglishCity,
-  getServiceNameColor,
-  humanizeDuration,
-  processDataForChart,
-  processDepoCompleteTimeData,
-  sumColumnBasedOnRowValue,
 } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
-import TrackerView from "~/features/tracker";
-import { CITIES, City_Levels, Reports_Period, Text } from "~/constants";
-import { cn } from "~/lib/utils";
-import { Column } from "react-table";
-import Header from "~/features/header";
+
+import { City_Levels } from "~/constants";
+
 import { LayoutGroup } from "framer-motion";
 import MyBarList from "~/features/bar-list";
 import Gauge from "~/features/gauge";
@@ -62,7 +38,6 @@ import { toast } from "sonner";
 import {
   defaultProjectTypes,
   defualtContractTypes,
-  defualtDateInfos,
   defualtRoles,
 } from "~/constants/personnel-performance";
 import {
@@ -71,21 +46,19 @@ import {
   getMonthNamesFromJOINED_date_strings,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
-import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
-import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import { FilterType, PeriodType } from "~/context/personnel-filter.context";
 
-const dataFormatter = (number: number) => {
-  return "$ " + Intl.NumberFormat("us").format(number).toString();
-};
+// const dataFormatter = (number: number) => {
+//   return "$ " + Intl.NumberFormat("us").format(number).toString();
+// };
 
-function filterColumn(rows, id, filterValue) {
-  return rows.filter((row) => {
-    const rowValue = row.values[id];
-    // console.log(rowValue, filterValue);
-    return filterValue.includes(rowValue);
-  });
-}
+// function filterColumn(rows, id, filterValue) {
+//   return rows.filter((row) => {
+//     const rowValue = row.values[id];
+//     // console.log(rowValue, filterValue);
+//     return filterValue.includes(rowValue);
+//   });
+// }
 
 export default function PersonnelPerformancePage() {
   // const users = api.example.getAll.useQuery();
@@ -200,39 +173,41 @@ function PersonnelPerformanceTable({ sessionData }) {
     ),
   ];
 
-  const distincedData = useMemo(
-    () =>
-      distinctPersonnelPerformanceData(
-        personnelPerformance.data,
-        ["NationalCode", "NameFamily", "CityName"],
-        [
-          "CityName",
-          "NationalCode",
-          "NameFamily",
-          "SabtAvalieAsnad",
-          "PazireshVaSabtAvalieAsnad",
-          "ArzyabiAsanadBimarsetaniDirect",
-          "ArzyabiAsnadBimarestaniIndirect",
-          "ArzyabiAsnadDandanVaParaDirect",
-          "ArzyabiAsnadDandanVaParaIndirect",
-          "ArzyabiAsnadDaroDirect",
-          "ArzyabiAsnadDaroIndirect",
-          "WithScanCount",
-          "WithoutScanCount",
-          "WithoutScanInDirectCount",
-          "ArchiveDirectCount",
-          "ArchiveInDirectCount",
-          "Role",
-          "RoleType",
-          "ContractType",
-          "ProjectType",
-          "TotalPerformance",
-          "Start_Date",
-          "DateInfo",
-        ],
-      ),
-    [personnelPerformance.data],
-  );
+  // const distincedData = useMemo(
+  //   () =>
+  //     distinctPersonnelPerformanceData(
+  //       personnelPerformance.data,
+  //       ["NationalCode", "NameFamily", "CityName"],
+  //       [
+  //         "CityName",
+  //         "NationalCode",
+  //         "NameFamily",
+  //         "SabtAvalieAsnad",
+  //         "PazireshVaSabtAvalieAsnad",
+  //         "ArzyabiAsanadBimarsetaniDirect",
+  //         "ArzyabiAsnadBimarestaniIndirect",
+  //         "ArzyabiAsnadDandanVaParaDirect",
+  //         "ArzyabiAsnadDandanVaParaIndirect",
+  //         "ArzyabiAsnadDaroDirect",
+  //         "ArzyabiAsnadDaroIndirect",
+  //         "WithScanCount",
+  //         "WithoutScanCount",
+  //         "WithoutScanInDirectCount",
+  //         "ArchiveDirectCount",
+  //         "ArchiveInDirectCount",
+  //         "Role",
+  //         "RoleType",
+  //         "ContractType",
+  //         "ProjectType",
+  //         "TotalPerformance",
+  //         "Start_Date",
+  //         "DateInfo",
+  //       ],
+  //       {},
+  //       true,
+  //     ),
+  //   [personnelPerformance.data],
+  // );
 
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
@@ -816,7 +791,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             data={
               personnelPerformance?.data?.periodType === "روزانه"
                 ? personnelPerformance?.data?.result
-                : distincedData
+                : personnelPerformance?.data?.result
             }
             columns={columns}
             renderInFilterView={() => {

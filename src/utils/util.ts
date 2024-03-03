@@ -216,7 +216,7 @@ export function processDataForChart(
             typeof current[value] === "string"
           ) {
             if (acc[existingGroupIndex][value] === current[value]) continue;
-            acc[existingGroupIndex][value] += ","; // my code
+            //acc[existingGroupIndex][value] += ","; // my code
           } else if (
             typeof acc[existingGroupIndex][value] === "number" &&
             typeof current[value] === "number"

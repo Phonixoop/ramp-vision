@@ -82,6 +82,9 @@ export function distinctDataAndCalculatePerformance(
     groupBy,
     values,
     where,
+    // {
+    //   max: ["COUNT"],
+    // },
   );
 
   return mapToCitiesWithPerformance({
@@ -114,28 +117,35 @@ export function distinctPersonnelPerformanceData(
     "TotalPerformance",
   ],
   where = {},
+  isThursdayFixed = false,
 ) {
-  const dataWithThurdsdayEdit = data?.result?.map((item) => {
-    const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+  const dataWithThurdsdayEdit =
+    isThursdayFixed === false
+      ? data?.result?.map((item) => {
+          const isThursday =
+            moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
-    // const count = item.COUNT > 0 ? item.COUNT : 1;
-    return {
-      ...item,
+          // const count = item.COUNT > 0 ? item.COUNT : 1;
+          return {
+            ...item,
 
-      TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2)
-        : item.TotalPerformance,
-    };
-  });
+            TotalPerformance: isThursday
+              ? calculatePerformance(item, 1, 2)
+              : item.TotalPerformance,
+          };
+        })
+      : [];
 
   return processDataForChart(
-    dataWithThurdsdayEdit ?? [],
+    isThursdayFixed === false
+      ? dataWithThurdsdayEdit ?? []
+      : data?.result ?? [],
     groupBy,
     values,
     where,
   ).map((item) => {
-    const city =
-      getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
+    // const city =
+    //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
     return {
       ...item,
@@ -155,7 +165,10 @@ function mapToCitiesWithPerformance({
     // const personnelCount = result.find(
     //   (a) => a.key.CityName === item.key.CityName,
     // ).COUNT;
-
+    // console.log({ item });
+    // const maxCount = Math.max(
+    //   result.filter((a) => a.CityName === item.key).map((a) => a.COUNT),
+    // );
     return {
       CityName_En: item.key.CityName,
       CityName_Fa: getEnglishToPersianCity(item.key.CityName),
