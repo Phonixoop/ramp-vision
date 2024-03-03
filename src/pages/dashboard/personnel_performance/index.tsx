@@ -132,26 +132,26 @@ function PersonnelPerformanceTable({ sessionData }) {
     deferredFilter,
     {
       enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
-      select: (data) => {
-        const dataWithThurdsdayEdit = data?.result?.map((item) => {
-          const isThursday =
-            moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+      // select: (data) => {
+      //   const dataWithThurdsdayEdit = data?.result?.map((item) => {
+      //     const isThursday =
+      //       moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
-          // const count = item.COUNT > 0 ? item.COUNT : 1;
-          return {
-            ...item,
-            TotalPerformance: isThursday
-              ? calculatePerformance(item, 1, 2)
-              : item.TotalPerformance,
-          };
-        });
+      //     // const count = item.COUNT > 0 ? item.COUNT : 1;
+      //     return {
+      //       ...item,
+      //       TotalPerformance: isThursday
+      //         ? calculatePerformance(item, 1, 2)
+      //         : item.TotalPerformance,
+      //     };
+      //   });
 
-        return {
-          periodType: data.periodType,
-          dateLength: data.dateLength,
-          result: dataWithThurdsdayEdit,
-        };
-      },
+      //   return {
+      //     periodType: data.periodType,
+      //     dateLength: data.dateLength,
+      //     result: dataWithThurdsdayEdit,
+      //   };
+      // },
       refetchOnWindowFocus: true,
     },
   );

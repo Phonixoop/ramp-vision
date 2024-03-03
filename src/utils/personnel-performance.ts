@@ -66,19 +66,19 @@ export function distinctDataAndCalculatePerformance(
   ],
   where = {},
 ) {
-  const dataWithThurdsdayEdit = data?.result?.map((item) => {
-    const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
-    // const count = item.COUNT > 0 ? item.COUNT : 1;
-    return {
-      ...item,
-      TotalPerformance: isThursday
-        ? calculatePerformance(item, 1, 2)
-        : item.TotalPerformance,
-    };
-  });
+  // const dataWithThurdsdayEdit = data?.result?.map((item) => {
+  //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+  //   // const count = item.COUNT > 0 ? item.COUNT : 1;
+  //   return {
+  //     ...item,
+  //     TotalPerformance: isThursday
+  //       ? calculatePerformance(item, 1, 2)
+  //       : item.TotalPerformance,
+  //   };
+  // });
 
   const citiesWithPerformanceData = processDataForChart(
-    dataWithThurdsdayEdit ?? [],
+    data?.result ?? [],
     groupBy,
     values,
     where,
@@ -119,27 +119,19 @@ export function distinctPersonnelPerformanceData(
   where = {},
   isThursdayFixed = false,
 ) {
-  const dataWithThurdsdayEdit =
-    isThursdayFixed === false
-      ? data?.result?.map((item) => {
-          const isThursday =
-            moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+  // const dataWithThurdsdayEdit = data?.result?.map((item) => {
+  //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
-          // const count = item.COUNT > 0 ? item.COUNT : 1;
-          return {
-            ...item,
+  //   // const count = item.COUNT > 0 ? item.COUNT : 1;
+  //   return {
+  //     ...item,
 
-            TotalPerformance: isThursday
-              ? calculatePerformance(item, 1, 2)
-              : item.TotalPerformance,
-          };
-        })
-      : [];
-
+  //     TotalPerformance: 5,
+  //   };
+  // });
   return processDataForChart(
-    isThursdayFixed === false
-      ? dataWithThurdsdayEdit ?? []
-      : data?.result ?? [],
+    data?.result ?? [],
+
     groupBy,
     values,
     where,

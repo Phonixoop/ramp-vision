@@ -121,7 +121,7 @@ export default function CityPage({ children, city }) {
             "COUNT",
           ],
         );
-        console.log({ result });
+
         setUpdatedList(result);
       },
       refetchOnWindowFocus: false,
