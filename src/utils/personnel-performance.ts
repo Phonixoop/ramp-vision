@@ -117,7 +117,6 @@ export function distinctPersonnelPerformanceData(
     "TotalPerformance",
   ],
   where = {},
-  isThursdayFixed = false,
 ) {
   // const dataWithThurdsdayEdit = data?.result?.map((item) => {
   //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;

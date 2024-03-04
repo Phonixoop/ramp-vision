@@ -85,6 +85,9 @@ function PersonnelPerformanceTable({ sessionData }) {
   //   moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
   // ]);
 
+  const [toggleDistinctData, setToggleDistinctData] = useState<
+    "Distincted" | "Pure"
+  >("Distincted");
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
 
   const getInitialCities = api.personnelPerformance.getInitialCities.useQuery(
@@ -173,41 +176,40 @@ function PersonnelPerformanceTable({ sessionData }) {
     ),
   ];
 
-  // const distincedData = useMemo(
-  //   () =>
-  //     distinctPersonnelPerformanceData(
-  //       personnelPerformance.data,
-  //       ["NationalCode", "NameFamily", "CityName"],
-  //       [
-  //         "CityName",
-  //         "NationalCode",
-  //         "NameFamily",
-  //         "SabtAvalieAsnad",
-  //         "PazireshVaSabtAvalieAsnad",
-  //         "ArzyabiAsanadBimarsetaniDirect",
-  //         "ArzyabiAsnadBimarestaniIndirect",
-  //         "ArzyabiAsnadDandanVaParaDirect",
-  //         "ArzyabiAsnadDandanVaParaIndirect",
-  //         "ArzyabiAsnadDaroDirect",
-  //         "ArzyabiAsnadDaroIndirect",
-  //         "WithScanCount",
-  //         "WithoutScanCount",
-  //         "WithoutScanInDirectCount",
-  //         "ArchiveDirectCount",
-  //         "ArchiveInDirectCount",
-  //         "Role",
-  //         "RoleType",
-  //         "ContractType",
-  //         "ProjectType",
-  //         "TotalPerformance",
-  //         "Start_Date",
-  //         "DateInfo",
-  //       ],
-  //       {},
-  //       true,
-  //     ),
-  //   [personnelPerformance.data],
-  // );
+  const distincedData = useMemo(
+    () =>
+      distinctPersonnelPerformanceData(
+        personnelPerformance.data,
+        ["NationalCode", "NameFamily", "CityName"],
+        [
+          "CityName",
+          "NationalCode",
+          "NameFamily",
+          "SabtAvalieAsnad",
+          "PazireshVaSabtAvalieAsnad",
+          "ArzyabiAsanadBimarsetaniDirect",
+          "ArzyabiAsnadBimarestaniIndirect",
+          "ArzyabiAsnadDandanVaParaDirect",
+          "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDaroDirect",
+          "ArzyabiAsnadDaroIndirect",
+          "WithScanCount",
+          "WithoutScanCount",
+          "WithoutScanInDirectCount",
+          "ArchiveDirectCount",
+          "ArchiveInDirectCount",
+          "Role",
+          "RoleType",
+          "ContractType",
+          "ProjectType",
+          "TotalPerformance",
+          "Start_Date",
+          "DateInfo",
+        ],
+        {},
+      ),
+    [personnelPerformance.data],
+  );
 
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
@@ -789,9 +791,12 @@ function PersonnelPerformanceTable({ sessionData }) {
             }}
             isLoading={personnelPerformance.isLoading}
             data={
-              personnelPerformance?.data?.periodType === "روزانه"
-                ? personnelPerformance?.data?.result
+              toggleDistinctData === "Distincted"
+                ? distincedData
                 : personnelPerformance?.data?.result
+              // personnelPerformance?.data?.periodType === "روزانه"
+              //   ? personnelPerformance?.data?.result
+              //   : personnelPerformance?.data?.result
             }
             columns={columns}
             renderInFilterView={() => {
@@ -961,7 +966,7 @@ function PersonnelPerformanceTable({ sessionData }) {
 
               const totalPerformance = sumOfPerformances / flatRows.length;
               return (
-                <>
+                <div className="flex flex-col items-center justify-center gap-2">
                   <div className="flex w-full flex-col items-center justify-center gap-5">
                     <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
                       <div className="flex w-full  flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn/50 py-4 sm:py-0 xl:flex-row">
@@ -994,7 +999,22 @@ function PersonnelPerformanceTable({ sessionData }) {
                       </div>
                     </div>
                   </div>
-                </>
+                  <div className="w-full">
+                    <Button
+                      className="min-w-[150px]  bg-secbuttn text-primary"
+                      onClick={() => {
+                        setToggleDistinctData((prev) => {
+                          if (prev === "Distincted") return "Pure";
+                          return "Distincted";
+                        });
+                      }}
+                    >
+                      {toggleDistinctData === "Distincted"
+                        ? "Distincted"
+                        : "Pure"}
+                    </Button>
+                  </div>
+                </div>
               );
             }}
             // renderAfterTable={(flatRows) => {
