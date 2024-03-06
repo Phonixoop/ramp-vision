@@ -16,6 +16,7 @@ import { SelectColumnFilter } from "~/features/checkbox-list";
 import moment from "jalali-moment";
 
 import {
+  arrIncludeExcat,
   commify,
   dataAsTable,
   en,
@@ -257,15 +258,7 @@ function DeposTable({ sessionData }) {
         {
           header: "نوع پرونده",
           accessorKey: "DocumentType",
-          filterFn: (
-            row,
-            ColumnName,
-            selectedDocumentTypeFilters: string[],
-          ) => {
-            return selectedDocumentTypeFilters.includes(
-              row.original[ColumnName],
-            );
-          },
+          filterFn: arrIncludeExcat,
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">

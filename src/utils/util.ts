@@ -641,3 +641,12 @@ export function dataAsTable(data) {
 export const isNumber = (value) => {
   return typeof value === "number" && !isNaN(value);
 };
+
+export function arrIncludeExcat(
+  row,
+  ColumnName,
+  selectedDocumentTypeFilters: string[],
+) {
+  if (selectedDocumentTypeFilters.length <= 0) return true;
+  return selectedDocumentTypeFilters.includes(row.original[ColumnName]);
+}
