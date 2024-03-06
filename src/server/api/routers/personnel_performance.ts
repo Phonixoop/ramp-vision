@@ -192,7 +192,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -390,7 +390,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         }
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-        console.log(queryCities);
+        //   console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         const uniqueData = resultOfCities.recordsets[0].filter(

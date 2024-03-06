@@ -257,7 +257,15 @@ function DeposTable({ sessionData }) {
         {
           header: "نوع پرونده",
           accessorKey: "DocumentType",
-          filterFn: "arrIncludesSome",
+          filterFn: (
+            row,
+            ColumnName,
+            selectedDocumentTypeFilters: string[],
+          ) => {
+            return selectedDocumentTypeFilters.includes(
+              row.original[ColumnName],
+            );
+          },
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
