@@ -69,7 +69,7 @@ export function SelectControlled({
           );
         })}
       </MultiSelect>
-      {withSelectAll && value.length > 0 && (
+      {withSelectAll && list.length > 0 && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>

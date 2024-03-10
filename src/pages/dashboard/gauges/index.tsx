@@ -2,7 +2,7 @@ import { LayoutGroup } from "framer-motion";
 import moment from "jalali-moment";
 import React, { useMemo, useState } from "react";
 import DatePicker from "react-multi-date-picker";
-import { CITIES, Reports_Period } from "~/constants";
+import { CITIES, City_Levels, Reports_Period } from "~/constants";
 import {
   FilterType,
   PeriodType,
@@ -102,10 +102,18 @@ export default function GaugesPage() {
         .filter((a) => a),
     ),
   ];
-  const result = useMemo(
-    () => distinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
-    [getCitiesWithPerformance.data],
-  );
+  const [cityLevel, setCityLevel] = useState({
+    index: -1,
+    cities: [],
+  });
+  const result = useMemo(() => {
+    if (cityLevel.cities.length > 0)
+      return distinctDataAndCalculatePerformance(
+        getCitiesWithPerformance.data,
+      ).filter((city) => cityLevel.cities.includes(city.CityName_Fa));
+
+    return distinctDataAndCalculatePerformance(getCitiesWithPerformance.data);
+  }, [getCitiesWithPerformance.data, cityLevel]);
   return (
     <>
       <BlurBackground />
@@ -219,6 +227,44 @@ export default function GaugesPage() {
                               ...prev.filter,
                               Role: values,
                             },
+                          };
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="flex min-w-[15rem] max-w-sm flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                    <span className="font-bold text-primary">استان</span>
+
+                    <LayoutGroup id="CityLevelMenu">
+                      <InPageMenu
+                        list={City_Levels.map((a) => a.name)}
+                        startIndex={-1}
+                        index={cityLevel.index}
+                        onChange={(value) => {
+                          const cities = City_Levels.find(
+                            (a) => a.name === value.item.name,
+                          ).cities;
+                          console.log({ cities });
+                          setCityLevel({
+                            index: value.index,
+                            cities: cities.map(getEnglishToPersianCity),
+                          });
+                        }}
+                      />
+                    </LayoutGroup>
+
+                    <SelectControlled
+                      withSelectAll
+                      list={getCitiesWithPerformance.data?.result?.map((a) =>
+                        getEnglishToPersianCity(a.CityName),
+                      )}
+                      title={"استان"}
+                      value={cityLevel.cities}
+                      onChange={(values) => {
+                        setCityLevel((prev) => {
+                          return {
+                            index: 0,
+                            cities: values,
                           };
                         });
                       }}

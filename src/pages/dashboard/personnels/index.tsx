@@ -2,7 +2,7 @@ import { LayoutGroup } from "framer-motion";
 import moment from "jalali-moment";
 import React, { useMemo, useState } from "react";
 import DatePicker from "react-multi-date-picker";
-import { CITIES, Reports_Period } from "~/constants";
+import { CITIES, City_Levels, Reports_Period } from "~/constants";
 import {
   FilterType,
   PeriodType,
@@ -20,6 +20,7 @@ import {
   DistinctData,
   calculateAggregateByFields,
   en,
+  getEnglishToPersianCity,
   getPerformanceText,
 } from "~/utils/util";
 import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
@@ -71,52 +72,59 @@ export default function GaugesPage() {
             );
           },
         },
-        // CityName,NameFamily, ProjectType,ContractType,Role,RoleType,DateInfo
-        // {
-        //   header: "استان",
-        //   accessorKey: "CityName",
-        //   filterFn: "arrIncludesSome",
-        //   Filter: ({ column }) => {
-        //     return (
-        //       <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-        //         <span className="font-bold text-primary">استان ها</span>
-        //         {initialFilters.data?.Cities && (
-        //           <LayoutGroup id="CityLevelMenu">
-        //             <InPageMenu
-        //               list={City_Levels.map((a) => a.name)}
-        //               value={0}
-        //               onChange={(value) => {
-        //                 const { setFilterValue } = column;
-        //                 const cities = City_Levels.find(
-        //                   (a) => a.name === value.item.name,
-        //                 ).cities;
+        //CityName,NameFamily, ProjectType,ContractType,Role,RoleType,DateInfo
+        {
+          header: "استان",
+          accessorKey: "CityName",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            const { getFilterValue } = column;
 
-        //                 // beacuse our system is permission based we need to only filter allowed cities.
-        //                 const canFilterCities = cities.filter((city) =>
-        //                   initialFilters.data.Cities.map(
-        //                     (a) => a.CityName,
-        //                   ).includes(city),
-        //                 );
+            // const foundItem = City_Levels.find((item) =>
+            //   getFilterValue().every((city) => item.cities.includes(city)),
+            // );
 
-        //                 if (cities.length <= 0) {
-        //                   setFilterValue(
-        //                     initialFilters.data.Cities.map((a) => a.CityName),
-        //                   );
-        //                 } else setFilterValue(canFilterCities);
-        //               }}
-        //             />
-        //           </LayoutGroup>
-        //         )}
+            // let index = -1;
+            // if (foundItem)
+            //   index = City_Levels.findIndex(
+            //     (item) => item.name === foundItem.name,
+            //   );
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">استان ها</span>
 
-        //         <SelectColumnFilter
-        //           column={column}
-        //           data={initialFilters.data?.Cities}
-        //           onChange={(filter) => {}}
-        //         />
-        //       </div>
-        //     );
-        //   },
-        // },
+                <LayoutGroup id="CityLevelMenu">
+                  <InPageMenu
+                    list={City_Levels.map((a) => a.name)}
+                    startIndex={-1}
+                    //  index={index}
+                    onChange={(value) => {
+                      const { setFilterValue } = column;
+                      const cities = City_Levels.find(
+                        (a) => a.name === value.item.name,
+                      ).cities;
+                      setFilterValue(cities.map(getEnglishToPersianCity));
+                    }}
+                  />
+                </LayoutGroup>
+
+                <SelectColumnFilter
+                  initialFilters={[]}
+                  column={column}
+                  data={getPersonnls.data}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
         {
           header: "کابران",
           accessorKey: "NameFamily",
@@ -143,31 +151,31 @@ export default function GaugesPage() {
             );
           },
         },
-        {
-          header: "استان",
-          accessorKey: "CityName",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">استان</span>
-                <SelectColumnFilter
-                  initialFilters={[]}
-                  column={column}
-                  data={getPersonnls.data}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
+        // {
+        //   header: "استان",
+        //   accessorKey: "CityName",
+        //   filterFn: "arrIncludesSome",
+        //   Filter: ({ column }) => {
+        //     return (
+        //       <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+        //         <span className="font-bold text-primary">استان</span>
+        //         <SelectColumnFilter
+        //           initialFilters={[]}
+        //           column={column}
+        //           data={getPersonnls.data}
+        //           onChange={(filter) => {
+        //             // setDataFilters((prev) => {
+        //             //   return {
+        //             //     ...prev,
+        //             //     [filter.id]: filter.values,
+        //             //   };
+        //             // });
+        //           }}
+        //         />
+        //       </div>
+        //     );
+        //   },
+        // },
         {
           header: "نوع پروژه",
           accessorKey: "ProjectType",
