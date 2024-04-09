@@ -43,7 +43,7 @@ export function CitiesWithDatesPerformanceBarChart({
           return distinctPersonnelPerformanceData(
             data,
             ["Start_Date", "CityName"],
-            ["TotalPerformance"],
+            ["TotalPerformance", "COUNT"],
             { CityName: filters.filter.CityName },
           );
         },
@@ -78,7 +78,7 @@ export function CitiesWithDatesPerformanceBarChart({
               data={(getCitiesWithPerformance?.data ?? []).map((row) => {
                 return {
                   تاریخ: row.key.Start_Date,
-                  عملکرد: Math.round(row.TotalPerformance),
+                  عملکرد: Math.round(row.TotalPerformance / row.COUNT),
                 };
               })}
               bars={[
