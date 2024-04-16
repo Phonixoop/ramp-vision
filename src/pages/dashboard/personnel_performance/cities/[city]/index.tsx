@@ -214,6 +214,46 @@ export default function CityPage({ children, city }) {
             : [...new Array(10).map((a) => [undefined, a])]
         }
         selectProperty={"NameFamily"}
+        downloadFileName={`${getEnglishToPersianCity(
+          router.query.city,
+        )} عملکرد پرسنل شهر ${
+          reportPeriod === "ماهانه" && filters.filter.Start_Date.length == 1
+            ? moment(filters.filter.Start_Date[0], "jYYYY,jMM,jDD")
+                .locale("fa")
+                .format("YYYY jMMMM")
+            : filters.filter.Start_Date.join(",")
+        }`}
+        headers={[
+          { label: "عملکرد", key: "TotalPerformance" },
+          { label: "پرسنل", key: "NameFamily" },
+        ]}
+        dataToDownload={distinctPersonnelPerformanceData(
+          getAll?.data ?? [],
+          ["NationalCode", "NameFamily", "CityName"],
+          [
+            "NationalCode",
+            "NameFamily",
+            "SabtAvalieAsnad",
+            "PazireshVaSabtAvalieAsnad",
+            "ArzyabiAsanadBimarsetaniDirect",
+            "ArzyabiAsnadBimarestaniIndirect",
+            "ArzyabiAsnadDandanVaParaDirect",
+            "ArzyabiAsnadDandanVaParaIndirect",
+            "ArzyabiAsnadDaroDirect",
+            "ArzyabiAsnadDaroIndirect",
+            "WithScanCount",
+            "WithoutScanCount",
+            "WithoutScanInDirectCount",
+            "ArchiveDirectCount",
+            "ArchiveInDirectCount",
+            "Role",
+            "RoleType",
+            "ContractType",
+            "ProjectType",
+            "TotalPerformance",
+            "Start_Date",
+          ],
+        )}
         onChange={(updatedList) => {
           setUpdatedList(updatedList);
         }}

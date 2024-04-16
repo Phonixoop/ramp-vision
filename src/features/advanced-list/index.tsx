@@ -1,13 +1,14 @@
 import {
   ArrowDownAZIcon,
   ArrowUpAZIcon,
+  DownloadCloudIcon,
   EraserIcon,
   Tally5Icon,
 } from "lucide-react";
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
-
+import { CSVLink } from "react-csv";
 export default function AdvancedList({
   className = "",
   title = <></> || "",
@@ -16,6 +17,9 @@ export default function AdvancedList({
   isLoading = false,
   disabled = false,
   selectProperty = undefined,
+  downloadFileName = "",
+  headers = [],
+  dataToDownload = [],
 
   onChange = (action) => {},
   renderItem = (item, i) => <></>,
@@ -115,6 +119,18 @@ export default function AdvancedList({
           </div>
         )}
       </div>
+
+      <Button className="sticky bottom-1 w-full    bg-accent text-secondary">
+        <CSVLink
+          className="flex w-full justify-center gap-1 "
+          headers={headers}
+          data={dataToDownload}
+          filename={`${downloadFileName}.csv`}
+        >
+          <DownloadCloudIcon />
+          دانلود لیست
+        </CSVLink>
+      </Button>
     </div>
   );
 }
