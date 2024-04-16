@@ -215,7 +215,7 @@ export default function CityPage({ children, city }) {
         }
         selectProperty={"NameFamily"}
         downloadFileName={`${getEnglishToPersianCity(
-          router.query.city,
+          router.query.city as string,
         )} عملکرد پرسنل شهر ${
           reportPeriod === "ماهانه" && filters.filter.Start_Date.length == 1
             ? moment(filters.filter.Start_Date[0], "jYYYY,jMM,jDD")
