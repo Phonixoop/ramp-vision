@@ -7,6 +7,8 @@ export default function withConfirmation(Component) {
   return function WrappedComponent({
     withModal = true,
     title = "",
+    confirmText = "تایید",
+    cancelText = "لغو",
     onConfirm = (e) => {},
     ...rest
   }) {
@@ -35,6 +37,8 @@ export default function withConfirmation(Component) {
                     onReject={() => {
                       setIsOpen(false);
                     }}
+                    confirmText={confirmText}
+                    cancelText={cancelText}
                   />
                 </div>
               </Modal>
@@ -47,6 +51,8 @@ export default function withConfirmation(Component) {
                 onReject={() => {
                   setIsOpen(false);
                 }}
+                confirmText={confirmText}
+                cancelText={cancelText}
               />
             )}
           </>
@@ -61,7 +67,12 @@ export default function withConfirmation(Component) {
   };
 }
 
-function Content({ onConfirm = (e) => {}, onReject = (e) => {} }) {
+function Content({
+  onConfirm = (e) => {},
+  onReject = (e) => {},
+  confirmText = "تایید",
+  cancelText = "لغو",
+}) {
   return (
     <div className="flex gap-5">
       <div className="flex w-fit">
@@ -69,7 +80,7 @@ function Content({ onConfirm = (e) => {}, onReject = (e) => {} }) {
           onClick={(e) => onReject(e)}
           className="rounded-lg bg-primary px-7 text-secondary  hover:bg-primary/60"
         >
-          لغو
+          {cancelText}
         </Button>
       </div>
       <div className="flex w-fit">
@@ -79,7 +90,7 @@ function Content({ onConfirm = (e) => {}, onReject = (e) => {} }) {
           }}
           className=" rounded-lg bg-secondary px-6 text-primary ring-1 ring-inset ring-accent hover:bg-secbuttn  hover:text-primbuttn"
         >
-          تایید
+          {confirmText}
         </Button>
       </div>
     </div>

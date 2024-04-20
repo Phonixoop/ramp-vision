@@ -4,7 +4,6 @@ import { api } from "~/utils/api";
 import {
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
-  sparkChartForPersonnelAndCity,
 } from "~/utils/personnel-performance";
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 

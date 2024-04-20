@@ -1,6 +1,6 @@
 import { AreaChart, BarChart, SparkAreaChart } from "@tremor/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
-import moment from "jalali-moment";
+import moment, { Moment } from "jalali-moment";
 import {
   Contact2Icon,
   MinusIcon,
@@ -9,6 +9,7 @@ import {
   TrendingUpIcon,
 } from "lucide-react";
 import { InferGetStaticPropsType, NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { use, useEffect, useMemo, useState } from "react";
@@ -36,14 +37,16 @@ import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performanc
 import Gauge from "~/features/gauge";
 import ToolTipSimple from "~/features/tooltip-simple-use";
 import { TrendDecider } from "~/features/trend-decider";
+import UseUserManager from "~/hooks/userManager";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
-import { CityWithPerformanceData } from "~/types";
+import { CityWithPerformanceData, Permission } from "~/types";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
+import withConfirmation from "~/ui/with-confirmation";
 
 import { api } from "~/utils/api";
 import { getMonthNumber } from "~/utils/date-utils";
@@ -51,7 +54,7 @@ import {
   distinctPersonnelPerformanceData,
   getMonthNamesFromJOINED_date_strings,
   getPerformanceMetric,
-  sparkChartForPersonnelAndCity,
+  sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
 import {
   DistinctData,
@@ -59,10 +62,16 @@ import {
   commify,
   getEnglishToPersianCity,
   getPerformanceText,
+  getPersianToEnglishCity,
   processDataForChart,
 } from "~/utils/util";
 
+const ButtonWithConfirmation = withConfirmation(Button);
+
 export default function CityPage({ children, city }) {
+  const { session, hasManagePersonnelAccess } = UseUserManager();
+  const utils = api.useContext();
+
   const router = useRouter();
   const {
     filters,
@@ -118,8 +127,10 @@ export default function CityPage({ children, city }) {
             "ProjectType",
             "TotalPerformance",
             "Start_Date",
+            "HasTheDayOff",
             "COUNT",
           ],
+          { HasTheDayOff: false },
         );
 
         setUpdatedList(result);
@@ -206,7 +217,9 @@ export default function CityPage({ children, city }) {
             "ProjectType",
             "TotalPerformance",
             "Start_Date",
+            "HasTheDayOff",
           ],
+          { HasTheDayOff: false },
         )}
         filteredList={
           !getAll.isLoading
@@ -252,7 +265,9 @@ export default function CityPage({ children, city }) {
             "ProjectType",
             "TotalPerformance",
             "Start_Date",
+            "HasTheDayOff",
           ],
+          { HasTheDayOff: false },
         )}
         onChange={(updatedList) => {
           setUpdatedList(updatedList);
@@ -283,11 +298,12 @@ export default function CityPage({ children, city }) {
           // ||
           // user.NationalCode === router.query.personnel;
 
-          const sparkData = sparkChartForPersonnelAndCity(
+          const sparkData = sparkChartForPersonnel(
             getAll?.data?.result,
             "NameFamily",
             user.NameFamily,
           );
+
           return (
             <>
               <Button
@@ -308,7 +324,7 @@ export default function CityPage({ children, city }) {
                   // );
                   setSelectedPerson({
                     ...user,
-                    sparkData: sparkChartForPersonnelAndCity(
+                    sparkData: sparkChartForPersonnel(
                       getAll?.data?.result,
                       "NameFamily",
                       user.NameFamily,
@@ -456,70 +472,80 @@ export default function CityPage({ children, city }) {
                         userCalData?.TotalPerformance,
                       );
 
+                      const hasTheDayOff = getAll?.data?.result.find(
+                        (a) =>
+                          a.Start_Date === date.format("YYYY/MM/DD") &&
+                          a.NationalCode === selectedPerson.key.NationalCode,
+                      )?.HasTheDayOff;
+
                       return (
                         <>
                           {parseInt(date.format("M")) !== monthNumber + 1 ? (
-                            <ToolTipSimple
-                              className="bg-secondary"
-                              tooltip={
-                                <span
-                                  style={{
-                                    color: userCalData
-                                      ? userMetric.color
-                                      : undefined,
-                                  }}
-                                  className="text-base "
-                                >
-                                  {userCalData?.TotalPerformance.toFixed(2)}
-                                </span>
-                              }
-                            >
-                              <span
-                                className={twMerge(
-                                  "flex items-center justify-center text-xs text-primary/50 ",
+                            <span
+                              className={twMerge(
+                                "flex items-center justify-center text-xs text-primary/50 ",
 
-                                  `h-6 w-6 rounded-full `,
-                                )}
-                                style={{
-                                  backgroundColor: userCalData
-                                    ? userMetric.color
-                                    : undefined,
-                                }}
-                              >
-                                {date.format("D")}
-                              </span>
-                            </ToolTipSimple>
+                                `h-6 w-6 rounded-full `,
+                              )}
+                              style={{
+                                backgroundColor: userCalData
+                                  ? userMetric.color
+                                  : undefined,
+                              }}
+                            >
+                              {date.format("D")}
+                            </span>
                           ) : (
-                            <ToolTipSimple
-                              className="bg-secondary"
-                              tooltip={
-                                <span
-                                  style={{
-                                    color: userCalData
-                                      ? userMetric.color
-                                      : undefined,
-                                  }}
-                                  className="text-base "
-                                >
-                                  {userCalData?.TotalPerformance.toFixed(2)}
-                                </span>
-                              }
-                            >
-                              <span
-                                className={twMerge(
-                                  "flex items-center justify-center text-xs text-primary ",
-
-                                  `h-6 w-6 rounded-full `,
-                                )}
-                                style={{
-                                  backgroundColor: userCalData
-                                    ? userMetric.color
-                                    : undefined,
-                                }}
+                            <>
+                              <ToolTipSimple
+                                className="cursor-default bg-secondary"
+                                tooltip={
+                                  <span
+                                    style={{
+                                      color: userCalData
+                                        ? userMetric.color
+                                        : undefined,
+                                    }}
+                                    className="text-base text-primary "
+                                  >
+                                    {hasTheDayOff
+                                      ? "مرخصی"
+                                      : userCalData?.TotalPerformance.toFixed(
+                                          2,
+                                        )}
+                                  </span>
+                                }
                               >
-                                {date.format("D")}
-                              </span>
-                            </ToolTipSimple>
+                                {/* {hasTheDayOff ? "yes" : "no"} */}
+                                {hasManagePersonnelAccess ? (
+                                  <TogglePersonelDayOffButton
+                                    hasTheDayOff={hasTheDayOff}
+                                    selectedPerson={selectedPerson}
+                                    date={date}
+                                    userCalData={userCalData}
+                                    userMetric={userMetric}
+                                  />
+                                ) : (
+                                  <span
+                                    className={twMerge(
+                                      "flex cursor-default items-center justify-center text-xs ",
+
+                                      `h-6 w-6 rounded-full `,
+                                      hasTheDayOff === true
+                                        ? "bg-white text-secondary"
+                                        : "bg-secondary  text-primary",
+                                    )}
+                                    style={{
+                                      backgroundColor: userCalData
+                                        ? userMetric.color
+                                        : undefined,
+                                    }}
+                                  >
+                                    {date.format("D")}
+                                  </span>
+                                )}
+                              </ToolTipSimple>
+                            </>
                           )}
                         </>
                       );
@@ -591,6 +617,68 @@ export default function CityPage({ children, city }) {
         </div>
       </div>
     </CitiesPage>
+  );
+}
+
+type TogglePersonelDayOffButton = {
+  hasTheDayOff: boolean;
+  selectedPerson: any;
+  date: Moment;
+  userCalData: string;
+  userMetric: {
+    limit: number;
+    color: string;
+    tooltip: {
+      text: string;
+    };
+  };
+};
+function TogglePersonelDayOffButton({
+  hasTheDayOff,
+  selectedPerson,
+  date,
+  userCalData,
+  userMetric,
+}: TogglePersonelDayOffButton) {
+  const utils = api.useContext();
+  const togglePersonnelDayOffMutation =
+    api.personnelPerformance.togglePersonnelDayOff.useMutation();
+
+  const textForDayOff = `آیا میخواهید این روز را مرخصی رد کنید؟`;
+  const textForDayOn = `آیا میخواهید این روز را مرخصی بودن خارج کنید؟`;
+  return (
+    <>
+      <ButtonWithConfirmation
+        title={hasTheDayOff ? textForDayOn : textForDayOff}
+        confirmText="بله"
+        cancelText="خیر"
+        className={twMerge(
+          " p-2",
+          hasTheDayOff === true ? "bg-white text-secondary" : "bg-secondary",
+        )}
+        onConfirm={() => {
+          togglePersonnelDayOffMutation.mutate({
+            date: date.format("YYYY/MM/DD"),
+            nationalCode: selectedPerson.key.NationalCode,
+            cityName: getPersianToEnglishCity(selectedPerson.key.CityName),
+            nameFamily: selectedPerson.key.NameFamily,
+          });
+        }}
+      >
+        <span
+          className={twMerge(
+            "flex items-center justify-center text-xs text-inherit ",
+
+            `h-6 w-6 rounded-full `,
+          )}
+          style={{
+            backgroundColor: userCalData ? userMetric.color : undefined,
+          }}
+        >
+          {date.format("D")}
+        </span>
+      </ButtonWithConfirmation>
+    </>
   );
 }
 

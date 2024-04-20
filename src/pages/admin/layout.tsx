@@ -31,6 +31,12 @@ const menuList = [
     description: `در این بخش می توانید سمت های مد نظر خود را بسازید تا در بخش کاربر ها برای آن ها اعمال کنید`,
     link: "roles",
   },
+
+  {
+    value: "پرسنل",
+    description: `در این بخش می توانید بر روی پرسنل ویرایش های لازم را انجام دهید`,
+    link: "personnel",
+  },
 ];
 
 export default function AdminMainLayout({ children }: any): any {

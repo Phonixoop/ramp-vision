@@ -175,20 +175,35 @@ function mapToCitiesWithPerformance({
   });
 }
 
-export function sparkChartForPersonnelAndCity(
+export function sparkChartForPersonnel(
   data = [],
   propertyToCheck,
   valueToCheck,
 ) {
   return data
-    ?.filter((a) => a[propertyToCheck] === valueToCheck)
+    ?.filter(
+      (a) => a[propertyToCheck] === valueToCheck && a.HasTheDayOff === false,
+    )
     .map((item) => {
-      const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+      // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
       return {
-        TotalPerformance: isThursday
-          ? calculatePerformance(item, 1, 2)
-          : item.TotalPerformance,
+        TotalPerformance: item.TotalPerformance,
+        Start_Date: item.Start_Date,
+        Benchmark: 75,
+        Benchmark2: 120,
+      };
+    });
+}
+
+export function sparkChartForCity(data = [], propertyToCheck, valueToCheck) {
+  return data
+    ?.filter((a) => a[propertyToCheck] === valueToCheck)
+    .map((item) => {
+      // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+
+      return {
+        TotalPerformance: item.TotalPerformance,
         Start_Date: item.Start_Date,
         Benchmark: 75,
         Benchmark2: 120,

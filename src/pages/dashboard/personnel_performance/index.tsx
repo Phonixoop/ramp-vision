@@ -205,8 +205,9 @@ function PersonnelPerformanceTable({ sessionData }) {
           "TotalPerformance",
           "Start_Date",
           "DateInfo",
+          "HasTheDayOff",
         ],
-        {},
+        { HasTheDayOff: false },
       ),
     [personnelPerformance.data],
   );

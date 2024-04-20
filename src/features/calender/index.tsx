@@ -80,7 +80,7 @@ export default function Calender({
     ),
   );
   return (
-    <div className="grid w-full  gap-10 px-2 py-10">
+    <div className="grid w-full  gap-10 p-2 ">
       {withMonthMenu && (
         <LayoutGroup id="months-InPageMenu">
           <InPageMenu
@@ -117,7 +117,7 @@ export default function Calender({
             item.locale("fa").format("D MMMM yyyy");
           return (
             <>
-              <button
+              {/* <button
                 onClick={() => onClick(item)}
                 key={i}
                 disabled={item
@@ -133,8 +133,9 @@ export default function Calender({
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/75  "></span>
                   </span>
                 )}
-                {onDate(item, calendar[16].jMonth())}
-              </button>
+              
+              </button> */}
+              {onDate(item, calendar[16].jMonth())}
             </>
           );
         })}

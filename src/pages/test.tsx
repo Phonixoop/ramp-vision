@@ -1,9 +1,10 @@
 import { AreaChart, Card, Title } from "@tremor/react";
 import moment from "jalali-moment";
 import { twMerge } from "tailwind-merge";
-import { validDateBeforeToScrewThem } from "~/constants";
+import { PERMISSIONS, validDateBeforeToScrewThem } from "~/constants";
 import Calender from "~/features/calender";
 import CustomPieChart from "~/features/custom-charts/pie-chart";
+import { getUserPermissions, UserPermissions } from "~/lib/user.util";
 
 import H2 from "~/ui/heading/h2";
 import {
@@ -120,6 +121,12 @@ const result = distinctPersonnelPerformanceData(
 );
 
 // console.log(JSON.stringify(result, null, 2));
+// Example usage
+const userPermissions: UserPermissions = getUserPermissions(PERMISSIONS);
+
+// Accessing specific permissions
+console.log(userPermissions.ViewAdmin); // true or false
+console.log(userPermissions.ViewCharts); // true or false
 
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);

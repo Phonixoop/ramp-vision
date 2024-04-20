@@ -52,8 +52,7 @@ import ResponsiveView from "~/features/responsive-view";
 import { TrendDecider } from "~/features/trend-decider";
 import {
   distinctDataAndCalculatePerformance,
-  calculatePerformance,
-  sparkChartForPersonnelAndCity,
+  sparkChartForCity,
 } from "~/utils/personnel-performance";
 import { CityWithPerformanceData } from "~/types";
 import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
@@ -481,7 +480,7 @@ export default function CitiesPage({ children }) {
                     </div>
                     <div className="flex w-full  items-center justify-center">
                       <SparkAreaChart
-                        data={sparkChartForPersonnelAndCity(
+                        data={sparkChartForCity(
                           getCitiesWithPerformance?.data?.result ?? [],
                           "CityName",
                           item.CityName_En,

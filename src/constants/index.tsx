@@ -174,6 +174,12 @@ export const PERMISSIONS: Permission[] = [
     id: "ManageUsers",
     isActive: false,
     enLabel: "Manage Users",
+    faLabel: "مدیریت کاربر ها",
+  },
+  {
+    id: "ManagePersonnel",
+    isActive: false,
+    enLabel: "Manage Personnel",
     faLabel: "مدیریت پرسنل",
   },
   {

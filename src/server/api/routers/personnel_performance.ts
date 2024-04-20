@@ -19,6 +19,7 @@ import {
   defaultProjectTypes,
   defualtDateInfos,
 } from "~/constants/personnel-performance";
+import { getUserPermissions } from "~/lib/user.util";
 
 const config = {
   user: process.env.SQL_USER,
@@ -83,7 +84,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         //   );
 
         let queryStart = `
-        SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
+        SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
         
         SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
         SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
@@ -111,7 +112,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "هفتگی") {
@@ -123,11 +124,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date
+          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "ماهانه") {
-          queryStart = `SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,
+          queryStart = `SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
         
           SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
           SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
@@ -163,7 +164,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
             `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}') AND `,
           );
 
-          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date
+          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
             
           Order By CityName,NameFamily `;
           // const date = filter.Start_Date[0].split("/");
@@ -192,7 +193,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -688,6 +689,113 @@ export const personnelPerformanceRouter = createTRPCRouter({
         console.error("Error fetching data:", error.message);
         return error;
       }
+    }),
+
+  togglePersonnelDayOff: protectedProcedure
+    .input(
+      z.object({
+        cityName: z.string(),
+        nameFamily: z.string(),
+        nationalCode: z.string(),
+        date: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const permissions = await getPermission({ ctx });
+      if (!getUserPermissions(permissions).ManagePersonnel)
+        throw new Error("You dont have permission to Manage Personnel");
+
+      //   update personnel_performance set HasTheDayOff = 1 where NationalCode = '1381128971' and Start_Date = '1403/01/25'
+      // const updateHasTheDayOffQuery = `
+
+      // UPDATE personnel_performance
+      // SET HasTheDayOff = CASE WHEN HasTheDayOff = 1 THEN 0 ELSE 1 END
+      // WHERE NationalCode = '${input.nationalCode}' AND Start_Date = '${input.date}';
+
+      // `;
+      console.log({ input });
+      const updateHasTheDayOffQuery = `
+      
+      use RAMP_Daily
+
+      IF NOT EXISTS (
+        SELECT 1 
+        FROM personnel_performance 
+        WHERE NationalCode = '${input.nationalCode}' 
+          AND Start_Date = '${input.date}'
+          AND CityName = '${input.cityName}'
+    )
+    BEGIN
+        -- Insert new record
+        INSERT INTO personnel_performance 
+                   ([NameFamily], 
+                    [NationalCode], 
+                    [CityName], 
+                    [ArzyabiAsanadBimarsetaniDirect], 
+                    [ArzyabiAsnadBimarestaniIndirect], 
+                    [ArzyabiAsnadDaroDirect], 
+                    [ArzyabiAsnadDaroIndirect], 
+                    [ArzyabiAsnadDandanVaParaDirect], 
+                    [ArzyabiAsnadDandanVaParaIndirect], 
+                    [PazireshVaSabtAvalieAsnad], 
+                    [SabtAvalieAsnad], 
+                    [WithScanCount], 
+                    [WithoutScanCount], 
+                    [WithoutScanInDirectCount], 
+                    [DirectPerFormance], 
+                    [IndirectPerFormance], 
+                    [TotalPerformance], 
+                    [Start_Date], 
+                    [End_Date], 
+                    [CreatedAtPersian], 
+                    [ArchiveDirectCount], 
+                    [ArchiveInDirectCount], 
+                    [HasTheDayOff])
+        VALUES (N'${input.nameFamily}', 
+                '${input.nationalCode}', 
+                '${input.cityName}', 
+                0, 
+               0, 
+               0, 
+               0, 
+               0, 
+               0, 
+               0, 
+               0, 
+               0, 
+           0, 
+               0, 
+               0, 
+               0, 
+               0, 
+                '${input.date}', 
+                '${input.date}', 
+                '', 
+               0, 
+               0, 
+               1); -- Assuming default value for HasTheDayOff is 1
+    END
+    ELSE
+    BEGIN
+        -- Toggle update
+        UPDATE personnel_performance
+        SET HasTheDayOff = CASE 
+            WHEN HasTheDayOff = 0 THEN 1
+            WHEN HasTheDayOff = 1 THEN 0
+            ELSE HasTheDayOff
+        END
+        WHERE NationalCode = '${input.nationalCode}' 
+          AND Start_Date = '${input.date}'
+          AND CityName = '${input.cityName}'
+    END
+    
+      
+      `;
+
+      console.log(updateHasTheDayOffQuery);
+      const reuslt = await sql.query(updateHasTheDayOffQuery);
+
+      return reuslt;
     }),
 });
 

@@ -1,10 +1,10 @@
 import React from "react";
 import AdminMainLayout from "~/pages/admin/layout";
 
-export default function SettingsPage() {
+export default function PersonnelPage() {
   return (
     <AdminMainLayout>
-      <div>SettingsPage</div>
+      <div>PersonnelPage</div>
     </AdminMainLayout>
   );
 }

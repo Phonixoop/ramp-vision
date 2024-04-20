@@ -5,7 +5,7 @@ import {
   distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
-  sparkChartForPersonnelAndCity,
+  sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 
@@ -222,12 +222,14 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
         "ContractType",
         "ProjectType",
         "TotalPerformance",
+        "HasTheDayOff",
       ],
+      { HasTheDayOff: false },
     );
   }, [getCitysUsersPerformance?.data]);
 
   const selectedUserData = useMemo(() => {
-    return sparkChartForPersonnelAndCity(
+    return sparkChartForPersonnel(
       getCitysUsersPerformance?.data?.result,
       "NameFamily",
       router.query.NameFamily,
