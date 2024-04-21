@@ -1,9 +1,9 @@
-import SearchIcon from "ui/icons/searchs";
+import { SearchIcon } from "lucide-react";
 
 export default function SearchField({
   value = "",
   title = "",
-  onChange = () => {},
+  onChange = (value) => {},
 }) {
   return (
     <div dir="rtl" className="flex w-full rounded-xl bg-gray-50/80">
