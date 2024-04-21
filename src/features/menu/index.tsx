@@ -130,7 +130,16 @@ function MenuItem({
     </Link>
   );
 }
-
+type InPageMenuType = {
+  className?: string;
+  startIndex?: number;
+  index?: number;
+  list?: Array<any>;
+  onChange?: (value) => {
+    item: any;
+    index: number;
+  };
+};
 export function InPageMenu({
   className = "",
   startIndex = -1,

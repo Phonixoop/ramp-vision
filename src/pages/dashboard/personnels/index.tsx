@@ -1,5 +1,5 @@
 import { LayoutGroup } from "framer-motion";
-import moment from "jalali-moment";
+import moment, { Moment } from "jalali-moment";
 import React, { useMemo, useState } from "react";
 import DatePicker from "react-multi-date-picker";
 import { CITIES, City_Levels, Reports_Period } from "~/constants";
@@ -22,14 +22,32 @@ import {
   en,
   getEnglishToPersianCity,
   getPerformanceText,
+  getPersianToEnglishCity,
 } from "~/utils/util";
 import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
 import H2 from "~/ui/heading/h2";
 import Gauge from "~/features/gauge";
 import Table from "~/features/table";
 import { ColumnDef } from "@tanstack/react-table";
-import { defaultProjectTypes } from "~/constants/personnel-performance";
+import {
+  defaultProjectTypes,
+  defualtDateInfos,
+} from "~/constants/personnel-performance";
+import UseUserManager from "~/hooks/userManager";
+import Calender from "~/features/calender";
+import { getMonthNumber } from "~/utils/date-utils";
+import {
+  distinctPersonnelPerformanceData,
+  getPerformanceMetric,
+  sparkChartForPersonnel,
+} from "~/utils/personnel-performance";
+import { twMerge } from "tailwind-merge";
+import ToolTipSimple from "~/features/tooltip-simple-use";
+import withConfirmation from "~/ui/with-confirmation";
+import Modal from "~/ui/modals";
+import { Loader2Icon } from "lucide-react";
 export default function GaugesPage() {
+  const { hasManagePersonnelAccess } = UseUserManager();
   const [filters, setFilters] = useState({
     filter: {
       CityName: [],
@@ -58,6 +76,7 @@ export default function GaugesPage() {
     },
   );
 
+  const [personnel, setPersonnel] = useState<Personnel | undefined>(undefined);
   const columns =
     useMemo<ColumnDef<any>[]>(
       () => [
@@ -323,6 +342,17 @@ export default function GaugesPage() {
       >
         <div className="mx-auto flex w-11/12 flex-col-reverse items-center justify-between  gap-5  py-5 md:flex-row-reverse md:items-start">
           <Table
+            hasClickAction={hasManagePersonnelAccess}
+            onClick={(row) => {
+              if (!hasManagePersonnelAccess) return;
+              const { original } = row;
+              setPersonnel({
+                cityName: original.CityName,
+                dateInfo: original.DateInfo,
+                nameFamily: original.NameFamily,
+                nationalCode: original.NationalCode,
+              });
+            }}
             isLoading={getPersonnls.isLoading}
             data={getPersonnls.data ?? []}
             columns={columns}
@@ -330,8 +360,270 @@ export default function GaugesPage() {
               return <></>;
             }}
           />
+
+          <Modal
+            center
+            isOpen={!!personnel}
+            onClose={() => {
+              setPersonnel(undefined);
+            }}
+          >
+            <SetPersonnelDayOffWizard personnel={personnel} />
+          </Modal>
         </div>
       </div>
+    </>
+  );
+}
+
+type Personnel = {
+  cityName: string;
+  nameFamily: string;
+  nationalCode: string;
+  dateInfo: string;
+};
+export function SetPersonnelDayOffWizard({
+  personnel,
+}: {
+  personnel: Personnel;
+}) {
+  const getAll = api.personnelPerformance.getAll.useQuery(
+    {
+      filter: {
+        CityName: [personnel.cityName],
+        Start_Date: [
+          moment().locale("fa").add(-1, "month").format("YYYY/MM/DD"),
+        ],
+        NameFamily: [personnel.nameFamily],
+
+        DateInfo: [personnel.dateInfo],
+      },
+      periodType: "ماهانه",
+    },
+    {
+      onSuccess: (data) => {
+        // setSelectedPerson(undefined);
+
+        const result = distinctPersonnelPerformanceData(
+          data ?? [],
+          ["NationalCode", "NameFamily", "CityName"],
+          [
+            "NationalCode",
+            "NameFamily",
+            "SabtAvalieAsnad",
+            "PazireshVaSabtAvalieAsnad",
+            "ArzyabiAsanadBimarsetaniDirect",
+            "ArzyabiAsnadBimarestaniIndirect",
+            "ArzyabiAsnadDandanVaParaDirect",
+            "ArzyabiAsnadDandanVaParaIndirect",
+            "ArzyabiAsnadDaroDirect",
+            "ArzyabiAsnadDaroIndirect",
+            "WithScanCount",
+            "WithoutScanCount",
+            "WithoutScanInDirectCount",
+            "ArchiveDirectCount",
+            "ArchiveInDirectCount",
+            "Role",
+            "RoleType",
+            "ContractType",
+            "ProjectType",
+            "TotalPerformance",
+            "Start_Date",
+            "HasTheDayOff",
+            "COUNT",
+          ],
+          { HasTheDayOff: false },
+        );
+        return result;
+        // const sparkData = sparkChartForPersonnel(
+        //   result,
+        //   "NameFamily",
+        //   selectedPerson.NameFamily,
+        // );
+        // setSelectedPerson({
+        //   ...selectedPerson,
+        //   sparkData,
+        // });
+      },
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  if (getAll.isLoading)
+    return (
+      <>
+        <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
+          <Loader2Icon className="h-12 w-12 animate-spin stroke-accent" />
+        </div>
+      </>
+    );
+  const sparkData = sparkChartForPersonnel(
+    getAll?.data?.result ?? [],
+    "NameFamily",
+    personnel.nameFamily,
+  );
+  return (
+    <>
+      <div dir="rtl" className="col-span-2 w-full">
+        <Calender
+          withMonthMenu
+          defaultMonth={moment().jMonth()}
+          // year={moment().jYear()}
+          onDate={(date, monthNumber) => {
+            const userCalData = sparkData.find(
+              (d) => d.Start_Date === date.format("YYYY/MM/DD"),
+            );
+            const userMetric = getPerformanceMetric(
+              userCalData?.TotalPerformance,
+            );
+
+            const hasTheDayOff = getAll?.data?.result.find(
+              (a) =>
+                a.Start_Date === date.format("YYYY/MM/DD") &&
+                a.NationalCode === personnel.nationalCode,
+            )?.HasTheDayOff;
+
+            return (
+              <>
+                {/* {date.format("YYYY/MM/DD")} */}
+                {parseInt(date.format("M")) !== monthNumber + 1 ? (
+                  <span
+                    className={twMerge(
+                      "flex w-full items-center justify-center p-2 text-xs text-primary/50 ",
+
+                      `w-full rounded-full `,
+                    )}
+                    style={{
+                      backgroundColor: userCalData
+                        ? userMetric.color
+                        : undefined,
+                    }}
+                  >
+                    {date.format("D")}
+                  </span>
+                ) : (
+                  <>
+                    <ToolTipSimple
+                      className="cursor-default bg-secondary"
+                      tooltip={
+                        <span
+                          style={{
+                            color: userCalData ? userMetric.color : undefined,
+                          }}
+                          className="text-base text-primary "
+                        >
+                          {hasTheDayOff
+                            ? "مرخصی"
+                            : userCalData?.TotalPerformance.toFixed(2)}
+                        </span>
+                      }
+                    >
+                      {/* {hasTheDayOff ? "yes" : "no"} */}
+                      {
+                        <TogglePersonelDayOffButton
+                          hasTheDayOff={hasTheDayOff}
+                          selectedPerson={{
+                            cityName: personnel.cityName,
+                            nameFamily: personnel.nameFamily,
+                            nationalCode: personnel.nationalCode,
+                            dateInfo: personnel.dateInfo,
+                          }}
+                          date={date}
+                          userCalData={userCalData}
+                          userMetric={userMetric}
+                        />
+                      }
+                    </ToolTipSimple>
+                  </>
+                )}
+              </>
+            );
+          }}
+        />
+      </div>
+    </>
+  );
+}
+type TogglePersonelDayOffButton = {
+  hasTheDayOff: boolean;
+  selectedPerson: {
+    cityName: string;
+    nationalCode: string;
+    nameFamily: string;
+    dateInfo: string;
+  };
+  date: Moment;
+  userCalData: any;
+  userMetric: {
+    limit: number;
+    color: string;
+    tooltip: {
+      text: string;
+    };
+  };
+};
+const ButtonWithConfirmation = withConfirmation(Button);
+export function TogglePersonelDayOffButton({
+  hasTheDayOff,
+  selectedPerson,
+  date,
+  userCalData,
+  userMetric,
+}: TogglePersonelDayOffButton) {
+  const utils = api.useContext();
+
+  const togglePersonnelDayOffMutation =
+    api.personnelPerformance.togglePersonnelDayOff.useMutation({
+      onSuccess(data, variables, context) {
+        utils.personnelPerformance.getAll.invalidate({
+          filter: {
+            CityName: [selectedPerson.cityName],
+            Start_Date: [
+              moment().locale("fa").add(-1, "month").format("YYYY/MM/DD"),
+            ],
+            NameFamily: [selectedPerson.nameFamily],
+
+            DateInfo: [selectedPerson.dateInfo],
+          },
+          periodType: "ماهانه",
+        });
+      },
+    });
+
+  const textForDayOff = `آیا میخواهید این روز را مرخصی رد کنید؟`;
+  const textForDayOn = `آیا میخواهید این روز را مرخصی بودن خارج کنید؟`;
+  return (
+    <>
+      <ButtonWithConfirmation
+        title={hasTheDayOff ? textForDayOn : textForDayOff}
+        confirmText="بله"
+        cancelText="خیر"
+        className={twMerge(
+          " w-full p-2",
+          hasTheDayOff === true ? "bg-white text-secondary" : "bg-secondary",
+        )}
+        onConfirm={async () => {
+          await togglePersonnelDayOffMutation.mutate({
+            date: date.format("YYYY/MM/DD"),
+            nationalCode: selectedPerson.nationalCode,
+            cityName: getPersianToEnglishCity(selectedPerson.cityName),
+            nameFamily: selectedPerson.nameFamily,
+          });
+        }}
+      >
+        <span
+          className={twMerge(
+            "flex items-center justify-center text-xs text-inherit ",
+
+            `h-6 w-6 rounded-full `,
+          )}
+          style={{
+            backgroundColor: userCalData ? userMetric.color : undefined,
+          }}
+        >
+          {date.format("D")}
+        </span>
+      </ButtonWithConfirmation>
     </>
   );
 }

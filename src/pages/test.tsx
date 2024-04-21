@@ -128,6 +128,29 @@ const userPermissions: UserPermissions = getUserPermissions(PERMISSIONS);
 console.log(userPermissions.ViewAdmin); // true or false
 console.log(userPermissions.ViewCharts); // true or false
 
+function getStartOfMonth(monthNumber, year) {
+  // Check if the month number is valid (1 to 12)
+  if (monthNumber < 1 || monthNumber > 12) {
+    monthNumber = moment().jMonth();
+  }
+
+  // If year is not provided, use the current year
+  year = year || moment().jYear();
+
+  // Create a moment object for the given month and year
+  const startOfMonth = moment({ year, month: monthNumber - 1 }).startOf(
+    "jMonth",
+  );
+
+  return startOfMonth;
+}
+
+console.log({
+  start: moment({ year: 1403, month: 3 })
+    .startOf("jMonth")
+    .format("YYYY-MM-jDD"),
+});
+
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (

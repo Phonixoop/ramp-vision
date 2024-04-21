@@ -634,9 +634,13 @@ export default function CityPage({ children, city }) {
 
 type TogglePersonelDayOffButton = {
   hasTheDayOff: boolean;
-  selectedPerson: any;
+  selectedPerson: {
+    cityName: string;
+    nationalCode: string;
+    nameFamily: string;
+  };
   date: Moment;
-  userCalData: string;
+  userCalData: any;
   userMetric: {
     limit: number;
     color: string;
@@ -645,7 +649,7 @@ type TogglePersonelDayOffButton = {
     };
   };
 };
-function TogglePersonelDayOffButton({
+export function TogglePersonelDayOffButton({
   hasTheDayOff,
   selectedPerson,
   date,
@@ -653,7 +657,7 @@ function TogglePersonelDayOffButton({
   userMetric,
 }: TogglePersonelDayOffButton) {
   const utils = api.useContext();
-  const { setSelectedPerson } = usePersonnelFilter();
+
   const togglePersonnelDayOffMutation =
     api.personnelPerformance.togglePersonnelDayOff.useMutation();
 
@@ -672,9 +676,9 @@ function TogglePersonelDayOffButton({
         onConfirm={async () => {
           togglePersonnelDayOffMutation.mutate({
             date: date.format("YYYY/MM/DD"),
-            nationalCode: selectedPerson.key.NationalCode,
-            cityName: getPersianToEnglishCity(selectedPerson.key.CityName),
-            nameFamily: selectedPerson.key.NameFamily,
+            nationalCode: selectedPerson.nationalCode,
+            cityName: getPersianToEnglishCity(selectedPerson.cityName),
+            nameFamily: selectedPerson.nameFamily,
           });
           const person = selectedPerson;
           await utils.personnelPerformance.getAll.invalidate();

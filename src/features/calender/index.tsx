@@ -87,15 +87,15 @@ export default function Calender({
             className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
             startIndex={moment().locale("fa").month()}
             list={MONTHS}
-            onChange={(monthNumber) => {
+            onChange={(value: { item: any; index: number }) => {
               const newCalendar = getMonthDays(
-                moment().jMonth(monthNumber).locale("fa"),
+                moment().jMonth(value.index).locale("fa"),
               );
               setCalender(newCalendar);
-              onMonthChange(
-                newCalendar.at(0),
-                newCalendar.at(newCalendar.length - 1),
-              );
+              // onMonthChange(
+              //   newCalendar.at(0),
+              //   newCalendar.at(newCalendar.length - 1),
+              // );
             }}
           />
         </LayoutGroup>
