@@ -5,7 +5,7 @@ export default function TextField({
   children = <></> || "",
 
   className = ``,
-  value = "",
+  value,
   placeholder = " ",
   isRtl = true,
   min = 0,
@@ -90,7 +90,7 @@ export default function TextField({
         opacity-0
         duration-300
        peer-placeholder-shown:scale-100
-         peer-focus:text-secondary
+         peer-focus:text-primary
         mobileMax:peer-focus:opacity-100 
        "
       >

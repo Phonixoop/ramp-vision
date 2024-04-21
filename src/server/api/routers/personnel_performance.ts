@@ -193,7 +193,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -792,7 +792,6 @@ export const personnelPerformanceRouter = createTRPCRouter({
       
       `;
 
-      console.log(updateHasTheDayOffQuery);
       const reuslt = await sql.query(updateHasTheDayOffQuery);
 
       return reuslt;

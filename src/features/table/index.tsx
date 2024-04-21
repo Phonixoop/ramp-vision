@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import {
   RefObject,
+  useDeferredValue,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -28,7 +29,28 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
+  FilterFn,
 } from "@tanstack/react-table";
+
+import {
+  RankingInfo,
+  rankItem,
+  compareItems,
+} from "@tanstack/match-sorter-utils";
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value);
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  });
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed;
+};
+
 import { useVirtual } from "@tanstack/react-virtual";
 
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
@@ -37,6 +59,9 @@ import H2 from "~/ui/heading/h2";
 import { twMerge } from "tailwind-merge";
 import ResponsiveView from "~/features/responsive-view";
 import Button from "~/ui/buttons";
+import TextField from "~/ui/forms/text-field";
+import withLabel from "~/ui/forms/with-label";
+import useDebounce from "~/hooks/useDebounce";
 
 type Props = {
   isLoading?: boolean;
@@ -65,14 +90,19 @@ export default function Table({
   renderAfterFilterView = (rows) => <></>,
 }: Props) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
+  const [globalFilter, setGlobalFilter] = useState("");
   const table = useReactTable({
     data: data,
     columns,
 
     state: {
       columnFilters,
+      globalFilter,
     },
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
+
     onColumnFiltersChange: setColumnFilters,
 
     getCoreRowModel: getCoreRowModel(),
@@ -82,6 +112,8 @@ export default function Table({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
     // debugTable: true,
     // debugHeaders: true,
     // debugColumns: false,
@@ -176,233 +208,282 @@ export default function Table({
       >
         {renderChild(flatRows)}
 
-        <div className="relative flex  max-h-[50rem] w-full items-stretch justify-start py-10">
+        <div className="relative flex max-h-[50rem] w-full  flex-col items-stretch justify-start gap-5 py-10">
           {isLoading && (
             <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center backdrop-blur-xl">
               <Loader2Icon className="h-12 w-12 animate-spin stroke-accent" />
             </div>
           )}
-          <div
-            ref={tableContainerRef}
-            className=" w-full overflow-auto rounded-[20px] scrollbar-w-12 "
-          >
-            <table
-              // style={{ height: `${totalSize}px` }}
-              // {...getTableProps()}
-              className=" sticky top-0 w-full overflow-hidden overflow-y-auto  text-center "
+          {!isLoading && (
+            <div className="m-auto flex w-full justify-start p-2">
+              <DebouncedInput
+                value={globalFilter ?? " "}
+                onChange={(value) => setGlobalFilter(String(value))}
+                label="جستجو..."
+              />
+            </div>
+          )}
+          {!isLoading && (
+            <div
+              ref={tableContainerRef}
+              className=" w-full overflow-auto rounded-[20px] scrollbar-w-12 "
             >
-              <thead>
-                {
-                  // Loop over the header rows
-                  table.getHeaderGroups().map((headerGroup, i) => {
-                    // const { key, ...restHeaderGroupProps } =
-                    //   headerGroup.getHeaderGroupProps();
-                    let hasStickyCount = -1;
+              <table
+                // style={{ height: `${totalSize}px` }}
+                // {...getTableProps()}
+                className=" sticky top-0 w-full overflow-hidden overflow-y-auto  text-center "
+              >
+                <thead>
+                  {
+                    // Loop over the header rows
+                    table.getHeaderGroups().map((headerGroup, i) => {
+                      // const { key, ...restHeaderGroupProps } =
+                      //   headerGroup.getHeaderGroupProps();
+                      let hasStickyCount = -1;
+                      return (
+                        <tr
+                          className="text-center"
+                          key={headerGroup.id}
+                          // {...restHeaderGroupProps}
+                        >
+                          {
+                            // Loop over the headers in each row
+                            headerGroup.headers.map((header, i) => {
+                              // const { key, ...restHeaderProps } =
+                              //   column.getHeaderProps(
+                              //     //@ts-ignore
+                              //     column.getSortByToggleProps(),
+                              //   );
+                              //@ts-ignore
+
+                              //@ts-ignore
+
+                              const isSorted = header.column.getIsSorted();
+
+                              const isSortedDesc =
+                                (header.column.getIsSorted() as string) ==
+                                "desc";
+
+                              //@ts-ignore
+                              const isSticky = header.column.columnDef.hSticky;
+
+                              return (
+                                <th
+                                  key={header.id}
+                                  colSpan={header.colSpan}
+                                  // {...restHeaderProps}
+                                  className={twMerge(
+                                    "sticky top-0 z-0 w-5 bg-secbuttn px-6 py-3 text-center text-xs  font-black leading-4 tracking-wider text-accent   ",
+
+                                    isSticky ? ` z-20 ` : "",
+                                  )}
+                                  style={{
+                                    right: isSticky
+                                      ? getRightStickyPos(i)
+                                      : undefined,
+                                  }}
+                                >
+                                  <div
+                                    className={cn(
+                                      "relative flex min-w-max select-none items-center justify-center gap-3 text-center ",
+                                      header.column.getCanSort()
+                                        ? "cursor-pointer select-none"
+                                        : "",
+                                    )}
+                                    onClick={header.column.getToggleSortingHandler()}
+                                  >
+                                    {flexRender(
+                                      // Render the header
+                                      header.column.columnDef.header,
+                                      header.getContext(),
+                                    )}
+
+                                    <ArrowUpFromDotIcon
+                                      className={`absolute -left-5 ${
+                                        isSorted && isSortedDesc
+                                          ? "rotate-180"
+                                          : "rotate-0"
+                                      } 
+                                    
+                                    ${
+                                      !isSorted ? "translate-y-12 scale-0" : ""
+                                    } 
+                                    transition-transform duration-500`}
+                                    />
+                                  </div>
+                                </th>
+                              );
+                            })
+                          }
+                        </tr>
+                      );
+                    })
+                  }
+                </thead>
+                {/* Apply the table body props */}
+                <tbody
+                  //  {...getTableBodyProps()}
+                  className="divide-y divide-accent/20 bg-secondary"
+                >
+                  {paddingTop > 0 && (
+                    <tr>
+                      <td
+                        style={{ height: paddingTop, overflowAnchor: "none" }}
+                      />
+                    </tr>
+                  )}
+                  {
+                    // Loop over the table rows
+                    virtualRows.map((virtualRow, index) => {
+                      const row = rows[virtualRow.index];
+                      let hasStickyCount = -1;
+                      // Prepare the row for display
+                      // prepareRow(row);
+                      // const { key, ...restRowProps } = row.getRowProps();
+                      return (
+                        // Apply the row props
+                        <tr
+                          style={{ overflowAnchor: "none" }}
+                          onClick={() => onClick(row)}
+                          key={index}
+                          // {...restRowProps}
+
+                          className={twMerge(
+                            "group",
+                            index.toString() === clickedRowIndex
+                              ? "bg-primary/20 hover:bg-primary/25"
+                              : "hover:bg-primary/5",
+                            hasClickAction
+                              ? "cursor-pointer hover:bg-primary/80 "
+                              : "",
+                          )}
+                        >
+                          {
+                            //@ts-ignore
+                            row.getVisibleCells().map((cell, i) => {
+                              // const right = `right-[${i * 30}px]`;
+                              //@ts-ignore
+                              const isSticky = cell.column.columnDef.hSticky;
+                              if (isSticky) hasStickyCount++;
+                              //@ts-ignore
+                              const width = cell.column.columnDef.width;
+
+                              //  const widthTw = `w-[${width}px]`;
+                              return (
+                                <td
+                                  key={cell.id}
+                                  className={twMerge(
+                                    " z-10 border-l border-primary/50 bg-secondary text-center text-primary  last:border-0 group-hover:bg-secondary/90  ",
+                                    isSticky ? "lg:sticky " : "",
+                                  )}
+                                  style={{
+                                    right: getRightStickyPos(i),
+                                  }}
+                                >
+                                  <div
+                                    className={twMerge(
+                                      " flex  justify-center px-2 text-center",
+                                      "min-w-max",
+                                    )}
+                                    style={{
+                                      width: width,
+                                    }}
+                                  >
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </div>
+                                </td>
+                              );
+                            })
+                          }
+                        </tr>
+                      );
+                    })
+                  }
+                  {paddingBottom > 0 && (
+                    <tr>
+                      <td style={{ height: paddingBottom }} />
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot>
+                  {table.getFooterGroups().map((footerGroup) => {
                     return (
-                      <tr
-                        className="text-center"
-                        key={headerGroup.id}
-                        // {...restHeaderGroupProps}
-                      >
-                        {
-                          // Loop over the headers in each row
-                          headerGroup.headers.map((header, i) => {
-                            // const { key, ...restHeaderProps } =
-                            //   column.getHeaderProps(
-                            //     //@ts-ignore
-                            //     column.getSortByToggleProps(),
-                            //   );
-                            //@ts-ignore
-
-                            //@ts-ignore
-
-                            const isSorted = header.column.getIsSorted();
-
-                            const isSortedDesc =
-                              (header.column.getIsSorted() as string) == "desc";
-
-                            //@ts-ignore
-                            const isSticky = header.column.columnDef.hSticky;
-
+                      <>
+                        <tr key={footerGroup.id}>
+                          {footerGroup.headers.map((header) => {
+                            const content = flexRender(
+                              header.column.columnDef.footer,
+                              header.getContext(),
+                            );
                             return (
                               <th
                                 key={header.id}
                                 colSpan={header.colSpan}
                                 // {...restHeaderProps}
                                 className={twMerge(
-                                  "sticky top-0 z-0 w-5 bg-secbuttn px-6 py-3 text-center text-xs  font-black leading-4 tracking-wider text-accent   ",
-
-                                  isSticky ? ` z-20 ` : "",
+                                  "font-bol sticky bottom-0 z-40 bg-secbuttn px-6 py-3 text-center text-xs   leading-4 tracking-wider text-primary ",
+                                  content
+                                    ? " border-0 border-x border-primary"
+                                    : "",
                                 )}
-                                style={{
-                                  right: isSticky
-                                    ? getRightStickyPos(i)
-                                    : undefined,
-                                }}
                               >
-                                <div
-                                  className={cn(
-                                    "relative flex min-w-max select-none items-center justify-center gap-3 text-center ",
-                                    header.column.getCanSort()
-                                      ? "cursor-pointer select-none"
-                                      : "",
-                                  )}
-                                  onClick={header.column.getToggleSortingHandler()}
-                                >
-                                  {flexRender(
-                                    // Render the header
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
-
-                                  <ArrowUpFromDotIcon
-                                    className={`absolute -left-5 ${
-                                      isSorted && isSortedDesc
-                                        ? "rotate-180"
-                                        : "rotate-0"
-                                    } 
-                                    
-                                    ${
-                                      !isSorted ? "translate-y-12 scale-0" : ""
-                                    } 
-                                    transition-transform duration-500`}
-                                  />
-                                </div>
+                                <span className="text-lg font-bold">
+                                  {header.isPlaceholder ? null : content}
+                                </span>
                               </th>
                             );
-                          })
-                        }
-                      </tr>
+                          })}
+                        </tr>
+                      </>
                     );
-                  })
-                }
-              </thead>
-              {/* Apply the table body props */}
-              <tbody
-                //  {...getTableBodyProps()}
-                className="divide-y divide-accent/20 bg-secondary"
-              >
-                {paddingTop > 0 && (
-                  <tr>
-                    <td
-                      style={{ height: paddingTop, overflowAnchor: "none" }}
-                    />
-                  </tr>
-                )}
-                {
-                  // Loop over the table rows
-                  virtualRows.map((virtualRow, index) => {
-                    const row = rows[virtualRow.index];
-                    let hasStickyCount = -1;
-                    // Prepare the row for display
-                    // prepareRow(row);
-                    // const { key, ...restRowProps } = row.getRowProps();
-                    return (
-                      // Apply the row props
-                      <tr
-                        style={{ overflowAnchor: "none" }}
-                        onClick={() => onClick(row)}
-                        key={index}
-                        // {...restRowProps}
-
-                        className={twMerge(
-                          "group",
-                          index.toString() === clickedRowIndex
-                            ? "bg-primary/20 hover:bg-primary/25"
-                            : "hover:bg-primary/5",
-                          hasClickAction
-                            ? "cursor-pointer hover:bg-primary/80 "
-                            : "",
-                        )}
-                      >
-                        {
-                          //@ts-ignore
-                          row.getVisibleCells().map((cell, i) => {
-                            // const right = `right-[${i * 30}px]`;
-                            //@ts-ignore
-                            const isSticky = cell.column.columnDef.hSticky;
-                            if (isSticky) hasStickyCount++;
-                            //@ts-ignore
-                            const width = cell.column.columnDef.width;
-
-                            //  const widthTw = `w-[${width}px]`;
-                            return (
-                              <td
-                                key={cell.id}
-                                className={twMerge(
-                                  " z-10 border-l border-primary/50 bg-secondary text-center text-primary  last:border-0 group-hover:bg-secondary/90  ",
-                                  isSticky ? "lg:sticky " : "",
-                                )}
-                                style={{
-                                  right: getRightStickyPos(i),
-                                }}
-                              >
-                                <div
-                                  className={twMerge(
-                                    " flex  justify-center px-2 text-center",
-                                    "min-w-max",
-                                  )}
-                                  style={{
-                                    width: width,
-                                  }}
-                                >
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </div>
-                              </td>
-                            );
-                          })
-                        }
-                      </tr>
-                    );
-                  })
-                }
-                {paddingBottom > 0 && (
-                  <tr>
-                    <td style={{ height: paddingBottom }} />
-                  </tr>
-                )}
-              </tbody>
-              <tfoot>
-                {table.getFooterGroups().map((footerGroup) => {
-                  return (
-                    <>
-                      <tr key={footerGroup.id}>
-                        {footerGroup.headers.map((header) => {
-                          const content = flexRender(
-                            header.column.columnDef.footer,
-                            header.getContext(),
-                          );
-                          return (
-                            <th
-                              key={header.id}
-                              colSpan={header.colSpan}
-                              // {...restHeaderProps}
-                              className={twMerge(
-                                "font-bol sticky bottom-0 z-40 bg-secbuttn px-6 py-3 text-center text-xs   leading-4 tracking-wider text-primary ",
-                                content
-                                  ? " border-0 border-x border-primary"
-                                  : "",
-                              )}
-                            >
-                              <span className="text-lg font-bold">
-                                {header.isPlaceholder ? null : content}
-                              </span>
-                            </th>
-                          );
-                        })}
-                      </tr>
-                    </>
-                  );
-                })}
-              </tfoot>
-            </table>
-          </div>
+                  })}
+                </tfoot>
+              </table>
+            </div>
+          )}
         </div>
         {renderAfterTable(flatRows)}
       </div>
+    </div>
+  );
+}
+const TextFieldWithLable = withLabel(TextField);
+// A debounced input react component
+
+function DebouncedInput({
+  value,
+  onChange,
+  label = "",
+  placeholder = "",
+  delay = 250,
+}) {
+  const [inputValue, setInputValue] = useState(value);
+
+  // Create a debounced value
+  const deferredValue = useDeferredValue(inputValue);
+
+  /**
+   * Call the onChange function when a user stops typing
+   */
+  useEffect(() => {
+    onChange(deferredValue);
+  }, [deferredValue]);
+
+  return (
+    <div className="flex flex-col items-end justify-center ">
+      <TextFieldWithLable
+        placeholder={placeholder}
+        label={label}
+        value={inputValue}
+        className={"bg-secondary"}
+        onChange={(v) => {
+          //@ts-ignore
+          setInputValue(v.target.value ?? "");
+        }}
+      />
     </div>
   );
 }

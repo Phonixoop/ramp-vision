@@ -100,7 +100,7 @@ export default function CityPage({ children, city }) {
     },
     {
       onSuccess: (data) => {
-        setSelectedPerson(undefined);
+        // setSelectedPerson(undefined);
 
         const result = distinctPersonnelPerformanceData(
           data ?? [],
@@ -134,6 +134,18 @@ export default function CityPage({ children, city }) {
         );
 
         setUpdatedList(result);
+
+        if (!selectedPerson) return;
+
+        // const sparkData = sparkChartForPersonnel(
+        //   result,
+        //   "NameFamily",
+        //   selectedPerson.NameFamily,
+        // );
+        // setSelectedPerson({
+        //   ...selectedPerson,
+        //   sparkData,
+        // });
       },
       refetchOnWindowFocus: false,
     },
@@ -641,6 +653,7 @@ function TogglePersonelDayOffButton({
   userMetric,
 }: TogglePersonelDayOffButton) {
   const utils = api.useContext();
+  const { setSelectedPerson } = usePersonnelFilter();
   const togglePersonnelDayOffMutation =
     api.personnelPerformance.togglePersonnelDayOff.useMutation();
 
@@ -656,13 +669,25 @@ function TogglePersonelDayOffButton({
           " p-2",
           hasTheDayOff === true ? "bg-white text-secondary" : "bg-secondary",
         )}
-        onConfirm={() => {
+        onConfirm={async () => {
           togglePersonnelDayOffMutation.mutate({
             date: date.format("YYYY/MM/DD"),
             nationalCode: selectedPerson.key.NationalCode,
             cityName: getPersianToEnglishCity(selectedPerson.key.CityName),
             nameFamily: selectedPerson.key.NameFamily,
           });
+          const person = selectedPerson;
+          await utils.personnelPerformance.getAll.invalidate();
+          const getAll = utils.personnelPerformance.getAll.getData();
+          console.log({ selectedPerson });
+          // setSelectedPerson({
+          //   ...selectedPerson.user,
+          //   sparkData: sparkChartForPersonnel(
+          //     getAll?.data?.result,
+          //     "NameFamily",
+          //     selectedPerson.user.NameFamily,
+          //   ),
+          // });
         }}
       >
         <span

@@ -28,7 +28,8 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "src/pages/_document.jsx"
+    "src/pages/_document.jsx",
+    "src/ui/forms/search-field/index.jsx"
   ],
   "exclude": ["node_modules"]
 }
