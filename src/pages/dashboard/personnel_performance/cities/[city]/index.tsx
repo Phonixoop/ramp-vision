@@ -100,7 +100,7 @@ export default function CityPage({ children, city }) {
     },
     {
       onSuccess: (data) => {
-        // setSelectedPerson(undefined);
+         setSelectedPerson(undefined);
 
         const result = distinctPersonnelPerformanceData(
           data ?? [],
