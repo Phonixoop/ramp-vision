@@ -1,9 +1,10 @@
 import moment, { Moment } from "jalali-moment";
-import { MegaphoneIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, MegaphoneIcon } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import { InPageMenu } from "~/features/menu";
 import { LayoutGroup } from "framer-motion";
+import Button from "~/ui/buttons";
 
 function getMonthDays(m: Moment): Moment[] {
   let calendarTemp = [];
@@ -50,6 +51,23 @@ const MONTHS = [
 //     .format("dd");
 // });
 const defaultWeekdays = ["شن", "یک", "دو", "سه", "چهار", "پنج", "جم"];
+
+function orderBasedOnFirstList(firstList, secondList) {
+  return secondList.sort((a, b) => {
+    return firstList.indexOf(a) - firstList.indexOf(b);
+  });
+}
+function findIndexInSecondArray(firstArray, secondArray, indexInFirstArray) {
+  // Get the element from the first array using the provided index
+  var element = firstArray[indexInFirstArray];
+
+  // Find the index of the element in the second array
+  var indexInSecondArray = secondArray.indexOf(element);
+
+  // Return the index in the second array
+  return indexInSecondArray;
+}
+
 type Props = {
   onDate?: (
     date: Moment,
@@ -62,6 +80,8 @@ type Props = {
   defaultMonth?: number;
   year?: number;
   customData?: any[];
+  collapsedUi?: boolean;
+  listOfMonths?: string[];
 };
 
 export default function Calender({
@@ -73,6 +93,8 @@ export default function Calender({
   year = undefined,
   defaultMonth = -1,
   customData = undefined,
+  collapsedUi = false,
+  listOfMonths = [],
 }: Props) {
   const [calendar, setCalender] = useState(
     getMonthDays(
@@ -81,18 +103,23 @@ export default function Calender({
         : moment().locale("fa").jYear(year),
     ),
   );
-
+  let _listOfMonths = MONTHS;
+  if (listOfMonths && listOfMonths.length > 0)
+    _listOfMonths = orderBasedOnFirstList(MONTHS, listOfMonths);
   return (
     <div className="grid w-full  gap-10 p-2 ">
       {withMonthMenu && (
         <LayoutGroup id="months-InPageMenu">
           <InPageMenu
+            collapsedUi={collapsedUi}
             className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
-            startIndex={moment().locale("fa").month()}
-            list={MONTHS}
+            startIndex={
+              listOfMonths && listOfMonths.length > 0 ? 0 : defaultMonth
+            }
+            list={_listOfMonths}
             onChange={(value: { item: any; index: number }) => {
               const newCalendar = getMonthDays(
-                moment().locale("fa").jYear(year).jMonth(defaultMonth),
+                moment().locale("fa").jYear(year).jMonth(value.index),
               );
               setCalender(newCalendar);
               // onMonthChange(
@@ -104,7 +131,7 @@ export default function Calender({
         </LayoutGroup>
       )}
 
-      <div className="grid grid-cols-7 gap-3 text-center text-xs text-primary md:text-base">
+      <div className="grid grid-cols-7 gap-3 text-center text-xs text-accent md:text-base">
         {defaultWeekdays.map((week) => {
           return (
             <>

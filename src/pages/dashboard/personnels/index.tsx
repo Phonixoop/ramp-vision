@@ -467,6 +467,7 @@ export function SetPersonnelDayOffWizard({
       <div dir="rtl" className="col-span-2 w-full">
         <Calender
           withMonthMenu
+          year={moment().jYear()}
           defaultMonth={moment().jMonth()}
           // year={moment().jYear()}
           onDate={(date, monthNumber) => {

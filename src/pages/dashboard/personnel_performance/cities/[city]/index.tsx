@@ -38,6 +38,7 @@ import Gauge from "~/features/gauge";
 import ToolTipSimple from "~/features/tooltip-simple-use";
 import { TrendDecider } from "~/features/trend-decider";
 import UseUserManager from "~/hooks/userManager";
+import { uniqueArray } from "~/lib/utils";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
@@ -442,7 +443,7 @@ export default function CityPage({ children, city }) {
                   );
                 })}
               </div>
-              <div className="grid  gap-4 " dir="rtl">
+              <div className="grid gap-4 " dir="rtl">
                 {noneNumericItems.map(([key, value], index, array) => {
                   if (!value) return;
                   const isLastItem = index === array.length - 1;
@@ -473,6 +474,13 @@ export default function CityPage({ children, city }) {
                 })}
                 <div className="col-span-2 w-full">
                   <Calender
+                    withMonthMenu
+                    collapsedUi
+                    listOfMonths={uniqueArray(
+                      selectedPerson.sparkData.map(
+                        (a) => a.Start_Date.split("/")[1],
+                      ),
+                    ).map((a) => moment(a, "jMM").locale("fa").format("MMMM"))}
                     year={parseInt(
                       selectedPerson.sparkData[0].Start_Date.split("/")[0],
                     )}

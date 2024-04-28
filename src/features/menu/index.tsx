@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { getPathName } from "~/utils/util";
 import { twMerge } from "tailwind-merge";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import Button from "~/ui/buttons";
 export type MenuItem = {
   value: string;
   link: string;
@@ -139,12 +140,14 @@ type InPageMenuType = {
     item: any;
     index: number;
   };
+  collapsedUi: boolean;
 };
 export function InPageMenu({
   className = "",
   startIndex = -1,
   index = -1,
   list = [],
+  collapsedUi = false,
   onChange = (value) => {},
 }) {
   const [activeIndex, setActiveIndex] = useState(startIndex);
@@ -158,46 +161,106 @@ export function InPageMenu({
   const activeMonth = items.find((a) => a.isActive == true)?.name;
 
   return (
-    <motion.div
-      className={twMerge(
-        " group flex cursor-pointer items-center justify-start  gap-3 overflow-hidden overflow-x-auto scrollbar-none ",
-        className,
-      )}
-      onHoverEnd={() => {
-        setActiveIndex(-1);
-      }}
-    >
-      {items.map((item, i) => {
-        return (
-          <motion.span
-            className="flex min-w-fit"
-            key={i}
-            onHoverStart={() => {
-              setActiveIndex(i);
-            }}
-            onClick={() => {
-              setItems((prev: any) => {
-                return prev.map((a) => {
-                  if (a.name === item.name) a.isActive = true;
-                  else a.isActive = false;
-                  return a;
+    <>
+      {!collapsedUi ? (
+        <motion.div
+          className={twMerge(
+            "group flex cursor-pointer items-center justify-start  gap-3 overflow-hidden overflow-x-auto scrollbar-none ",
+            className,
+          )}
+          onHoverEnd={() => {
+            setActiveIndex(-1);
+          }}
+        >
+          {items.map((item, i) => {
+            return (
+              <motion.span
+                className="flex min-w-fit"
+                key={i}
+                onHoverStart={() => {
+                  setActiveIndex(i);
+                }}
+                onClick={() => {
+                  setItems((prev: any) => {
+                    return prev.map((a) => {
+                      if (a.name === item.name) a.isActive = true;
+                      else a.isActive = false;
+                      return a;
+                    });
+                  });
+                  onChange({
+                    item: item,
+                    index: i,
+                  });
+                }}
+              >
+                <InPageMenuItem
+                  text={item.name}
+                  isHovered={activeIndex === i}
+                  isActive={item.name === activeMonth}
+                />
+              </motion.span>
+            );
+          })}
+        </motion.div>
+      ) : (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              disabled={activeIndex + 1 > items.length - 1 || list.length <= 0}
+              className={twMerge(
+                "group  left-1 z-20 rounded-full p-1.5 ring-1 ring-primary transition duration-500   hover:ring-accent  disabled:bg-transparent disabled:ring-transparent",
+                activeIndex + 1 > items.length - 1 || list.length <= 0
+                  ? ""
+                  : "hover:bg-accent/20",
+              )}
+              onClick={() => {
+                const index = Math.min(activeIndex + 1, list.length - 1);
+                setActiveIndex(index);
+                onChange({
+                  item: items[index],
+                  index: index,
                 });
-              });
-              onChange({
-                item: item,
-                index: i,
-              });
-            }}
-          >
-            <InPageMenuItem
-              text={item.name}
-              isHovered={activeIndex === i}
-              isActive={item.name === activeMonth}
-            />
-          </motion.span>
-        );
-      })}
-    </motion.div>
+              }}
+            >
+              <ChevronRight
+                className={twMerge(
+                  "h-5 w-5 stroke-primary  group-disabled:stroke-primary/20 ",
+                  activeIndex + 1 > items.length - 1 || list.length <= 0
+                    ? ""
+                    : "group-hover:stroke-accent",
+                )}
+              />
+            </Button>
+            <Button
+              disabled={activeIndex - 1 < 0 || list.length <= 0}
+              className={twMerge(
+                "group  left-1 z-20 rounded-full p-1.5 ring-1 ring-primary transition duration-500   hover:ring-accent  disabled:bg-transparent disabled:ring-transparent",
+                activeIndex - 1 < 0 || list.length <= 0
+                  ? ""
+                  : "hover:bg-accent/20",
+              )}
+              onClick={() => {
+                const index = Math.max(activeIndex - 1, 0);
+                setActiveIndex(index);
+                onChange({
+                  item: items[index],
+                  index: index,
+                });
+              }}
+            >
+              <ChevronLeft
+                className={twMerge(
+                  "h-5 w-5 stroke-primary  group-disabled:stroke-primary/20 ",
+                  activeIndex - 1 < 0 ? "" : "group-hover:stroke-accent",
+                )}
+              />
+            </Button>
+          </div>
+          <span className="text-accent">{items[activeIndex]?.name}</span>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -238,3 +301,22 @@ function InPageMenuItem({ text, isHovered = false, isActive = false }) {
     </div>
   );
 }
+/*<div className="flex items-center justify-between">
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            className={twMerge(
+              "group  left-1 z-20 rounded-full p-1.5 ring-1 ring-primary transition duration-500 hover:bg-accent/20 hover:ring-accent",
+            )}
+          >
+            <ChevronRight className="h-5 w-5 stroke-primary group-hover:stroke-accent " />
+          </Button>
+          <Button
+            className={twMerge(
+              "group  left-1 z-20 rounded-full p-1.5 ring-1 ring-primary transition duration-500 hover:bg-accent/20 hover:ring-accent",
+            )}
+          >
+            <ChevronLeft className="h-5 w-5 stroke-primary group-hover:stroke-accent " />
+          </Button>
+        </div>
+        <span className="text-accent">{calendar[16].format("MMMM")}</span>
+      </div>*/
