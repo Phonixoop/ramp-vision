@@ -100,7 +100,7 @@ export default function CityPage({ children, city }) {
     },
     {
       onSuccess: (data) => {
-         setSelectedPerson(undefined);
+        setSelectedPerson(undefined);
 
         const result = distinctPersonnelPerformanceData(
           data ?? [],
@@ -473,6 +473,9 @@ export default function CityPage({ children, city }) {
                 })}
                 <div className="col-span-2 w-full">
                   <Calender
+                    year={parseInt(
+                      selectedPerson.sparkData[0].Start_Date.split("/")[0],
+                    )}
                     defaultMonth={getMonthNumber(
                       selectedPerson.sparkData[0].Start_Date,
                     )}
@@ -493,20 +496,22 @@ export default function CityPage({ children, city }) {
                       return (
                         <>
                           {parseInt(date.format("M")) !== monthNumber + 1 ? (
-                            <span
-                              className={twMerge(
-                                "flex items-center justify-center text-xs text-primary/50 ",
+                            <div className="flex h-full w-full items-center justify-center">
+                              <span
+                                className={twMerge(
+                                  "flex items-center justify-center  text-xs text-primary/50 ",
 
-                                `h-6 w-6 rounded-full `,
-                              )}
-                              style={{
-                                backgroundColor: userCalData
-                                  ? userMetric.color
-                                  : undefined,
-                              }}
-                            >
-                              {date.format("D")}
-                            </span>
+                                  `h-6 w-6 rounded-full `,
+                                )}
+                                style={{
+                                  backgroundColor: userCalData
+                                    ? userMetric.color
+                                    : undefined,
+                                }}
+                              >
+                                {date.format("D")}
+                              </span>
+                            </div>
                           ) : (
                             <>
                               <ToolTipSimple
@@ -538,14 +543,12 @@ export default function CityPage({ children, city }) {
                                     userMetric={userMetric}
                                   />
                                 ) : (
-                                  <span
+                                  <div
                                     className={twMerge(
-                                      "flex cursor-default items-center justify-center text-xs ",
-
-                                      `h-6 w-6 rounded-full `,
+                                      "flex w-max  cursor-default items-center justify-center rounded-lg p-2",
                                       hasTheDayOff === true
                                         ? "bg-white text-secondary"
-                                        : "bg-secondary  text-primary",
+                                        : "bg-secondary",
                                     )}
                                     style={{
                                       backgroundColor: userCalData
@@ -553,8 +556,16 @@ export default function CityPage({ children, city }) {
                                         : undefined,
                                     }}
                                   >
-                                    {date.format("D")}
-                                  </span>
+                                    <span
+                                      className={twMerge(
+                                        "flex items-center justify-center bg-secondary text-xs text-primary",
+
+                                        `h-6 w-6 rounded-full `,
+                                      )}
+                                    >
+                                      {date.format("D")}
+                                    </span>
+                                  </div>
                                 )}
                               </ToolTipSimple>
                             </>
@@ -564,7 +575,7 @@ export default function CityPage({ children, city }) {
                     }}
                   />
                 </div>
-                <div className="col-span-2  flex  w-full flex-col items-center justify-center   ">
+                <div className="col-span-2  flex  w-full flex-col items-center justify-center">
                   <H2>عملکرد</H2>
 
                   <Gauge value={selectedPerson?.TotalPerformance} />
@@ -673,6 +684,9 @@ export function TogglePersonelDayOffButton({
           " p-2",
           hasTheDayOff === true ? "bg-white text-secondary" : "bg-secondary",
         )}
+        style={{
+          backgroundColor: userCalData ? userMetric.color : undefined,
+        }}
         onConfirm={async () => {
           togglePersonnelDayOffMutation.mutate({
             date: date.format("YYYY/MM/DD"),
@@ -680,10 +694,10 @@ export function TogglePersonelDayOffButton({
             cityName: getPersianToEnglishCity(selectedPerson.cityName),
             nameFamily: selectedPerson.nameFamily,
           });
-          const person = selectedPerson;
+          //  const person = selectedPerson;
           await utils.personnelPerformance.getAll.invalidate();
-          const getAll = utils.personnelPerformance.getAll.getData();
-          console.log({ selectedPerson });
+          //   const getAll = utils.personnelPerformance.getAll.getData();
+          //  console.log({ selectedPerson });
           // setSelectedPerson({
           //   ...selectedPerson.user,
           //   sparkData: sparkChartForPersonnel(
@@ -696,13 +710,10 @@ export function TogglePersonelDayOffButton({
       >
         <span
           className={twMerge(
-            "flex items-center justify-center text-xs text-inherit ",
+            "flex items-center justify-center bg-secondary text-xs text-primary",
 
             `h-6 w-6 rounded-full `,
           )}
-          style={{
-            backgroundColor: userCalData ? userMetric.color : undefined,
-          }}
         >
           {date.format("D")}
         </span>

@@ -4,14 +4,14 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import { InPageMenu } from "~/features/menu";
 import { LayoutGroup } from "framer-motion";
-function getMonthDays(moment: Moment): Moment[] {
+
+function getMonthDays(m: Moment): Moment[] {
   let calendarTemp = [];
 
-  const startDay = moment.clone().startOf("month").startOf("week");
-  const endDay = moment.clone().endOf("month").endOf("week");
+  const startDay = m.clone().startOf("month").startOf("week");
+  const endDay = m.clone().endOf("month").endOf("week");
 
   let date = startDay.clone().subtract(1, "day");
-
   while (date.isBefore(endDay, "day"))
     calendarTemp.push({
       days: Array(7)
@@ -60,6 +60,7 @@ type Props = {
   withMonthMenu?: boolean;
   showCurrentDay?: boolean;
   defaultMonth?: number;
+  year?: number;
   customData?: any[];
 };
 
@@ -69,16 +70,18 @@ export default function Calender({
   onClick = () => {},
   withMonthMenu = false,
   showCurrentDay = false,
+  year = undefined,
   defaultMonth = -1,
   customData = undefined,
 }: Props) {
   const [calendar, setCalender] = useState(
     getMonthDays(
       defaultMonth >= 0
-        ? moment().jMonth(defaultMonth).locale("fa")
-        : moment().locale("fa"),
+        ? moment().locale("fa").jYear(year).jMonth(defaultMonth)
+        : moment().locale("fa").jYear(year),
     ),
   );
+
   return (
     <div className="grid w-full  gap-10 p-2 ">
       {withMonthMenu && (
@@ -89,7 +92,7 @@ export default function Calender({
             list={MONTHS}
             onChange={(value: { item: any; index: number }) => {
               const newCalendar = getMonthDays(
-                moment().jMonth(value.index).locale("fa"),
+                moment().locale("fa").jYear(year).jMonth(defaultMonth),
               );
               setCalender(newCalendar);
               // onMonthChange(

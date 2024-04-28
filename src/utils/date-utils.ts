@@ -119,5 +119,5 @@ export function getMonthNumber(date: string) {
   return moment()
     .locale("fa")
     .month(parseInt(date.split("/")[1]) - 1)
-    .month();
+    .jMonth();
 }

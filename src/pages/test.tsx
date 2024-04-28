@@ -145,12 +145,14 @@ function getStartOfMonth(monthNumber, year) {
   return startOfMonth;
 }
 
-console.log({
-  start: moment({ year: 1403, month: 3 })
-    .startOf("jMonth")
-    .format("YYYY-MM-jDD"),
-});
+// console.log({
+//   start: moment({ year: 1403, month: 3 })
+//     .startOf("jMonth")
+//     .format("YYYY-MM-jDD"),
+// });
+const mmm = moment().locale("fa");
 
+console.log("year22 :", moment().locale("fa").jYear(1402).jMonth(11).format());
 export default function TestPage() {
   // const isSameOrBefore = date.isSameOrBefore(validDateBeforeToScrewThem);
   return (
