@@ -59,6 +59,7 @@ import { CityPerformanceWithUsersChart } from "~/features/cities-performance-cha
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
+import { sortDates } from "~/lib/utils";
 
 // function DistinctDataForCity(data = []): CityWithPerformanceData[] {
 //   const cityMap = new Map();
@@ -152,13 +153,15 @@ export default function CitiesPage({ children }) {
     },
   );
 
-  const DateInfos = [
+  const _DateInfos = [
     ...new Set(
       getInitialFilters?.data?.DateInfos?.map((a) => a.DateInfo).filter(
         (a) => a,
       ),
     ),
   ];
+
+  const DateInfos = sortDates({ dates: _DateInfos });
 
   const Roles = [
     ...new Set(
@@ -338,7 +341,9 @@ export default function CitiesPage({ children }) {
                 <SelectControlled
                   title={"تاریخ گزارش پرسنل"}
                   list={DateInfos}
-                  value={filters.filter.DateInfo ?? [DateInfos[0]]}
+                  value={
+                    filters.filter.DateInfo ?? [DateInfos[DateInfos.length - 1]]
+                  }
                   onChange={(values) => {
                     let _values = values;
                     _values = [values[values.length - 1]];

@@ -43,6 +43,7 @@ import { uniqueArray } from "~/lib/utils";
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
 import { CityWithPerformanceData, Permission } from "~/types";
+import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
@@ -472,7 +473,7 @@ export default function CityPage({ children, city }) {
                     </>
                   );
                 })}
-                <div className="col-span-2 w-full">
+                <div className="relative col-span-2 w-full overflow-hidden rounded-xl bg-accent/10  p-1">
                   <Calender
                     withMonthMenu
                     collapsedUi

@@ -20,6 +20,7 @@ import {
   defualtDateInfos,
 } from "~/constants/personnel-performance";
 import { getUserPermissions } from "~/lib/user.util";
+import { sortDates } from "~/lib/utils";
 
 const config = {
   user: process.env.SQL_USER,
@@ -34,6 +35,7 @@ const config = {
 };
 
 await sql.connect(config);
+
 export const personnelPerformanceRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(
@@ -78,6 +80,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
 
         if (filter.CityName.length <= 0) filter.CityName = cities;
+
+        const defualtDateInfo = await getDefualtDateInfo();
+        filter.DateInfo = [defualtDateInfo];
         // if (input.periodType === "ماهانه" && filter.CityName.length > 3)
         //   throw new Error(
         //     "more than 3 cities in monthly filter is not allowed",
@@ -193,7 +198,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        //console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -295,6 +300,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
           .subPermissions.filter((permission) => permission.isActive)
           .map((permission) => permission.enLabel);
 
+        const defualtDateInfo = await getDefualtDateInfo();
+        filter.DateInfo = [defualtDateInfo];
         let whereClause = generateWhereClause({
           ...filter,
           CityName: cities,
@@ -430,7 +437,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
               .array(z.string())
               .nullish()
               .default(defaultProjectTypes),
-            DateInfo: z.array(z.string()).nullish().default(defualtDateInfos),
+            DateInfo: z.array(z.string()).nullish(),
           }),
         })
         .optional(),
@@ -835,3 +842,23 @@ function generateFilterOnlySelect(filter: string[]) {
 //     ? `WHERE CityName is not NULL AND ${conditions.join(" AND ")}`
 //     : "";
 // }
+
+export async function getDefualtDateInfo() {
+  const query = `
+
+
+  SELECT DISTINCT DateInfo FROM RAMP_Daily.dbo.users_info
+
+
+
+  `;
+  // console.log(query);
+  const result = await sql.query(query);
+  // console.log(result.recordsets);
+
+  const usersInfos = result.recordsets[0].map((a) => a.DateInfo);
+
+  const sortedDates = sortDates({ dates: usersInfos });
+
+  return sortedDates[sortedDates.length - 1];
+}

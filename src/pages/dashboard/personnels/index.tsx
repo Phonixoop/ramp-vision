@@ -46,6 +46,7 @@ import ToolTipSimple from "~/features/tooltip-simple-use";
 import withConfirmation from "~/ui/with-confirmation";
 import Modal from "~/ui/modals";
 import { Loader2Icon } from "lucide-react";
+import { sortDates } from "~/lib/utils";
 export default function GaugesPage() {
   const { hasManagePersonnelAccess } = UseUserManager();
   const [filters, setFilters] = useState({
@@ -306,6 +307,13 @@ export default function GaugesPage() {
           accessorKey: "DateInfo",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
+            const _DateInfos = [
+              ...new Set(getPersonnls?.data?.map((a) => a.DateInfo)),
+            ];
+
+            const DateInfos = sortDates({ dates: _DateInfos });
+            console.log(DateInfos[DateInfos.length - 1]);
+            if (DateInfos.length <= 0) return;
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">
@@ -313,6 +321,7 @@ export default function GaugesPage() {
                 </span>
                 <SelectColumnFilter
                   column={column}
+                  initialFilters={[DateInfos[DateInfos.length - 1]]}
                   singleSelect
                   data={getPersonnls.data}
                   onChange={(filter) => {

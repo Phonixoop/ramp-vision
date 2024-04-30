@@ -47,6 +47,7 @@ import {
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
 import { FilterType, PeriodType } from "~/context/personnel-filter.context";
+import { sortDates } from "~/lib/utils";
 
 // const dataFormatter = (number: number) => {
 //   return "$ " + Intl.NumberFormat("us").format(number).toString();
@@ -158,9 +159,6 @@ function PersonnelPerformanceTable({ sessionData }) {
       refetchOnWindowFocus: true,
     },
   );
-
-  const DateInfos: string[] =
-    initialFilters?.data?.DateInfos?.map((a) => a.DateInfo) ?? [];
 
   const Roles = [
     ...new Set(
@@ -732,6 +730,13 @@ function PersonnelPerformanceTable({ sessionData }) {
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             if (initialFilters.isLoading) return;
+
+            const _DateInfos: string[] =
+              initialFilters?.data?.DateInfos?.map((a) => a.DateInfo) ?? [];
+
+            const DateInfos = sortDates({ dates: _DateInfos });
+
+            if (DateInfos.length <= 0) return;
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">
@@ -741,7 +746,9 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <SelectColumnFilter
                   singleSelect
                   column={column}
-                  initialFilters={filters.filter.DateInfo ?? [DateInfos[0]]}
+                  initialFilters={
+                    filters.filter.DateInfo ?? [DateInfos[DateInfos.length - 1]]
+                  }
                   data={DateInfos.map((a) => {
                     return {
                       DateInfo: a,
