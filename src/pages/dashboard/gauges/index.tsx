@@ -35,6 +35,7 @@ import DatePickerPeriodic from "~/features/date-picker-periodic";
 import { FilterIcon } from "lucide-react";
 import ResponsiveView from "~/features/responsive-view";
 import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
+import { sortDates } from "~/lib/utils";
 
 export default function GaugesPage() {
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
@@ -81,13 +82,15 @@ export default function GaugesPage() {
     },
   );
 
-  const DateInfos = [
+  const _DateInfos = [
     ...new Set(
       getInitialFilters?.data?.DateInfos?.map((a) => a.DateInfo).filter(
         (a) => a,
       ),
     ),
   ];
+
+  const DateInfos = sortDates({ dates: _DateInfos });
 
   const Roles = [
     ...new Set(
@@ -352,7 +355,11 @@ export default function GaugesPage() {
                     <SelectControlled
                       title={"تاریخ گزارش پرسنل"}
                       list={DateInfos}
-                      value={filters.filter.DateInfo ?? [DateInfos[0]]}
+                      value={
+                        filters.filter.DateInfo ?? [
+                          DateInfos[DateInfos.length - 1],
+                        ]
+                      }
                       onChange={(values) => {
                         let _values = values;
                         _values = [values[0]];
