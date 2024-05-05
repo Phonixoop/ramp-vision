@@ -198,7 +198,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -720,7 +720,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       // WHERE NationalCode = '${input.nationalCode}' AND Start_Date = '${input.date}';
 
       // `;
-      console.log({ input });
+      //console.log({ input });
       const updateHasTheDayOffQuery = `
       
       use RAMP_Daily

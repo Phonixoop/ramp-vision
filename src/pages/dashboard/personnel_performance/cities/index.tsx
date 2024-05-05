@@ -176,6 +176,14 @@ export default function CitiesPage({ children }) {
         .filter((a) => a),
     ),
   ];
+
+  const RolesType = [
+    ...new Set(
+      getInitialFilters?.data?.usersInfo
+        ?.map((a) => a.RoleType)
+        .filter((a) => a),
+    ),
+  ];
   const distincedData = useMemo(
     () => distinctDataAndCalculatePerformance(getCitiesWithPerformance.data),
     [getCitiesWithPerformance.data],
@@ -312,13 +320,7 @@ export default function CitiesPage({ children }) {
                 <SelectControlled
                   withSelectAll
                   title={"نوع سمت"}
-                  list={[
-                    ...new Set(
-                      getInitialFilters?.data?.usersInfo
-                        ?.map((a) => a.RoleType)
-                        .filter((a) => a),
-                    ),
-                  ]}
+                  list={RolesType}
                   value={filters.filter.RoleType ?? []}
                   onChange={(values) => {
                     //@ts-ignore

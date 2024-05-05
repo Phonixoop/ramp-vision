@@ -75,6 +75,7 @@ const weekNumberText = {
   2: "دوم",
   3: "سوم",
   4: "چهارم",
+  5: "پنجم",
 };
 
 export function getFirstSaturdayOfLastWeekOfMonth(year: number, month: number) {
