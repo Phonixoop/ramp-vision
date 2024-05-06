@@ -708,6 +708,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      //  new Promise((resolve) => {
+      //   setTimeout(resolve, 2000);
+      // });
+      // return
       const permissions = await getPermission({ ctx });
       if (!getUserPermissions(permissions).ManagePersonnel)
         throw new Error("You dont have permission to Manage Personnel");

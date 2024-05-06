@@ -1,9 +1,19 @@
 import * as XLSX from "xlsx";
 import { randomUUID } from "crypto";
-import { FileIcon, TrashIcon, UploadCloudIcon } from "lucide-react";
+import {
+  CheckIcon,
+  FileIcon,
+  ListOrderedIcon,
+  TrashIcon,
+  UploadCloudIcon,
+  UserCheckIcon,
+  UserXIcon,
+  XIcon,
+} from "lucide-react";
 import {
   forwardRef,
   useReducer,
+  useRef,
   useState,
   type ChangeEvent,
   type DragEvent,
@@ -16,6 +26,13 @@ interface FileWithUrl {
   name: string;
   size: number;
   file: any;
+  fileData: any;
+  mutate?: {
+    done: number;
+    error: number;
+  };
+  isMutating?: boolean;
+  rowCount?: number;
   error?: boolean | undefined;
 }
 import { toast } from "sonner";
@@ -25,6 +42,7 @@ import ExcelIcon from "~/ui/icons/excel";
 import { api, RouterOutputs } from "~/utils/api";
 import { date } from "zod";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
+import moment from "jalali-moment";
 // Reducer action(s)
 const addFilesToInput = () => ({
   type: "ADD_FILES_TO_INPUT" as const,
@@ -36,9 +54,40 @@ const deleteFileFromInput = () => ({
   id: "" as string,
 });
 
+const addDoneStatusToFileMutate = () => ({
+  type: "Add_Done_Status_To_File_Mutate" as const,
+});
+
+const addErrorStatusToFileMutate = () => ({
+  type: "Add_Error_Status_To_File_Mutate" as const,
+});
+
+const resetFileMutateStatus = () => ({
+  type: "Reset_File_Mutate_Status" as const,
+  id: "" as string,
+});
+
+const updateFileRowCount = () => ({
+  type: "UPDATE_FILE_RowCount" as const,
+  id: "" as string,
+  rowCount: -1 as number,
+});
+
+const updateFileIsMutatingStatus = () => ({
+  type: "Update_File_IsMutating_Status" as const,
+  id: "" as string,
+  isMutating: false as boolean,
+});
+
 type Action =
   | ReturnType<typeof addFilesToInput>
-  | ReturnType<typeof deleteFileFromInput>;
+  | ReturnType<typeof deleteFileFromInput>
+  | ReturnType<typeof addDoneStatusToFileMutate>
+  | ReturnType<typeof addErrorStatusToFileMutate>
+  | ReturnType<typeof resetFileMutateStatus>
+  | ReturnType<typeof updateFileRowCount>
+  | ReturnType<typeof updateFileIsMutatingStatus>;
+
 type State = FileWithUrl[];
 
 export interface InputProps
@@ -69,6 +118,10 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
           });
         },
         onSuccess: (data: any, variables: any) => {
+          dispatch({
+            type: "Add_Done_Status_To_File_Mutate",
+          });
+
           toast("مرخصی رد شد", {
             description: (
               <>
@@ -87,6 +140,10 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
           });
         },
         onError: (data: any) => {
+          dispatch({
+            type: "Add_Error_Status_To_File_Mutate",
+          });
+
           toast("خطا", {
             description: (
               <>
@@ -105,7 +162,7 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
           });
         },
       });
-
+    const isMutating = useRef(false);
     const [dragActive, setDragActive] = useState<boolean>(false);
 
     const [input, dispatch] = useReducer((state: State, action: Action) => {
@@ -127,7 +184,62 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
 
           return [...state.filter((a) => a.id !== action.id)];
         }
+        case "Add_Done_Status_To_File_Mutate": {
+          // do not allow more than 5 files to be uploaded at once
+          const index = state.findIndex((a) => a.isMutating);
+          const copy = [...state];
+          copy[index] = {
+            ...copy[index],
+            mutate: {
+              done: (copy[index]?.mutate?.done ?? 0) + 1,
+              error: copy[index]?.mutate?.error ?? 0,
+            },
+          };
+          return copy;
+        }
+        case "Add_Error_Status_To_File_Mutate": {
+          // do not allow more than 5 files to be uploaded at once
 
+          const index = state.findIndex((a) => a.isMutating);
+          const copy = [...state];
+          copy[index] = {
+            ...copy[index],
+            mutate: {
+              done: copy[index]?.mutate?.done ?? 0,
+              error: (copy[index]?.mutate?.error ?? 0) + 1,
+            },
+          };
+          return copy;
+        }
+        case "Reset_File_Mutate_Status": {
+          // do not allow more than 5 files to be uploaded at once
+
+          const index = state.findIndex((a) => a.id === action.id);
+          const copy = [...state];
+          copy[index] = {
+            ...copy[index],
+            mutate: {
+              done: 0,
+              error: 0,
+            },
+          };
+          return copy;
+        }
+        case "UPDATE_FILE_RowCount": {
+          // do not allow more than 5 files to be uploaded at once
+          const index = state.findIndex((a) => a.id !== action.id);
+          const copy = [...state];
+          copy[index] = { ...copy[index], rowCount: action.rowCount };
+          return copy;
+        }
+        case "Update_File_IsMutating_Status": {
+          // do not allow more than 5 files to be uploaded at once
+
+          const index = state.findIndex((a) => a.id === action.id);
+          const copy = [...state];
+          copy[index] = { ...copy[index], isMutating: action.isMutating };
+          return copy;
+        }
         // You could extend this, for example to allow removing files
       }
     }, []);
@@ -163,8 +275,25 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
 
           const { name, size } = e.target.files[0];
 
+          const arrayBuffer = await e.target.files[0].arrayBuffer();
+          const workbook = XLSX.read(arrayBuffer, {
+            type: "buffer",
+          });
+          const worksheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[worksheetName];
+
+          const data: any = XLSX.utils.sheet_to_json(worksheet);
+
           addFilesToState([
-            { file: e.target.files[0], name, size, id: generateUUID() },
+            {
+              file: e.target.files[0],
+              name,
+              size,
+              id: generateUUID(),
+              fileData: data,
+              rowCount: data.length,
+              isMutating: false,
+            },
           ]);
         }
       } catch (error) {
@@ -196,40 +325,66 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
 
         setDragActive(false);
 
-        // at least one file has been selected
-        addFilesToState(
-          files.map((file) => {
-            return {
-              file: file,
-              size: file.size,
-              name: file.name,
-              id: generateUUID(),
-            };
-          }),
-        );
+        let filestoAdd = [];
+        files.forEach(async (file) => {
+          const arrayBuffer = await file.arrayBuffer();
+          const workbook = XLSX.read(arrayBuffer, {
+            type: "buffer",
+          });
+          const worksheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[worksheetName];
+
+          const data: any = XLSX.utils.sheet_to_json(worksheet);
+
+          filestoAdd.push({
+            file: file,
+            fileData: data,
+            rowCount: data.length,
+            size: file.size,
+            name: file.name,
+            isMutating: false,
+            id: generateUUID(),
+          });
+        }),
+          // at least one file has been selected
+          addFilesToState(filestoAdd);
 
         e.dataTransfer.clearData();
       }
     };
 
-    const onReadXLSX = async (item) => {
-      const arrayBuffer = await item.file.arrayBuffer();
-      const workbook = XLSX.readFile(arrayBuffer, {
-        type: "buffer",
-      });
-      const worksheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[worksheetName];
-
-      const data: any = XLSX.utils.sheet_to_json(worksheet);
-      for (const item of data) {
-        await togglePersonnelDayOff.mutateAsync({
-          cityName: item.cityName,
-          date: item.date,
-          nameFamily: item.nameFamily,
-          nationalCode: item.nationalCode,
-        });
+    async function onMutateFile(value) {
+      if (input.find((a) => a.isMutating === true)) {
+        return;
       }
-    };
+      // const arrayBuffer = await item.file.arrayBuffer();
+      // const workbook = XLSX.readFile(arrayBuffer, {
+      //   type: "buffer",
+      // });
+      // const worksheetName = workbook.SheetNames[0];
+      // const worksheet = workbook.Sheets[worksheetName];
+
+      // const data: any = XLSX.utils.sheet_to_json(worksheet);
+
+      for (const item of value.fileData) {
+        if (isMutating.current === false) break;
+        try {
+          await togglePersonnelDayOff.mutateAsync({
+            cityName: item.cityName,
+            date: item.date,
+            nameFamily: item.nameFamily,
+            nationalCode: item.nationalCode,
+          });
+        } catch {
+          console.log(moment().format("HH:mm:ss:SSS"));
+        }
+      }
+      dispatch({
+        type: "Update_File_IsMutating_Status",
+        id: value.id,
+        isMutating: false,
+      });
+    }
     return (
       <form
         onSubmit={(e) => e.preventDefault()}
@@ -341,6 +496,12 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
                       >
                         عملیات
                       </th>
+                      <th
+                        scope="col"
+                        className=" p-2 text-center text-xs font-medium uppercase  tracking-wider text-primary"
+                      >
+                        وضعیت
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="relative divide-y">
@@ -355,32 +516,85 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
                         <td className="whitespace-nowrap p-2 text-center text-sm text-primary ">
                           {file.size}
                         </td>
-                        <td className="flex justify-center gap-2 whitespace-nowrap p-2 text-center text-sm text-primary ">
-                          <Button
-                            type="submit"
-                            className="bg-accent/10 text-accent"
-                            onClick={() => {
-                              onReadXLSX(file);
-                            }}
-                          >
-                            {togglePersonnelDayOff.isLoading && (
-                              <ThreeDotsWave />
-                            )}
-                            رد کردن مرخصی
-                          </Button>
-                          <Button
-                            type="submit"
-                            className="bg-rose-700/10 text-rose-700"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              dispatch({
-                                type: "DELETE_FILE_FROM_INPUT",
-                                id: file.id,
-                              });
-                            }}
-                          >
-                            <TrashIcon className="h-5 w-5" />
-                          </Button>
+
+                        <td className="whitespace-nowrap p-2 text-center text-sm text-primary ">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              disabled={!file.isMutating}
+                              type="submit"
+                              className="bg-accent/10 text-accent"
+                              onClick={() => {
+                                dispatch({
+                                  type: "Update_File_IsMutating_Status",
+                                  id: file.id,
+                                  isMutating: false,
+                                });
+                                isMutating.current = false;
+                              }}
+                            >
+                              لغو
+                            </Button>
+                            <Button
+                              disabled={
+                                input.filter((a) => a.isMutating === true)
+                                  .length > 0
+                              }
+                              type="submit"
+                              className="bg-accent/10 text-accent"
+                              onClick={() => {
+                                dispatch({
+                                  type: "Reset_File_Mutate_Status",
+                                  id: file.id,
+                                });
+
+                                dispatch({
+                                  type: "Update_File_IsMutating_Status",
+                                  id: file.id,
+                                  isMutating: true,
+                                });
+                                isMutating.current = true;
+                                onMutateFile(file);
+                              }}
+                            >
+                              رد کردن مرخصی
+                            </Button>
+
+                            <Button
+                              type="submit"
+                              className="bg-rose-700/10 text-rose-700"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                dispatch({
+                                  type: "DELETE_FILE_FROM_INPUT",
+                                  id: file.id,
+                                });
+                              }}
+                            >
+                              <TrashIcon className="h-5 w-5" />
+                            </Button>
+                          </div>
+                        </td>
+                        <td className="whitespace-nowrap p-2 text-center text-sm text-primary ">
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="flex flex-col items-center justify-center gap-1">
+                              <UserCheckIcon className="stroke-emerald-600" />
+                              <span className="w-full ">
+                                {file?.mutate?.done ?? 0}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-center justify-center gap-1 text-center">
+                              <UserXIcon className=" stroke-rose-600" />
+                              <span className="w-full text-left ">
+                                {file?.mutate?.error ?? 0}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-center justify-center gap-1 text-center">
+                              <ListOrderedIcon className=" stroke-amber-600" />
+                              <span className="w-full text-left ">
+                                {file?.rowCount ?? 0}
+                              </span>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -422,5 +636,4 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
-XlsxViewer.displayName = "XlsxViewer";
 export default XlsxViewer;
