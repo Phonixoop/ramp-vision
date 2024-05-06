@@ -325,30 +325,32 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
 
         setDragActive(false);
 
-        let filestoAdd = [];
-        files.forEach(async (file) => {
-          const arrayBuffer = await file.arrayBuffer();
-          const workbook = XLSX.read(arrayBuffer, {
-            type: "buffer",
-          });
-          const worksheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[worksheetName];
+        let filestoAdd = await Promise.all(
+          files.map(async (file) => {
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, {
+              type: "buffer",
+            });
+            const worksheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[worksheetName];
 
-          const data: any = XLSX.utils.sheet_to_json(worksheet);
+            const data: any = XLSX.utils.sheet_to_json(worksheet);
 
-          filestoAdd.push({
-            file: file,
-            fileData: data,
-            rowCount: data.length,
-            size: file.size,
-            name: file.name,
-            isMutating: false,
-            id: generateUUID(),
-          });
-        }),
-          // at least one file has been selected
-          addFilesToState(filestoAdd);
+            return {
+              file: file,
+              fileData: data,
+              rowCount: data.length,
+              size: file.size,
+              name: file.name,
+              isMutating: false,
+              id: generateUUID(),
+            };
+          }),
+        );
 
+        // Now, filestoAdd is an array of objects, not promises
+        // at least one file has been selected
+        addFilesToState(filestoAdd);
         e.dataTransfer.clearData();
       }
     };
