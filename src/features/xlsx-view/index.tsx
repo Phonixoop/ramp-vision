@@ -636,4 +636,6 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
+
+XlsxViewer.displayName = "XlsxViewer";
 export default XlsxViewer;
