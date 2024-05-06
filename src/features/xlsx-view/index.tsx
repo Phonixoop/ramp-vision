@@ -46,7 +46,7 @@ export interface InputProps
 
 // type TogglePersonnelDayOff =
 //   RouterOutputs["personnelPerformance"]["togglePersonnelDayOff"][number];
-const FileInput = forwardRef<HTMLInputElement, InputProps>(
+const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {
     const togglePersonnelDayOff =
       api.personnelPerformance.togglePersonnelDayOff.useMutation({
@@ -423,5 +423,5 @@ const FileInput = forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
-FileInput.displayName = "FileInput";
-export { FileInput };
+XlsxViewer.displayName = "XlsxViewer";
+export default XlsxViewer;

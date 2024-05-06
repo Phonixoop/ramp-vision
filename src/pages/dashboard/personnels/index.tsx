@@ -47,8 +47,8 @@ import withConfirmation from "~/ui/with-confirmation";
 import Modal from "~/ui/modals";
 import { Loader2Icon } from "lucide-react";
 import { sortDates } from "~/lib/utils";
-import XlsxView from "~/features/xlsx-reader-view";
-import { FileInput } from "~/features/xlsx-view";
+
+import XlsxViewer from "~/features/xlsx-view";
 export default function GaugesPage() {
   const { hasManagePersonnelAccess } = UseUserManager();
   const [filters, setFilters] = useState({
@@ -397,7 +397,7 @@ export default function GaugesPage() {
             }}
           />
           {/* <XlsxView /> */}
-          <FileInput />
+          <XlsxViewer />
           <Modal
             center
             isOpen={!!personnel}
