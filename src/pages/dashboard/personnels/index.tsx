@@ -47,6 +47,8 @@ import withConfirmation from "~/ui/with-confirmation";
 import Modal from "~/ui/modals";
 import { Loader2Icon } from "lucide-react";
 import { sortDates } from "~/lib/utils";
+import XlsxView from "~/features/xlsx-reader-view";
+import { FileInput } from "~/features/xlsx-view";
 export default function GaugesPage() {
   const { hasManagePersonnelAccess } = UseUserManager();
   const [filters, setFilters] = useState({
@@ -146,7 +148,7 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "کابران",
+          header: "نام",
           accessorKey: "NameFamily",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -170,6 +172,31 @@ export default function GaugesPage() {
               </>
             );
           },
+        },
+        {
+          header: "کد ملی",
+          accessorKey: "NationalCode",
+          filterFn: "arrIncludesSome",
+          // Filter: ({ column }) => {
+          //   return (
+          //     <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          //       <span className="font-bold text-primary">کد ملی</span>
+          //       <SelectColumnFilter
+          //         initialFilters={defaultProjectTypes}
+          //         column={column}
+          //         data={getPersonnls.data}
+          //         onChange={(filter) => {
+          //           // setDataFilters((prev) => {
+          //           //   return {
+          //           //     ...prev,
+          //           //     [filter.id]: filter.values,
+          //           //   };
+          //           // });
+          //         }}
+          //       />
+          //     </div>
+          //   );
+          // },
         },
         // {
         //   header: "استان",
@@ -312,7 +339,7 @@ export default function GaugesPage() {
             ];
 
             const DateInfos = sortDates({ dates: _DateInfos });
-            console.log(DateInfos[DateInfos.length - 1]);
+
             if (DateInfos.length <= 0) return;
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
@@ -349,7 +376,7 @@ export default function GaugesPage() {
         className="flex min-h-screen w-full flex-col gap-5 bg-secondary"
         dir="rtl"
       >
-        <div className="mx-auto flex w-11/12 flex-col-reverse items-center justify-between  gap-5  py-5 md:flex-row-reverse md:items-start">
+        <div className="mx-auto flex w-11/12 flex-col items-center justify-center  gap-5  py-5  ">
           <Table
             hasClickAction={hasManagePersonnelAccess}
             onClick={(row) => {
@@ -369,7 +396,8 @@ export default function GaugesPage() {
               return <></>;
             }}
           />
-
+          {/* <XlsxView /> */}
+          <FileInput />
           <Modal
             center
             isOpen={!!personnel}
