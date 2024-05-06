@@ -397,7 +397,7 @@ export default function GaugesPage() {
             }}
           />
           {/* <XlsxView /> */}
-          <XlsxViewer />
+          {hasManagePersonnelAccess && <XlsxViewer />}
           <Modal
             center
             isOpen={!!personnel}
