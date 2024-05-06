@@ -107,7 +107,7 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
       });
 
     const [dragActive, setDragActive] = useState<boolean>(false);
-    const [excelFile, setExcelFile] = useState(undefined);
+
     const [input, dispatch] = useReducer((state: State, action: Action) => {
       switch (action.type) {
         case "ADD_FILES_TO_INPUT": {
@@ -155,14 +155,13 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
           // validate file type
           const valid = validateFileType(e.target.files[0]);
           if (!valid) {
-            toast("Invalid file type", {
-              description: "Please upload a valid file type.",
+            toast("فایل نامعتبر", {
+              description: "لطفا از فایل اکسل مانند xlsx و csv استفاده کنید",
             });
             return;
           }
 
           const { name, size } = e.target.files[0];
-          setExcelFile(e.target.files[0]);
 
           addFilesToState([
             { file: e.target.files[0], name, size, id: generateUUID() },
@@ -188,14 +187,14 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
         const validFiles = files.filter((file) => validateFileType(file));
 
         if (files.length !== validFiles.length) {
-          toast("Invalid file type", {
-            description: "Only xlsx,csv files are allowed.",
+          toast("فایل نامعتبر", {
+            description: "لطفا از فایل اکسل مانند xlsx و csv استفاده کنید",
           });
+          setDragActive(false);
+          return;
         }
 
         setDragActive(false);
-
-        setExcelFile(files[0]);
 
         // at least one file has been selected
         addFilesToState(
@@ -307,7 +306,7 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
                   ref={ref}
                   multiple
                   onChange={handleChange}
-                  accept="*.xlsx, *.csv"
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv" // Correct accept attribute
                   id="dropzone-file"
                   type="file"
                   className="hidden"
@@ -408,7 +407,7 @@ const XlsxViewer = forwardRef<HTMLInputElement, InputProps>(
                       ref={ref}
                       multiple
                       onChange={handleChange}
-                      accept="*.xlsx, *.csv"
+                      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv" // Correct accept attribute
                       type="file"
                       id="dropzone-file-images-present"
                       className=" z-20 hidden"
