@@ -423,5 +423,5 @@ const FileInput = forwardRef<HTMLInputElement, InputProps>(
     );
   },
 );
-
+FileInput.displayName = "FileInput";
 export { FileInput };
