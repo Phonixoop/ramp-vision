@@ -14,7 +14,7 @@ const GaugeChart = dynamic(() => import("react-gauge-component"), {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 export default function Gauge({ value }) {
-  if (!value) return <></>;
+  if (value == undefined || value == null) return <></>;
   return (
     <div className="text-center">
       <GaugeChart
@@ -89,7 +89,6 @@ export default function Gauge({ value }) {
         value={Math.round(Number.isNaN(value) ? 0 : value)}
       />
       <span className="text-primary">
-        {" "}
         {(Number.isNaN(value) ? 0 : value).toFixed(2)}
       </span>
     </div>

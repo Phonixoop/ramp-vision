@@ -128,6 +128,8 @@ export default function CityPage({ children, city }) {
             "ContractType",
             "ProjectType",
             "TotalPerformance",
+            "DirectPerFormance",
+            "InDirectPerFormance",
             "Start_Date",
             "HasTheDayOff",
             "COUNT",
@@ -230,6 +232,8 @@ export default function CityPage({ children, city }) {
             "ContractType",
             "ProjectType",
             "TotalPerformance",
+            "DirectPerFormance",
+            "InDirectPerFormance",
             "Start_Date",
             "HasTheDayOff",
           ],
@@ -584,14 +588,32 @@ export default function CityPage({ children, city }) {
                     }}
                   />
                 </div>
-                <div className="col-span-2  flex  w-full flex-col items-center justify-center">
-                  <H2>عملکرد</H2>
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-center lg:flex-row">
+              <div className="col-span-2  flex  w-full flex-col items-center justify-center">
+                <H2>عملکرد کلی</H2>
 
-                  <Gauge value={selectedPerson?.TotalPerformance} />
-                  <p className="text-accent">
-                    {getPerformanceText(selectedPerson?.TotalPerformance)}
-                  </p>
-                </div>
+                <Gauge value={selectedPerson?.TotalPerformance} />
+                <p className="text-accent">
+                  {getPerformanceText(selectedPerson?.TotalPerformance)}
+                </p>
+              </div>
+              <div className="col-span-2  flex  w-full flex-col items-center justify-center">
+                <H2>عملکرد مستقیم</H2>
+
+                <Gauge value={selectedPerson?.DirectPerFormance} />
+                <p className="text-accent">
+                  {getPerformanceText(selectedPerson?.DirectPerFormance)}
+                </p>
+              </div>
+              <div className="col-span-2  flex  w-full flex-col items-center justify-center">
+                <H2>عملکرد غیر مستقیم</H2>
+
+                <Gauge value={selectedPerson?.InDirectPerFormance} />
+                <p className="text-accent">
+                  {getPerformanceText(selectedPerson?.InDirectPerFormance)}
+                </p>
               </div>
             </div>
           </>

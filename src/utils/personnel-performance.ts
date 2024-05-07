@@ -141,6 +141,8 @@ export function distinctPersonnelPerformanceData(
     return {
       ...item,
       TotalPerformance: item.TotalPerformance / item.key.rowCount,
+      DirectPerFormance: item.DirectPerFormance / item.key.rowCount,
+      InDirectPerFormance: item.InDirectPerFormance / item.key.rowCount,
       // (groupBy.includes("Start_Date")
       //   ? item.key.COUNT
       //   : data.dateLength[city]),

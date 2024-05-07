@@ -4,8 +4,6 @@ import {
   BrainCogIcon,
   FileCheckIcon,
   FileInputIcon,
-  FilePlus2Icon,
-  FilePlusIcon,
   FileScanIcon,
   FunctionSquareIcon,
   SyringeIcon,
@@ -26,7 +24,9 @@ export const PersonnelPerformanceTranslate = {
   WithoutScanCount: "ثبت ارزیابی بدون اسکن مدارک",
   WithoutScanInDirectCount: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
 
-  TotalPerformance: "عملکرد",
+  DirectPerFormance: "عملکرد مستقیم",
+  InDirectPerFormance: "عملکرد غیر مستقیم",
+  TotalPerformance: "عملکرد کلی",
 };
 
 export const PersonnelPerformanceIcons = {
@@ -51,6 +51,8 @@ export const PersonnelPerformanceIcons = {
 
   WithoutScanInDirectCount: <FileScanIcon className="stroke-cyan-900" />,
 
+  DirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
+  InDirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
   TotalPerformance: <FunctionSquareIcon className="stroke-cyan-600" />,
 };
 

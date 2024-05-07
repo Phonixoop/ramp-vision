@@ -104,8 +104,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
         SUM(ArchiveDirectCount) as ArchiveDirectCount,
         SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
+
         SUM(TotalPerformance) as TotalPerformance, 
         
+        SUM(DirectPerFormance) as DirectPerFormance, 
+        SUM(InDirectPerFormance) as InDirectPerFormance, 
+
         DateInfo,Start_Date from dbName1 as p
         JOIN dbName2 as u on p.NationalCode = u.NationalCode  
          `;
@@ -148,8 +152,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
           SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
           SUM(ArchiveDirectCount) as ArchiveDirectCount,
           SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-          SUM(TotalPerformance) as TotalPerformance,  DateInfo,Start_Date
+          SUM(TotalPerformance) as TotalPerformance,DateInfo,Start_Date,
           
+          SUM(DirectPerFormance) as DirectPerFormance, 
+          SUM(InDirectPerFormance) as InDirectPerFormance
+
           from dbName1 as p
           JOIN dbName2 as u on p.NationalCode = u.NationalCode  
            `;
