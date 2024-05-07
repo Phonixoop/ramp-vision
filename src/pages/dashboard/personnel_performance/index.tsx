@@ -196,11 +196,15 @@ function PersonnelPerformanceTable({ sessionData }) {
           "WithoutScanInDirectCount",
           "ArchiveDirectCount",
           "ArchiveInDirectCount",
+          "SabtVisitInDirectCount",
           "Role",
           "RoleType",
           "ContractType",
           "ProjectType",
           "TotalPerformance",
+          "DirectPerFormance",
+          "InDirectPerFormance",
+
           "Start_Date",
           "DateInfo",
           "HasTheDayOff",
@@ -479,7 +483,7 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
-          header: "عملکرد",
+          header: "عملکرد کلی",
           accessorKey: "TotalPerformance",
           cell: ({ row }) => (
             <span>{row.original.TotalPerformance.toFixed(2)}</span>
@@ -496,6 +500,61 @@ function PersonnelPerformanceTable({ sessionData }) {
                     0,
                   ),
               ),
+            ),
+        },
+        {
+          header: "عملکرد مستقیم",
+          accessorKey: "DirectPerFormance",
+          cell: ({ row }) => (
+            <span>{row.original.DirectPerFormance.toFixed(2)}</span>
+          ),
+          footer: ({ table }) =>
+            commify(
+              Math.round(
+                table
+                  .getFilteredRowModel()
+                  .rows.reduce(
+                    (total, row) =>
+                      (total as number) +
+                      (row.getValue("DirectPerFormance") as number),
+                    0,
+                  ),
+              ),
+            ),
+        },
+        {
+          header: "عملکرد غیر مستقیم",
+          accessorKey: "InDirectPerFormance",
+          cell: ({ row }) => (
+            <span>{row.original.InDirectPerFormance.toFixed(2)}</span>
+          ),
+          footer: ({ table }) =>
+            commify(
+              Math.round(
+                table
+                  .getFilteredRowModel()
+                  .rows.reduce(
+                    (total, row) =>
+                      (total as number) +
+                      (row.getValue("InDirectPerFormance") as number),
+                    0,
+                  ),
+              ),
+            ),
+        },
+        {
+          header: "ثبت ویزیت غیر مستقیم",
+          accessorKey: "SabtVisitInDirectCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("SabtVisitInDirectCount") as number),
+                  0,
+                ),
             ),
         },
         {

@@ -123,6 +123,7 @@ export default function CityPage({ children, city }) {
             "WithoutScanInDirectCount",
             "ArchiveDirectCount",
             "ArchiveInDirectCount",
+            "SabtVisitInDirectCount",
             "Role",
             "RoleType",
             "ContractType",
@@ -227,6 +228,7 @@ export default function CityPage({ children, city }) {
             "WithoutScanInDirectCount",
             "ArchiveDirectCount",
             "ArchiveInDirectCount",
+            "SabtVisitInDirectCount",
             "Role",
             "RoleType",
             "ContractType",
@@ -277,11 +279,14 @@ export default function CityPage({ children, city }) {
             "WithoutScanInDirectCount",
             "ArchiveDirectCount",
             "ArchiveInDirectCount",
+            "SabtVisitInDirectCount",
             "Role",
             "RoleType",
             "ContractType",
             "ProjectType",
             "TotalPerformance",
+            "DirectPerFormance",
+            "InDirectPerFormance",
             "Start_Date",
             "HasTheDayOff",
           ],
@@ -399,7 +404,7 @@ export default function CityPage({ children, city }) {
                 dir="rtl"
               >
                 {numericItems.map(([key, value], index, array) => {
-                  // const isLastItem = index === array.length - 1;
+                  const isLastItem = index === array.length - 1;
 
                   if (!PersonnelPerformanceIcons[key]) return;
                   return (
@@ -444,6 +449,9 @@ export default function CityPage({ children, city }) {
                           </span>
                         </div>
                       </div>
+                      {numericItems.length % 2 != 0 && isLastItem && (
+                        <div className="cross_hatch_pattern hidden w-full max-w-sm rounded-xl sm:block" />
+                      )}
                     </>
                   );
                 })}

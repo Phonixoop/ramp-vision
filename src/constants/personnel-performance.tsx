@@ -7,6 +7,7 @@ import {
   FileScanIcon,
   FunctionSquareIcon,
   SyringeIcon,
+  ViewIcon,
 } from "lucide-react";
 
 export const PersonnelPerformanceTranslate = {
@@ -20,9 +21,10 @@ export const PersonnelPerformanceTranslate = {
   ArzyabiAsnadDaroIndirect: "ارزیابی اسناد دارو غیر مستقیم",
   ArchiveDirectCount: "بایگانی مستقیم",
   ArchiveInDirectCount: "بایگانی غیر مستقیم",
-  WithScanCount: "ثبت ارزیابی با اسکن مدارک",
   WithoutScanCount: "ثبت ارزیابی بدون اسکن مدارک",
   WithoutScanInDirectCount: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+  WithScanCount: "ثبت ارزیابی با اسکن مدارک",
+  SabtVisitInDirectCount: "ثبت ویزیت غیر مستقیم",
 
   DirectPerFormance: "عملکرد مستقیم",
   InDirectPerFormance: "عملکرد غیر مستقیم",
@@ -50,6 +52,8 @@ export const PersonnelPerformanceIcons = {
   WithoutScanCount: <FileScanIcon className="stroke-cyan-700" />,
 
   WithoutScanInDirectCount: <FileScanIcon className="stroke-cyan-900" />,
+
+  SabtVisitInDirectCount: <ViewIcon className="stroke-cyan-900" />,
 
   DirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
   InDirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
