@@ -10,6 +10,24 @@ export function uniqueArray<T>(array): T[] {
   return Array.from(new Set(array));
 }
 
+interface UniqueResult<T> {
+  result: T[];
+  counts: { [key: string]: number };
+}
+
+export function uniqueArrayWithCounts<T>(array: T[]): UniqueResult<T> {
+  const uniqueItems = Array.from(new Set(array));
+  const counts: { [key: string]: number } = {};
+
+  // Count occurrences of each item
+  array.forEach((item) => {
+    const key = String(item);
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  return { result: uniqueItems, counts };
+}
+
 export function sortDates({
   dates,
   format = "YYYY/MM/DD",

@@ -170,12 +170,16 @@ export const personnelPerformanceRouter = createTRPCRouter({
             return extractYearAndMonth(d);
           });
 
-          const date = filter.Start_Date[0].split("/");
+          let dates = filter.Start_Date.map((d) => {
+            const _d = d.split("/");
+            return `'${_d[0]}/${_d[1]}'`;
+          });
+
           whereClause = generateWhereClause(
             filter,
             ["Start_Date"],
             undefined,
-            `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}') AND `,
+            `SUBSTRING(Start_Date, 1, 7) IN (${dates.join(",")}) AND `,
           );
 
           whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
@@ -207,7 +211,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        //  console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -353,7 +357,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       FROM dbName.dbo.personnel_performance as p
       JOIN
       RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-      whereClause
+      whereClause AND HasTheDayOff = 0
 
       group by CityName,p.Start_Date ORDER BY CityName ASC
       `;
@@ -369,6 +373,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
         if (input.periodType === "ماهانه") {
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
+          });
+
+          let dates = filter.Start_Date.map((d) => {
+            const _d = d.split("/");
+
+            return `LIKE '${_d[0]}/${_d[1]}/%'`;
           });
           const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
@@ -400,14 +410,16 @@ export const personnelPerformanceRouter = createTRPCRouter({
         FROM dbName.dbo.personnel_performance as p
         JOIN
         RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-        whereClause AND Start_Date LIKE '${date[0]}/${date[1]}%'
+        whereClause AND (Start_Date ${dates.join(
+          " OR Start_Date ",
+        )}) AND HasTheDayOff = 0
 
         group by CityName,p.Start_Date ORDER BY CityName ASC
         `;
         }
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
-        // console.log(queryCities);
+        console.log(queryCities);
         const resultOfCities = await sql.query(queryCities);
 
         const uniqueData = resultOfCities.recordsets[0].filter(

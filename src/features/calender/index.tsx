@@ -81,7 +81,7 @@ type Props = {
   year?: number;
   customData?: any[];
   collapsedUi?: boolean;
-  listOfMonths?: string[];
+  listOfDates?: Moment[];
 };
 
 export default function Calender({
@@ -94,7 +94,7 @@ export default function Calender({
   defaultMonth = -1,
   customData = undefined,
   collapsedUi = false,
-  listOfMonths = [],
+  listOfDates = [],
 }: Props) {
   const [calendar, setCalender] = useState(
     getMonthDays(
@@ -104,23 +104,55 @@ export default function Calender({
     ),
   );
   let _listOfMonths = MONTHS;
-  if (listOfMonths && listOfMonths.length > 0)
-    _listOfMonths = orderBasedOnFirstList(MONTHS, listOfMonths);
+  const listOfYears = listOfDates.map((d) => d.locale("fa").format("YYYY"));
+  let listOfMonthsOutOfGivenDates = listOfDates.map((d) =>
+    d.locale("fa").format("MMMM"),
+  );
+  if (listOfMonthsOutOfGivenDates && listOfMonthsOutOfGivenDates.length > 0)
+    _listOfMonths = orderBasedOnFirstList(MONTHS, listOfMonthsOutOfGivenDates);
   return (
-    <div className="grid w-full  gap-10 p-2 ">
+    <div className="grid w-full  gap-5 p-2 ">
+      <LayoutGroup id="months-InPageMenu">
+        <InPageMenu
+          collapsedUi={collapsedUi}
+          className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
+          startIndex={0}
+          list={listOfYears}
+          onChange={(value: { item: any; index: number }) => {
+            const newCalendar = getMonthDays(
+              moment()
+                .locale("fa")
+                .jYear(parseInt(value.item.name))
+                .jMonth(calendar[16].jMonth()),
+            );
+
+            setCalender(newCalendar);
+            // onMonthChange(
+            //   newCalendar.at(0),
+            //   newCalendar.at(newCalendar.length - 1),
+            // );
+          }}
+        />
+      </LayoutGroup>
       {withMonthMenu && (
         <LayoutGroup id="months-InPageMenu">
           <InPageMenu
             collapsedUi={collapsedUi}
             className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
             startIndex={
-              listOfMonths && listOfMonths.length > 0 ? 0 : defaultMonth
+              listOfMonthsOutOfGivenDates &&
+              listOfMonthsOutOfGivenDates.length > 0
+                ? 0
+                : defaultMonth
             }
             list={_listOfMonths}
             onChange={(value: { item: any; index: number }) => {
+              const monthIndex = MONTHS.find((x) => x === value.item.name);
+
               const newCalendar = getMonthDays(
-                moment().locale("fa").jYear(year).jMonth(value.index),
+                moment().locale("fa").jYear(year).jMonth(monthIndex),
               );
+              console.log(value.index);
               setCalender(newCalendar);
               // onMonthChange(
               //   newCalendar.at(0),

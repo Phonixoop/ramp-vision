@@ -2,6 +2,7 @@ import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/utils/api";
 import {
+  distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
@@ -17,6 +18,8 @@ import {
   defualtContractTypes,
   defualtRoles,
 } from "~/constants/personnel-performance";
+import moment from "jalali-moment";
+import { uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
@@ -39,12 +42,52 @@ export function CitiesWithDatesPerformanceBarChart({
       },
       {
         select: (data) => {
-          return distinctPersonnelPerformanceData(
-            data,
-            ["Start_Date", "CityName"],
-            ["TotalPerformance", "COUNT"],
-            { CityName: filters.filter.CityName },
+          const dates = uniqueArrayWithCounts(
+            data?.result.map((a) => a.Start_Date.slice(0, 7)),
           );
+          if (dates.result.length === 1) {
+            return distinctPersonnelPerformanceData(
+              data,
+
+              ["Start_Date", "CityName"],
+              ["TotalPerformance", "COUNT"],
+              { CityName: filters.filter.CityName },
+            );
+          }
+
+          const result: any = data.result.map((a) => {
+            return {
+              ...a,
+              Start_Date: moment(a.Start_Date, "jYYYY/jMM/jDD")
+                .locale("fa")
+                .format("MMMM"),
+            };
+          });
+
+          const resultGroupByStartDate = Object.groupBy(
+            result,
+            (item: any) => item.Start_Date,
+          );
+
+          const rrr = Object.entries(resultGroupByStartDate).map(
+            ([key, value]) => {
+              const vv: any = distinctDataAndCalculatePerformance(
+                { ...data, result: value },
+                ["Start_Date", "CityName"],
+                ["TotalPerformance", "COUNT"],
+                { CityName: filters.filter.CityName },
+              );
+              return {
+                key: { Start_Date: key },
+                COUNT: 1,
+                ...vv[0],
+              };
+            },
+          );
+
+          return rrr;
+
+          // console.log({ d });
         },
         refetchOnWindowFocus: false,
       },
@@ -75,6 +118,7 @@ export function CitiesWithDatesPerformanceBarChart({
               width={500}
               height={500}
               data={(getCitiesWithPerformance?.data ?? []).map((row) => {
+                console.log({ row });
                 return {
                   تاریخ: row.key.Start_Date,
                   عملکرد: Math.round(row.TotalPerformance / row.COUNT),

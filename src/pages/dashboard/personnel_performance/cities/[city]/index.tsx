@@ -400,7 +400,7 @@ export default function CityPage({ children, city }) {
           <>
             <div className="flex w-full flex-col items-start justify-center gap-5 xl:flex-row">
               <div
-                className="grid grid-cols-1 divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn rounded-xl bg-secondary p-2  md:grid-cols-2 "
+                className="grid grid-cols-1  divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn rounded-xl bg-secondary  p-2 lg:grid-cols-2 "
                 dir="rtl"
               >
                 {numericItems.map(([key, value], index, array) => {
@@ -489,11 +489,13 @@ export default function CityPage({ children, city }) {
                   <Calender
                     withMonthMenu
                     collapsedUi
-                    listOfMonths={uniqueArray(
-                      selectedPerson.sparkData.map(
-                        (a) => a.Start_Date.split("/")[1],
+                    listOfDates={uniqueArray(
+                      selectedPerson.sparkData.map((a) =>
+                        moment(a.Start_Date, "jYYYY/jMM/jDD")
+                          .format("jYYYY/jMM")
+                          .slice(0, 7),
                       ),
-                    ).map((a) => moment(a, "jMM").locale("fa").format("MMMM"))}
+                    ).map((a) => moment(a, "jYYYY/jMM "))}
                     year={parseInt(
                       selectedPerson.sparkData[0].Start_Date.split("/")[0],
                     )}
@@ -577,15 +579,7 @@ export default function CityPage({ children, city }) {
                                         : undefined,
                                     }}
                                   >
-                                    <span
-                                      className={twMerge(
-                                        "flex items-center justify-center bg-secondary text-xs text-primary",
-
-                                        `h-6 w-6 rounded-full `,
-                                      )}
-                                    >
-                                      {date.format("D")}
-                                    </span>
+                                    <SingleDayView date={date} />
                                   </div>
                                 )}
                               </ToolTipSimple>
@@ -747,17 +741,23 @@ export function TogglePersonelDayOffButton({
           // });
         }}
       >
-        <span
-          className={twMerge(
-            "flex items-center justify-center bg-secondary text-xs text-primary",
-
-            `h-6 w-6 rounded-full `,
-          )}
-        >
-          {date.format("D")}
-        </span>
+        <SingleDayView date={date} />
       </ButtonWithConfirmation>
     </>
+  );
+}
+
+function SingleDayView({ date }: { date: Moment }) {
+  return (
+    <span
+      className={twMerge(
+        "flex items-center justify-center bg-secondary text-xs text-primary",
+
+        `h-6 w-6 rounded-full `,
+      )}
+    >
+      {date.format("D")}
+    </span>
   );
 }
 
