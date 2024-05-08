@@ -19,7 +19,7 @@ import {
   defualtRoles,
 } from "~/constants/personnel-performance";
 import moment from "jalali-moment";
-import { uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
+import { groupBy, uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
@@ -64,7 +64,7 @@ export function CitiesWithDatesPerformanceBarChart({
             };
           });
 
-          const resultGroupByStartDate = Object.groupBy(
+          const resultGroupByStartDate = groupBy(
             result,
             (item: any) => item.Start_Date,
           );

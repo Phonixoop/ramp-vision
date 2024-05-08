@@ -28,6 +28,25 @@ export function uniqueArrayWithCounts<T>(array: T[]): UniqueResult<T> {
   return { result: uniqueItems, counts };
 }
 
+export function groupBy<T>(
+  items: Iterable<T>,
+  keySelector: (item: T, index: number) => any,
+): Partial<Record<any, T[]>> {
+  const grouped: Partial<Record<any, T[]>> = {};
+
+  let index = 0;
+  for (const item of items) {
+    const key = keySelector(item, index);
+    if (!(key in grouped)) {
+      grouped[key] = [];
+    }
+    grouped[key]!.push(item);
+    index++;
+  }
+
+  return grouped;
+}
+
 export function sortDates({
   dates,
   format = "YYYY/MM/DD",
