@@ -183,6 +183,10 @@ function PersonnelPerformanceTable({ sessionData }) {
           "CityName",
           "NationalCode",
           "NameFamily",
+          "TownName",
+          "BranchCode",
+          "BranchName",
+          "BranchType",
           "SabtAvalieAsnad",
           "PazireshVaSabtAvalieAsnad",
           "ArzyabiAsanadBimarsetaniDirect",
@@ -459,7 +463,7 @@ function PersonnelPerformanceTable({ sessionData }) {
         {
           header: "نوع سمت",
           enablePinning: true,
-          hSticky: true,
+          hSticky: false,
           accessorKey: "RoleType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
@@ -543,6 +547,110 @@ function PersonnelPerformanceTable({ sessionData }) {
             ),
         },
         {
+          header: "نام شهر",
+          enablePinning: true,
+          hSticky: false,
+          accessorKey: "TownName",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">نام شهر</span>
+                <SelectColumnFilter
+                  column={column}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
+        {
+          header: "نام شعبه",
+          enablePinning: true,
+          hSticky: false,
+          accessorKey: "BranchName",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">نام شعبه</span>
+                <SelectColumnFilter
+                  column={column}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
+        {
+          header: "کد شعبه",
+          enablePinning: true,
+          hSticky: false,
+          accessorKey: "BranchCode",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">کد شعبه</span>
+                <SelectColumnFilter
+                  column={column}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
+        {
+          header: "نوع شعبه",
+          enablePinning: true,
+          hSticky: false,
+          accessorKey: "BranchType",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">نوع شعبه</span>
+                <SelectColumnFilter
+                  column={column}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
+        {
           header: "ثبت ویزیت غیر مستقیم",
           accessorKey: "SabtVisitInDirectCount",
           footer: ({ table }) =>
@@ -557,6 +665,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                 ),
             ),
         },
+
         {
           header: "ثبت اولیه اسناد",
           accessorKey: "SabtAvalieAsnad",
