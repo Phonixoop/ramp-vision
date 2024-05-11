@@ -356,7 +356,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
       p.Start_Date,
       COUNT(*) AS COUNT,
       SUM(TotalPerformance) AS TotalPerformance,
-  
+      SUM(DirectPerFormance) AS DirectPerFormance,
+      SUM(InDirectPerFormance) AS InDirectPerFormance,
       
       SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
       SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
@@ -408,7 +409,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
         p.Start_Date,
         COUNT(*) AS COUNT,
         SUM(TotalPerformance) AS TotalPerformance,
-    
+        SUM(DirectPerFormance) AS DirectPerFormance,
+        SUM(InDirectPerFormance) AS InDirectPerFormance,
         
         SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
         SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,

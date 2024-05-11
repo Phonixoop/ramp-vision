@@ -38,6 +38,8 @@ export type CityWithPerformanceData = {
   CityName_En: string;
   CityName_Fa: string;
   TotalPerformance: number;
+  DirectPerFormance: number;
+  InDirectPerFormance: number;
 };
 
 export type TableJson = {

@@ -63,6 +63,8 @@ export function distinctDataAndCalculatePerformance(
     "ArchiveInDirectCount",
     "COUNT",
     "TotalPerformance",
+    "DirectPerFormance",
+    "InDirectPerFormance",
   ],
   where = {},
 ) {
@@ -166,7 +168,8 @@ function mapToCitiesWithPerformance({
       CityName_En: item.key.CityName,
       CityName_Fa: getEnglishToPersianCity(item.key.CityName),
       TotalPerformance: item.TotalPerformance / item.COUNT,
-
+      DirectPerFormance: item.DirectPerFormance / item.COUNT,
+      InDirectPerFormance: item.InDirectPerFormance / item.COUNT,
       // calculatePerformance(item, data?.dateLength) /
       // Math.max(
       //   ...data?.result

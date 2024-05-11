@@ -36,6 +36,7 @@ import { FilterIcon } from "lucide-react";
 import ResponsiveView from "~/features/responsive-view";
 import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
 import { sortDates } from "~/lib/utils";
+import { CityWithPerformanceData } from "~/types";
 
 export default function GaugesPage() {
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
@@ -119,14 +120,12 @@ export default function GaugesPage() {
   }, [getCitiesWithPerformance.data, cityLevel]);
   return (
     <>
-      <BlurBackground />
-
       <div
         className="flex min-h-screen w-full flex-col gap-5 bg-secondary"
         dir="rtl"
       >
-        <div className="mx-auto flex w-11/12 flex-col-reverse items-center justify-between  gap-5  py-5 md:flex-row-reverse md:items-start">
-          <div className="grid grid-cols-1 gap-4  sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto flex w-11/12  items-center justify-between  gap-5  py-5 md:flex-row-reverse md:items-start">
+          <div className="flex w-full flex-col items-center justify-center gap-5">
             {getCitiesWithPerformance.isLoading ? (
               <>
                 {Array.from(
@@ -143,20 +142,38 @@ export default function GaugesPage() {
                 })}
               </>
             ) : (
-              result.map((city: any, i) => {
+              result.map((city: CityWithPerformanceData, i) => {
                 return (
                   <>
                     <div
                       key={i}
-                      className="flex w-full  flex-col items-center  justify-between gap-5 rounded-2xl "
+                      className="flex w-full items-stretch justify-between gap-2  rounded-xl bg-secbuttn  "
                     >
-                      <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl border border-dashed border-accent/50 bg-secbuttn/50 py-5 xl:w-auto  xl:p-5">
-                        <H2>{getEnglishToPersianCity(city.CityName_Fa)}</H2>
-
-                        <Gauge value={city.TotalPerformance} />
-                        <p className="text-accent">
-                          {getPerformanceText(city.TotalPerformance)}
-                        </p>
+                      <H2 className="w-16 min-w-fit content-center rounded-l-2xl border border-dashed border-accent/10 bg-secondary text-center text-lg text-accent">
+                        {getEnglishToPersianCity(city.CityName_Fa)}
+                      </H2>
+                      <div className="flex w-full  items-center justify-between  gap-5 rounded-2xl ">
+                        <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl py-5 xl:w-auto  xl:p-5">
+                          <span className="text-accent">عملکرد کلی</span>
+                          <Gauge value={city.TotalPerformance} />
+                          <p className="text-accent">
+                            {getPerformanceText(city.TotalPerformance)}
+                          </p>
+                        </div>
+                        <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl py-5 xl:w-auto  xl:p-5">
+                          <span className="text-accent">عملکرد مستقیم</span>
+                          <Gauge value={city.DirectPerFormance} />
+                          <p className="text-accent">
+                            {getPerformanceText(city.DirectPerFormance)}
+                          </p>
+                        </div>
+                        <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl py-5 xl:w-auto  xl:p-5">
+                          <span className="text-accent">عملکرد غیر مستقیم</span>
+                          <Gauge value={city.TotalPerformance} />
+                          <p className="text-accent">
+                            {getPerformanceText(city.TotalPerformance)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </>
