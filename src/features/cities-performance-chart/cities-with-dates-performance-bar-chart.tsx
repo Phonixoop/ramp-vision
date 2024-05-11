@@ -118,7 +118,6 @@ export function CitiesWithDatesPerformanceBarChart({
               width={500}
               height={500}
               data={(getCitiesWithPerformance?.data ?? []).map((row) => {
-                console.log({ row });
                 return {
                   تاریخ: row.key.Start_Date,
                   عملکرد: Math.round(row.TotalPerformance / row.COUNT),

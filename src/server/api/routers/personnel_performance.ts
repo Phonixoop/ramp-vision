@@ -90,6 +90,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
+
+        TownName,
+        BranchCode,
+        BranchName,
+        BranchType,
         
         SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
         SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
@@ -122,7 +127,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
+          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
+          BranchCode,
+          BranchName,
+          BranchType
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "هفتگی") {
@@ -134,12 +142,19 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
+          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
+          BranchCode,
+          BranchName,
+          BranchType
 
           Order By CityName,NameFamily `;
         } else if (input.periodType === "ماهانه") {
           queryStart = `SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
-        
+          TownName,
+          BranchCode,
+          BranchName,
+          BranchType,
+
           SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
           SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
           SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
@@ -182,7 +197,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
             `SUBSTRING(Start_Date, 1, 7) IN (${dates.join(",")}) AND `,
           );
 
-          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff
+          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
+          BranchCode,
+          BranchName,
+          BranchType
             
           Order By CityName,NameFamily `;
           // const date = filter.Start_Date[0].split("/");
@@ -211,7 +229,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        //  console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {

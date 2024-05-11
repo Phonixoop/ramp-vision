@@ -110,6 +110,10 @@ export default function CityPage({ children, city }) {
           [
             "NationalCode",
             "NameFamily",
+            "TownName",
+            "BranchCode",
+            "BranchName",
+            "BranchType",
             "SabtAvalieAsnad",
             "PazireshVaSabtAvalieAsnad",
             "ArzyabiAsanadBimarsetaniDirect",
@@ -137,7 +141,7 @@ export default function CityPage({ children, city }) {
           ],
           { HasTheDayOff: false },
         );
-
+        console.log({ result });
         setUpdatedList(result);
 
         if (!selectedPerson) return;
@@ -160,7 +164,7 @@ export default function CityPage({ children, city }) {
   const numericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "number",
   );
-
+  console.log({ selectedPerson });
   const noneNumericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "string",
   );
@@ -215,6 +219,10 @@ export default function CityPage({ children, city }) {
           [
             "NationalCode",
             "NameFamily",
+            "TownName",
+            "BranchCode",
+            "BranchName",
+            "BranchType",
             "SabtAvalieAsnad",
             "PazireshVaSabtAvalieAsnad",
             "ArzyabiAsanadBimarsetaniDirect",
@@ -266,6 +274,10 @@ export default function CityPage({ children, city }) {
           [
             "NationalCode",
             "NameFamily",
+            "TownName",
+            "BranchCode",
+            "BranchName",
+            "BranchType",
             "SabtAvalieAsnad",
             "PazireshVaSabtAvalieAsnad",
             "ArzyabiAsanadBimarsetaniDirect",
