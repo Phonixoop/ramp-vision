@@ -169,9 +169,9 @@ export default function GaugesPage() {
                         </div>
                         <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl py-5 xl:w-auto  xl:p-5">
                           <span className="text-accent">عملکرد غیر مستقیم</span>
-                          <Gauge value={city.TotalPerformance} />
+                          <Gauge value={city.InDirectPerFormance} />
                           <p className="text-accent">
-                            {getPerformanceText(city.TotalPerformance)}
+                            {getPerformanceText(city.InDirectPerFormance)}
                           </p>
                         </div>
                       </div>
