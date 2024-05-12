@@ -149,9 +149,15 @@ export default function GaugesPage() {
                       key={i}
                       className="flex w-full items-stretch justify-between gap-2  rounded-xl bg-secbuttn  "
                     >
-                      <H2 className="w-16 min-w-fit content-center rounded-l-2xl border border-dashed border-accent/10 bg-secondary text-center text-lg text-accent">
-                        {getEnglishToPersianCity(city.CityName_Fa)}
-                      </H2>
+                      <div className="relative w-16  content-center rounded-l-2xl border border-r-0 border-dashed border-accent/10 bg-secondary ">
+                        <H2
+                          className="  w-full origin-center rotate-180  content-center whitespace-nowrap  text-center text-lg text-accent "
+                          style={{ writingMode: "vertical-rl" }}
+                        >
+                          {getEnglishToPersianCity(city.CityName_Fa)}
+                        </H2>
+                      </div>
+
                       <div className="flex w-full  items-center justify-between  gap-5 rounded-2xl ">
                         <div className="flex w-full flex-col items-center justify-between gap-5  rounded-2xl py-5 xl:w-auto  xl:p-5">
                           <span className="text-accent">عملکرد کلی</span>
