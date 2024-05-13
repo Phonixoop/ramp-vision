@@ -148,7 +148,9 @@ input::-webkit-inner-spin-button {
 
 /* Firefox */
 input[type="number"] {
-  -moz-appearance: textfield;
+  -webkit-appearance: textfield; /* For Safari and Chrome */
+  -moz-appearance: textfield; /* For Firefox */
+  appearance: textfield; /* For other browsers */
 }
 
 #__next {
