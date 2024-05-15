@@ -47,7 +47,7 @@ export function SelectControlled({
   return (
     <div
       className={twMerge(
-        " flex w-full   items-center justify-center gap-1 px-2 text-center sm:px-0 ",
+        " flex w-full items-center justify-center gap-1 px-2 text-center sm:px-0 ",
         className,
       )}
     >

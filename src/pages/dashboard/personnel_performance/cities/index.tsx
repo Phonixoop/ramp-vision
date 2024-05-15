@@ -111,6 +111,10 @@ export default function CitiesPage({ children }) {
           ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
           RoleType: filters?.filter?.RoleType,
           DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
+          TownName: filters?.filter?.TownName,
+          BranchName: filters?.filter?.BranchName,
+          BranchCode: filters?.filter?.BranchCode,
+          BranchType: filters?.filter?.BranchType,
         },
       },
       {
@@ -198,7 +202,7 @@ export default function CitiesPage({ children }) {
 
           {!getInitialFilters.isLoading && (
             <ResponsiveView
-              className=" z-20 flex max-h-[100vh] w-full flex-wrap items-stretch justify-center  bg-secondary sm:max-h-min sm:p-5"
+              className=" z-20 flex max-h-[100vh] w-full flex-wrap items-stretch justify-start  bg-secondary sm:max-h-min sm:p-5"
               dir="rtl"
               btnClassName="bg-secondary text-primary"
               icon={
@@ -336,6 +340,92 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
+              {/* TownName BranchName BranchCode BranchType */}
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+                <span className="font-bold text-primary">نام شهر</span>
+                <SelectControlled
+                  withSelectAll
+                  title={"نام شهر"}
+                  list={getInitialFilters.data.TownNames}
+                  value={filters.filter.TownName ?? []}
+                  onChange={(values) => {
+                    //@ts-ignore
+                    setFilters((prev) => {
+                      return {
+                        periodType: reportPeriod,
+                        filter: {
+                          ...prev.filter,
+                          TownName: values,
+                        },
+                      };
+                    });
+                  }}
+                />
+              </div>
+              <div className="flex min-w-full max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+                <span className="font-bold text-primary">نام شعبه</span>
+                <SelectControlled
+                  withSelectAll
+                  title={"نام شعبه"}
+                  list={getInitialFilters.data.BranchNames}
+                  value={filters.filter.BranchName ?? []}
+                  onChange={(values) => {
+                    //@ts-ignore
+                    setFilters((prev) => {
+                      return {
+                        periodType: reportPeriod,
+                        filter: {
+                          ...prev.filter,
+                          BranchName: values,
+                        },
+                      };
+                    });
+                  }}
+                />
+              </div>
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+                <span className="font-bold text-primary">کد شعبه</span>
+                <SelectControlled
+                  withSelectAll
+                  title={"کد شعبه"}
+                  list={getInitialFilters.data.BranchCodes}
+                  value={filters.filter.BranchCode ?? []}
+                  onChange={(values) => {
+                    //@ts-ignore
+                    setFilters((prev) => {
+                      return {
+                        periodType: reportPeriod,
+                        filter: {
+                          ...prev.filter,
+                          BranchCode: values,
+                        },
+                      };
+                    });
+                  }}
+                />
+              </div>
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+                <span className="font-bold text-primary">نوع شعبه</span>
+                <SelectControlled
+                  withSelectAll
+                  title={"نوع شعبه"}
+                  list={getInitialFilters.data.BranchTypes}
+                  value={filters.filter.BranchType ?? []}
+                  onChange={(values) => {
+                    //@ts-ignore
+                    setFilters((prev) => {
+                      return {
+                        periodType: reportPeriod,
+                        filter: {
+                          ...prev.filter,
+                          BranchType: values,
+                        },
+                      };
+                    });
+                  }}
+                />
+              </div>
+              {/* END TownName BranchName BranchCode BranchType END*/}
               <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
                 <span className="font-bold text-primary">
                   تاریخ گزارش پرسنل

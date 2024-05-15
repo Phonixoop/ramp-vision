@@ -58,6 +58,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
             .array(z.string().nullish())
             .nullish()
             .default(defualtDateInfos),
+          TownName: z.array(z.string()).nullish(),
+          BranchName: z.array(z.string()).nullish(),
+          BranchCode: z.array(z.string()).nullish(),
+          BranchType: z.array(z.string()).nullish(),
         }),
       }),
     )
@@ -318,6 +322,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
             .array(z.string().nullish())
             .nullish()
             .default(defualtDateInfos),
+          TownName: z.array(z.string()).nullish(),
+          BranchName: z.array(z.string()).nullish(),
+          BranchCode: z.array(z.string()).nullish(),
+          BranchType: z.array(z.string()).nullish(),
         }),
       }),
     )
@@ -502,7 +510,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
         });
 
         const query = `
-      SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo FROM RAMP_Daily.dbo.users_info
+      SELECT DISTINCT Role,RoleType,ContractType,ProjectType,DateInfo
+      
+
+      FROM RAMP_Daily.dbo.users_info
       ${whereClauseForRest}
 
       
@@ -512,9 +523,17 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
       SELECT DISTINCT DateInfo FROM RAMP_Daily.dbo.users_info
 
-      SELECT DISTINCT ProjectType FROM RAMP_Daily.dbo.users_info WHERE ProjectType is not NULL AND ProjectType != ''
+      SELECT DISTINCT ProjectType FROM RAMP_Daily.dbo.users_info WHERE ProjectType is not NULL AND ProjectType != ''  
 
+      SELECT DISTINCT  TownName FROM RAMP_Daily.dbo.personnel_performance WHERE TownName is not NULL AND TownName != ''
 
+      SELECT DISTINCT  BranchCode FROM RAMP_Daily.dbo.personnel_performance WHERE BranchCode is not NULL AND BranchCode != ''
+
+      SELECT DISTINCT  BranchName FROM RAMP_Daily.dbo.personnel_performance WHERE BranchName is not NULL AND BranchName != ''
+
+      SELECT DISTINCT  BranchType FROM RAMP_Daily.dbo.personnel_performance WHERE BranchType is not NULL AND BranchType != ''
+
+     
       `;
         // console.log(query);
         const result = await sql.query(query);
@@ -531,6 +550,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
             }),
           DateInfos: result.recordsets[2],
           ProjectTypes: result.recordsets[3].map((c) => c.ProjectType),
+          TownNames: result.recordsets[4].map((c) => c.TownName),
+          BranchCodes: result.recordsets[5].map((c) => c.BranchCode),
+          BranchNames: result.recordsets[6].map((c) => c.BranchName),
+          BranchTypes: result.recordsets[7].map((c) => c.BranchType),
         };
         // Respond with the fetched data
       } catch (error) {

@@ -13,6 +13,10 @@ export type FilterType = {
     Role?: string[];
     RoleType?: string[];
     DateInfo?: string[];
+    TownName?: string[];
+    BranchName?: string[];
+    BranchCode?: string[];
+    BranchType?: string[];
   };
 };
 

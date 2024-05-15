@@ -97,6 +97,10 @@ export default function CityPage({ children, city }) {
         ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
         RoleType: filters?.filter?.RoleType,
         DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
+        TownName: filters?.filter?.TownName,
+        BranchName: filters?.filter?.BranchName,
+        BranchCode: filters?.filter?.BranchCode,
+        BranchType: filters?.filter?.BranchType,
       },
       periodType: filters.periodType,
     },
@@ -141,7 +145,7 @@ export default function CityPage({ children, city }) {
           ],
           { HasTheDayOff: false },
         );
-        console.log({ result });
+
         setUpdatedList(result);
 
         if (!selectedPerson) return;

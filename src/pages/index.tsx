@@ -24,7 +24,7 @@ function Card({ value = -1 }) {
         <span className="text-2xl text-accent">
           {value < 0 ? "..." : value}
         </span>{" "}
-        روز، گزارش گرفته شده
+        روز، گزارش دریافت شده است
       </p>
     </div>
   );

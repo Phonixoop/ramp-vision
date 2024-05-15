@@ -22,6 +22,7 @@ import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { twMerge } from "tailwind-merge";
 import DrawerView from "~/features/drawer-view";
+import { cn } from "~/lib/utils";
 
 function checkStatusForMenu(status, user) {
   if (status === "unauthenticated" || !user)
@@ -36,6 +37,8 @@ function checkStatusForMenu(status, user) {
         case "گیج عملکرد استان ها":
           return false;
         case "پرسنل":
+          return false;
+        case "جزئیات ورودی اسناد مستقیم شعب":
           return false;
       }
       return true;
@@ -62,7 +65,7 @@ function LogoRamp({ className = "" }) {
 }
 export default function Header() {
   const session = useSession();
-
+  const router = useRouter();
   return (
     <>
       <header
@@ -83,7 +86,12 @@ export default function Header() {
                         <>
                           <Link
                             key={i}
-                            className="rounded-lg bg-secbuttn p-2 text-primary"
+                            className={cn(
+                              "rounded-lg bg-secbuttn p-2 text-primary",
+                              item.link === router.asPath
+                                ? "bg-accent/20 text-accent"
+                                : "",
+                            )}
                             href={item.link}
                           >
                             {item.value}
@@ -98,7 +106,12 @@ export default function Header() {
                                     className="flex flex-col pr-4"
                                   >
                                     <Link
-                                      className="w-fit self-start rounded-lg bg-secbuttn p-2  text-primary"
+                                      className={cn(
+                                        "w-fit self-start rounded-lg bg-secbuttn p-2  text-primary",
+                                        subItem.link === router.asPath
+                                          ? "bg-accent/20 text-accent"
+                                          : "",
+                                      )}
                                       href={subItem.link}
                                     >
                                       {subItem.value}

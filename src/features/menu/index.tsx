@@ -85,9 +85,9 @@ function MenuItem({
       <div
         className={twMerge(
           "  relative z-0 flex items-center justify-center  gap-2 rounded-sm px-3 py-2 text-sm",
-          isActive ? "text-accent hover:text-secondary" : " text-primary",
-          isHovered ? "text-secondary" : "",
-          isSub ? "bg-primbuttn/90 text-primary hover:text-secondary" : "",
+          isActive ? "text-accent hover:text-secondary" : " text-accent",
+          isHovered ? "text-accent" : "",
+          isSub ? "bg-secondary text-primary hover:text-accent" : "",
           theme === "solid" ? "rounded-md" : "rounded-full ",
         )}
       >
@@ -98,7 +98,7 @@ function MenuItem({
             }}
             layoutId="bg-follower"
             className={twMerge(
-              "absolute inset-0 -z-10 bg-primary  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
+              "absolute inset-0 -z-10 bg-primary text-accent  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
               theme === "solid" ? "rounded-md" : "rounded-full ",
             )}
           />
@@ -107,7 +107,7 @@ function MenuItem({
         {isActive && (
           <motion.div
             layoutId="underline"
-            className="absolute -bottom-[5px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primary"
+            className="absolute -bottom-[5px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primary text-accent"
           />
         )}
 
