@@ -167,7 +167,7 @@ export function RoleForm({
               title={`حذف ${selectedRole.name}`}
               isLoading={deleteRole.isLoading}
               className="flex items-center justify-center gap-2 border border-dashed border-yellow-600 text-amber-500"
-              onClick={() => {
+              onConfirm={() => {
                 deleteRole
                   .mutateAsync({ id: selectedRole.id })
                   .then(() => {
