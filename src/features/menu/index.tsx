@@ -85,7 +85,7 @@ function MenuItem({
       <div
         className={twMerge(
           "  relative z-0 flex items-center justify-center  gap-2 rounded-sm px-3 py-2 text-sm",
-          isActive ? "text-accent hover:text-secondary" : " text-accent",
+          isActive ? "text-primary hover:text-secondary" : " text-primary",
           isHovered ? "text-accent" : "",
           isSub ? "bg-secondary text-primary hover:text-accent" : "",
           theme === "solid" ? "rounded-md" : "rounded-full ",

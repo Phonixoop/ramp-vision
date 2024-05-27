@@ -29,6 +29,11 @@ export const PersonnelPerformanceTranslate = {
   DirectPerFormance: "عملکرد مستقیم",
   InDirectPerFormance: "عملکرد غیر مستقیم",
   TotalPerformance: "عملکرد کلی",
+
+  TownName: "نام شهر",
+  BranchType: "نوع شعبه",
+  BranchCode: "کد شعبه",
+  BranchName: "نام شعبه",
 };
 
 export const PersonnelPerformanceIcons = {

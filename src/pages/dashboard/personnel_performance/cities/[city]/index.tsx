@@ -485,19 +485,28 @@ export default function CityPage({ children, city }) {
                     );
                   return (
                     <>
-                      <div
-                        key={key}
-                        className={twMerge(
-                          "flex  min-w-[150px] flex-col justify-center  gap-2 rounded-2xl bg-secondary p-2",
-                          isLastItem || index === 0
-                            ? " md:col-span-2"
-                            : "col-span-1",
-                        )}
+                      <ToolTipSimple
+                        className="cursor-auto  bg-secondary"
+                        tooltip={
+                          <span className="text-base text-primary ">
+                            {PersonnelPerformanceTranslate[key] ?? key}
+                          </span>
+                        }
                       >
-                        <span className="break-words text-center font-bold text-accent">
-                          {_value as string}
-                        </span>
-                      </div>
+                        <div
+                          key={key}
+                          className={twMerge(
+                            "flex  min-w-[150px] cursor-auto  items-center justify-center  gap-2 rounded-2xl bg-secondary p-2",
+                            isLastItem || index === 0
+                              ? " md:col-span-2"
+                              : "col-span-1",
+                          )}
+                        >
+                          <span className="max-w-[250px] break-words text-center font-bold text-accent">
+                            {_value as string}
+                          </span>
+                        </div>
+                      </ToolTipSimple>
                     </>
                   );
                 })}
@@ -574,13 +583,86 @@ export default function CityPage({ children, city }) {
                               >
                                 {/* {hasTheDayOff ? "yes" : "no"} */}
                                 {hasManagePersonnelAccess ? (
-                                  <TogglePersonelDayOffButton
-                                    hasTheDayOff={hasTheDayOff}
-                                    selectedPerson={selectedPerson}
-                                    date={date}
-                                    userCalData={userCalData}
-                                    userMetric={userMetric}
-                                  />
+                                  // <TogglePersonelDayOffButton
+                                  //   hasTheDayOff={hasTheDayOff}
+                                  //   selectedPerson={selectedPerson}
+                                  //   date={date}
+                                  //   userCalData={userCalData}
+                                  //   userMetric={userMetric}
+                                  // />
+                                  <>
+                                    <Button
+                                      className={twMerge(
+                                        " p-2",
+                                        hasTheDayOff === true
+                                          ? "bg-white text-secondary"
+                                          : "bg-secondary",
+                                      )}
+                                      style={{
+                                        backgroundColor: userCalData
+                                          ? userMetric.color
+                                          : undefined,
+                                      }}
+                                      onClick={() => {
+                                        console.log({ selectedPerson });
+                                        const result =
+                                          distinctPersonnelPerformanceData(
+                                            getAll?.data ?? [],
+                                            [
+                                              "NationalCode",
+                                              "NameFamily",
+                                              "CityName",
+                                            ],
+                                            [
+                                              "NationalCode",
+                                              "NameFamily",
+                                              "TownName",
+                                              "BranchCode",
+                                              "BranchName",
+                                              "BranchType",
+                                              "SabtAvalieAsnad",
+                                              "PazireshVaSabtAvalieAsnad",
+                                              "ArzyabiAsanadBimarsetaniDirect",
+                                              "ArzyabiAsnadBimarestaniIndirect",
+                                              "ArzyabiAsnadDandanVaParaDirect",
+                                              "ArzyabiAsnadDandanVaParaIndirect",
+                                              "ArzyabiAsnadDaroDirect",
+                                              "ArzyabiAsnadDaroIndirect",
+                                              "WithScanCount",
+                                              "WithoutScanCount",
+                                              "WithoutScanInDirectCount",
+                                              "ArchiveDirectCount",
+                                              "ArchiveInDirectCount",
+                                              "SabtVisitInDirectCount",
+                                              "Role",
+                                              "RoleType",
+                                              "ContractType",
+                                              "ProjectType",
+                                              "TotalPerformance",
+                                              "DirectPerFormance",
+                                              "InDirectPerFormance",
+                                              "Start_Date",
+                                              "HasTheDayOff",
+                                            ],
+                                            {
+                                              HasTheDayOff: false,
+                                              Start_Date:
+                                                date.format("jYYYY/jMM/jDD"),
+                                            },
+                                          ).find(
+                                            (a) =>
+                                              a.key.NationalCode ===
+                                              selectedPerson.key.NationalCode,
+                                          );
+                                        setSelectedPerson({
+                                          ...selectedPerson,
+                                          ...result,
+                                        });
+                                      }}
+                                    >
+                                      <SingleDayView date={date} />
+                                    </Button>
+                                  </>
                                 ) : (
                                   <div
                                     className={twMerge(
