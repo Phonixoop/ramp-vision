@@ -253,6 +253,28 @@ export default function CitiesPage({ children }) {
                     setReportPeriod={setReportPeriod}
                   />
                 </div>
+                <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3   p-2">
+                  <span className="font-bold text-primary">نوع پروژه</span>
+
+                  <SelectControlled
+                    withSelectAll
+                    title={"نوع پروژه"}
+                    list={getInitialFilters?.data?.ProjectTypes}
+                    value={filters.filter.ProjectType ?? defaultProjectTypes}
+                    onChange={(values) => {
+                      //@ts-ignore
+                      setFilters((prev) => {
+                        return {
+                          periodType: reportPeriod,
+                          filter: {
+                            ...prev.filter,
+                            ProjectType: values,
+                          },
+                        };
+                      });
+                    }}
+                  />
+                </div>
                 <div className="flex  max-w-sm flex-col items-center justify-center gap-3   p-2 sm:w-[25rem]">
                   <span className="font-bold text-primary">سمت</span>
 
@@ -272,28 +294,6 @@ export default function CitiesPage({ children }) {
                           filter: {
                             ...prev.filter,
                             Role: values,
-                          },
-                        };
-                      });
-                    }}
-                  />
-                </div>
-                <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3   p-2">
-                  <span className="font-bold text-primary">نوع پروژه</span>
-
-                  <SelectControlled
-                    withSelectAll
-                    title={"نوع پروژه"}
-                    list={getInitialFilters?.data?.ProjectTypes}
-                    value={filters.filter.ProjectType ?? defaultProjectTypes}
-                    onChange={(values) => {
-                      //@ts-ignore
-                      setFilters((prev) => {
-                        return {
-                          periodType: reportPeriod,
-                          filter: {
-                            ...prev.filter,
-                            ProjectType: values,
                           },
                         };
                       });
