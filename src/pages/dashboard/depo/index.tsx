@@ -661,7 +661,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
       <div className="flex w-full flex-col items-center justify-center gap-5">
         <div className="flex w-full  flex-col items-center justify-center gap-5 xl:flex-row">
           <div className="flex w-full  flex-col items-stretch justify-between gap-5 xl:flex-row">
-            <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed border-accent/50 bg-secondary py-5 xl:p-5">
+            <div className="flex w-full flex-col justify-center gap-5 rounded-2xl border border-dashed  bg-secbuttn py-5 xl:p-5">
               <H2 className="text-lg font-bold">نمودار به تفکیک فعالیت</H2>
               {/* <ReBarChart
                 data={(serviceData ?? []).map((row) => {

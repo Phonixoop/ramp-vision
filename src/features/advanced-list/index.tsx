@@ -12,7 +12,7 @@ import { CSVLink } from "react-csv";
 export default function AdvancedList({
   className = "",
   title = <></> || "",
-  list = [],
+  list = () => [] || [],
   filteredList = [],
   isLoading = false,
   disabled = false,
@@ -24,16 +24,16 @@ export default function AdvancedList({
   onChange = (action) => {},
   renderItem = (item, i) => <></>,
 }) {
+  const correctList = typeof list === "function" ? list() : list;
   const [sortOrder, setSortOrder] = useState("asc");
   function filterBySearch(query) {
     // Access input value
+    let updatedList = [...correctList];
 
-    // Create copy of item list
-    let updatedList = [...list];
     // Include all elements which includes the search query
 
     //@ts-ignore
-    updatedList = list.filter((item) => {
+    updatedList = correctList.filter((item) => {
       const selectItem = selectProperty ? item[selectProperty] : item;
       return selectItem.toLowerCase().indexOf(query.toLowerCase()) !== -1;
     });
@@ -43,11 +43,11 @@ export default function AdvancedList({
   }
 
   function toggleSortOrder() {
-    if (list.length <= 0) return;
+    if (correctList.length <= 0) return;
     const newOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newOrder);
 
-    const sorted = [...list].sort((a, b) => {
+    const sorted = [...correctList].sort((a, b) => {
       const aa = selectProperty ? a[selectProperty] : a;
       const bb = selectProperty ? b[selectProperty] : b;
       const comparison = aa.localeCompare(bb);
@@ -113,7 +113,7 @@ export default function AdvancedList({
         {filteredList.map((item, i) => {
           return renderItem(item, i);
         })}
-        {list.length <= 0 && !isLoading && (
+        {correctList.length <= 0 && !isLoading && (
           <div className=" flex h-full w-full items-center justify-center">
             <span className="text-primary">دیتا ای موجود نیست</span>
           </div>

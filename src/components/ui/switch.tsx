@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import * as SwitchPrimitives from "@radix-ui/react-switch";
 
 import { cn } from "~/lib/utils";
 import { CheckIcon, MinusIcon, XIcon } from "lucide-react";
@@ -27,7 +26,7 @@ export function Switch({
       rounded-full border-2 border-transparent 
       shadow-xl
       ring-primary transition-colors 
-      data-[state=checked]:bg-secbuttn
+      data-[state=checked]:bg-accent/10
       data-[state=unchecked]:bg-secbuttn 
       focus-visible:outline-none 
       focus-visible:ring-2 
@@ -52,7 +51,7 @@ export function Switch({
        ring-0 
           
        transition-transform
-        data-[state=checked]:bg-primary/20 
+        data-[state=checked]:bg-accent/10 
         data-[state=unchecked]:bg-primary/20`,
           middle
             ? `w-6 translate-x-1 
@@ -76,7 +75,7 @@ export function Switch({
 
       <IconRight
         className={cn(
-          `absolute right-0 top-1/2  h-3 w-3 -translate-x-[2px] -translate-y-1/2 stroke-primary transition-all duration-500`,
+          `absolute right-0 top-1/2  h-3 w-3 -translate-x-[2px] -translate-y-1/2 stroke-accent stroke-[3px] transition-all duration-500`,
           checked && !middle
             ? ""
             : "right-0 top-1/2 h-3 w-3 -translate-x-[18px] -translate-y-1/2 -rotate-180 scale-0",

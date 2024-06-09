@@ -86,6 +86,23 @@ export default function CityPage({ children, city }) {
     setSelectedPerson,
     setSelectedCity,
   } = usePersonnelFilter();
+  const getPersonnls = api.personnel.getAll.useQuery(
+    {
+      filter: {
+        CityName: [city],
+
+        ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
+        Role: filters?.filter?.Role ?? defualtRoles,
+        ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
+        RoleType: filters?.filter?.RoleType,
+        DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
+      },
+    },
+    {
+      onSuccess: (data) => {},
+      refetchOnWindowFocus: false,
+    },
+  );
 
   const getAll = api.personnelPerformance.getAll.useQuery(
     {
@@ -163,12 +180,13 @@ export default function CityPage({ children, city }) {
       refetchOnWindowFocus: false,
     },
   );
+
   const [updatedList, setUpdatedList] = useState([]);
 
   const numericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "number",
   );
-  console.log({ selectedPerson });
+  //console.log({ selectedPerson });
   const noneNumericItems = Object.entries(selectedPerson ?? []).filter(
     ([key, value]) => typeof value === "string",
   );
@@ -204,6 +222,55 @@ export default function CityPage({ children, city }) {
     setSelectedPerson(undefined);
   }, [router]);
 
+  function getUpdatedListByAddindPersonnelList(list) {
+    if (!getPersonnls.data || !list) return [];
+    // Create a Set of NationalCodes from prev for efficient look-up
+    const prevNationalCodes = new Set(list.map((b) => b.NationalCode));
+
+    // Filter getPersonnls.data to exclude items with NationalCodes already in prev
+    const filteredData = getPersonnls.data
+      .filter((a) => !prevNationalCodes.has(a.NationalCode))
+      .map((a) => {
+        return {
+          ...a,
+          TotalPerformance: 0,
+          key: {
+            CityName: a.CityName,
+            NameFamily: a.NameFamily,
+            NationalCode: a.NationalCode,
+          },
+        };
+      });
+    console.log({ list, filteredData });
+    // Concatenate prev and the filtered data to create the updated list
+    return [...list, ...filteredData];
+  }
+  // useEffect(() => {
+  //   if (!getPersonnls.data || !getAll.data) return;
+  //   setUpdatedList((prev) => {
+  //     // Create a Set of NationalCodes from prev for efficient look-up
+  //     const prevNationalCodes = new Set(prev.map((b) => b.NationalCode));
+
+  //     // Filter getPersonnls.data to exclude items with NationalCodes already in prev
+  //     const filteredData = getPersonnls.data
+  //       .filter((a) => !prevNationalCodes.has(a.NationalCode))
+  //       .map((a) => {
+  //         return {
+  //           ...a,
+  //           TotalPerformance: 0,
+  //           key: {
+  //             CityName: a.CityName,
+  //             NameFamily: a.NameFamily,
+  //             NationalCode: a.NationalCode,
+  //           },
+  //         };
+  //       });
+
+  //     // Concatenate prev and the filtered data to create the updated list
+  //     return [...prev, ...filteredData];
+  //   });
+  // }, [getPersonnls.data, getAll.data]);
+
   return (
     <CitiesPage>
       <AdvancedList
@@ -217,45 +284,10 @@ export default function CityPage({ children, city }) {
         }
         isLoading={getAll.isLoading}
         disabled={!!!updatedList}
-        list={distinctPersonnelPerformanceData(
-          getAll?.data ?? [],
-          ["NationalCode", "NameFamily", "CityName"],
-          [
-            "NationalCode",
-            "NameFamily",
-            "TownName",
-            "BranchCode",
-            "BranchName",
-            "BranchType",
-            "SabtAvalieAsnad",
-            "PazireshVaSabtAvalieAsnad",
-            "ArzyabiAsanadBimarsetaniDirect",
-            "ArzyabiAsnadBimarestaniIndirect",
-            "ArzyabiAsnadDandanVaParaDirect",
-            "ArzyabiAsnadDandanVaParaIndirect",
-            "ArzyabiAsnadDaroDirect",
-            "ArzyabiAsnadDaroIndirect",
-            "WithScanCount",
-            "WithoutScanCount",
-            "WithoutScanInDirectCount",
-            "ArchiveDirectCount",
-            "ArchiveInDirectCount",
-            "SabtVisitInDirectCount",
-            "Role",
-            "RoleType",
-            "ContractType",
-            "ProjectType",
-            "TotalPerformance",
-            "DirectPerFormance",
-            "InDirectPerFormance",
-            "Start_Date",
-            "HasTheDayOff",
-          ],
-          { HasTheDayOff: false },
-        )}
+        list={() => getUpdatedListByAddindPersonnelList(updatedList)}
         filteredList={
           !getAll.isLoading
-            ? updatedList
+            ? getUpdatedListByAddindPersonnelList(updatedList)
             : [...new Array(10).map((a) => [undefined, a])]
         }
         selectProperty={"NameFamily"}
@@ -309,7 +341,9 @@ export default function CityPage({ children, city }) {
           { HasTheDayOff: false },
         )}
         onChange={(updatedList) => {
-          setUpdatedList(updatedList);
+          setUpdatedList(() =>
+            getUpdatedListByAddindPersonnelList(updatedList),
+          );
         }}
         renderItem={(user, i) => {
           if (!user?.NationalCode)
@@ -347,8 +381,9 @@ export default function CityPage({ children, city }) {
             <>
               <Button
                 key={i}
+                disabled={!user.Start_Date}
                 className={twMerge(
-                  "rounded-xl  ",
+                  "rounded-xl disabled:bg-secbuttn ",
                   isActive
                     ? "sticky top-24 z-10 bg-primary text-secondary "
                     : " bg-secondary  text-primary",
@@ -372,13 +407,20 @@ export default function CityPage({ children, city }) {
                 }}
               >
                 <div className=" flex w-full flex-row-reverse items-center justify-between gap-2  px-2 text-right ">
-                  <div className=" w-10">
-                    {isActive ? (
-                      <BarChart3Loading />
-                    ) : (
-                      <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
-                    )}
-                  </div>
+                  {user.Start_Date && (
+                    <>
+                      <div className=" w-10">
+                        {isActive ? (
+                          <BarChart3Loading />
+                        ) : (
+                          <>
+                            <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
+
                   <div className="flex flex-col items-center justify-center">
                     <TrendDecider values={userPerformances} />
                     {user.TotalPerformance.toFixed(0)}
@@ -393,6 +435,7 @@ export default function CityPage({ children, city }) {
                         "Benchmark2",
                         "Benchmark3",
                       ]}
+                      noDataText="بدون داده"
                       index={"Start_Date"}
                       colors={["purple", "rose", "cyan"]}
                       className={twMerge(
@@ -759,15 +802,17 @@ export default function CityPage({ children, city }) {
             selectedPerson ? "" : "",
           )}
         >
-          <CitiesWithDatesPerformanceBarChart
-            filters={{
-              ...filters,
-              filter: {
-                ...filters.filter,
-                CityName: [router.query.city as string],
-              },
-            }}
-          />
+          <ResponsiveContainer width="99%" height="auto">
+            <CitiesWithDatesPerformanceBarChart
+              filters={{
+                ...filters,
+                filter: {
+                  ...filters.filter,
+                  CityName: [router.query.city as string],
+                },
+              }}
+            />
+          </ResponsiveContainer>
         </div>
       </div>
     </CitiesPage>

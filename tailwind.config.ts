@@ -146,7 +146,6 @@ export default {
 
         max2xl: { max: "1536px" },
       },
-
       colors: {
         // light mode
         tremor: {

@@ -124,6 +124,7 @@ export default function CitiesPage({ children }) {
         refetchOnWindowFocus: false,
       },
     );
+
   const router = useRouter();
 
   // const persianCities = getCitiesWithPerformance.data?.map((a) => {
@@ -196,15 +197,15 @@ export default function CitiesPage({ children }) {
     <>
       <BlurBackground />
 
-      <div className="flex min-h-screen w-full flex-col divide-y-2 divide-secbuttn  bg-secbuttn  py-2">
-        <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-t-2xl  bg-secondary  p-2 sm:flex-col ">
+      <div className="flex min-h-screen w-full flex-col divide-y-2 divide-secbuttn  py-2">
+        <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-t-2xl    p-2 sm:flex-col ">
           <H2 className="hidden py-2 text-xl sm:flex">فیلترها</H2>
 
           {!getInitialFilters.isLoading && (
             <ResponsiveView
-              className=" z-20 flex max-h-[100vh] w-full flex-wrap items-stretch justify-start  bg-secondary sm:max-h-min sm:p-5"
+              className=" z-20 flex max-h-[100vh] w-full flex-wrap items-stretch justify-start rounded-t-3xl bg-secondary  sm:max-h-min sm:p-5"
               dir="rtl"
-              btnClassName="bg-secondary text-primary"
+              btnClassName=" text-primary"
               icon={
                 <>
                   <span className="px-2">فیلترها</span>
@@ -212,7 +213,7 @@ export default function CitiesPage({ children }) {
                 </>
               }
             >
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3   p-2">
                 <span className="font-bold text-primary">بازه گزارش</span>
                 <DatePickerPeriodic
                   filter={filters}
@@ -245,7 +246,7 @@ export default function CitiesPage({ children }) {
                 />
               </div>
 
-              <div className="flex  max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2 sm:w-[25rem]">
+              <div className="flex  max-w-sm flex-col items-center justify-center gap-3   p-2 sm:w-[25rem]">
                 <span className="font-bold text-primary">سمت</span>
 
                 <SelectControlled
@@ -270,7 +271,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm  flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">نوع پروژه</span>
 
                 <SelectControlled
@@ -293,7 +294,7 @@ export default function CitiesPage({ children }) {
                 />
               </div>
 
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">نوع قرار داد</span>
                 <SelectControlled
                   withSelectAll
@@ -319,7 +320,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">نوع سمت</span>
                 <SelectControlled
                   withSelectAll
@@ -341,7 +342,7 @@ export default function CitiesPage({ children }) {
                 />
               </div>
               {/* TownName BranchName BranchCode BranchType */}
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">نام شهر</span>
                 <SelectControlled
                   withSelectAll
@@ -362,7 +363,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex min-w-full max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex min-w-full max-w-sm flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">نام شعبه</span>
                 <SelectControlled
                   withSelectAll
@@ -383,7 +384,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">کد شعبه</span>
                 <SelectControlled
                   withSelectAll
@@ -404,7 +405,7 @@ export default function CitiesPage({ children }) {
                   }}
                 />
               </div>
-              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+              <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3   p-2">
                 <span className="font-bold text-primary">نوع شعبه</span>
                 <SelectControlled
                   withSelectAll
@@ -455,9 +456,9 @@ export default function CitiesPage({ children }) {
             </ResponsiveView>
           )}
         </div>
-        <div className="mx-auto flex w-11/12 items-center justify-end bg-secondary">
+        <div className="mx-auto flex w-11/12 items-center justify-end ">
           {router.query?.city && (
-            <div className="flex items-center justify-center gap-1 p-2 px-6 text-primbuttn">
+            <div className="flex items-center justify-center gap-1 p-2 px-6 text-accent">
               <span> {selectedPerson?.NameFamily}</span>
               {selectedPerson && <span>{"/"}</span>}
               <span>
@@ -479,7 +480,9 @@ export default function CitiesPage({ children }) {
             }
             isLoading={getCitiesWithPerformance.isLoading}
             disabled={!!!updatedList}
-            list={distincedData}
+            list={() => {
+              return distincedData;
+            }}
             filteredList={
               !getCitiesWithPerformance.isLoading
                 ? updatedList
@@ -582,6 +585,7 @@ export default function CitiesPage({ children }) {
                           "CityName",
                           item.CityName_En,
                         )}
+                        noDataText="بدون داده"
                         categories={[
                           "TotalPerformance",
                           "Benchmark",
@@ -591,7 +595,7 @@ export default function CitiesPage({ children }) {
                         index={"Start_Date"}
                         colors={["purple", "rose", "cyan"]}
                         className={twMerge(
-                          " dash-a h-10 w-36  cursor-pointer",
+                          " dash-a h-10 w-36  ",
                           isTransitioning || isActive
                             ? "animate-path animate-[move_100s_linear_infinite]"
                             : "",

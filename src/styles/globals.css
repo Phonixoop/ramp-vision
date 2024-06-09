@@ -66,13 +66,13 @@
 
 .theme-dark-1 {
   --primary: 244, 246, 245;
-  --secondary: 4, 6, 5;
+  --secondary: 7, 12, 19;
   --primbuttn: 75, 113, 100;
   /* --primbuttn: 141, 165, 163; */
-  --secbuttn: 16, 18, 20;
+  --secbuttn: 13, 20, 33;
   /* --secbuttn: 10, 10, 10; */
   /* --accent: 190, 255, 255; */
-  --accent: 85, 119, 97;
+  --accent: 230, 146, 35;
 }
 
 .theme-dark-2 {
@@ -88,6 +88,14 @@
   --primbuttn: 150, 186, 135;
   --secbuttn: 19, 32, 22;
   --accent: 80, 139, 93;
+}
+
+.theme-dark-4 {
+  --primary: 244, 246, 245;
+  --secondary: 19, 17, 10;
+  --primbuttn: 75, 113, 100;
+  --secbuttn: 63, 59, 56;
+  --accent: 230, 185, 35;
 }
 
 @tailwind utilities;
