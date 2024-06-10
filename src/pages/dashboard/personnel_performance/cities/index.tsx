@@ -347,7 +347,7 @@ export default function CitiesPage({ children }) {
                     }}
                   />
                 </div>
-                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3  bg-secondary p-2">
+                <div className="flex w-[15rem] max-w-sm flex-col items-center justify-center gap-3   p-2">
                   <span className="font-bold text-primary">
                     تاریخ گزارش پرسنل
                   </span>

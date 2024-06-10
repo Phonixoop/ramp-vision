@@ -91,10 +91,6 @@ export default function CityPage({ children, city }) {
       filter: {
         CityName: [city],
 
-        ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
-        Role: filters?.filter?.Role ?? defualtRoles,
-        ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
-        RoleType: filters?.filter?.RoleType,
         DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
       },
     },
@@ -241,35 +237,10 @@ export default function CityPage({ children, city }) {
           },
         };
       });
-    console.log({ list, filteredData });
+    // console.log({ list, filteredData });
     // Concatenate prev and the filtered data to create the updated list
     return [...list, ...filteredData];
   }
-  // useEffect(() => {
-  //   if (!getPersonnls.data || !getAll.data) return;
-  //   setUpdatedList((prev) => {
-  //     // Create a Set of NationalCodes from prev for efficient look-up
-  //     const prevNationalCodes = new Set(prev.map((b) => b.NationalCode));
-
-  //     // Filter getPersonnls.data to exclude items with NationalCodes already in prev
-  //     const filteredData = getPersonnls.data
-  //       .filter((a) => !prevNationalCodes.has(a.NationalCode))
-  //       .map((a) => {
-  //         return {
-  //           ...a,
-  //           TotalPerformance: 0,
-  //           key: {
-  //             CityName: a.CityName,
-  //             NameFamily: a.NameFamily,
-  //             NationalCode: a.NationalCode,
-  //           },
-  //         };
-  //       });
-
-  //     // Concatenate prev and the filtered data to create the updated list
-  //     return [...prev, ...filteredData];
-  //   });
-  // }, [getPersonnls.data, getAll.data]);
 
   return (
     <CitiesPage>
@@ -361,7 +332,9 @@ export default function CityPage({ children, city }) {
                 <span className="h-4 w-4 rounded-lg bg-secbuttn" />
               </div>
             );
-          const isActive = user.NationalCode === selectedPerson?.NationalCode;
+          const isActive =
+            user.NationalCode === selectedPerson?.NationalCode &&
+            user?.Id === selectedPerson?.Id;
           const userPerformances = getAll?.data?.result
             .filter((x) => x.NameFamily === user.NameFamily)
             .map((m) => {
@@ -381,7 +354,7 @@ export default function CityPage({ children, city }) {
             <>
               <Button
                 key={i}
-                disabled={!user.Start_Date}
+                //  disabled={!user.Start_Date}
                 className={twMerge(
                   "rounded-xl disabled:bg-secbuttn ",
                   isActive
@@ -520,7 +493,7 @@ export default function CityPage({ children, city }) {
                   if (!value) return;
                   const isLastItem = index === array.length - 1;
                   let _value = value;
-                  if (key === "DateInfo") return;
+                  if (key === "Id") return;
                   if (key === "Start_Date")
                     _value = getMonthNamesFromJOINED_date_strings(
                       value as string,
@@ -553,90 +526,165 @@ export default function CityPage({ children, city }) {
                     </>
                   );
                 })}
+
                 <div className="relative col-span-2 w-full overflow-hidden rounded-xl bg-accent/10  p-1">
-                  <Calender
-                    withMonthMenu
-                    collapsedUi
-                    listOfDates={uniqueArray(
-                      selectedPerson.sparkData.map((a) =>
-                        moment(a.Start_Date, "jYYYY/jMM/jDD")
-                          .format("jYYYY/jMM")
-                          .slice(0, 7),
-                      ),
-                    ).map((a) => moment(a, "jYYYY/jMM "))}
-                    year={parseInt(
-                      selectedPerson.sparkData[0].Start_Date.split("/")[0],
-                    )}
-                    defaultMonth={getMonthNumber(
-                      selectedPerson.sparkData[0].Start_Date,
-                    )}
-                    onDate={(date, monthNumber) => {
-                      const userCalData = selectedPerson.sparkData.find(
-                        (d) => d.Start_Date === date.format("YYYY/MM/DD"),
-                      );
-                      const userMetric = getPerformanceMetric(
-                        userCalData?.TotalPerformance,
-                      );
+                  {selectedPerson.sparkData.length > 0 ? (
+                    <Calender
+                      withMonthMenu
+                      collapsedUi
+                      listOfDates={uniqueArray(
+                        selectedPerson.sparkData.map((a) =>
+                          moment(a.Start_Date, "jYYYY/jMM/jDD")
+                            .format("jYYYY/jMM")
+                            .slice(0, 7),
+                        ),
+                      ).map((a) => moment(a, "jYYYY/jMM "))}
+                      year={parseInt(
+                        selectedPerson.sparkData[0].Start_Date.split("/")[0],
+                      )}
+                      defaultMonth={getMonthNumber(
+                        selectedPerson.sparkData[0].Start_Date,
+                      )}
+                      onDate={(date, monthNumber) => {
+                        const userCalData = selectedPerson.sparkData.find(
+                          (d) => d.Start_Date === date.format("YYYY/MM/DD"),
+                        );
+                        const userMetric = getPerformanceMetric(
+                          userCalData?.TotalPerformance,
+                        );
 
-                      const hasTheDayOff = getAll?.data?.result.find(
-                        (a) =>
-                          a.Start_Date === date.format("YYYY/MM/DD") &&
-                          a.NationalCode === selectedPerson.key.NationalCode,
-                      )?.HasTheDayOff;
+                        const hasTheDayOff = getAll?.data?.result.find(
+                          (a) =>
+                            a.Start_Date === date.format("YYYY/MM/DD") &&
+                            a.NationalCode === selectedPerson.key.NationalCode,
+                        )?.HasTheDayOff;
 
-                      return (
-                        <>
-                          {parseInt(date.format("M")) !== monthNumber + 1 ? (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <span
-                                className={twMerge(
-                                  "flex items-center justify-center  text-xs text-primary/50 ",
+                        return (
+                          <>
+                            {parseInt(date.format("M")) !== monthNumber + 1 ? (
+                              <div className="flex h-full w-full items-center justify-center">
+                                <span
+                                  className={twMerge(
+                                    "flex items-center justify-center  text-xs text-primary/50 ",
 
-                                  `h-6 w-6 rounded-full `,
-                                )}
-                                style={{
-                                  backgroundColor: userCalData
-                                    ? userMetric.color
-                                    : undefined,
-                                }}
-                              >
-                                {date.format("D")}
-                              </span>
-                            </div>
-                          ) : (
-                            <>
-                              <ToolTipSimple
-                                className="cursor-default bg-secondary"
-                                tooltip={
-                                  <span
-                                    style={{
-                                      color: userCalData
-                                        ? userMetric.color
-                                        : undefined,
-                                    }}
-                                    className="text-base text-primary "
-                                  >
-                                    {hasTheDayOff
-                                      ? "مرخصی"
-                                      : userCalData?.TotalPerformance.toFixed(
-                                          2,
+                                    `h-6 w-6 rounded-full `,
+                                  )}
+                                  style={{
+                                    backgroundColor: userCalData
+                                      ? userMetric.color
+                                      : undefined,
+                                  }}
+                                >
+                                  {date.format("D")}
+                                </span>
+                              </div>
+                            ) : (
+                              <>
+                                <ToolTipSimple
+                                  className="cursor-default bg-secondary"
+                                  tooltip={
+                                    <span
+                                      style={{
+                                        color: userCalData
+                                          ? userMetric.color
+                                          : undefined,
+                                      }}
+                                      className="text-base text-primary "
+                                    >
+                                      {hasTheDayOff
+                                        ? "مرخصی"
+                                        : userCalData?.TotalPerformance.toFixed(
+                                            2,
+                                          )}
+                                    </span>
+                                  }
+                                >
+                                  {/* {hasTheDayOff ? "yes" : "no"} */}
+                                  {hasManagePersonnelAccess ? (
+                                    // <TogglePersonelDayOffButton
+                                    //   hasTheDayOff={hasTheDayOff}
+                                    //   selectedPerson={selectedPerson}
+                                    //   date={date}
+                                    //   userCalData={userCalData}
+                                    //   userMetric={userMetric}
+                                    // />
+                                    <>
+                                      <Button
+                                        className={twMerge(
+                                          " p-2",
+                                          hasTheDayOff === true
+                                            ? "bg-white text-secondary"
+                                            : "bg-secondary",
                                         )}
-                                  </span>
-                                }
-                              >
-                                {/* {hasTheDayOff ? "yes" : "no"} */}
-                                {hasManagePersonnelAccess ? (
-                                  // <TogglePersonelDayOffButton
-                                  //   hasTheDayOff={hasTheDayOff}
-                                  //   selectedPerson={selectedPerson}
-                                  //   date={date}
-                                  //   userCalData={userCalData}
-                                  //   userMetric={userMetric}
-                                  // />
-                                  <>
-                                    <Button
+                                        style={{
+                                          backgroundColor: userCalData
+                                            ? userMetric.color
+                                            : undefined,
+                                        }}
+                                        onClick={() => {
+                                          console.log({ selectedPerson });
+                                          const result =
+                                            distinctPersonnelPerformanceData(
+                                              getAll?.data ?? [],
+                                              [
+                                                "NationalCode",
+                                                "NameFamily",
+                                                "CityName",
+                                              ],
+                                              [
+                                                "NationalCode",
+                                                "NameFamily",
+                                                "TownName",
+                                                "BranchCode",
+                                                "BranchName",
+                                                "BranchType",
+                                                "SabtAvalieAsnad",
+                                                "PazireshVaSabtAvalieAsnad",
+                                                "ArzyabiAsanadBimarsetaniDirect",
+                                                "ArzyabiAsnadBimarestaniIndirect",
+                                                "ArzyabiAsnadDandanVaParaDirect",
+                                                "ArzyabiAsnadDandanVaParaIndirect",
+                                                "ArzyabiAsnadDaroDirect",
+                                                "ArzyabiAsnadDaroIndirect",
+                                                "WithScanCount",
+                                                "WithoutScanCount",
+                                                "WithoutScanInDirectCount",
+                                                "ArchiveDirectCount",
+                                                "ArchiveInDirectCount",
+                                                "SabtVisitInDirectCount",
+                                                "Role",
+                                                "RoleType",
+                                                "ContractType",
+                                                "ProjectType",
+                                                "TotalPerformance",
+                                                "DirectPerFormance",
+                                                "InDirectPerFormance",
+                                                "Start_Date",
+                                                "HasTheDayOff",
+                                              ],
+                                              {
+                                                HasTheDayOff: false,
+                                                Start_Date:
+                                                  date.format("jYYYY/jMM/jDD"),
+                                              },
+                                            ).find(
+                                              (a) =>
+                                                a.key.NationalCode ===
+                                                selectedPerson.key.NationalCode,
+                                            );
+                                          setSelectedPerson({
+                                            ...selectedPerson,
+                                            ...result,
+                                          });
+                                        }}
+                                      >
+                                        <SingleDayView date={date} />
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <div
                                       className={twMerge(
-                                        " p-2",
+                                        "flex w-max  cursor-default items-center justify-center rounded-lg p-2",
                                         hasTheDayOff === true
                                           ? "bg-white text-secondary"
                                           : "bg-secondary",
@@ -646,90 +694,22 @@ export default function CityPage({ children, city }) {
                                           ? userMetric.color
                                           : undefined,
                                       }}
-                                      onClick={() => {
-                                        console.log({ selectedPerson });
-                                        const result =
-                                          distinctPersonnelPerformanceData(
-                                            getAll?.data ?? [],
-                                            [
-                                              "NationalCode",
-                                              "NameFamily",
-                                              "CityName",
-                                            ],
-                                            [
-                                              "NationalCode",
-                                              "NameFamily",
-                                              "TownName",
-                                              "BranchCode",
-                                              "BranchName",
-                                              "BranchType",
-                                              "SabtAvalieAsnad",
-                                              "PazireshVaSabtAvalieAsnad",
-                                              "ArzyabiAsanadBimarsetaniDirect",
-                                              "ArzyabiAsnadBimarestaniIndirect",
-                                              "ArzyabiAsnadDandanVaParaDirect",
-                                              "ArzyabiAsnadDandanVaParaIndirect",
-                                              "ArzyabiAsnadDaroDirect",
-                                              "ArzyabiAsnadDaroIndirect",
-                                              "WithScanCount",
-                                              "WithoutScanCount",
-                                              "WithoutScanInDirectCount",
-                                              "ArchiveDirectCount",
-                                              "ArchiveInDirectCount",
-                                              "SabtVisitInDirectCount",
-                                              "Role",
-                                              "RoleType",
-                                              "ContractType",
-                                              "ProjectType",
-                                              "TotalPerformance",
-                                              "DirectPerFormance",
-                                              "InDirectPerFormance",
-                                              "Start_Date",
-                                              "HasTheDayOff",
-                                            ],
-                                            {
-                                              HasTheDayOff: false,
-                                              Start_Date:
-                                                date.format("jYYYY/jMM/jDD"),
-                                            },
-                                          ).find(
-                                            (a) =>
-                                              a.key.NationalCode ===
-                                              selectedPerson.key.NationalCode,
-                                          );
-                                        setSelectedPerson({
-                                          ...selectedPerson,
-                                          ...result,
-                                        });
-                                      }}
                                     >
                                       <SingleDayView date={date} />
-                                    </Button>
-                                  </>
-                                ) : (
-                                  <div
-                                    className={twMerge(
-                                      "flex w-max  cursor-default items-center justify-center rounded-lg p-2",
-                                      hasTheDayOff === true
-                                        ? "bg-white text-secondary"
-                                        : "bg-secondary",
-                                    )}
-                                    style={{
-                                      backgroundColor: userCalData
-                                        ? userMetric.color
-                                        : undefined,
-                                    }}
-                                  >
-                                    <SingleDayView date={date} />
-                                  </div>
-                                )}
-                              </ToolTipSimple>
-                            </>
-                          )}
-                        </>
-                      );
-                    }}
-                  />
+                                    </div>
+                                  )}
+                                </ToolTipSimple>
+                              </>
+                            )}
+                          </>
+                        );
+                      }}
+                    />
+                  ) : (
+                    <div className=" w-full  text-center text-accent">
+                      بدون داده
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
