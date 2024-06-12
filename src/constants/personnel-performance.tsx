@@ -74,6 +74,58 @@ export const defualtRoles = [
   "کارشناس ثبت اسناد خسارت",
 ];
 
+export const defualtRoleTypesForPercase = [
+  "پیشخوان",
+  "نمایندگی",
+  "کارگزاری(نمایندگی)",
+  "میزخدمت",
+  "کارشناس ارزیاب اسناد بیمارستانی",
+  "کارشناس ارزیاب اسناد پاراکلینیکی",
+  "کارشناس ارزیاب اسناد دارویی",
+  "کارشناس ارزیاب اسناد تجهیزات پزشکی",
+  "ثبات ارزیابی اسناد بستری غیر مستقیم",
+  "ثبات ارزیابی اسناد سرپایی غیر مستقیم",
+  "ثبات ارزیابی اسناد ویزیت غیر مستقیم",
+  "ثبات ارزیابی اسناد مستقیم",
+  "ثبات ارزیابی اسناد ویزیت مستقیم",
+];
+
+export const defualtRoleTypesForMoshavere = [
+  "میزخدمت",
+  "سرپرست",
+  "کارشناس ارزیاب اسناد بیمارستانی",
+  "کارشناس ارزیاب اسناد پاراکلینیکی",
+  "کارشناس ارزیاب اسناد دارویی",
+];
+
+export function getDefaultRoleTypesBaseOnContractType(projectType) {
+  if (Array.isArray(projectType)) {
+    const roleTypes = new Set();
+
+    if (projectType.includes("پرکیس")) {
+      defualtRoleTypesForPercase.forEach((roleType) => roleTypes.add(roleType));
+    }
+
+    if (projectType.includes("مشاوره")) {
+      defualtRoleTypesForMoshavere.forEach((roleType) =>
+        roleTypes.add(roleType),
+      );
+    }
+
+    return Array.from(roleTypes);
+  }
+
+  // Fallback for non-array input (if needed)
+  switch (projectType) {
+    case "پرکیس":
+      return defualtRoleTypesForPercase;
+    case "مشاوره":
+      return defualtRoleTypesForMoshavere;
+    default:
+      return []; // or some other default value
+  }
+}
+
 export const defaultProjectTypes = ["ارزیابی"];
 
 export const defualtContractTypes = ["تمام وقت"];

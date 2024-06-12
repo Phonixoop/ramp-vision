@@ -31,7 +31,10 @@ import Table from "~/features/table";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   defaultProjectTypes,
+  defualtContractTypes,
   defualtDateInfos,
+  defualtRoles,
+  getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
 import UseUserManager from "~/hooks/userManager";
 import Calender from "~/features/calender";
@@ -61,7 +64,13 @@ export default function GaugesPage() {
       DateInfo: [],
     },
   });
-
+  const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
+    useState({
+      filter: {
+        ContractType: defualtContractTypes,
+        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+      },
+    });
   const getPersonnls = api.personnel.getAll.useQuery(
     {
       filter: {
@@ -249,15 +258,15 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "نوع قرارداد",
-          accessorKey: "ContractType",
+          header: "سمت",
+          accessorKey: "Role",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نوع قرارداد</span>
+                <span className="font-bold text-primary">سمت</span>
                 <SelectColumnFilter
-                  initialFilters={["تمام وقت"]}
+                  initialFilters={defualtRoles}
                   column={column}
                   data={getPersonnls.data}
                   onChange={(filter) => {
@@ -274,31 +283,26 @@ export default function GaugesPage() {
           },
         },
         {
-          header: "سمت",
-          accessorKey: "Role",
+          header: "نوع قرارداد",
+          accessorKey: "ContractType",
           filterFn: "arrIncludesSome",
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">سمت</span>
+                <span className="font-bold text-primary">نوع قرارداد</span>
                 <SelectColumnFilter
-                  initialFilters={[
-                    "کارشناس ارزیاب اسناد بیمارستانی",
-                    "کارشناس ارزیاب اسناد پاراکلینیکی",
-                    "کارشناس ارزیاب اسناد دارویی",
-                    "کارشناس ارزیاب اسناد دندانپزشکی",
-                    "کارشناس پذیرش اسناد",
-                    "کارشناس ثبت اسناد خسارت",
-                  ]}
                   column={column}
                   data={getPersonnls.data}
                   onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
+                    setFiltersWithNoNetworkRequest((prev) => {
+                      return {
+                        ...prev,
+                        filter: {
+                          ...prev.filter,
+                          [filter.id]: filter.values,
+                        },
+                      };
+                    });
                   }}
                 />
               </div>
@@ -314,16 +318,16 @@ export default function GaugesPage() {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع سمت</span>
                 <SelectColumnFilter
+                  initialFilters={getDefaultRoleTypesBaseOnContractType(
+                    filtersWithNoNetworkRequest?.filter?.ContractType ??
+                      defualtContractTypes,
+                  )}
+                  selectedValues={getDefaultRoleTypesBaseOnContractType(
+                    filtersWithNoNetworkRequest?.filter?.ContractType ??
+                      defualtContractTypes,
+                  )}
                   column={column}
                   data={getPersonnls.data}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
                 />
               </div>
             );
@@ -365,7 +369,7 @@ export default function GaugesPage() {
           },
         },
       ],
-      [getPersonnls.data],
+      [getPersonnls.data, filtersWithNoNetworkRequest],
     ) || [];
 
   return (

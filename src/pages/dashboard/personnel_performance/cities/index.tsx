@@ -42,6 +42,7 @@ import {
   defualtContractTypes,
   defualtDateInfos,
   defualtRoles,
+  getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
 
 import { SelectControlled } from "~/features/checkbox-list";
@@ -332,7 +333,11 @@ export default function CitiesPage({ children }) {
                     withSelectAll
                     title={"نوع سمت"}
                     list={RolesType}
-                    value={filters.filter.RoleType ?? []}
+                    value={
+                      getDefaultRoleTypesBaseOnContractType(
+                        filters?.filter?.ContractType ?? defualtContractTypes,
+                      ) ?? filters.filter.RoleType
+                    }
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {

@@ -37,7 +37,7 @@ export default function CheckboxList({ checkboxes, onCheckboxChange }) {
 
 export function SelectControlled({
   list = [],
-  value,
+  value = [],
   onChange,
   title,
   className = "",
@@ -107,6 +107,7 @@ export function SelectColumnFilter({
   column,
   data,
   initialFilters = [],
+  selectedValues = [],
   onChange = (filter) => {},
   withSelectAll = true,
   singleSelect = false,
@@ -124,7 +125,10 @@ export function SelectColumnFilter({
     .filter((item) => item != undefined)
     .toSorted();
 
-  const selectedCount = getFilterValue() ? (getFilterValue() as any).length : 0;
+  const finalValues =
+    selectedValues?.length <= 0 ? getFilterValue() : selectedValues ?? [];
+
+  const selectedCount = finalValues ? (finalValues as any).length : 0;
   const selectAllState = selectedCount < unique.length;
   return (
     <div className=" flex w-full items-center justify-center gap-2 px-2 text-center sm:px-0 ">
@@ -132,7 +136,11 @@ export function SelectColumnFilter({
         className="min-w-0"
         title={column.columnDef.header}
         list={unique}
-        value={getFilterValue() ?? []}
+        value={
+          selectedValues?.length <= 0
+            ? (finalValues as any[])
+            : selectedValues ?? []
+        }
         onChange={(values) => {
           let _values = values;
           if (singleSelect) _values = [values[values.length - 1]];

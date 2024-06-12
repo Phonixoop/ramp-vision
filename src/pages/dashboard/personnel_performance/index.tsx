@@ -39,6 +39,7 @@ import {
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
+  getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
 import {
   distinctPersonnelPerformanceData,
@@ -108,6 +109,15 @@ function PersonnelPerformanceTable({ sessionData }) {
       ],
     },
   });
+
+  const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
+    useState({
+      periodType: reportPeriod,
+      filter: {
+        ContractType: defualtContractTypes,
+        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+      },
+    });
   const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
     {
       filter: {
@@ -403,35 +413,7 @@ function PersonnelPerformanceTable({ sessionData }) {
             );
           },
         },
-        {
-          header: "نوع قرارداد",
-          hSticky: true,
-          width: 200,
-          accessorKey: "ContractType",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نوع قرارداد</span>
-                <SelectColumnFilter
-                  initialFilters={
-                    filters.filter.ContractType ?? defualtContractTypes
-                  }
-                  column={column}
-                  data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
+
         {
           header: "سمت",
           hSticky: true,
@@ -461,6 +443,39 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
         {
+          header: "نوع قرارداد",
+          hSticky: true,
+          width: 200,
+          accessorKey: "ContractType",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">نوع قرارداد</span>
+                <SelectColumnFilter
+                  initialFilters={
+                    filtersWithNoNetworkRequest.filter.ContractType ??
+                    defualtContractTypes
+                  }
+                  column={column}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    setFiltersWithNoNetworkRequest((prev) => {
+                      return {
+                        ...prev,
+                        filter: {
+                          ...prev.filter,
+                          [filter.id]: filter.values,
+                        },
+                      };
+                    });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
+        {
           header: "نوع سمت",
           enablePinning: true,
           hSticky: false,
@@ -470,17 +485,26 @@ function PersonnelPerformanceTable({ sessionData }) {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع سمت</span>
+
                 <SelectColumnFilter
+                  initialFilters={getDefaultRoleTypesBaseOnContractType(
+                    filtersWithNoNetworkRequest?.filter?.ContractType ??
+                      defualtContractTypes,
+                  )}
+                  selectedValues={getDefaultRoleTypesBaseOnContractType(
+                    filtersWithNoNetworkRequest?.filter?.ContractType ??
+                      defualtContractTypes,
+                  )}
                   column={column}
                   data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
+                  // onChange={(filter) => {
+                  //   setFiltersWithNoNetworkRequest((prev) => {
+                  //     return {
+                  //       ...prev,
+                  //       [filter.id]: filter.values,
+                  //     };
+                  //   });
+                  // }}
                 />
               </div>
             );
@@ -546,110 +570,7 @@ function PersonnelPerformanceTable({ sessionData }) {
               ),
             ),
         },
-        {
-          header: "نام شهر",
-          enablePinning: true,
-          hSticky: false,
-          accessorKey: "TownName",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نام شهر</span>
-                <SelectColumnFilter
-                  column={column}
-                  data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
-        {
-          header: "نام شعبه",
-          enablePinning: true,
-          hSticky: false,
-          accessorKey: "BranchName",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نام شعبه</span>
-                <SelectColumnFilter
-                  column={column}
-                  data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
-        {
-          header: "کد شعبه",
-          enablePinning: true,
-          hSticky: false,
-          accessorKey: "BranchCode",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">کد شعبه</span>
-                <SelectColumnFilter
-                  column={column}
-                  data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
-        {
-          header: "نوع شعبه",
-          enablePinning: true,
-          hSticky: false,
-          accessorKey: "BranchType",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">نوع شعبه</span>
-                <SelectColumnFilter
-                  column={column}
-                  data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
+
         {
           header: "ثبت اولیه اسناد",
           accessorKey: "SabtAvalieAsnad",
@@ -938,7 +859,7 @@ function PersonnelPerformanceTable({ sessionData }) {
           },
         },
       ],
-      [personnelPerformance.data],
+      [personnelPerformance.data, filtersWithNoNetworkRequest],
     ) || [];
 
   return (
