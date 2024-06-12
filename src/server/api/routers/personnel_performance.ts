@@ -113,7 +113,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
         SUM(ArchiveDirectCount) as ArchiveDirectCount,
         SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-        SUM(SabtVisitInDirectCount) as SabtVisitInDirectCount,
+      
 
         SUM(TotalPerformance) as TotalPerformance, 
         
@@ -172,7 +172,6 @@ export const personnelPerformanceRouter = createTRPCRouter({
           SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
           SUM(ArchiveDirectCount) as ArchiveDirectCount,
           SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-          SUM(SabtVisitInDirectCount) as SabtVisitInDirectCount,
           SUM(TotalPerformance) as TotalPerformance,DateInfo,Start_Date,
           
           SUM(DirectPerFormance) as DirectPerFormance, 

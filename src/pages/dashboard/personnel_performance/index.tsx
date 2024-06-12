@@ -210,7 +210,6 @@ function PersonnelPerformanceTable({ sessionData }) {
           "WithoutScanInDirectCount",
           "ArchiveDirectCount",
           "ArchiveInDirectCount",
-          "SabtVisitInDirectCount",
           "Role",
           "RoleType",
           "ContractType",
@@ -719,21 +718,6 @@ function PersonnelPerformanceTable({ sessionData }) {
                   (total, row) =>
                     (total as number) +
                     (row.getValue("WithoutScanInDirectCount") as number),
-                  0,
-                ),
-            ),
-        },
-        {
-          header: "ثبت ویزیت غیر مستقیم",
-          accessorKey: "SabtVisitInDirectCount",
-          footer: ({ table }) =>
-            commify(
-              table
-                .getFilteredRowModel()
-                .rows.reduce(
-                  (total, row) =>
-                    (total as number) +
-                    (row.getValue("SabtVisitInDirectCount") as number),
                   0,
                 ),
             ),

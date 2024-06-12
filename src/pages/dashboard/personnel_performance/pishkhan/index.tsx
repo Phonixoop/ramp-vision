@@ -200,7 +200,6 @@ function PersonnelPerformanceTable({ sessionData }) {
           "WithoutScanInDirectCount",
           "ArchiveDirectCount",
           "ArchiveInDirectCount",
-          "SabtVisitInDirectCount",
           "Role",
           "RoleType",
           "ContractType",
