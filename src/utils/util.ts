@@ -170,6 +170,7 @@ export function en(inputString): string {
 
 export function processDataForChart(
   rawData,
+  // can be array
   groupBy,
   values = [],
   where = {},

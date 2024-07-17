@@ -122,7 +122,7 @@ export function SelectColumnFilter({
 
   if (!data || data.length === 0) return <></>;
   const unique = [...new Set(data.map((a) => a[column.id]))]
-    .filter((item) => item != undefined)
+    .filter((item) => item)
     .toSorted();
 
   const finalValues =

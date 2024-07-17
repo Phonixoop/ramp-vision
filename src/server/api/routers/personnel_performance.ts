@@ -406,7 +406,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
             return `LIKE '${_d[0]}/${_d[1]}/%'`;
           });
-          const date = filter.Start_Date[0].split("/");
+          //   const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
 
           queryCities = `

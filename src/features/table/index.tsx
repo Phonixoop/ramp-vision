@@ -173,8 +173,8 @@ export default function Table({
           {renderInFilterView !== undefined && (
             <>
               {renderInFilterView !== undefined && (
-                <div className="flex w-full flex-row justify-center md:px-0 ">
-                  <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5  ">
+                <div className="flex w-full flex-row justify-center md:px-0">
+                  <div className="flex w-full flex-col flex-wrap items-center justify-start gap-5 rounded-2xl bg-secbuttn px-4 py-5 last:pb-20 ">
                     <div className="flex items-center justify-center gap-3 text-accent">
                       <FilterIcon className="h-4 w-4" />
                       <H2 className="text-lg font-bold text-accent">فیلترها</H2>

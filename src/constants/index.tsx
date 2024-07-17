@@ -33,7 +33,14 @@ export const MENU = [
       },
     ],
   },
-
+  {
+    value: "حواله خسارت",
+    link: "/dashboard/havale_khesarat",
+  },
+  {
+    value: "ورودی مستقیم ماهانه",
+    link: "/dashboard/insurance_metrics",
+  },
   {
     value: "گیج عملکرد استان ها",
     link: "/dashboard/gauges",
@@ -60,6 +67,7 @@ export const City_Levels: {
     cities: [
       "Tehran InDirect",
       "Tehran Direct",
+      "Tehran",
       "Isfahan",
       "Fars",
       "East Azerbaijan",
@@ -146,6 +154,7 @@ export const CITIES: City[] = [
   { EnglishName: "Hormozgan", PersianName: "هرمزگان" },
   { EnglishName: "Yazd", PersianName: "یزد" },
   { EnglishName: "Hamadan", PersianName: "همدان" },
+  { EnglishName: "Tehran", PersianName: "تهران" },
 ];
 
 export const PERMISSIONS: Permission[] = [

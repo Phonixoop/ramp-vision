@@ -16,6 +16,7 @@ import { Reports_Period } from "~/constants";
 export default function DatePickerPeriodic({
   filter,
   reportPeriod,
+  hidePeriodSelection = false,
   onChange = (date: DateObject | DateObject[] | null) => {},
   setReportPeriod = (period) => {},
 }) {
@@ -56,20 +57,29 @@ export default function DatePickerPeriodic({
           onChange(date);
         }}
       >
-        <LayoutGroup id="DateMenu">
-          <div dir={"rtl"} className="mx-0  w-fit rounded-lg bg-secondary p-2">
-            <InPageMenu
-              list={Object.keys(Reports_Period)}
-              startIndex={
-                reportPeriod === "روزانه" ? 0 : reportPeriod === "هفتگی" ? 1 : 2
-              }
-              onChange={(value) => {
-                // openCalendar();
-                setReportPeriod(value.item.name);
-              }}
-            />
-          </div>
-        </LayoutGroup>
+        {hidePeriodSelection == true && (
+          <LayoutGroup id="DateMenu">
+            <div
+              dir={"rtl"}
+              className="mx-0  w-fit rounded-lg bg-secondary p-2"
+            >
+              <InPageMenu
+                list={Object.keys(Reports_Period)}
+                startIndex={
+                  reportPeriod === "روزانه"
+                    ? 0
+                    : reportPeriod === "هفتگی"
+                    ? 1
+                    : 2
+                }
+                onChange={(value) => {
+                  // openCalendar();
+                  setReportPeriod(value.item.name);
+                }}
+              />
+            </div>
+          </LayoutGroup>
+        )}
       </DatePicker>
     </>
   );
