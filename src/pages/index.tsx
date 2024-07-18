@@ -95,7 +95,7 @@ export default function Home() {
               className="line_width_animation_140  absolute -left-[20%] 
               top-0 h-[1px] w-[140%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
             />
-            نرم افزار جامع تجزیه تحلیل و آنالیز داده های پرسنل و شعب
+            نرم افزار جامع مدیریت و تحلیل عملکرد پرسنل و شعب
           </h1>
           <div className="relative max-w-[550px] p-5 text-center text-primary/80 ">
             کلیه اطلاعات پایه و مدیریت مورد نیاز همانند انواع خدمت، پوشش های

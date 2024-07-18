@@ -39,7 +39,7 @@ export default function SimpleTable({
             {columns.map((column) => (
               <TableHead
                 className={twMerge(
-                  "border-b-2 border-primary/50 text-center  text-primbuttn last:border-l-0",
+                  "border-b-2 border-primary/50 text-center  text-accent last:border-l-0",
                   table[column].headClassName,
                 )}
                 key={column}

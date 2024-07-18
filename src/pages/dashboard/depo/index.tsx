@@ -603,9 +603,9 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     {
       name: "ورودی",
       value: entryBaseOnSabt,
-      fill: "#e11d48",
-      headClassName: "text-lg text-rose-600 bg-secondary rounded-tr-xl",
-      rowClassName: "text-lg  text-rose-600 bg-secondary rounded-br-xl",
+      fill: "#06B6D4",
+      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
+      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
     },
     {
       name: "رسیدگی",
@@ -696,7 +696,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                     })}
                     index="name"
                     categories={["تعداد دپو", "تعداد ورودی", "تعداد رسیدگی"]}
-                    colors={["cyan", "rose", "emerald"]}
+                    colors={["rose", "cyan", "emerald"]}
                     valueFormatter={commify}
                     yAxisWidth={20}
                     showXAxis

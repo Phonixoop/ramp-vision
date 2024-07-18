@@ -9,7 +9,7 @@ import Table from "~/features/table";
 import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { api } from "~/utils/api";
 
 import { SelectColumnFilter } from "~/features/checkbox-list";
@@ -49,6 +49,7 @@ import {
 } from "~/utils/personnel-performance";
 import { FilterType, PeriodType } from "~/context/personnel-filter.context";
 import { sortDates } from "~/lib/utils";
+import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 
 // const dataFormatter = (number: number) => {
 //   return "$ " + Intl.NumberFormat("us").format(number).toString();
@@ -99,6 +100,22 @@ function PersonnelPerformanceTable({ sessionData }) {
       refetchOnWindowFocus: false,
     },
   );
+  const getLastDate = api.personnelPerformance.getLastDate.useQuery(undefined, {
+    enabled: sessionData?.user !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    setDataFilters((prev) => {
+      return {
+        ...prev,
+        filter: {
+          ...prev.filter,
+          Start_Date: [getLastDate?.data ?? ""],
+        },
+      };
+    });
+  }, [getLastDate.data]);
 
   const [filters, setDataFilters] = useState<FilterType>({
     periodType: reportPeriod,
@@ -412,35 +429,6 @@ function PersonnelPerformanceTable({ sessionData }) {
             );
           },
         },
-
-        {
-          header: "سمت",
-          hSticky: true,
-          width: 250,
-          accessorKey: "Role",
-          filterFn: "arrIncludesSome",
-          Filter: ({ column }) => {
-            return (
-              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-                <span className="font-bold text-primary">سمت</span>
-
-                <SelectColumnFilter
-                  initialFilters={defualtRoles}
-                  column={column}
-                  data={personnelPerformance.data?.result}
-                  onChange={(filter) => {
-                    // setDataFilters((prev) => {
-                    //   return {
-                    //     ...prev,
-                    //     [filter.id]: filter.values,
-                    //   };
-                    // });
-                  }}
-                />
-              </div>
-            );
-          },
-        },
         {
           header: "نوع قرارداد",
           hSticky: true,
@@ -474,6 +462,35 @@ function PersonnelPerformanceTable({ sessionData }) {
             );
           },
         },
+        {
+          header: "سمت",
+          hSticky: true,
+          width: 250,
+          accessorKey: "Role",
+          filterFn: "arrIncludesSome",
+          Filter: ({ column }) => {
+            return (
+              <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+                <span className="font-bold text-primary">سمت</span>
+
+                <SelectColumnFilter
+                  initialFilters={defualtRoles}
+                  column={column}
+                  data={personnelPerformance.data?.result}
+                  onChange={(filter) => {
+                    // setDataFilters((prev) => {
+                    //   return {
+                    //     ...prev,
+                    //     [filter.id]: filter.values,
+                    //   };
+                    // });
+                  }}
+                />
+              </div>
+            );
+          },
+        },
+
         {
           header: "نوع سمت",
           enablePinning: true,
@@ -884,36 +901,43 @@ function PersonnelPerformanceTable({ sessionData }) {
                 <>
                   <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
                     <span className="font-bold text-primary">بازه گزارش</span>
+                    {getLastDate.isLoading ? (
+                      <>
+                        <div className="text-primary">
+                          <ThreeDotsWave />
+                        </div>
+                      </>
+                    ) : (
+                      <DatePickerPeriodic
+                        filter={deferredFilter}
+                        reportPeriod={reportPeriod}
+                        onChange={(date) => {
+                          if (!date) return;
 
-                    <DatePickerPeriodic
-                      filter={deferredFilter}
-                      reportPeriod={reportPeriod}
-                      onChange={(date) => {
-                        if (!date) return;
-
-                        if (Array.isArray(date) && date.length <= 0) return;
-                        let dates = [];
-                        if (Array.isArray(date)) {
-                          dates = date
-                            .filter((a) => a.format() != "")
-                            .map((a) => en(a.format("YYYY/MM/DD")));
-                        } else {
-                          if (date.format() != "")
-                            dates = [en(date.format("YYYY/MM/DD"))];
-                        }
-                        if (dates.length <= 0) return;
-                        setDataFilters((prev) => {
-                          return {
-                            periodType: reportPeriod,
-                            filter: {
-                              ...prev.filter,
-                              Start_Date: dates,
-                            },
-                          };
-                        });
-                      }}
-                      setReportPeriod={setReportPeriod}
-                    />
+                          if (Array.isArray(date) && date.length <= 0) return;
+                          let dates = [];
+                          if (Array.isArray(date)) {
+                            dates = date
+                              .filter((a) => a.format() != "")
+                              .map((a) => en(a.format("YYYY/MM/DD")));
+                          } else {
+                            if (date.format() != "")
+                              dates = [en(date.format("YYYY/MM/DD"))];
+                          }
+                          if (dates.length <= 0) return;
+                          setDataFilters((prev) => {
+                            return {
+                              periodType: reportPeriod,
+                              filter: {
+                                ...prev.filter,
+                                Start_Date: dates,
+                              },
+                            };
+                          });
+                        }}
+                        setReportPeriod={setReportPeriod}
+                      />
+                    )}
                   </div>
                 </>
               );

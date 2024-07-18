@@ -57,7 +57,7 @@ export default function DatePickerPeriodic({
           onChange(date);
         }}
       >
-        {hidePeriodSelection == true && (
+        {hidePeriodSelection == false && (
           <LayoutGroup id="DateMenu">
             <div
               dir={"rtl"}

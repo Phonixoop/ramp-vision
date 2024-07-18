@@ -687,6 +687,16 @@ export const personnelPerformanceRouter = createTRPCRouter({
         }),
     };
   }),
+  getLastDate: protectedProcedure.query(async ({ ctx }) => {
+    const query = ` 
+    SELECT TOP 1 Start_Date FROM RAMP_Daily.dbo.personnel_performance ORDER BY Start_Date DESC 
+    `;
+
+    const result = await sql.query(query);
+    const value = result.recordsets[0][0]["Start_Date"];
+    // console.log(result.recordsets);
+    return value;
+  }),
 
   getUsersByCityName: protectedProcedure
     .input(
