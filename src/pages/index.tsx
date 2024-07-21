@@ -1,4 +1,4 @@
-import { FormInputIcon, UserCog2 } from "lucide-react";
+import { FormInputIcon, SaveIcon, UserCog2 } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 
@@ -15,6 +15,10 @@ import AreaChartFake from "~/features/fake-charts/area";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
+import Image from "next/image";
+import { PowerLine } from "~/ui/icons/power-lines";
+import { PowerLineMobile } from "~/ui/icons/power-lines/mobile";
+import H2 from "~/ui/heading/h2";
 
 function Card({ value = -1 }) {
   return (
@@ -47,94 +51,168 @@ export default function Home() {
       </Head>
       <BlurBackground />
 
-      <div className=" flex min-h-screen w-full  flex-col items-center justify-center gap-5 overflow-hidden bg-secondary transition-colors duration-1000 ">
+      <div className=" flex min-h-screen w-full flex-col items-center justify-center  overflow-hidden bg-secondary py-5 transition-colors duration-1000 ">
         <section
           dir="rtl"
-          className=" relative mx-auto flex max-w-[1000px] flex-col items-center gap-7 p-5"
+          className=" relative mx-auto flex h-[70vh]  max-w-[1000px] flex-col items-center justify-center gap-7 p-5"
         >
-          <div className=" hidden items-center justify-center gap-5 text-primary lg:flex">
-            <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
-              جدید
-            </span>
-            <p className="text-primary/60">
-              <span className="text-primary">ویژگی</span> های نسخه جدید، سرعت
-              بهتر در مقایسه بیشتر، بهبود امکانات آنلایز و اضافه شدن گزارش گیری
-              ماهانه.
-            </p>
+          <div
+            dir="rtl"
+            className=" relative mx-auto flex  max-w-[1000px] flex-col items-center justify-center gap-7 p-5"
+          >
+            <div className=" hidden items-center justify-center gap-5 text-primary lg:flex">
+              <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
+                جدید
+              </span>
+              <p className="text-primary/60">
+                <span className="text-primary">ویژگی</span> های نسخه جدید، سرعت
+                بهتر در مقایسه بیشتر، بهبود امکانات آنلایز و اضافه شدن گزارش
+                گیری ماهانه.
+              </p>
+              <Link
+                href={"/about"}
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary px-4 py-1 text-primary"
+              >
+                بیشتر بخوانید
+                <ChevronLeftIcon className="h-3 w-3 fill-none stroke-primary stroke-2" />
+              </Link>
+            </div>
+            {/* mobile */}
             <Link
               href={"/about"}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary px-4 py-1 text-primary"
+              className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary py-1 pl-2 pr-1 text-primary lg:hidden"
             >
-              بیشتر بخوانید
+              <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
+                جدید
+              </span>
+              <p className="text-sm text-primary/60">
+                <span className="text-primary">ویژگی</span> ها و امکانات نسخه
+                جدید
+              </p>
               <ChevronLeftIcon className="h-3 w-3 fill-none stroke-primary stroke-2" />
             </Link>
-          </div>
-          {/* mobile */}
-          <Link
-            href={"/about"}
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary py-1 pl-2 pr-1 text-primary lg:hidden"
-          >
-            <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
-              جدید
-            </span>
-            <p className="text-sm text-primary/60">
-              <span className="text-primary">ویژگی</span> ها و امکانات نسخه جدید
-            </p>
-            <ChevronLeftIcon className="h-3 w-3 fill-none stroke-primary stroke-2" />
-          </Link>
-          <FloatDiv
-            className="line_height_animation_120 absolute -top-[10%] 
+            <FloatDiv
+              className="line_height_animation_120 absolute -top-[10%] 
             left-0 h-[120%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
-          />
-          <FloatDiv
-            className="line_height_animation_120 absolute -top-[10%] 
+            />
+            <FloatDiv
+              className="line_height_animation_120 absolute -top-[10%] 
             right-0 h-[120%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
-          />
-          <h1 className="relative p-5 text-center text-4xl font-bold text-primary">
-            <FloatDiv
-              className="line_width_animation_140  absolute -left-[20%] 
+            />
+            <h1 className="relative p-5 text-center text-4xl font-bold text-primary">
+              <FloatDiv
+                className="line_width_animation_140  absolute -left-[20%] 
               top-0 h-[1px] w-[140%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
-            />
-            نرم افزار جامع مدیریت و تحلیل عملکرد پرسنل و شعب
-          </h1>
-          <div className="relative max-w-[550px] p-5 text-center text-primary/80 ">
-            کلیه اطلاعات پایه و مدیریت مورد نیاز همانند انواع خدمت، پوشش های
-            بیمه ای ، تعرفه های درمانی و ارزیابی ، اطلاعات کاربران و مراجع
-            درمانی جهت نظارت بر فعالیت سامانه و کلیه بخش های زیر مجموعه آن از
-            طریق این پنل صورت می گیرد.
-            <FloatDiv className="line_width_animation_215 absolute -left-[57.5%] bottom-0 h-[1px] w-[215%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  " />
-          </div>
-          <div className="relative flex w-auto flex-col items-center justify-center gap-4  p-5 ">
-            <FloatDiv
-              className="line_height_animation_160 absolute -top-[25%] 
-              right-0 h-[160%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/50 via-50% to-transparent to-100%  "
-            />
-            <FloatDiv
-              className="line_height_animation_160 absolute -top-[25%] 
-              left-0 h-[160%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/50 via-50% to-transparent to-100%  "
-            />
-            <div className="relative flex items-center justify-between gap-4  ">
-              <Link
-                className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm  font-medium text-secondary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-                href={"about"}
-              >
-                درباره RAMP
-              </Link>
-
-              {!sessionData?.user && (
-                <Button
-                  className="flex  items-center justify-center gap-2 rounded-lg border border-accent  stroke-accent p-0 px-6 py-1.5  text-primary"
-                  onClick={
-                    sessionData ? () => void signOut() : () => void signIn()
-                  }
-                >
-                  <span className="">ورود</span>
-                  <FormInputIcon className="stroke-primary" />
-                </Button>
-              )}
+              />
+              نرم افزار جامع مدیریت و تحلیل عملکرد پرسنل و شعب
+            </h1>
+            <div className="relative max-w-[550px] p-5 text-center text-primary/80 ">
+              کلیه اطلاعات پایه و مدیریت مورد نیاز همانند انواع خدمت، پوشش های
+              بیمه ای ، تعرفه های درمانی و ارزیابی ، اطلاعات کاربران و مراجع
+              درمانی جهت نظارت بر فعالیت سامانه و کلیه بخش های زیر مجموعه آن از
+              طریق این پنل صورت می گیرد.
+              <FloatDiv className="line_width_animation_215 absolute -left-[57.5%] bottom-0 h-[1px] w-[215%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  " />
             </div>
-            <Card value={!getCount.data ? -1 : getCount.data} />
+            <div className="relative flex w-auto flex-col items-center justify-center gap-4  p-5 ">
+              <FloatDiv
+                className="line_height_animation_160 absolute -top-[25%] 
+              right-0 h-[160%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/50 via-50% to-transparent to-100%  "
+              />
+              <FloatDiv
+                className="line_height_animation_160 absolute -top-[25%] 
+              left-0 h-[160%] w-[1px] bg-gradient-to-b  from-transparent from-0% via-primary/50 via-50% to-transparent to-100%  "
+              />
+              <div className="relative flex items-center justify-between gap-4  ">
+                <Link
+                  className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm  font-medium text-secondary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                  href={"about"}
+                >
+                  درباره RAMP
+                </Link>
+
+                {!sessionData?.user && (
+                  <Button
+                    className="flex  items-center justify-center gap-2 rounded-lg border border-accent  stroke-accent p-0 px-6 py-1.5  text-primary"
+                    onClick={
+                      sessionData ? () => void signOut() : () => void signIn()
+                    }
+                  >
+                    <span className="">ورود</span>
+                    <FormInputIcon className="stroke-primary" />
+                  </Button>
+                )}
+              </div>
+              <Card value={!getCount.data ? -1 : getCount.data} />
+            </div>
           </div>
+        </section>
+        <section className="">
+          <Image
+            className=""
+            src={"/svg/diagram-main.svg"}
+            width={1000}
+            height={720}
+            alt="dashboard"
+          />
+        </section>
+        <section className="relative flex w-full flex-col items-center justify-center gap-4 bg-secondary">
+          <H2 className="pt-10 text-3xl">
+            بر پایه ابزارهای سریع و درجه تولید ساخته شده است
+          </H2>
+          <div className="bg-shadow relative flex  w-full items-center justify-center  ">
+            <PowerLine className="mobileMax:hidden" />
+            <PowerLineMobile className="mobileMin:hidden" />
+
+            {/* absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2  */}
+            <div className="foundation_cpu__ciXpm absolute left-1/2 top-[calc(50%+9px)] flex h-16 w-[180px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md bg-secbuttn text-red-600">
+              <span className="text-lg text-accent"> پردازش</span>
+              <div data-cpu-shine="true"></div>
+              <div data-connectors="true" data-side="left">
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+              </div>
+              <div data-connectors="true" data-side="top">
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+              </div>
+              <div data-connectors="true" data-side="bottom">
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+              </div>
+              <div data-connectors="true" data-side="right">
+                <span data-connector="true"></span>
+                <span data-connector="true"></span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="flex w-11/12 items-center justify-center gap-5">
+          <InfoCard className="blueShadow">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
+            consequatur laboriosam quod quis totam aliquam, unde harum magnam
+            vitae error tempore obcaecati modi fuga placeat ipsum ipsam minima.
+            Laborum, ab.
+          </InfoCard>
+          <InfoCard className="yellowShadow">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
+            consequatur laboriosam quod quis totam aliquam, unde harum magnam
+            vitae error tempore obcaecati modi fuga placeat ipsum ipsam minima.
+            Laborum, ab.
+          </InfoCard>
+          <InfoCard className="redShadow">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
+            consequatur laboriosam quod quis totam aliquam, unde harum magnam
+            vitae error tempore obcaecati modi fuga placeat ipsum ipsam minima.
+            Laborum, ab.
+          </InfoCard>
         </section>
 
         {/* <section className="flex w-9/12 items-center justify-center gap-2">
@@ -154,6 +232,26 @@ export default function Home() {
           height={1080}
           alt="dashboard"
         /> */}
+      </div>
+    </>
+  );
+}
+
+function InfoCard({ children, className = "", title = "عنوان" }) {
+  return (
+    <>
+      <div
+        dir="rtl"
+        className={twMerge(
+          "foundation_card__v7VKB  flex max-w-md flex-col items-center justify-center gap-4 rounded-lg  border border-secbuttn bg-secbuttn p-4",
+          className,
+        )}
+      >
+        <div className="flex w-full items-center justify-between">
+          <h3 className="w-full text-right text-2xl text-accent">{title}</h3>
+          <SaveIcon className="h-14 w-14 stroke-accent" />
+        </div>
+        <p className="text-justify text-primary">{children}</p>
       </div>
     </>
   );
