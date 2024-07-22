@@ -1,4 +1,11 @@
-import { FormInputIcon, SaveIcon, UserCog2 } from "lucide-react";
+import {
+  BuildingIcon,
+  FormInputIcon,
+  PercentDiamondIcon,
+  SaveIcon,
+  UserCog2,
+  UserSearchIcon,
+} from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 
@@ -107,10 +114,8 @@ export default function Home() {
               نرم افزار جامع مدیریت و تحلیل عملکرد پرسنل و شعب
             </h1>
             <div className="relative max-w-[550px] p-5 text-center text-primary/80 ">
-              کلیه اطلاعات پایه و مدیریت مورد نیاز همانند انواع خدمت، پوشش های
-              بیمه ای ، تعرفه های درمانی و ارزیابی ، اطلاعات کاربران و مراجع
-              درمانی جهت نظارت بر فعالیت سامانه و کلیه بخش های زیر مجموعه آن از
-              طریق این پنل صورت می گیرد.
+              این سامانه جهت سهولت در تحلیل عملکرد شعب و پرسنل و محاسبه درصد
+              خسارت بر اساس استاندارد های تعیین شده طراحی گردیده است
               <FloatDiv className="line_width_animation_215 absolute -left-[57.5%] bottom-0 h-[1px] w-[215%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  " />
             </div>
             <div className="relative flex w-auto flex-col items-center justify-center gap-4  p-5 ">
@@ -160,7 +165,7 @@ export default function Home() {
             بر پایه ابزارهای سریع و درجه تولید ساخته شده است
           </H2>
           <div className="bg-shadow relative flex  w-full items-center justify-center  ">
-            <PowerLine className="mobileMax:hidden" />
+            <PowerLine className="powerline mobileMax:hidden" />
             <PowerLineMobile className="mobileMin:hidden" />
 
             {/* absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2  */}
@@ -194,24 +199,92 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="flex w-11/12 items-center justify-center gap-5">
-          <InfoCard className="blueShadow">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
-            consequatur laboriosam quod quis totam aliquam, unde harum magnam
-            vitae error tempore obcaecati modi fuga placeat ipsum ipsam minima.
-            Laborum, ab.
+        <section className="flex w-11/12 items-stretch justify-center gap-5">
+          <InfoCard
+            className="blueShadow text-cyan-500"
+            title="محاسبه درصد خسارت"
+            icon={
+              <>
+                <PercentDiamondIcon className="h-14 w-14 stroke-cyan-500" />
+              </>
+            }
+          >
+            از دیگر ویژگی های این سامانه می توان به دستیابی به گزارشات؛ حواله
+            های عودتی نظارت، حواله های عودتی خسارت، محاسبه درصد انحراف حواله های
+            خسارت و درصد حواله های ابطال شده به تفکیک استان اشاره کر
           </InfoCard>
-          <InfoCard className="yellowShadow">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
-            consequatur laboriosam quod quis totam aliquam, unde harum magnam
-            vitae error tempore obcaecati modi fuga placeat ipsum ipsam minima.
-            Laborum, ab.
+          <InfoCard
+            className="redShadow text-rose-700"
+            title="محاسبه عملکرد پرسنل"
+            icon={
+              <>
+                <UserSearchIcon className="h-14 w-14 stroke-rose-700" />
+              </>
+            }
+          >
+            به منظور دستیابی به عملکرد پرسنل تمام وقت شعبه، فعالیت های صورت
+            گرفته ازارزیابی اسناد بیمارستانی، ارزیابی اسناد دارویی، پذیرش و ثبت
+            اولیه اسناد،ثبت ارزیابی با اسکن مدارک، تعداد پرونده ورودی،تعداد دپو
+            و... بر اساس استانداردهای تعیین شده بررسی می گردد.
           </InfoCard>
-          <InfoCard className="redShadow">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. At
-            consequatur laboriosam quod quis totam aliquam, unde harum magnam
-            vitae error tempore obcaecati modi fuga placeat ipsum ipsam minima.
-            Laborum, ab.
+          <InfoCard
+            className="yellowShadow text-accent"
+            title="محاسبه عملکرد کلی شعبه"
+            icon={
+              <>
+                <BuildingIcon className="h-14 w-14 stroke-accent" />
+              </>
+            }
+          >
+            به منظور سنجش عملکرد هر شعبه عمکرد حاصل از پرسنل آن در چهار دسته
+            عالی، خوب، متوسط و ضعیف ارزیابی می‌گردد. درصورتی که درصد عملکرد شعبه
+            بیشتر از 90 باشد عملکرد شعبه عالی، در صورتی که بین 75 تا 90 باشد
+            عملکرد شعبه خوب، در صورتی که بین 60 تا 75 باشد عملکرد شعبه متوسط و
+            در صتعداد دپوورتی که کمتر از 60 باشد عملکرد شعبه ضعیف است.
+          </InfoCard>
+        </section>
+        <section className="flex w-11/12 items-stretch justify-center gap-5 py-2">
+          <InfoCard
+            className=" text-cyan-500"
+            title="محاسبه درصد خسارت"
+            icon={
+              <>
+                <PercentDiamondIcon className="h-14 w-14 stroke-cyan-500" />
+              </>
+            }
+          >
+            از دیگر ویژگی های این سامانه می توان به دستیابی به گزارشات؛ حواله
+            های عودتی نظارت، حواله های عودتی خسارت، محاسبه درصد انحراف حواله های
+            خسارت و درصد حواله های ابطال شده به تفکیک استان اشاره کر
+          </InfoCard>
+          <InfoCard
+            className=" text-rose-700"
+            title="محاسبه عملکرد پرسنل"
+            icon={
+              <>
+                <UserSearchIcon className="h-14 w-14 stroke-rose-700" />
+              </>
+            }
+          >
+            به منظور دستیابی به عملکرد پرسنل تمام وقت شعبه، فعالیت های صورت
+            گرفته ازارزیابی اسناد بیمارستانی، ارزیابی اسناد دارویی، پذیرش و ثبت
+            اولیه اسناد،ثبت ارزیابی با اسکن مدارک، تعداد پرونده ورودی،تعداد دپو
+            و... بر اساس استانداردهای تعیین شده بررسی می گردد.
+          </InfoCard>
+          <InfoCard
+            className=" text-accent"
+            title="محاسبه عملکرد کلی شعبه"
+            icon={
+              <>
+                <BuildingIcon className="h-14 w-14 stroke-accent" />
+              </>
+            }
+          >
+            به منظور سنجش عملکرد هر شعبه عمکرد حاصل از پرسنل آن در چهار دسته
+            عالی، خوب، متوسط و ضعیف ارزیابی می‌گردد. درصورتی که درصد عملکرد شعبه
+            بیشتر از 90 باشد عملکرد شعبه عالی، در صورتی که بین 75 تا 90 باشد
+            عملکرد شعبه خوب، در صورتی که بین 60 تا 75 باشد عملکرد شعبه متوسط و
+            در صتعداد دپوورتی که کمتر از 60 باشد عملکرد شعبه ضعیف است.
           </InfoCard>
         </section>
 
@@ -237,19 +310,21 @@ export default function Home() {
   );
 }
 
-function InfoCard({ children, className = "", title = "عنوان" }) {
+function InfoCard({ children, className = "", title = "عنوان", icon = <></> }) {
   return (
     <>
       <div
         dir="rtl"
         className={twMerge(
-          "foundation_card__v7VKB  flex max-w-md flex-col items-center justify-center gap-4 rounded-lg  border border-secbuttn bg-secbuttn p-4",
+          "foundation_card__v7VKB  flex max-w-md flex-col items-center justify-start gap-4 rounded-lg  border border-secbuttn bg-secbuttn p-4",
           className,
         )}
       >
         <div className="flex w-full items-center justify-between">
-          <h3 className="w-full text-right text-2xl text-accent">{title}</h3>
-          <SaveIcon className="h-14 w-14 stroke-accent" />
+          <h3 className="w-full text-right text-2xl font-bold text-inherit">
+            {title}
+          </h3>
+          {icon}
         </div>
         <p className="text-justify text-primary">{children}</p>
       </div>

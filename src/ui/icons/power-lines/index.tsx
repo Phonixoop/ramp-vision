@@ -13,7 +13,7 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M388 96V68a4 4 0 00-4-4h-74M349 150H73a4 4 0 00-4 4v20M547 130h275a4 4 0 014 4v130"
         ></path>
         <path
@@ -24,7 +24,7 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M349 130H5a4 4 0 00-4 4v130"
         ></path>
         <path
@@ -36,7 +36,7 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M547 150h86a4 4 0 014 4v82a4 4 0 01-4 4H488a4 4 0 00-4 4v20"
         ></path>
         <path
@@ -48,7 +48,7 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M388 184v10a4 4 0 01-4 4H77a4 4 0 00-4 4v62"
         ></path>
         <path
@@ -60,13 +60,13 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="url(#paint4_linear_7_94)"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M412 96V0"
         ></path>
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M412 263.5V184"
         ></path>
         <path
@@ -78,7 +78,7 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M508 96v-8a4 4 0 014-4h374a4 4 0 014 4v176"
         ></path>
         <path
@@ -89,73 +89,73 @@ export function PowerLine({ className = "" }) {
         <path
           stroke="url(#paint7_linear_7_94)"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M436 96V0"
         ></path>
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M436 214v-30M460 96V64M460 239v-55"
         ></path>
         <path
           stroke="url(#paint8_linear_7_94)"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M484 96V24a4 4 0 014-4h66"
         ></path>
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M484 184v26a4 4 0 004 4h72"
         ></path>
         <path
           stroke="#fff"
           strokeDasharray="1 1"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M508 184v9a4 4 0 004 4h48"
         ></path>
         <path fill="#000" d="M460 68a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M460 67.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
         <path fill="#000" d="M308 68a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M308 67.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
         <path fill="#000" d="M69 177a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M69 176.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
         <path fill="#000" d="M436 218a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M436 217.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
         <path fill="#000" d="M460 244a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M460 243.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
         <path fill="#000" d="M560 218a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M560 217.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
         <path fill="#000" d="M560 201a4 4 0 100-8 4 4 0 000 8z"></path>
         <path
           stroke="#fff"
-          strokeOpacity="0.1"
+          strokeOpacity="0.5"
           d="M560 200.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         ></path>
       </g>

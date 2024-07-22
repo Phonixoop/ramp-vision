@@ -786,16 +786,21 @@ input[type="number"] {
     from 180deg at 50% 50%,
     transparent 0deg,
     transparent 176deg,
-    #c02020 193deg,
+    #be123c 193deg,
     transparent 217deg,
     transparent 1turn
   );
 }
+/* red #c02020 */
 
 .bg-shadow {
   background: radial-gradient(
     50% 50% at 50% 50%,
-    rgb(var(--accent), 0.1) 0,
+    rgb(var(--accent), 0.05) 0,
     rgb(var(--secondary)) 100%
   );
 }
+
+/* .powerline path {
+  @apply stroke-accent/70;
+} */
