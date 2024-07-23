@@ -68,7 +68,6 @@ export const havaleKhesaratRouter = createTRPCRouter({
       )}) Order By CityName `;
       query += whereClause;
 
-      console.log(query);
       const result = await sql.query(query);
 
       return result.recordset.map((r) => {
