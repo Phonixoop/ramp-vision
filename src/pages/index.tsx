@@ -27,6 +27,7 @@ import Image from "next/image";
 import { PowerLineMobile } from "~/ui/icons/power-lines/mobile";
 import H2 from "~/ui/heading/h2";
 import { PowerLine } from "~/ui/icons/power-lines/test";
+import { DiagramSVG } from "~/resources/diagram";
 
 function Card({ value = -1 }) {
   return (
@@ -153,13 +154,14 @@ export default function Home() {
           </div>
         </section>
         <section className="">
-          <Image
+          {/* <Image
             className=""
             src={"/svg/diagram-main.svg"}
             width={1000}
             height={720}
             alt="dashboard"
-          />
+          /> */}
+          <DiagramSVG />
         </section>
         <section className="relative flex w-full flex-col items-center justify-center gap-4 bg-secondary">
           <H2 className="pt-10 text-3xl">
