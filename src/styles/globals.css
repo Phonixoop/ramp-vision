@@ -802,5 +802,20 @@ input[type="number"] {
 }
 
 /* .powerline path {
-  @apply stroke-accent/70;
+  @apply stroke-primary/40;
+} */
+/* .powerline circle {
+  @apply fill-accent;
+} */
+
+/* .powerline g > path:nth-child(2) {
+  stroke-dasharray: 1032;
+  stroke-dashoffset: 1032;
+  animation: line-anim 0.5s ease infinite;
+}
+
+@keyframes line-anim {
+  to {
+    offset-distance: 1;
+  }
 } */

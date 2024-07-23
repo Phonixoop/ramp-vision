@@ -23,9 +23,10 @@ import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
 import Image from "next/image";
-import { PowerLine } from "~/ui/icons/power-lines";
+
 import { PowerLineMobile } from "~/ui/icons/power-lines/mobile";
 import H2 from "~/ui/heading/h2";
+import { PowerLine } from "~/ui/icons/power-lines/test";
 
 function Card({ value = -1 }) {
   return (
@@ -229,50 +230,6 @@ export default function Home() {
           </InfoCard>
           <InfoCard
             className="yellowShadow text-accent"
-            title="محاسبه عملکرد کلی شعبه"
-            icon={
-              <>
-                <BuildingIcon className="h-14 w-14 stroke-accent" />
-              </>
-            }
-          >
-            به منظور سنجش عملکرد هر شعبه عمکرد حاصل از پرسنل آن در چهار دسته
-            عالی، خوب، متوسط و ضعیف ارزیابی می‌گردد. درصورتی که درصد عملکرد شعبه
-            بیشتر از 90 باشد عملکرد شعبه عالی، در صورتی که بین 75 تا 90 باشد
-            عملکرد شعبه خوب، در صورتی که بین 60 تا 75 باشد عملکرد شعبه متوسط و
-            در صتعداد دپوورتی که کمتر از 60 باشد عملکرد شعبه ضعیف است.
-          </InfoCard>
-        </section>
-        <section className="flex w-11/12 items-stretch justify-center gap-5 py-2">
-          <InfoCard
-            className=" text-cyan-500"
-            title="محاسبه درصد خسارت"
-            icon={
-              <>
-                <PercentDiamondIcon className="h-14 w-14 stroke-cyan-500" />
-              </>
-            }
-          >
-            از دیگر ویژگی های این سامانه می توان به دستیابی به گزارشات؛ حواله
-            های عودتی نظارت، حواله های عودتی خسارت، محاسبه درصد انحراف حواله های
-            خسارت و درصد حواله های ابطال شده به تفکیک استان اشاره کر
-          </InfoCard>
-          <InfoCard
-            className=" text-rose-700"
-            title="محاسبه عملکرد پرسنل"
-            icon={
-              <>
-                <UserSearchIcon className="h-14 w-14 stroke-rose-700" />
-              </>
-            }
-          >
-            به منظور دستیابی به عملکرد پرسنل تمام وقت شعبه، فعالیت های صورت
-            گرفته ازارزیابی اسناد بیمارستانی، ارزیابی اسناد دارویی، پذیرش و ثبت
-            اولیه اسناد،ثبت ارزیابی با اسکن مدارک، تعداد پرونده ورودی،تعداد دپو
-            و... بر اساس استانداردهای تعیین شده بررسی می گردد.
-          </InfoCard>
-          <InfoCard
-            className=" text-accent"
             title="محاسبه عملکرد کلی شعبه"
             icon={
               <>
