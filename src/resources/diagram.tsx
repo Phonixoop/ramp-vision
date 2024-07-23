@@ -2,13 +2,7 @@ import React from "react";
 
 export function DiagramSVG() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="831"
-      height="592"
-      fill="none"
-      viewBox="0 0 831 592"
-    >
+    <svg width="831" height="592" fill="none" viewBox="0 0 831 592">
       <path
         fill="url(#paint0_linear_4_2)"
         d="M372 111.431h-66.23l-6.99-4.002a23.7 23.7 0 00-23.56 0l-6.943 4.002H202v17.876l.039-3.826a10.695 10.695 0 005.433 9.949l63.965 36.732a31.255 31.255 0 0031.065 0l63.965-36.694c3.574-2.016 5.533-3.81 5.44-6.122v-3.827l.093-14.088z"

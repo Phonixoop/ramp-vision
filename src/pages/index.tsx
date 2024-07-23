@@ -153,26 +153,24 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="">
-          {/* <Image
+        <section className="pt-20 md:p-0">
+          <Image
             className=""
             src={"/svg/diagram-main.svg"}
             width={1000}
             height={720}
             alt="dashboard"
-          /> */}
-          <DiagramSVG />
+          />
+          {/* <DiagramSVG /> */}
         </section>
-        <section className="relative flex w-full flex-col items-center justify-center gap-4 bg-secondary">
-          <H2 className="pt-10 text-3xl">
-            بر پایه ابزارهای سریع و درجه تولید ساخته شده است
-          </H2>
+        <section className="relative flex  w-full flex-col items-center justify-center gap-4 bg-secondary">
+          <H2 className="sizeforh2 pt-10 text-center">ویژگی های کلی سامانه</H2>
           <div className="bg-shadow relative flex  w-full items-center justify-center  ">
             <PowerLine className="powerline mobileMax:hidden" />
-            <PowerLineMobile className="mobileMin:hidden" />
+            <PowerLineMobile className="powerlineMobile mobileMin:hidden" />
 
             {/* absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2  */}
-            <div className="foundation_cpu__ciXpm absolute left-1/2 top-[calc(50%+9px)] flex h-16 w-[180px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md bg-secbuttn text-red-600">
+            <div className="foundation_cpu__ciXpm absolute left-1/2 top-[25%] flex h-16 w-[180px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md bg-secbuttn text-red-600 mobileMin:top-[calc(50%+9px)]">
               <span className="text-lg text-accent"> پردازش</span>
               <div data-cpu-shine="true"></div>
               <div data-connectors="true" data-side="left">
@@ -202,7 +200,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className="flex w-11/12 items-stretch justify-center gap-5">
+        <section className="flex w-full flex-col items-center justify-center gap-5 md:w-11/12 md:flex-row md:items-stretch">
           <InfoCard
             className="blueShadow text-cyan-500"
             title="محاسبه درصد خسارت"

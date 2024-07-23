@@ -11,12 +11,10 @@ export function PowerLineMobile({ className = "" }) {
       viewBox="0 0 400 312"
     >
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M140 36V23a4 4 0 00-4-4H62M116 62H16M284 62.008h275a4 4 0 014 4V195.5M116 81.932h-276a4 4 0 00-4 4v19.909"
       ></path>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M284.5 82H370a4 4 0 014 4v215.883a4 4 0 01-4 4H240a4 4 0 00-4 4V312M140 108v9.825a4 4 0 01-4 4H67"
       ></path>
@@ -25,18 +23,13 @@ export function PowerLineMobile({ className = "" }) {
         strokeOpacity="0.1"
         d="M164 36V4"
       ></path>
-      <path
-        stroke="var(--geist-foreground)"
-        strokeOpacity="0.1"
-        d="M164 172.5V108"
-      ></path>
+      <path strokeOpacity="0.1" d="M164 172.5V108"></path>
       <path
         stroke="url(#paint1_linear_114_9407)"
         strokeOpacity="0.1"
         d="M188 36V4"
       ></path>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M188 137.689v-29.886M212 36.136V4.258M212 138v-30"
       ></path>
@@ -46,15 +39,10 @@ export function PowerLineMobile({ className = "" }) {
         d="M236 36V8a4 4 0 014-4h66"
       ></path>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M236 107.803v25.886a4 4 0 004 4h72M260 36.136v-7.954a4 4 0 014-4h374a4 4 0 014 4V203.5"
       ></path>
-      <path
-        stroke="var(--geist-foreground)"
-        strokeOpacity="0.1"
-        d="M260 107.803v8.951a4 4 0 004 4h48"
-      ></path>
+      <path strokeOpacity="0.1" d="M260 107.803v8.951a4 4 0 004 4h48"></path>
       <ellipse
         cx="212"
         cy="4.258"
@@ -63,7 +51,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M215.5 4.258a3.492 3.492 0 01-3.5 3.484 3.492 3.492 0 01-3.5-3.484A3.492 3.492 0 01212 .773c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>
@@ -75,7 +62,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M63.5 18.985A3.492 3.492 0 0160 22.47a3.492 3.492 0 01-3.5-3.485A3.492 3.492 0 0160 15.5c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>
@@ -87,7 +73,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M23.5 61.985A3.492 3.492 0 0120 65.47a3.492 3.492 0 01-3.5-3.485A3.492 3.492 0 0120 58.5c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>
@@ -99,7 +84,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M191.5 137.985a3.492 3.492 0 01-3.5 3.485 3.492 3.492 0 01-3.5-3.485 3.492 3.492 0 013.5-3.485c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>
@@ -111,7 +95,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M69.5 121.985a3.492 3.492 0 01-3.5 3.485 3.492 3.492 0 01-3.5-3.485A3.492 3.492 0 0166 118.5c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>
@@ -123,7 +106,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M215.5 137.985a3.492 3.492 0 01-3.5 3.485 3.492 3.492 0 01-3.5-3.485 3.492 3.492 0 013.5-3.485c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>
@@ -135,7 +117,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M315.5 137.689a3.492 3.492 0 01-3.5 3.485 3.492 3.492 0 01-3.5-3.485 3.492 3.492 0 013.5-3.484c1.935 0 3.5 1.562 3.5 3.484z"
       ></path>
@@ -147,7 +128,6 @@ export function PowerLineMobile({ className = "" }) {
         ry="3.985"
       ></ellipse>
       <path
-        stroke="var(--geist-foreground)"
         strokeOpacity="0.1"
         d="M315.5 120.754a3.492 3.492 0 01-3.5 3.485 3.492 3.492 0 01-3.5-3.485 3.492 3.492 0 013.5-3.485c1.935 0 3.5 1.562 3.5 3.485z"
       ></path>

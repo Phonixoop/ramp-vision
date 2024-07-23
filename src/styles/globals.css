@@ -554,6 +554,9 @@ input[type="number"] {
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   pointer-events: none;
 }
@@ -757,6 +760,7 @@ input[type="number"] {
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 .blueShadow:before {
@@ -819,3 +823,10 @@ input[type="number"] {
     offset-distance: 1;
   }
 } */
+
+.powerlineMobile path {
+  @apply stroke-accent;
+}
+.sizeforh2 {
+  font-size: clamp(0.2rem, 12vw + 1rem, 1.875rem);
+}
