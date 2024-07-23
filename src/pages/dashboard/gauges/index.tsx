@@ -281,9 +281,13 @@ export default function GaugesPage() {
 
                     <SelectControlled
                       withSelectAll
-                      list={getCitiesWithPerformance.data?.result?.map((a) =>
-                        getEnglishToPersianCity(a.CityName),
-                      )}
+                      list={[
+                        ...new Set(
+                          getCitiesWithPerformance.data?.result?.map((a) =>
+                            getEnglishToPersianCity(a.CityName),
+                          ),
+                        ),
+                      ]}
                       title={"استان"}
                       value={cityLevel.cities}
                       onChange={(values) => {

@@ -20,7 +20,7 @@ export default function Gauge({ value }) {
       <GaugeChart
         // className="xl:scale-125"
         //@ts-ignore
-        type="semicircle"
+        type="grafana"
         minValue={0}
         maxValue={500}
         arc={{
