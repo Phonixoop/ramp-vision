@@ -32,7 +32,13 @@ function checkStatusForMenu(status, user) {
           return false;
         case "جزئیات عملکرد پرسنل شعب (جدول)":
           return false;
-        case "جزئیات عملکرد پرسنل شعب":
+        case "جزئیات عملکرد پرسنل شعب (نمودار)":
+          return false;
+        case "جزئیات ورودی اسناد مستقیم شعب":
+          return false;
+        case "حواله خسارت":
+          return false;
+        case "ورودی مستقیم ماهانه":
           return false;
         case "گیج عملکرد استان ها":
           return false;
