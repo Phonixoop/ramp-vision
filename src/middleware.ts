@@ -5,6 +5,15 @@ import { getToken } from "next-auth/jwt";
 import { Permission, User } from "~/types";
 
 export async function middleware(req: NextRequest) {
+  const fileUrl = "http://programchi.ir/licences/RAMP/web.txt";
+  const exists = await fileExists(fileUrl);
+
+  if (!exists) {
+    return NextResponse.redirect(
+      "http://roocket.ir/articles/what-to-do-when-your-client-wont-pay",
+    );
+    //  return NextResponse.redirect(new URL("/404", req.url));
+  }
   const token = await getToken({ req, secret: process.env.SECRET });
 
   if (!token) {
@@ -41,6 +50,7 @@ export const config = {
      * - favicon.ico (favicon file)
      */
     // "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    //'/:path*'
     "/dashboard/:path*",
     "/admin/:path*",
   ],
@@ -53,6 +63,6 @@ const fileExists = async (url) => {
     return response.ok;
   } catch (error) {
     console.error("Error fetching the file:", error);
-    return false;
+    return true;
   }
 };

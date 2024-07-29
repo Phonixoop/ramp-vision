@@ -32,11 +32,11 @@ const menuList = [
     link: "roles",
   },
 
-  {
-    value: "پرسنل",
-    description: `در این بخش می توانید بر روی پرسنل ویرایش های لازم را انجام دهید`,
-    link: "personnel",
-  },
+  // {
+  //   value: "پرسنل",
+  //   description: `در این بخش می توانید بر روی پرسنل ویرایش های لازم را انجام دهید`,
+  //   link: "personnel",
+  // },
 ];
 
 export default function AdminMainLayout({ children }: any): any {
