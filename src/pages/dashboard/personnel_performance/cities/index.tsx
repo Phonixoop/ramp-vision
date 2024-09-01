@@ -333,11 +333,9 @@ export default function CitiesPage({ children }) {
                     withSelectAll
                     title={"نوع سمت"}
                     list={RolesType}
-                    value={
-                      getDefaultRoleTypesBaseOnContractType(
-                        filters?.filter?.ContractType ?? defualtContractTypes,
-                      ) ?? filters.filter.RoleType
-                    }
+                    value={getDefaultRoleTypesBaseOnContractType(
+                      filters?.filter?.ContractType ?? defualtContractTypes,
+                    )}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
