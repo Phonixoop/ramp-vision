@@ -321,6 +321,9 @@ export default function CitiesPage({ children }) {
                           filter: {
                             ...prev.filter,
                             ContractType: values,
+                            RoleType: getDefaultRoleTypesBaseOnContractType(
+                              values ?? defualtContractTypes,
+                            ),
                           },
                         };
                       });
@@ -333,9 +336,7 @@ export default function CitiesPage({ children }) {
                     withSelectAll
                     title={"نوع سمت"}
                     list={RolesType}
-                    value={getDefaultRoleTypesBaseOnContractType(
-                      filters?.filter?.ContractType ?? defualtContractTypes,
-                    )}
+                    value={filters?.filter?.RoleType}
                     onChange={(values) => {
                       //@ts-ignore
                       setFilters((prev) => {
