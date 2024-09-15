@@ -23,7 +23,6 @@ import {
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
-  defualtDateInfos,
 } from "~/constants/personnel-performance";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
@@ -86,12 +85,13 @@ export default function CityPage({ children, city }) {
     setSelectedPerson,
     setSelectedCity,
   } = usePersonnelFilter();
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
   const getPersonnls = api.personnel.getAll.useQuery(
     {
       filter: {
         CityName: [city],
 
-        DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
+        DateInfo: filters?.filter?.DateInfo ?? [defualtDateInfo.data],
       },
     },
     {
@@ -99,7 +99,6 @@ export default function CityPage({ children, city }) {
       refetchOnWindowFocus: false,
     },
   );
-
   const getAll = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
@@ -109,7 +108,7 @@ export default function CityPage({ children, city }) {
         Role: filters?.filter?.Role ?? defualtRoles,
         ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
         RoleType: filters?.filter?.RoleType,
-        DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
+        DateInfo: filters?.filter?.DateInfo ?? [defualtDateInfo.data],
         TownName: filters?.filter?.TownName,
         BranchName: filters?.filter?.BranchName,
         BranchCode: filters?.filter?.BranchCode,
@@ -118,6 +117,7 @@ export default function CityPage({ children, city }) {
       periodType: filters.periodType,
     },
     {
+      enabled: !!defualtDateInfo.data,
       onSuccess: (data) => {
         setSelectedPerson(undefined);
 
@@ -152,6 +152,7 @@ export default function CityPage({ children, city }) {
             "DirectPerFormance",
             "InDirectPerFormance",
             "Start_Date",
+            "DateInfo",
             "HasTheDayOff",
             "COUNT",
           ],
@@ -274,41 +275,7 @@ export default function CityPage({ children, city }) {
           { label: "عملکرد", key: "TotalPerformance" },
           { label: "پرسنل", key: "NameFamily" },
         ]}
-        dataToDownload={distinctPersonnelPerformanceData(
-          getAll?.data ?? [],
-          ["NationalCode", "NameFamily", "CityName"],
-          [
-            "NationalCode",
-            "NameFamily",
-            "TownName",
-            "BranchCode",
-            "BranchName",
-            "BranchType",
-            "SabtAvalieAsnad",
-            "PazireshVaSabtAvalieAsnad",
-            "ArzyabiAsanadBimarsetaniDirect",
-            "ArzyabiAsnadBimarestaniIndirect",
-            "ArzyabiAsnadDandanVaParaDirect",
-            "ArzyabiAsnadDandanVaParaIndirect",
-            "ArzyabiAsnadDaroDirect",
-            "ArzyabiAsnadDaroIndirect",
-            "WithScanCount",
-            "WithoutScanCount",
-            "WithoutScanInDirectCount",
-            "ArchiveDirectCount",
-            "ArchiveInDirectCount",
-            "Role",
-            "RoleType",
-            "ContractType",
-            "ProjectType",
-            "TotalPerformance",
-            "DirectPerFormance",
-            "InDirectPerFormance",
-            "Start_Date",
-            "HasTheDayOff",
-          ],
-          { HasTheDayOff: false },
-        )}
+        dataToDownload={getUpdatedListByAddindPersonnelList(updatedList)}
         onChange={(updatedList) => {
           setUpdatedList(() =>
             getUpdatedListByAddindPersonnelList(updatedList),

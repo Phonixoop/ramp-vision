@@ -15,10 +15,7 @@ import {
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
 import { getEnglishToPersianCity } from "~/utils/util";
-import {
-  defaultProjectTypes,
-  defualtDateInfos,
-} from "~/constants/personnel-performance";
+import { defaultProjectTypes } from "~/constants/personnel-performance";
 import { getUserPermissions } from "~/lib/user.util";
 import { sortDates } from "~/lib/utils";
 
@@ -54,10 +51,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z
-            .array(z.string().nullish())
-            .nullish()
-            .default(defualtDateInfos),
+          DateInfo: z.array(z.string().nullish()).nullish(),
           TownName: z.array(z.string()).nullish(),
           BranchName: z.array(z.string()).nullish(),
           BranchCode: z.array(z.string()).nullish(),
@@ -85,8 +79,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         if (filter.CityName.length <= 0) filter.CityName = cities;
 
-        const defualtDateInfo = await getDefualtDateInfo();
-        filter.DateInfo = [defualtDateInfo];
+        // const defualtDateInfo = await getDefualtDateInfo();
+        // filter.DateInfo = [defualtDateInfo];
         // if (input.periodType === "ماهانه" && filter.CityName.length > 3)
         //   throw new Error(
         //     "more than 3 cities in monthly filter is not allowed",
@@ -232,7 +226,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
        
         ${whereClause}
         `;
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         // console.log({ input });
         if (input.periodType === "روزانه") {
@@ -317,10 +311,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           ContractType: z.array(z.string()).nullish(),
           Role: z.array(z.string()).nullish(),
           RoleType: z.array(z.string()).nullish(),
-          DateInfo: z
-            .array(z.string().nullish())
-            .nullish()
-            .default(defualtDateInfos),
+          DateInfo: z.array(z.string().nullish()).nullish(),
           TownName: z.array(z.string()).nullish(),
           BranchName: z.array(z.string()).nullish(),
           BranchCode: z.array(z.string()).nullish(),
@@ -338,8 +329,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
           .subPermissions.filter((permission) => permission.isActive)
           .map((permission) => permission.enLabel);
 
-        const defualtDateInfo = await getDefualtDateInfo();
-        filter.DateInfo = [defualtDateInfo];
+        // const defualtDateInfo = await getDefualtDateInfo();
+        // filter.DateInfo = [defualtDateInfo];
         let whereClause = generateWhereClause({
           ...filter,
           CityName: cities,

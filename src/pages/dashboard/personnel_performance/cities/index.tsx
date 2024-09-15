@@ -40,7 +40,6 @@ import {
 import {
   defaultProjectTypes,
   defualtContractTypes,
-  defualtDateInfos,
   defualtRoles,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
@@ -107,6 +106,7 @@ export default function CitiesPage({ children }) {
 
   const [isPending, startTransition] = useTransition();
   const [whichTranistion, setWhichTranistion] = useState("");
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -117,7 +117,7 @@ export default function CitiesPage({ children }) {
           Role: filters?.filter?.Role ?? defualtRoles,
           ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
           RoleType: filters?.filter?.RoleType,
-          DateInfo: filters?.filter?.DateInfo ?? defualtDateInfos,
+          DateInfo: filters?.filter?.DateInfo ?? [defualtDateInfo.data],
           TownName: filters?.filter?.TownName,
           BranchName: filters?.filter?.BranchName,
           BranchCode: filters?.filter?.BranchCode,
@@ -662,6 +662,8 @@ export async function getServerSideProps(context) {
     transformer: SuperJSON,
   });
 
+  await helpers.personnel.getDefualtDateInfo.prefetch();
+
   await helpers.personnelPerformance.getCitiesWithPerformance.prefetch({
     periodType: "روزانه",
     filter: {
@@ -670,7 +672,6 @@ export async function getServerSideProps(context) {
       ],
       ProjectType: defaultProjectTypes,
       Role: defualtRoles,
-      DateInfo: defualtDateInfos,
     },
   });
 

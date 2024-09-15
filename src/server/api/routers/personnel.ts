@@ -15,6 +15,8 @@ import {
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
 import { getEnglishToPersianCity } from "~/utils/util";
+import { getDefualtDateInfo } from "~/server/api/routers/personnel_performance";
+import { sortDates } from "~/lib/utils";
 
 const config = {
   user: process.env.SQL_USER,
@@ -54,7 +56,6 @@ export const personnelRouter = createTRPCRouter({
           .find((permission) => permission.id === "ViewCities")
           .subPermissions.filter((permission) => permission.isActive)
           .map((permission) => permission.enLabel);
-
         let filter = input.filter;
 
         if (filter.CityName?.length > 0)
@@ -114,6 +115,25 @@ export const personnelRouter = createTRPCRouter({
       console.error("Error fetching data:", error.message);
       return error;
     }
+  }),
+  getDefualtDateInfo: protectedProcedure.query(async ({ ctx, input }) => {
+    const query = `
+
+
+  SELECT DISTINCT DateInfo FROM RAMP_Daily.dbo.users_info
+
+
+
+  `;
+    // console.log(query);
+    const result = await sql.query(query);
+    // console.log(result.recordsets);
+
+    const usersInfos = result.recordsets[0].map((a) => a.DateInfo);
+
+    const sortedDates = sortDates({ dates: usersInfos });
+
+    return sortedDates[sortedDates.length - 1];
   }),
 });
 
