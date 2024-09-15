@@ -12,7 +12,7 @@ import { CSVLink } from "react-csv";
 export default function AdvancedList({
   className = "",
   title = <></> || "",
-  list = () => [] || [],
+  list = () => [],
   filteredList = [],
   isLoading = false,
   disabled = false,

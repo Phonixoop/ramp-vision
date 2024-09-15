@@ -13,7 +13,6 @@ import { CITIES } from "~/constants";
 import {
   defaultProjectTypes,
   defualtContractTypes,
-  defualtDateInfos,
   defualtRoles,
 } from "~/constants/personnel-performance";
 import H2 from "~/ui/heading/h2";
@@ -238,6 +237,7 @@ function assignColorsToItems(items) {
   return result;
 }
 export default function RadarGauge({ CityName = [] }) {
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -246,7 +246,7 @@ export default function RadarGauge({ CityName = [] }) {
           CityName: CityName.map((c) => getPersianToEnglishCity(c)),
           Role: defualtRoles,
           ProjectType: defaultProjectTypes,
-          DateInfo: defualtDateInfos,
+          DateInfo: [defualtDateInfo.data],
           ContractType: defualtContractTypes,
           RoleType: [],
           Start_Date: [moment().locale("fa").format("yyyy/MM/01")],

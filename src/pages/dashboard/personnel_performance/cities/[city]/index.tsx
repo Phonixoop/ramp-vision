@@ -587,7 +587,6 @@ export default function CityPage({ children, city }) {
                                             : undefined,
                                         }}
                                         onClick={() => {
-                                          console.log({ selectedPerson });
                                           const result =
                                             distinctPersonnelPerformanceData(
                                               getAll?.data ?? [],

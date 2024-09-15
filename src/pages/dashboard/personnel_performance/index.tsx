@@ -135,10 +135,11 @@ function PersonnelPerformanceTable({ sessionData }) {
         RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
       },
     });
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
   const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
     {
       filter: {
-        DateInfo: filters.filter.DateInfo,
+        DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
         ProjectType: filters.filter.ProjectType,
       },
     },

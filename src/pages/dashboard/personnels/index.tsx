@@ -32,7 +32,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   defaultProjectTypes,
   defualtContractTypes,
-  defualtDateInfos,
   defualtRoles,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
