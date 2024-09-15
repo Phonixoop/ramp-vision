@@ -49,7 +49,7 @@ export default function GaugesPage() {
       ],
     },
   });
-
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -60,7 +60,7 @@ export default function GaugesPage() {
           Role: filters?.filter?.Role ?? defualtRoles,
           ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
           RoleType: filters?.filter?.RoleType,
-          DateInfo: filters?.filter?.DateInfo,
+          DateInfo: filters?.filter?.DateInfo ?? [defualtDateInfo.data],
         },
       },
       {
@@ -382,21 +382,17 @@ export default function GaugesPage() {
                     <SelectControlled
                       title={"تاریخ گزارش پرسنل"}
                       list={DateInfos}
-                      value={
-                        filters.filter.DateInfo ?? [
-                          DateInfos[DateInfos.length - 1],
-                        ]
-                      }
+                      value={filters.filter.DateInfo ?? [defualtDateInfo.data]}
                       onChange={(values) => {
-                        let _values = values;
-                        _values = [values[0]];
+                        console.log(values as string[]);
+
                         //@ts-ignore
                         setFilters((prev) => {
                           return {
                             periodType: reportPeriod,
                             filter: {
                               ...prev.filter,
-                              DateInfo: _values,
+                              DateInfo: [values[values.length - 1]],
                             },
                           };
                         });
