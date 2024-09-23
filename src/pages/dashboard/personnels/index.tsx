@@ -67,7 +67,7 @@ export default function GaugesPage() {
     useState({
       filter: {
         ContractType: defualtContractTypes,
-        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+        RoleType: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
       },
     });
   const getPersonnls = api.personnel.getAll.useQuery(
@@ -275,14 +275,6 @@ export default function GaugesPage() {
                     //     [filter.id]: filter.values,
                     //   };
                     // });
-                    setFilters((prev) => {
-                      return {
-                        ...prev,
-                        RoleType: getDefaultRoleTypesBaseOnContractType(
-                          filter.values ?? defualtContractTypes,
-                        ),
-                      };
-                    });
                   }}
                 />
               </div>
@@ -307,6 +299,9 @@ export default function GaugesPage() {
                         filter: {
                           ...prev.filter,
                           [filter.id]: filter.values,
+                          RoleType: getDefaultRoleTypesBaseOnContractType(
+                            filter.values ?? defualtContractTypes,
+                          ),
                         },
                       };
                     });
@@ -316,6 +311,7 @@ export default function GaugesPage() {
             );
           },
         },
+
         {
           header: "نوع سمت",
           accessorKey: "RoleType",
@@ -325,12 +321,20 @@ export default function GaugesPage() {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع سمت</span>
                 <SelectColumnFilter
-                  initialFilters={defualtRoles}
-                  selectedValues={
-                    filtersWithNoNetworkRequest?.filter?.RoleTypes
-                  }
+                  selectedValues={filtersWithNoNetworkRequest?.filter?.RoleType}
                   column={column}
                   data={getPersonnls.data}
+                  onChange={(filter) => {
+                    setFiltersWithNoNetworkRequest((prev) => {
+                      return {
+                        ...prev,
+                        filter: {
+                          ...prev.filter,
+                          RoleType: filter.values,
+                        },
+                      };
+                    });
+                  }}
                 />
               </div>
             );
