@@ -153,7 +153,7 @@ export const CITIES: City[] = [
   { EnglishName: "Markazi", PersianName: "مرکزی" },
   { EnglishName: "Hormozgan", PersianName: "هرمزگان" },
   { EnglishName: "Yazd", PersianName: "یزد" },
-  { EnglishName: "Hamadan", PersianName: "همدان" },
+  { EnglishName: "Hamedan", PersianName: "همدان" },
   { EnglishName: "Tehran", PersianName: "تهران" },
 ];
 

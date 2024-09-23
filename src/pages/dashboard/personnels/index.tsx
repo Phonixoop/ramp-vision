@@ -275,6 +275,14 @@ export default function GaugesPage() {
                     //     [filter.id]: filter.values,
                     //   };
                     // });
+                    setFilters((prev) => {
+                      return {
+                        ...prev,
+                        RoleType: getDefaultRoleTypesBaseOnContractType(
+                          filter.values ?? defualtContractTypes,
+                        ),
+                      };
+                    });
                   }}
                 />
               </div>
@@ -317,14 +325,10 @@ export default function GaugesPage() {
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
                 <span className="font-bold text-primary">نوع سمت</span>
                 <SelectColumnFilter
-                  initialFilters={getDefaultRoleTypesBaseOnContractType(
-                    filtersWithNoNetworkRequest?.filter?.ContractType ??
-                      defualtContractTypes,
-                  )}
-                  selectedValues={getDefaultRoleTypesBaseOnContractType(
-                    filtersWithNoNetworkRequest?.filter?.ContractType ??
-                      defualtContractTypes,
-                  )}
+                  initialFilters={defualtRoles}
+                  selectedValues={
+                    filtersWithNoNetworkRequest?.filter?.RoleTypes
+                  }
                   column={column}
                   data={getPersonnls.data}
                 />

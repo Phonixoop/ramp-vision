@@ -71,7 +71,7 @@ export const personnelRouter = createTRPCRouter({
 
          ${whereClause}`;
 
-        //  console.log(query);
+        console.log(query);
         const result = await sql.query(query);
         //  console.log(result.recordsets[0]);
         return result.recordsets[0].map((c) => {
