@@ -158,7 +158,15 @@ function PersonnelPerformanceTable({ sessionData }) {
       refetchOnWindowFocus: false,
     },
   );
-  const deferredFilter = useDeferredValue(filters);
+  const deferredFilter = useDeferredValue({
+    ...filters,
+    periodType: filters.periodType,
+    filter: {
+      ...filters.filter,
+      DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
+      ProjectType: filters.filter.ProjectType,
+    },
+  });
 
   const personnelPerformance = api.personnelPerformance.getAll.useQuery(
     deferredFilter,
@@ -331,6 +339,7 @@ function PersonnelPerformanceTable({ sessionData }) {
                 }
 
                 <SelectColumnFilter
+                  singleSelect={reportPeriod === "ماهانه"}
                   column={column}
                   data={initialFilters.data?.Cities}
                   onChange={(filter) => {
@@ -792,12 +801,12 @@ function PersonnelPerformanceTable({ sessionData }) {
           cell: ({ row }) => {
             if (personnelPerformance.data.periodType === "هفتگی")
               return (
-                <>
+                <span>
                   {getMonthNamesFromJOINED_date_strings(
                     filters.filter.Start_Date.join(","),
                     personnelPerformance.data.periodType,
                   )}
-                </>
+                </span>
               );
 
             if (personnelPerformance.data.periodType === "ماهانه")
