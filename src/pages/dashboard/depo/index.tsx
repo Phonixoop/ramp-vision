@@ -577,8 +577,8 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     ...flatRows.map((row) => calculateDepoCompleteTime(row)),
   );
 
-  const entryBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows,
+  const entryDirectBaseOnSabt = sumColumnBasedOnRowValue(
+    flatRows.filter((a) => a.DocumentType === "مستقیم"),
     "EntryCount",
     "ServiceName",
     [
@@ -588,8 +588,19 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     ],
   );
 
-  const capacityBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows,
+  const entryInDirectBaseOnSabt = sumColumnBasedOnRowValue(
+    flatRows.filter((a) => a.DocumentType === "غیر مستقیم"),
+    "EntryCount",
+    "ServiceName",
+    [
+      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
+    ],
+  );
+
+  const capacityDirectBaseOnSabt = sumColumnBasedOnRowValue(
+    flatRows.filter((a) => a.DocumentType === "مستقیم"),
     "Capicity",
     "ServiceName",
     [
@@ -599,24 +610,59 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
     ],
   );
 
-  const entry_capacity = [
+  const capacityInDirectBaseOnSabt = sumColumnBasedOnRowValue(
+    flatRows.filter((a) => a.DocumentType === "غیر مستقیم"),
+    "Capicity",
+    "ServiceName",
+    [
+      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
+      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
+    ],
+  );
+
+  const entry_capacity_Direct = [
     {
       name: "ورودی",
-      value: entryBaseOnSabt,
+      value: entryDirectBaseOnSabt,
       fill: "#06B6D4",
       headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
       rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
     },
     {
       name: "رسیدگی",
-      value: capacityBaseOnSabt,
+      value: capacityDirectBaseOnSabt,
       fill: "#059669",
       headClassName: "text-lg text-emerald-600 bg-secondary",
       rowClassName: "text-lg  text-emerald-600 bg-secondary",
     },
     {
       name: "مانده",
-      value: entryBaseOnSabt - capacityBaseOnSabt,
+      value: entryDirectBaseOnSabt - capacityDirectBaseOnSabt,
+      fill: "#65a30d",
+      headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
+      rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
+    },
+  ];
+
+  const entry_capacity_InDirect = [
+    {
+      name: "ورودی",
+      value: entryInDirectBaseOnSabt,
+      fill: "#06B6D4",
+      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
+      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
+    },
+    {
+      name: "رسیدگی",
+      value: capacityInDirectBaseOnSabt,
+      fill: "#059669",
+      headClassName: "text-lg text-emerald-600 bg-secondary",
+      rowClassName: "text-lg  text-emerald-600 bg-secondary",
+    },
+    {
+      name: "مانده",
+      value: entryInDirectBaseOnSabt - capacityInDirectBaseOnSabt,
       fill: "#65a30d",
       headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
       rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
@@ -817,8 +863,8 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                 {/* <TrackerView data={getTracker.data ?? []} /> */}
 
                 {/* <RadarGauge CityName={trackerFilter.cities} /> */}
-                <div className="flex w-full flex-col items-stretch justify-between 2xl:flex-row">
-                  <div className="flex  w-full flex-col justify-between gap-5 rounded-2xl  p-2 ">
+                <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 ">
+                  <div className="flex w-full shrink-0 flex-col justify-between gap-5 rounded-2xl  p-2 ">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={EntryHandlingSkeletonLoading}
@@ -845,14 +891,14 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       <SimpleTable
                         className="flex  justify-start border-none"
                         data={{
-                          title: "تعداد ورودی و رسیدگی شده",
-                          table: dataAsTable(entry_capacity),
+                          title: "تعداد ورودی و رسیدگی شده مستقیم",
+                          table: dataAsTable(entry_capacity_Direct),
                         }}
                       >
                         <ResponsiveContainer width={"100%"} height={"50%"}>
                           <CustomPieChart
                             className="rounded-xl bg-secondary"
-                            data={entry_capacity}
+                            data={entry_capacity_Direct}
                             index="value"
                           />
                         </ResponsiveContainer>
@@ -879,7 +925,29 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       </div>
                     </Loading>
                   </div>
-                  <div className="flex w-full flex-col justify-between gap-5 rounded-2xl  p-2">
+                  <div className="flex  w-full shrink-0  flex-col justify-between gap-5 rounded-2xl  p-2 ">
+                    <Loading
+                      isLoading={depo.isLoading}
+                      LoadingComponent={EntryHandlingSkeletonLoading}
+                    >
+                      <SimpleTable
+                        className="flex  justify-start border-none"
+                        data={{
+                          title: " تعداد ورودی و رسیدگی شده غیر مستقیم",
+                          table: dataAsTable(entry_capacity_InDirect),
+                        }}
+                      >
+                        <ResponsiveContainer width={"100%"} height={"50%"}>
+                          <CustomPieChart
+                            className="rounded-xl bg-secondary"
+                            data={entry_capacity_InDirect}
+                            index="value"
+                          />
+                        </ResponsiveContainer>
+                      </SimpleTable>
+                    </Loading>
+                  </div>
+                  <div className="flex w-full shrink-0  flex-col justify-between gap-5 rounded-2xl  p-2">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoSkeletonLoading}
@@ -918,7 +986,7 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                       </div> */}
                     </Loading>
                   </div>
-                  <div className="flex w-full flex-col justify-between  gap-5 rounded-2xl  p-5 xl:max-w-md">
+                  <div className="flex w-full shrink-0  flex-col justify-between  gap-5 rounded-2xl  p-5 xl:max-w-md">
                     <Loading
                       isLoading={depo.isLoading}
                       LoadingComponent={DepoTimeSkeletonLoading}
