@@ -13,7 +13,7 @@ import { Cell, ResponsiveContainer } from "recharts";
 
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 import {
-  Performance_Levels,
+  Performance_Levels_Gauge,
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
@@ -24,6 +24,7 @@ import { useRouter } from "next/router";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 import { useMemo } from "react";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
+import PerformanceBadges from "~/components/main/performance-badges";
 
 export function CitiesPerformanceBarChart({
   filters,
@@ -60,6 +61,7 @@ export function CitiesPerformanceBarChart({
 
   return (
     <>
+      <PerformanceBadges />
       {!getCitiesWithPerformance.isLoading ? (
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
@@ -238,6 +240,7 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
 
   return (
     <>
+      <PerformanceBadges />
       {!getCitysUsersPerformance.isLoading ? (
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">

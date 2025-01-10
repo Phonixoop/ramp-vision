@@ -20,6 +20,7 @@ import {
 } from "~/constants/personnel-performance";
 import moment from "jalali-moment";
 import { groupBy, uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
+import PerformanceBadges from "~/components/main/performance-badges";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
@@ -107,6 +108,8 @@ export function CitiesWithDatesPerformanceBarChart({
 
   return (
     <>
+      {" "}
+      <PerformanceBadges />
       {!getCitiesWithPerformance.isLoading ? (
         <ResponsiveContainer width="99%" height="auto">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">

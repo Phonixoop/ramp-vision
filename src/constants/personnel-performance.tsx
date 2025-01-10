@@ -149,41 +149,22 @@ export const Indicators = {
   ArzyabiAsnadDandanVaParaIndirect: 300, // ارزیابی اسناد دندانپزشکی + پاراکلینیکی مستقیم
 };
 
-export const Performance_Levels = [
-  {
-    limit: 75,
-    color: "#B12B1D",
-    tooltip: {
-      text: "ضعیف",
-    },
-  },
+export const performanceLevels = [
+  { limit: 75, color: "#B12B1D", text: "ضعیف" },
+  { limit: 90, color: "#7BB11B", text: "متوسط" },
+  { limit: 120, color: "#7BB11B", text: "خوب" },
+  { limit: 180, color: "#16B13D", text: "عالی" },
+  { limit: 500, color: "#B1671E", text: "نیاز به بررسی" },
+];
 
-  {
-    limit: 90,
-    color: "#4ee975",
-    tooltip: {
-      text: "متوسط",
-    },
-  },
-  {
-    limit: 120,
-    color: "#7BB11B",
-    tooltip: {
-      text: "خوب",
-    },
-  },
-  {
-    limit: 180,
-    color: "#16B13D",
-    tooltip: {
-      text: "عالی",
-    },
-  },
-  {
-    limit: 500,
-    color: "#B1671E",
-    tooltip: {
-      text: "نیاز به بررسی",
-    },
-  },
+export const Performance_Levels_Gauge = [
+  ...performanceLevels.map((p) => {
+    return {
+      limit: p.limit,
+      color: p.color,
+      tooltip: {
+        text: p.text,
+      },
+    };
+  }),
 ];

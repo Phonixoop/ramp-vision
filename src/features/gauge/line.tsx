@@ -1,6 +1,6 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { Performance_Levels } from "~/constants/personnel-performance";
+import { Performance_Levels_Gauge } from "~/constants/personnel-performance";
 
 const subs = [
   {
@@ -47,7 +47,7 @@ export default function LineGauge({ value }) {
   return (
     <>
       <div className="relative flex h-4 w-full items-center justify-center">
-        {Performance_Levels.map((sub, index) => (
+        {Performance_Levels_Gauge.map((sub, index) => (
           <div
             key={index}
             className={twMerge(

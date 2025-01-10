@@ -204,6 +204,9 @@ export default function CitiesPage({ children }) {
     <>
       <BlurBackground />
 
+      <h1 className=" w-full py-5 text-center text-2xl text-primary underline underline-offset-[12px] ">
+        (نمودار) جزئیات عملکرد پرسنل شعب
+      </h1>
       <div className="flex min-h-screen w-full flex-col divide-y-2 divide-secbuttn  py-2">
         <div className="mx-auto flex w-11/12 items-center justify-center gap-5 rounded-t-2xl    p-2 sm:flex-col ">
           <H2 className="hidden py-2 text-xl sm:flex">فیلترها</H2>

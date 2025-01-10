@@ -1,7 +1,7 @@
 import moment from "jalali-moment";
 import {
   Indicators,
-  Performance_Levels,
+  Performance_Levels_Gauge,
 } from "~/constants/personnel-performance";
 import { PeriodType } from "~/context/personnel-filter.context";
 import { CityWithPerformanceData } from "~/types";
@@ -218,12 +218,15 @@ export function sparkChartForCity(data = [], propertyToCheck, valueToCheck) {
 
 export const getPerformanceMetric = (limit) => {
   // Find the first metric that matches the condition
-  const selectedMetric = Performance_Levels.find(
+  const selectedMetric = Performance_Levels_Gauge.find(
     (metric) => limit <= metric.limit,
   );
 
   // If nothing is found, return the last metric
-  return selectedMetric || Performance_Levels[Performance_Levels.length - 1];
+  return (
+    selectedMetric ||
+    Performance_Levels_Gauge[Performance_Levels_Gauge.length - 1]
+  );
 };
 
 export function getMonthNamesFromJOINED_date_strings(

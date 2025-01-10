@@ -518,6 +518,9 @@ function PersonnelPerformanceTable({ sessionData }) {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
+        <h1 className=" w-full py-5 text-center text-2xl text-primary underline underline-offset-[12px] ">
+          جزئیات ورودی اسناد مستقیم شعب
+        </h1>
         <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
             hasClickAction

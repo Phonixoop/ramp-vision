@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import moment from "jalali-moment";
 import { CITIES } from "~/constants";
-import { Performance_Levels } from "~/constants/personnel-performance";
+import { Performance_Levels_Gauge } from "~/constants/personnel-performance";
 import { Permission } from "~/types";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { calculatePerformance } from "~/utils/personnel-performance";
@@ -242,13 +242,24 @@ export function processDataForChart(
   }, []);
 }
 
-export function countColumnValues(data, column, values) {
+export function countColumnValues(
+  data,
+  column,
+  values,
+  options = { countAll: false, countNone: false },
+) {
   const countMap = {};
 
   data.forEach((item) => {
     const value = item[column];
 
-    if (values.includes(value)) {
+    // Handle the countNone option
+    if (options.countNone) {
+      return; // Skip counting
+    }
+
+    // Handle the countAll option
+    if (options.countAll || values.includes(value)) {
       if (countMap[value]) {
         countMap[value]++;
       } else {

@@ -75,7 +75,7 @@ export default function Home() {
               </span>
               <p className="text-primary/60">
                 <span className="text-primary">ویژگی</span> های نسخه جدید، سرعت
-                بهتر در مقایسه بیشتر، بهبود امکانات آنلایز و اضافه شدن گزارش
+                بهتر در مقایسه بیشتر، بهبود امکانات آنالیز و اضافه شدن گزارش
                 گیری ماهانه.
               </p>
               <Link

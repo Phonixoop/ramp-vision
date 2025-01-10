@@ -16,6 +16,7 @@ import React, { use, useEffect, useMemo, useState } from "react";
 import { ResponsiveContainer } from "recharts";
 import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
+import PerformanceBadges from "~/components/main/performance-badges";
 import { CITIES } from "~/constants";
 import {
   PersonnelPerformanceIcons,
@@ -483,7 +484,7 @@ export default function CityPage({ children, city }) {
                               : "col-span-1",
                           )}
                         >
-                          <span className="max-w-[250px] break-words text-center font-bold text-accent">
+                          <span className="max-w-[250px] select-text break-words text-center font-bold text-accent">
                             {_value as string}
                           </span>
                         </div>
@@ -676,30 +677,33 @@ export default function CityPage({ children, city }) {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center lg:flex-row">
-              <div className="col-span-2  flex  w-full flex-col items-center justify-center">
-                <H2>عملکرد کلی</H2>
+            <div className="flex w-full flex-col items-center justify-center">
+              <PerformanceBadges />
+              <div className="flex flex-col items-center justify-center lg:flex-row">
+                <div className="col-span-2  flex  w-full flex-col items-center justify-center">
+                  <H2>عملکرد کلی</H2>
 
-                <Gauge value={selectedPerson?.TotalPerformance} />
-                <p className="text-accent">
-                  {getPerformanceText(selectedPerson?.TotalPerformance)}
-                </p>
-              </div>
-              <div className="col-span-2  flex  w-full flex-col items-center justify-center">
-                <H2>عملکرد مستقیم</H2>
+                  <Gauge value={selectedPerson?.TotalPerformance} />
+                  <p className="text-accent">
+                    {getPerformanceText(selectedPerson?.TotalPerformance)}
+                  </p>
+                </div>
+                <div className="col-span-2  flex  w-full flex-col items-center justify-center">
+                  <H2>عملکرد مستقیم</H2>
 
-                <Gauge value={selectedPerson?.DirectPerFormance} />
-                <p className="text-accent">
-                  {getPerformanceText(selectedPerson?.DirectPerFormance)}
-                </p>
-              </div>
-              <div className="col-span-2  flex  w-full flex-col items-center justify-center">
-                <H2>عملکرد غیر مستقیم</H2>
+                  <Gauge value={selectedPerson?.DirectPerFormance} />
+                  <p className="text-accent">
+                    {getPerformanceText(selectedPerson?.DirectPerFormance)}
+                  </p>
+                </div>
+                <div className="col-span-2  flex  w-full flex-col items-center justify-center">
+                  <H2>عملکرد غیر مستقیم</H2>
 
-                <Gauge value={selectedPerson?.InDirectPerFormance} />
-                <p className="text-accent">
-                  {getPerformanceText(selectedPerson?.InDirectPerFormance)}
-                </p>
+                  <Gauge value={selectedPerson?.InDirectPerFormance} />
+                  <p className="text-accent">
+                    {getPerformanceText(selectedPerson?.InDirectPerFormance)}
+                  </p>
+                </div>
               </div>
             </div>
           </>
@@ -738,6 +742,7 @@ export default function CityPage({ children, city }) {
             />
           </ResponsiveContainer>
         </div> */}
+
         <div
           dir="rtl"
           className={twMerge(

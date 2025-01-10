@@ -37,6 +37,7 @@ import ResponsiveView from "~/features/responsive-view";
 import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
 import { sortDates } from "~/lib/utils";
 import { CityWithPerformanceData } from "~/types";
+import PerformanceBadges from "~/components/main/performance-badges";
 
 export default function GaugesPage() {
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("ماهانه");
@@ -126,6 +127,9 @@ export default function GaugesPage() {
       >
         <div className="mx-auto flex w-11/12  items-center justify-between  gap-5  py-5 md:flex-row-reverse md:items-start">
           <div className="flex w-full flex-col items-center justify-center gap-5">
+            <div className="sticky top-20 rounded-full bg-secondary/50 p-5 backdrop-blur-md">
+              <PerformanceBadges />
+            </div>
             {getCitiesWithPerformance.isLoading ? (
               <>
                 {Array.from(
