@@ -42,7 +42,6 @@ import DatePickerPeriodic from "~/features/date-picker-periodic";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { PeriodType } from "~/context/personnel-filter.context";
 
-import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import { InPageMenu } from "~/features/menu";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
@@ -52,6 +51,7 @@ import DepoSkeletonLoading from "~/features/loadings/depo/depo-box";
 import DepoTimeSkeletonLoading from "~/features/loadings/depo/depo-time-box";
 import CustomPieChart from "~/features/custom-charts/pie-chart";
 import SimpleTable from "~/features/guide-table";
+import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-barchart";
 
 const filterColumn = (row, columnId, value, addMeta) => {
   if (value === undefined || value.length === 0) {

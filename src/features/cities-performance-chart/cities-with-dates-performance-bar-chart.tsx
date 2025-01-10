@@ -108,7 +108,6 @@ export function CitiesWithDatesPerformanceBarChart({
 
   return (
     <>
-      {" "}
       <PerformanceBadges />
       {!getCitiesWithPerformance.isLoading ? (
         <ResponsiveContainer width="99%" height="auto">

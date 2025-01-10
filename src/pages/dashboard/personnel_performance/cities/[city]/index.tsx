@@ -29,10 +29,7 @@ import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
 import Calender from "~/features/calender";
-import {
-  CitiesPerformanceBarChart,
-  CityPerformanceWithUsersChart,
-} from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import Gauge from "~/features/gauge";
 import ToolTipSimple from "~/features/tooltip-simple-use";

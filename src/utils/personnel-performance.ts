@@ -88,11 +88,11 @@ export function distinctDataAndCalculatePerformance(
     //   max: ["COUNT"],
     // },
   );
-
-  return mapToCitiesWithPerformance({
+  const r = mapToCitiesWithPerformance({
     dateLengthPerCity: data?.dateLength,
     result: citiesWithPerformanceData,
   });
+  return r;
 }
 
 export function distinctPersonnelPerformanceData(
