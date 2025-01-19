@@ -879,8 +879,8 @@ function PersonnelPerformanceTable({ sessionData }) {
         className="flex  w-full flex-col items-center justify-center gap-5"
         dir="rtl"
       >
-        <h1 className="py-5 text-2xl text-primary underline underline-offset-[12px] ">
-          (جدول) جزئیات عملکرد پرسنل شعب
+        <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px] ">
+          جزئیات عملکرد پرسنل شعب (جدول)
         </h1>
         <div className="flex w-full items-center justify-center  rounded-lg  py-5 text-center ">
           <Table
