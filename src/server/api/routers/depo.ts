@@ -116,19 +116,28 @@ export const depoRouter = createTRPCRouter({
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
-          const date = filter.Start_Date[0].split("/");
+
+          let dates = filter.Start_Date.map((d) => {
+            const _d = d.split("/");
+
+            return `LIKE '${_d[0]}/${_d[1]}/%'`;
+          });
+
+          const date = filter.Start_Date.at(-1).split("/");
 
           const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
             parseInt(date[0]),
             parseInt(date[1]),
           );
-
-          const secondDate = secondDayOfNextMonth.split("/");
+          const likeConditions = dates
+            .map((date) => `Start_Date  ${date} `)
+            .join(" OR ");
+          // const secondDate = secondDayOfNextMonth.split("/");
           whereClause = generateWhereClause(
             filter,
             ["Start_Date"],
             undefined,
-            `SUBSTRING(Start_Date, 1, 7) IN ('${date[0]}/${date[1]}','${secondDate[0]}/${secondDate[1]}') AND`,
+            likeConditions + " AND ",
           );
           whereClause += ` group by ServiceName,DocumentType,CityName ORDER BY CityName`;
 
@@ -152,9 +161,19 @@ export const depoRouter = createTRPCRouter({
           queryStart = `
           SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,
 
-          SUM(CASE WHEN Start_Date = '${secondDayOfNextMonth}' THEN DepoCount ELSE 0 END) AS DepoCount,
-          SUM(CASE WHEN SUBSTRING(Start_Date, 1, 7) = '${date[0]}/${date[1]}' THEN EntryCount ELSE 0 END) AS EntryCount,
-          SUM(CASE WHEN SUBSTRING(Start_Date, 1, 7) = '${date[0]}/${date[1]}' THEN Capicity ELSE 0 END) AS Capicity
+               SUM(CASE 
+              WHEN ${likeConditions} 
+              THEN EntryCount 
+              ELSE 0 
+          END) AS EntryCount,
+
+
+          SUM(CASE 
+             WHEN ${likeConditions} 
+              THEN Capicity 
+              ELSE 0 
+          END) AS Capicity,
+              SUM(CASE WHEN Start_Date = '${secondDayOfNextMonth}' THEN DepoCount ELSE 0 END) AS DepoCount
 
 		    FROM 
           `;
@@ -165,7 +184,7 @@ export const depoRouter = createTRPCRouter({
         ${dbName} 
         ${whereClause}
         `;
-        //console.log(query);
+        console.log(query);
         const result = await sql.query(query);
 
         if (input.periodType === "روزانه") {
