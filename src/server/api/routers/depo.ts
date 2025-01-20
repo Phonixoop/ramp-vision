@@ -129,6 +129,18 @@ export const depoRouter = createTRPCRouter({
             parseInt(date[0]),
             parseInt(date[1]),
           );
+
+          const dateResult = await sql.query(`
+
+                  SELECT TOP 1 
+              COALESCE(
+                (SELECT MAX(Start_Date) FROM dbo.depos WHERE Start_Date = '${secondDayOfNextMonth}'),
+                (SELECT MAX(Start_Date) FROM dbo.depos)
+              ) AS LastDate
+            FROM dbo.depos
+            `);
+
+          const lastDate = dateResult.recordset[0].LastDate;
           const likeConditions = dates
             .map((date) => `Start_Date  ${date} `)
             .join(" OR ");
@@ -173,7 +185,7 @@ export const depoRouter = createTRPCRouter({
               THEN Capicity 
               ELSE 0 
           END) AS Capicity,
-              SUM(CASE WHEN Start_Date = '${secondDayOfNextMonth}' THEN DepoCount ELSE 0 END) AS DepoCount
+              SUM(CASE WHEN Start_Date = '${lastDate}' THEN DepoCount ELSE 0 END) AS DepoCount
 
 		    FROM 
           `;
