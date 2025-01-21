@@ -85,6 +85,7 @@ export const defualtRoleTypesForPercase = [
   "ثبات ارزیابی اسناد ویزیت غیر مستقیم",
   "ثبات ارزیابی اسناد مستقیم",
   "ثبات ارزیابی اسناد ویزیت مستقیم",
+  "کارشناس ارزیاب تمام خدمات",
 ];
 
 export const defualtRoleTypesForMoshavere = [
