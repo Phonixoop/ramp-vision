@@ -75,6 +75,7 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
         "WithoutScanInDirectCount",
         "ArchiveDirectCount",
         "ArchiveInDirectCount",
+        "ArzyabiVisitDirectCount",
         "Role",
         "RoleType",
         "ContractType",

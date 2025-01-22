@@ -472,6 +472,7 @@ export function SetPersonnelDayOffWizard({
             "WithoutScanInDirectCount",
             "ArchiveDirectCount",
             "ArchiveInDirectCount",
+            "ArzyabiVisitDirectCount",
             "Role",
             "RoleType",
             "ContractType",

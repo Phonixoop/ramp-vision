@@ -2,6 +2,7 @@ import {
   ArchiveIcon,
   BiohazardIcon,
   BrainCogIcon,
+  EyeIcon,
   FileCheckIcon,
   FileInputIcon,
   FileScanIcon,
@@ -57,7 +58,7 @@ export const PersonnelPerformanceIcons = {
 
   WithoutScanInDirectCount: <FileScanIcon className="stroke-cyan-900" />,
 
-  ArzyabiVisitDirectCount: <FileScanIcon className="stroke-orange-900" />,
+  ArzyabiVisitDirectCount: <EyeIcon className="stroke-orange-900" />,
 
   DirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
   InDirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
