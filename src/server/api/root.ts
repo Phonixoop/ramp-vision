@@ -3,6 +3,7 @@ import { exampleRouter } from "~/server/api/routers/example";
 import { havaleKhesaratRouter } from "~/server/api/routers/havale_khesarat";
 import { homeRouter } from "~/server/api/routers/home";
 import { insuranceMetricsRouter } from "~/server/api/routers/insurance_metric";
+import { otpUserRouter } from "~/server/api/routers/otpuser";
 import { personnelRouter } from "~/server/api/routers/personnel";
 import { personnelPerformanceRouter } from "~/server/api/routers/personnel_performance";
 import { roleRouter } from "~/server/api/routers/role";
@@ -24,6 +25,7 @@ export const appRouter = createTRPCRouter({
   havaleKhesarat: havaleKhesaratRouter,
   insuranceMetrics: insuranceMetricsRouter,
   home: homeRouter,
+  otpUser: otpUserRouter,
 });
 
 // export type definition of API

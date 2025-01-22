@@ -31,6 +31,11 @@ const menuList = [
     description: `در این بخش می توانید سمت های مد نظر خود را بسازید تا در بخش کاربر ها برای آن ها اعمال کنید`,
     link: "roles",
   },
+  {
+    value: "کد های تایید رسا",
+    description: "",
+    link: "otps",
+  },
 
   // {
   //   value: "پرسنل",

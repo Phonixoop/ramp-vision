@@ -15,6 +15,7 @@ import { ZodError } from "zod";
 
 import { getServerAuthSession } from "~/server/auth";
 import { db } from "~/server/db";
+import { Permission } from "~/types";
 
 /**
  * 1. CONTEXT
@@ -129,3 +130,18 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+// const enforceUserIsAuthedAndIsAdmin = t.middleware(({ ctx, next }) => {
+//   if (!ctx.session?.user) {
+//     throw new TRPCError({ code: "UNAUTHORIZED" });
+//   }
+
+//   return next({
+//     ctx: {
+//       // infers the `session` as non-nullable
+//       session: { ...ctx.session, user: ctx.session.user },
+//     },
+//   });
+// });
+
+// export const adminProcedure = t.procedure.use(enforceUserIsAuthedAndIsAdmin);
