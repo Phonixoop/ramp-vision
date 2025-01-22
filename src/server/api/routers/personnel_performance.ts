@@ -105,6 +105,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
         SUM(ArchiveDirectCount) as ArchiveDirectCount,
         SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
+        SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
       
 
         SUM(TotalPerformance) as TotalPerformance, 
@@ -164,6 +165,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
           SUM(ArchiveDirectCount) as ArchiveDirectCount,
           SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
+          SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
           SUM(TotalPerformance) as TotalPerformance,DateInfo,Start_Date,
           
           SUM(DirectPerFormance) as DirectPerFormance, 
@@ -367,7 +369,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
       SUM(WithoutScanCount) as WithoutScanCount,
       SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
       SUM(ArchiveDirectCount) as ArchiveDirectCount,
-      SUM(ArchiveInDirectCount) as ArchiveInDirectCount
+      SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
+      SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount
 
       FROM dbName.dbo.personnel_performance as p
       JOIN
@@ -420,7 +423,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SUM(WithoutScanCount) as WithoutScanCount,
         SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
         SUM(ArchiveDirectCount) as ArchiveDirectCount,
-        SUM(ArchiveInDirectCount) as ArchiveInDirectCount
+        SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
+          SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount
         
       
         FROM dbName.dbo.personnel_performance as p
@@ -717,6 +721,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
       SUM(ArchiveDirectCount) as ArchiveDirectCount,
       SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
+      SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
       DateInfo,Start_Date from dbName1 as p
       JOIN dbName2 as u on p.NationalCode = u.NationalCode  
        `;
@@ -823,6 +828,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
                     [CreatedAtPersian], 
                     [ArchiveDirectCount], 
                     [ArchiveInDirectCount], 
+                    [ArzyabiVisitDirectCount],
                     [HasTheDayOff])
         VALUES (N'${input.nameFamily}', 
                 '${input.nationalCode}', 
@@ -846,6 +852,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
                 '', 
                0, 
                0, 
+               0,
                1); -- Assuming default value for HasTheDayOff is 1
     END
     ELSE

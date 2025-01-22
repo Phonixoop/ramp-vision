@@ -236,6 +236,7 @@ function PersonnelPerformanceTable({ sessionData }) {
           "WithoutScanInDirectCount",
           "ArchiveDirectCount",
           "ArchiveInDirectCount",
+          "ArzyabiVisitDirectCount",
           "Role",
           "RoleType",
           "ContractType",
@@ -790,6 +791,21 @@ function PersonnelPerformanceTable({ sessionData }) {
                   (total, row) =>
                     (total as number) +
                     (row.getValue("ArchiveInDirectCount") as number),
+                  0,
+                ),
+            ),
+        },
+        {
+          header: "ارزیابی ویزیت",
+          accessorKey: "ArzyabiVisitDirectCount",
+          footer: ({ table }) =>
+            commify(
+              table
+                .getFilteredRowModel()
+                .rows.reduce(
+                  (total, row) =>
+                    (total as number) +
+                    (row.getValue("ArzyabiVisitDirectCount") as number),
                   0,
                 ),
             ),

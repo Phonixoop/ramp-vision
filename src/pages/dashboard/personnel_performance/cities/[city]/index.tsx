@@ -142,6 +142,7 @@ export default function CityPage({ children, city }) {
             "WithoutScanInDirectCount",
             "ArchiveDirectCount",
             "ArchiveInDirectCount",
+            "ArzyabiVisitDirectCount",
             "Role",
             "RoleType",
             "ContractType",
