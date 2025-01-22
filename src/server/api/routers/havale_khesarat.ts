@@ -9,8 +9,22 @@ import {
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { getEnglishToPersianCity } from "~/utils/util";
 import { extractYearAndMonth } from "~/utils/date-utils";
-import { dbRampDaily } from "~/server/server-utils/ramp-daily";
+// import { dbRampDaily } from "~/server/server-utils/ramp-daily";
 
+import sql from "mssql";
+const config = {
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
+  server: process.env.SQL_SERVERIP,
+  port: parseInt(process.env.SQL_PORT),
+  database: "", // Set your database name, e.g., "RAMP_Daily" or "RAMP_Weekly"
+  options: {
+    encrypt: true, // For securing the connection (optional, based on your setup)
+    trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
+  },
+};
+
+await sql.connect(config);
 export const havaleKhesaratRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(
@@ -56,7 +70,7 @@ export const havaleKhesaratRouter = createTRPCRouter({
       )}) Order By CityName `;
       query += whereClause;
 
-      const result = await dbRampDaily.query(query);
+      const result = await sql.query(query);
 
       return result.recordset.map((r) => {
         return {
@@ -86,7 +100,7 @@ export const havaleKhesaratRouter = createTRPCRouter({
   
     `;
     // console.log(query);
-    const result = await dbRampDaily.query(query);
+    const result = await sql.query(query);
     // console.log(result.recordsets);
     return {
       Cities: result.recordsets[0]

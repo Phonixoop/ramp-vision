@@ -15,7 +15,20 @@ import { TremorColor } from "~/types";
 import { getEnglishToPersianCity } from "~/utils/util";
 import { getDefualtDateInfo } from "~/server/api/routers/personnel_performance";
 import { sortDates } from "~/lib/utils";
-import { dbRampDaily } from "~/server/server-utils/ramp-daily";
+import sql from "mssql";
+const config = {
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
+  server: process.env.SQL_SERVERIP,
+  port: parseInt(process.env.SQL_PORT),
+  database: "", // Set your database name, e.g., "RAMP_Daily" or "RAMP_Weekly"
+  options: {
+    encrypt: true, // For securing the connection (optional, based on your setup)
+    trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
+  },
+};
+
+await sql.connect(config);
 
 export const personnelRouter = createTRPCRouter({
   getAll: protectedProcedure
@@ -59,7 +72,7 @@ export const personnelRouter = createTRPCRouter({
          ${whereClause}`;
 
         console.log(query);
-        const result = await dbRampDaily.query(query);
+        const result = await sql.query(query);
 
         //  console.log(result.recordsets[0]);
         return result.recordsets[0].map((c) => {
@@ -90,7 +103,7 @@ export const personnelRouter = createTRPCRouter({
       SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
       `;
 
-      const result = await dbRampDaily.query(query);
+      const result = await sql.query(query);
       // console.log(result.recordsets);
       return {
         usersInfo: result.recordsets[0],
@@ -114,7 +127,7 @@ export const personnelRouter = createTRPCRouter({
 
   `;
     // console.log(query);
-    const result = await dbRampDaily.query(query);
+    const result = await sql.query(query);
     // console.log(result.recordsets);
 
     const usersInfos = result.recordsets[0].map((a) => a.DateInfo);

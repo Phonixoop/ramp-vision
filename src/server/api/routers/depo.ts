@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import sql from "mssql";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import moment from "jalali-moment";
 import { getEnglishToPersianCity } from "~/utils/util";
@@ -16,8 +16,18 @@ import {
   getSecondOrLaterDayOfNextMonth,
   getWeekOfMonth,
 } from "~/utils/date-utils";
-import { dbRampDaily } from "~/server/server-utils/ramp-daily";
-
+const config = {
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
+  server: process.env.SQL_SERVERIP,
+  port: parseInt(process.env.SQL_PORT),
+  database: "", // RAMP_Daily | RAMP_Weekly
+  options: {
+    encrypt: true, // For securing the connection (optional, based on your setup)
+    trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
+  },
+};
+await sql.connect(config);
 export const depoRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(
@@ -117,7 +127,7 @@ export const depoRouter = createTRPCRouter({
             parseInt(date[1]),
           );
 
-          const dateResult = await dbRampDaily.query(`
+          const dateResult = await sql.query(`
 
                   SELECT TOP 1 
               COALESCE(
@@ -184,7 +194,7 @@ export const depoRouter = createTRPCRouter({
         ${whereClause}
         `;
         console.log(query);
-        const result = await dbRampDaily.query(query);
+        const result = await sql.query(query);
 
         if (input.periodType === "روزانه") {
           finalResult = result.recordsets[0];
@@ -254,14 +264,14 @@ export const depoRouter = createTRPCRouter({
         .map((permission) => permission.enLabel);
 
       const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `SELECT DISTINCT CityName FROM RAMP_Daily.dbo.depos ${whereClause} ORDER BY CityName ASC
+      const queryCities = `use RAMP_Daily  SELECT DISTINCT CityName FROM RAMP_Daily.dbo.depos ${whereClause} ORDER BY CityName ASC
       `;
 
-      const resultOfCities = await dbRampDaily.query(queryCities);
+      const resultOfCities = await sql.query(queryCities);
 
       // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-      // console.log(queryDocumentTypes);
-      // const resultOfDocumentTypes = await dbRampDaily.query(queryDocumentTypes);
+      console.log(queryCities);
+      // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
       const result = {
         Cities: resultOfCities.recordsets[0]
@@ -321,11 +331,11 @@ export const depoRouter = createTRPCRouter({
         GROUP BY Start_Date ORDER BY Start_Date
         `;
 
-        const resultDays = await dbRampDaily.query(queryDaysOfMonth);
+        const resultDays = await sql.query(queryDaysOfMonth);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
         // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await dbRampDaily.query(queryDocumentTypes);
+        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
         const result: {
           date: string;
