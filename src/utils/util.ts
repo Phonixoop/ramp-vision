@@ -460,10 +460,10 @@ export function humanizeDuration(value, tag) {
 }
 
 const performance_ranges = [
-  { min: 0, max: 80, result: "ضعیف" },
-  { min: 81, max: 100, result: "متوسط" },
-  { min: 101, max: 150, result: "خوب" },
-  { min: 151, max: 200, result: "عالی" },
+  { min: 0, max: 75, result: "ضعیف", enText: "Weak" },
+  { min: 76, max: 90, result: "متوسط", enText: "Average" },
+  { min: 91, max: 120, result: "خوب", enText: "Good" },
+  { min: 121, max: 180, result: "عالی", enText: "Excellent" },
 ];
 
 export function getPerformanceText(value: number) {
@@ -479,6 +479,18 @@ export function getPerformanceText(value: number) {
   return result;
 }
 
+export function getPerformanceTextEn(value: number) {
+  if (!value && value != 0) return "";
+  let result = "NeedsReview"; // Default result
+
+  performance_ranges.forEach((range) => {
+    if (value >= range.min && value <= range.max) {
+      result = range.enText;
+    }
+  });
+
+  return result;
+}
 export function updateDynamicPermissions(
   staticPermissions: Permission[],
   dynamicPermissions: Permission[],

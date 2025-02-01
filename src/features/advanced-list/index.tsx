@@ -23,6 +23,7 @@ export default function AdvancedList({
 
   onChange = (action) => {},
   renderItem = (item, i) => <></>,
+  renderUnderButtons = () => <></>,
 }) {
   const correctList = typeof list === "function" ? list() : list;
   const [sortOrder, setSortOrder] = useState("asc");
@@ -107,6 +108,9 @@ export default function AdvancedList({
               <span>مرتب سازی</span>
               {sortOrder === "asc" ? <ArrowDownAZIcon /> : <ArrowUpAZIcon />}
             </Button>
+          </div>
+          <div className="flex w-full items-center justify-stretch gap-2 ">
+            {renderUnderButtons()}
           </div>
         </div>
 

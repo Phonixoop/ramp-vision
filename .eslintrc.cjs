@@ -49,7 +49,7 @@ const config = {
   // parserOptions: {
   //   project: path.join(__dirname, "tsconfig.json"),
   // },
-  extends: ["next/core-web-vitals"],
+  extends: ["next/core-web-vitals", "plugin:react-compiler/recommended"],
   // rules: {
   //   "@typescript-eslint/consistent-type-imports": [
   //     "warn",

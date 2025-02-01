@@ -1,46 +1,34 @@
-import { AreaChart, BarChart, SparkAreaChart } from "@tremor/react";
+import { SparkAreaChart } from "@tremor/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
-import moment, { Moment } from "jalali-moment";
-import {
-  Contact2Icon,
-  MinusIcon,
-  MinusSquareIcon,
-  TrendingDownIcon,
-  TrendingUpIcon,
-} from "lucide-react";
-import { InferGetStaticPropsType, NextPage } from "next";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
+import moment, { type Moment } from "jalali-moment";
+import { Contact2Icon } from "lucide-react";
 import { useRouter } from "next/router";
-import React, { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { ResponsiveContainer } from "recharts";
 import SuperJSON from "superjson";
 import { twMerge } from "tailwind-merge";
 import PerformanceBadges from "~/components/main/performance-badges";
-import { CITIES } from "~/constants";
 import {
   PersonnelPerformanceIcons,
   PersonnelPerformanceTranslate,
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
+  performanceLevels,
 } from "~/constants/personnel-performance";
 import { usePersonnelFilter } from "~/context/personnel-filter.context";
 
 import AdvancedList from "~/features/advanced-list";
 import Calender from "~/features/calender";
-import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import Gauge from "~/features/gauge";
 import ToolTipSimple from "~/features/tooltip-simple-use";
 import { TrendDecider } from "~/features/trend-decider";
 import UseUserManager from "~/hooks/userManager";
-import { uniqueArray } from "~/lib/utils";
+import { cn, uniqueArray } from "~/lib/utils";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
-import { CityWithPerformanceData, Permission } from "~/types";
-import BlurBackground from "~/ui/blur-backgrounds";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
@@ -56,19 +44,21 @@ import {
   sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
 import {
-  DistinctData,
-  analyzePerformanceTrend,
   commify,
   getEnglishToPersianCity,
   getPerformanceText,
+  getPerformanceTextEn,
   getPersianToEnglishCity,
-  processDataForChart,
 } from "~/utils/util";
 
 const ButtonWithConfirmation = withConfirmation(Button);
-
+type Rating = "Weak" | "Average" | "Good" | "Excellent" | "NeedsReview" | "ALL";
 export default function CityPage({ children, city }) {
   const { session, hasManagePersonnelAccess } = UseUserManager();
+
+  const defaultList = useRef([]);
+  const currentLevelFilter = useRef<Rating>("ALL");
+
   const utils = api.useContext();
 
   const router = useRouter();
@@ -157,7 +147,7 @@ export default function CityPage({ children, city }) {
           ],
           { HasTheDayOff: false },
         );
-
+        defaultList.current = result;
         setUpdatedList(result);
 
         if (!selectedPerson) return;
@@ -241,6 +231,22 @@ export default function CityPage({ children, city }) {
     return [...list, ...filteredData];
   }
 
+  const setUsersPerformanceLevelFilter = useCallback((rating: Rating) => {
+    setUpdatedList(
+      (prevList) =>
+        defaultList.current?.filter((user) => {
+          if (rating === "ALL") return true;
+          const result = getPerformanceTextEn(user.TotalPerformance) === rating;
+          console.log({
+            rating,
+            user,
+            result: result,
+          });
+          return result;
+        }),
+    );
+  }, []);
+
   return (
     <CitiesPage>
       <AdvancedList
@@ -278,6 +284,54 @@ export default function CityPage({ children, city }) {
         onChange={(updatedList) => {
           setUpdatedList(() =>
             getUpdatedListByAddindPersonnelList(updatedList),
+          );
+        }}
+        renderUnderButtons={() => {
+          return (
+            <>
+              <div
+                dir="rtl"
+                className="flex w-full items-center justify-center gap-2 py-2"
+              >
+                {performanceLevels.map((level, index) => {
+                  const isSelected =
+                    currentLevelFilter.current === (level.enText as Rating);
+                  return (
+                    <Button
+                      onClick={() => {
+                        // Debounce the filter update
+                        const timer = setTimeout(() => {
+                          if (isSelected) {
+                            currentLevelFilter.current = "ALL";
+                            setUsersPerformanceLevelFilter("ALL");
+                            return;
+                          }
+                          currentLevelFilter.current = level.enText as Rating;
+                          setUsersPerformanceLevelFilter(
+                            level.enText as Rating,
+                          );
+                        }, 100);
+                        return () => clearTimeout(timer);
+                      }}
+                      key={level.enText}
+                      className={cn(
+                        "rounded-full px-2 py-1",
+                        isSelected ? "text-white" : " text-primary",
+                      )}
+                      style={{
+                        backgroundColor: isSelected
+                          ? level.color
+                          : "transparent",
+                        borderColor: level.color,
+                        borderWidth: "1px",
+                      }}
+                    >
+                      {level.text}
+                    </Button>
+                  );
+                })}
+              </div>
+            </>
           );
         }}
         renderItem={(user, i) => {
@@ -362,6 +416,7 @@ export default function CityPage({ children, city }) {
                     <TrendDecider values={userPerformances} />
                     {user.TotalPerformance.toFixed(0)}
                     {"%"}
+                    {/* {getPerformanceText(user.TotalPerformance)} */}
                   </div>
                   <div className="flex w-full items-center justify-center">
                     <SparkAreaChart
@@ -503,7 +558,7 @@ export default function CityPage({ children, city }) {
                             .slice(0, 7),
                         ),
                       ).map((a) => moment(a, "jYYYY/jMM "))}
-                      year={parseInt(
+                      year={Number.parseInt(
                         selectedPerson.sparkData[0].Start_Date.split("/")[0],
                       )}
                       defaultMonth={getMonthNumber(
@@ -525,7 +580,8 @@ export default function CityPage({ children, city }) {
 
                         return (
                           <>
-                            {parseInt(date.format("M")) !== monthNumber + 1 ? (
+                            {Number.parseInt(date.format("M")) !==
+                            monthNumber + 1 ? (
                               <div className="flex h-full w-full items-center justify-center">
                                 <span
                                   className={twMerge(

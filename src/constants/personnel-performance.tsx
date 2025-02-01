@@ -154,11 +154,16 @@ export const Indicators = {
 };
 
 export const performanceLevels = [
-  { limit: 75, color: "#B12B1D", text: "ضعیف" },
-  { limit: 90, color: "#7BB11B", text: "متوسط" },
-  { limit: 120, color: "#7BB11B", text: "خوب" },
-  { limit: 180, color: "#16B13D", text: "عالی" },
-  { limit: 500, color: "#B1671E", text: "نیاز به بررسی" },
+  { limit: 75, color: "#B12B1D", text: "ضعیف", enText: "Weak" },
+  { limit: 90, color: "#7BB11B", text: "متوسط", enText: "Average" },
+  { limit: 120, color: "#7BB11B", text: "خوب", enText: "Good" },
+  { limit: 180, color: "#16B13D", text: "عالی", enText: "Excellent" },
+  {
+    limit: 500,
+    color: "#B1671E",
+    text: "نیاز به بررسی",
+    enText: "NeedsReview",
+  },
 ];
 
 export const Performance_Levels_Gauge = [
@@ -169,6 +174,7 @@ export const Performance_Levels_Gauge = [
       tooltip: {
         text: p.text,
       },
+      enText: p.enText,
     };
   }),
 ];
