@@ -162,7 +162,7 @@ function DeposTable({ sessionData }) {
         {
           header: "استان",
           accessorKey: "CityName",
-          filterFn: "arrIncludesSome",
+          filterFn: arrIncludeExcat,
 
           Filter: ({ column }) => {
             return (
