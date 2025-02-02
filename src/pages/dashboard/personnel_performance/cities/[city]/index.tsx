@@ -147,6 +147,7 @@ export default function CityPage({ children, city }) {
           ],
           { HasTheDayOff: false },
         );
+
         defaultList.current = result;
         setUpdatedList(result);
 
@@ -456,7 +457,7 @@ export default function CityPage({ children, city }) {
               >
                 {numericItems.map(([key, value], index, array) => {
                   const isLastItem = index === array.length - 1;
-
+                  console.log({ key, value });
                   if (!PersonnelPerformanceIcons[key]) return;
                   return (
                     <>
