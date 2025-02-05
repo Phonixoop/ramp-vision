@@ -182,16 +182,25 @@ export const personnelPerformanceRouter = createTRPCRouter({
             return extractYearAndMonth(d);
           });
 
+          // let dates = filter.Start_Date.map((d) => {
+          //   const _d = d.split("/");
+          //   return `'${_d[0]}/${_d[1]}'`;
+          // });
+
           let dates = filter.Start_Date.map((d) => {
             const _d = d.split("/");
-            return `'${_d[0]}/${_d[1]}'`;
-          });
 
+            return `LIKE '${_d[0]}/${_d[1]}/%'`;
+          });
+          const likeConditions = dates
+            .map((date) => `Start_Date  ${date} `)
+            .join(" OR ");
           whereClause = generateWhereClause(
             filter,
             ["Start_Date"],
             undefined,
-            `SUBSTRING(Start_Date, 1, 7) IN (${dates.join(",")}) AND `,
+            likeConditions + " AND ",
+            //    `SUBSTRING(Start_Date, 1, 7) IN (${dates.join(",")}) AND `,
           );
 
           whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
@@ -227,8 +236,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
         ${whereClause}
         `;
 
+        console.log(query);
         const result = await sql.query(query);
-        // console.log({ input });
         if (input.periodType === "روزانه") {
           finalResult = result.recordsets[0];
         }
