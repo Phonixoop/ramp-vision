@@ -17,6 +17,7 @@ import { SelectColumnFilter } from "~/features/checkbox-list";
 import moment from "jalali-moment";
 
 import {
+  arrIncludeExcat,
   commify,
   countColumnValues,
   en,
@@ -254,7 +255,7 @@ function PersonnelPerformanceTable({ sessionData }) {
         {
           header: "استان",
           accessorKey: "CityName",
-          filterFn: "arrIncludesSome",
+          filterFn: arrIncludeExcat,
           Filter: ({ column }) => {
             return (
               <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">

@@ -49,6 +49,14 @@ export const MENU = [
     value: "پرسنل",
     link: "/dashboard/personnels",
   },
+  {
+    value: "Bi",
+    link: "/dashboard/bi",
+  },
+  {
+    value: "ارزیابان برتر",
+    link: "/bests",
+  },
 ];
 
 // export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];

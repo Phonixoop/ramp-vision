@@ -1,3 +1,4 @@
+import { biRouter } from "~/server/api/routers/bi";
 import { depoRouter } from "~/server/api/routers/depo";
 import { exampleRouter } from "~/server/api/routers/example";
 import { havaleKhesaratRouter } from "~/server/api/routers/havale_khesarat";
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   insuranceMetrics: insuranceMetricsRouter,
   home: homeRouter,
   otpUser: otpUserRouter,
+  bi: biRouter,
 });
 
 // export type definition of API

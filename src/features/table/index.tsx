@@ -91,6 +91,7 @@ export default function Table({
 }: Props) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+
   const table = useReactTable({
     data: data,
     columns,
@@ -132,7 +133,6 @@ export default function Table({
   const virtualizer = useVirtual({
     size: rows.length,
     parentRef: tableContainerRef,
-
     overscan: 20,
   });
 
@@ -159,7 +159,7 @@ export default function Table({
       {renderInFilterView && (
         <ResponsiveView
           className={twMerge(
-            "relative top-10 flex h-fit w-full flex-col justify-center gap-5 overflow-y-auto px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 2xl:pb-0 ",
+            "relative top-10 flex h-fit w-full flex-col justify-center gap-5 px-4 pb-10 md:px-0 xl:sticky xl:w-3/12 2xl:pb-0 ",
           )}
           dir="rtl"
           btnClassName="bg-secondary text-primary"

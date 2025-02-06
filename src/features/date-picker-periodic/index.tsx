@@ -14,6 +14,7 @@ import { InPageMenu } from "~/features/menu";
 import { Reports_Period } from "~/constants";
 
 export default function DatePickerPeriodic({
+  selector = "Start_Date",
   filter,
   reportPeriod,
   hidePeriodSelection = false,
@@ -36,18 +37,18 @@ export default function DatePickerPeriodic({
                 className="w-full min-w-full rounded-lg border border-dashed border-accent bg-primary p-2 text-center text-secondary"
               >
                 {reportPeriod === "ماهانه" &&
-                filter.filter.Start_Date.length == 1
-                  ? moment(filter.filter.Start_Date[0], "jYYYY,jMM,jDD")
+                filter.filter[selector]?.length == 1
+                  ? moment(filter.filter[selector][0], "jYYYY,jMM,jDD")
                       .locale("fa")
                       .format("MMMM")
-                  : filter.filter.Start_Date.join(seperator)}
+                  : filter.filter[selector].join(seperator)}
               </Button>
             </div>
           );
         }}
         inputClass="text-center"
         multiple={reportPeriod !== "ماهانه"}
-        value={filter.filter.Start_Date}
+        value={filter.filter[selector]}
         calendar={persian}
         locale={persian_fa}
         weekPicker={reportPeriod === "هفتگی"}

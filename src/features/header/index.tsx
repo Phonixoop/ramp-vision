@@ -46,6 +46,8 @@ function checkStatusForMenu(status, user) {
           return false;
         case "جزئیات ورودی اسناد مستقیم شعب":
           return false;
+        case "Bi":
+          return false;
       }
       return true;
     });

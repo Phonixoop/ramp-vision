@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import moment from "jalali-moment";
 import {
   calculateDepoCompleteTime,
@@ -12,7 +16,12 @@ import {
 
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { TremorColor } from "~/types";
-import { getEnglishToPersianCity } from "~/utils/util";
+import {
+  getEnglishToPersianCity,
+  getPerformanceText,
+  getPerformanceTextEn,
+  getPersianToEnglishCity,
+} from "~/utils/util";
 import { defaultProjectTypes } from "~/constants/personnel-performance";
 import { getUserPermissions } from "~/lib/user.util";
 import { sortDates } from "~/lib/utils";
@@ -680,16 +689,41 @@ export const personnelPerformanceRouter = createTRPCRouter({
   `;
     // console.log(query);
     const result = await sql.query(query);
-    // console.log(result.recordsets);
-    return {
+
+    const r = {
       Cities: result.recordsets[0]
         .filter((c) => c.CityName !== "")
         .map((c) => {
           return getEnglishToPersianCity(c.CityName);
         }),
     };
+
+    return r;
   }),
-  getLastDate: protectedProcedure.query(async ({ ctx }) => {
+  getInitialCitiesPublic: publicProcedure.query(async ({ ctx }) => {
+    const query = `
+
+  
+  SELECT DISTINCT CityName from RAMP_Daily.dbo.personnel_performance
+
+
+
+
+  `;
+    // console.log(query);
+    const result = await sql.query(query);
+
+    const r = {
+      Cities: result.recordsets[0]
+        .filter((c) => c.CityName !== "")
+        .map((c) => {
+          return getEnglishToPersianCity(c.CityName);
+        }),
+    };
+
+    return r;
+  }),
+  getLastDate: publicProcedure.query(async ({ ctx }) => {
     const query = ` 
     SELECT TOP 1 Start_Date FROM RAMP_Daily.dbo.personnel_performance ORDER BY Start_Date DESC 
     `;
@@ -885,6 +919,72 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
       return reuslt;
     }),
+
+  getBestPersonnel: publicProcedure
+    .input(
+      z.object({
+        filter: z.object({
+          Start_Date: z.array(z.string()),
+        }),
+        periodType: z.enum(["روزانه", "هفتگی", "ماهانه"]),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { filter, periodType } = input;
+      const { Start_Date } = filter;
+
+      const date = Start_Date.map((d) => extractYearAndMonth(d));
+
+      // const englishCityNames = CityName.map(
+      //   (city) => `'${getPersianToEnglishCity(city)}'`,
+      // ).join(", ");
+
+      const lastDateInfo = await getDefualtDateInfo();
+      /*${
+            englishCityNames.length > 0
+              ? `AND CityName IN (${englishCityNames})`
+              : ``
+          } */
+      const query = `
+        SELECT DISTINCT
+          NameFamily,
+          u.NationalCode,
+          AVG(TotalPerformance) AS TotalPerformance,
+          CityName
+        FROM RAMP_Daily.dbo.personnel_performance AS p
+        JOIN RAMP_Daily.dbo.users_info AS u ON p.NationalCode = u.NationalCode
+        WHERE 
+          Start_Date LIKE '${date[0]}/%'
+           AND CityName IS NOT NULL
+          AND DateInfo = '${lastDateInfo}'
+        GROUP BY NameFamily, u.NationalCode, CityName
+        ORDER BY AVG(TotalPerformance) DESC;
+      `;
+
+      const result = await sql.query(query);
+      const performanceOrder = [
+        "عالی",
+        "خوب",
+        "متوسط",
+        "ضعیف",
+        "نیاز به بررسی",
+      ];
+
+      const personnel = result.recordset
+        .map((a) => ({
+          ...a,
+          CityName: getEnglishToPersianCity(a.CityName),
+          TotalPerformance: Number(a.TotalPerformance).toFixed(2),
+          PerformanceText: getPerformanceText(Number(a.TotalPerformance)),
+        }))
+        .sort(
+          (a, b) =>
+            performanceOrder.indexOf(a.PerformanceText) -
+            performanceOrder.indexOf(b.PerformanceText),
+        );
+
+      return personnel;
+    }),
 });
 
 function generateFilterOnlySelect(filter: string[]) {
@@ -895,6 +995,16 @@ function generateFilterOnlySelect(filter: string[]) {
 
   return columns.length > 0 ? `${columns.join(",")}` : "";
 }
+
+export const PersonnelPerformanceSchema = z.object({
+  NameFamily: z.string(),
+  NationalCode: z.string(),
+  TotalPerformance: z.number(),
+  CityName: z.string(),
+  DateInfo: z.string(),
+});
+
+type PersonnelPerformance = z.infer<typeof PersonnelPerformanceSchema>;
 
 // function generateWhereClause(
 //   filter,
