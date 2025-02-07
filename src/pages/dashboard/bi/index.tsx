@@ -15,6 +15,7 @@ import { LayoutGroup } from "framer-motion";
 import { InPageMenu } from "~/features/menu";
 import { City_Levels } from "~/constants";
 import { SelectColumnFilter } from "~/features/checkbox-list";
+import { PeriodType } from "~/context/personnel-filter.context";
 
 export default function AssessmentPage() {
   return (
@@ -38,9 +39,7 @@ export default function AssessmentPage() {
 }
 
 export function AssessmentTable() {
-  const [reportPeriod, setReportPeriod] = useState<"هفتگی" | "ماهانه">(
-    "ماهانه",
-  );
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("ماهانه");
   const [filters, setFilters] = useState({
     filter: {
       DateFa: [moment().locale("fa").subtract(7, "days").format("YYYY/MM/DD")],
@@ -53,6 +52,7 @@ export function AssessmentTable() {
       filter: {
         DateFa: filters.filter.DateFa,
       },
+      periodType: filters.periodType,
     },
     {
       refetchOnWindowFocus: false,
@@ -88,18 +88,37 @@ export function AssessmentTable() {
       },
       { header: "تاریخ فارسی", accessorKey: "DateFa" },
       { header: "تاریخ میلادی", accessorKey: "DateEn" },
-      { header: "۵ درصد تعهد", accessorKey: "CommitmentFivePercentage" },
-      { header: "۱۰ درصد تعهد", accessorKey: "CommitmentTenPercentage" },
+      {
+        header: "عمل به تعهدات 5 روزه",
+        accessorKey: "CommitmentFivePercentage",
+        cell: ({ row }) =>
+          parseFloat(row.original.CommitmentFivePercentage).toFixed(4),
+      },
+      {
+        header: "عمل به تعهدات 10 روزه",
+        accessorKey: "CommitmentTenPercentage",
+        cell: ({ row }) =>
+          parseFloat(row.original.CommitmentTenPercentage).toFixed(4),
+      },
       {
         header: "میانگین تایید حواله",
         accessorKey: "AverageRemittaceConfirmation",
+        cell: ({ row }) =>
+          parseFloat(row.original.AverageRemittaceConfirmation).toFixed(4),
       },
       { header: "تعداد اسناد مستقیم", accessorKey: "DocumentBillCountDirect" },
       {
         header: "نسبت مدیریت اسناد مستقیم",
         accessorKey: "DocumentHandlingRatioDirect",
+        cell: ({ row }) =>
+          parseFloat(row.original.DocumentHandlingRatioDirect).toFixed(4),
       },
-      { header: "نسبت بازگشت مستقیم", accessorKey: "ReturnRatioDirect" },
+      {
+        header: "نسبت بازگشت مستقیم",
+        accessorKey: "ReturnRatioDirect",
+        cell: ({ row }) =>
+          parseFloat(row.original.ReturnRatioDirect).toFixed(4),
+      },
       {
         header: "تعداد پذیرش اسناد غیرمستقیم",
         accessorKey: "DocumentAcceptanceCountInDirect",
@@ -107,6 +126,8 @@ export function AssessmentTable() {
       {
         header: "نسبت مدیریت اسناد غیرمستقیم",
         accessorKey: "DocumentHandlingRatioInDirect",
+        cell: ({ row }) =>
+          parseFloat(row.original.DocumentHandlingRatioInDirect).toFixed(4),
       },
       { header: "آخرین بروزرسانی", accessorKey: "LastUpdateTime" },
     ],

@@ -22,7 +22,7 @@ export const biRouter = createTRPCRouter({
   getReports: protectedProcedure
     .input(
       z.object({
-        periodType: z.enum(["هفتگی", "ماهانه"]).default("ماهانه"),
+        periodType: z.enum(["هفتگی", "ماهانه", "روزانه"]).default("ماهانه"),
         filter: z.object({
           DateFa: z.array(z.string()).min(1).max(10),
         }),
@@ -31,7 +31,7 @@ export const biRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         let finalResult = [];
-        const permissions = await getPermission({ ctx });
+        // const permissions = await getPermission({ ctx });
 
         let filter = input.filter;
 
@@ -43,12 +43,30 @@ export const biRouter = createTRPCRouter({
         `;
         let whereClause = "";
 
-        if (input.periodType === "هفتگی") {
+        if (input.periodType === "روزانه") {
+          let dates = filter.DateFa.map((d) => {
+            const _d = d.split("/");
+
+            return `LIKE '${_d[0]}/${_d[1]}/${_d[2]}'`;
+          });
+          const likeConditions = dates
+            .map((date) => `DateFa  ${date} `)
+            .join(" OR ");
+          whereClause = likeConditions;
+        } else if (input.periodType === "هفتگی") {
           filter.DateFa = getDatesBetweenTwoDates(
             filter.DateFa[0],
             filter.DateFa[1],
           );
-          whereClause = generateWhereClause(filter);
+          let dates = filter.DateFa.map((d) => {
+            const _d = d.split("/");
+
+            return `LIKE '${_d[0]}/${_d[1]}/${_d[2]}'`;
+          });
+          const likeConditions = dates
+            .map((date) => `DateFa  ${date} `)
+            .join(" OR ");
+          whereClause = likeConditions;
         } else if (input.periodType === "ماهانه") {
           filter.DateFa = filter.DateFa.map((d) => extractYearAndMonth(d));
           let dates = filter.DateFa.map((d) => {
@@ -64,7 +82,7 @@ export const biRouter = createTRPCRouter({
         }
 
         let query = `${queryStart} Where ${whereClause} ORDER BY CityName, DateFa`;
-        console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
         finalResult = result.recordsets[0] ?? [];
 
