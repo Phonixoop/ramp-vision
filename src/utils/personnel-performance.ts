@@ -186,6 +186,7 @@ export function sparkChartForPersonnel(
   data = [],
   propertyToCheck,
   valueToCheck,
+  selectExtraProperty = [],
 ) {
   return data
     ?.filter(
@@ -199,6 +200,10 @@ export function sparkChartForPersonnel(
         Start_Date: item.Start_Date,
         Benchmark: 75,
         Benchmark2: 120,
+        ...selectExtraProperty.reduce((acc, curr) => {
+          acc[curr] = item[curr];
+          return acc;
+        }, {}),
       };
     });
 }

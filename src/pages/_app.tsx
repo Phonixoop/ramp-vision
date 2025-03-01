@@ -12,6 +12,7 @@ import { Default_Theme } from "~/constants/theme";
 import BlurBackground from "~/ui/blur-backgrounds";
 import Footer from "~/features/footer";
 import Header from "~/features/header";
+import { ModalProvider } from "~/context/modal.context";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   PageLayout?: (page: ReactElement) => ReactElement<any, any>;
@@ -101,9 +102,11 @@ function MyApp({
     <>
       <SessionProvider session={session}>
         <PersonnelFilterProvider>
-          <Header />
-          <Component.PageLayout {...pageProps} />
-          <Toaster />
+          <ModalProvider>
+            <Header />
+            <Component.PageLayout {...pageProps} />
+            <Toaster />
+          </ModalProvider>
         </PersonnelFilterProvider>
         <Footer />
       </SessionProvider>
@@ -111,9 +114,12 @@ function MyApp({
   ) : (
     <SessionProvider session={session}>
       <PersonnelFilterProvider>
-        <Header />
-        <Component {...pageProps} />
-        <Toaster />
+        {" "}
+        <ModalProvider>
+          <Header />
+          <Component {...pageProps} />
+          <Toaster />{" "}
+        </ModalProvider>
       </PersonnelFilterProvider>
       <Footer />
     </SessionProvider>

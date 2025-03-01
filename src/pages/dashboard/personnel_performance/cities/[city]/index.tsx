@@ -29,6 +29,7 @@ import { cn, uniqueArray } from "~/lib/utils";
 
 import CitiesPage from "~/pages/dashboard/personnel_performance/cities";
 import { appRouter } from "~/server/api/root";
+import { ButtonWithModal } from "~/ui/button-with-modal";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import ChevronLeftIcon from "~/ui/icons/chervons/chevron-left";
@@ -362,13 +363,11 @@ export default function CityPage({ children, city }) {
 
           // ||
           // user.NationalCode === router.query.personnel;
-
           const sparkData = sparkChartForPersonnel(
             getAll?.data?.result,
             "NameFamily",
             user.NameFamily,
           );
-
           return (
             <>
               <Button
@@ -394,6 +393,7 @@ export default function CityPage({ children, city }) {
                       getAll?.data?.result,
                       "NameFamily",
                       user.NameFamily,
+                      ["BranchName", "Role"],
                     ),
                   });
                 }}
@@ -546,6 +546,115 @@ export default function CityPage({ children, city }) {
                     </>
                   );
                 })}
+
+                <ButtonWithModal
+                  buttonProps={{
+                    className: "w-full rounded-xl bg-primary text-secondary",
+                  }}
+                  buttonChildren={
+                    <>
+                      <span className="text-contrast">نقش ها</span>
+                    </>
+                  }
+                  modalProps={{
+                    title: "نقش های " + selectedPerson.NameFamily,
+                    size: "sm",
+                    center: true,
+                    className: "bg-secondary",
+                  }}
+                >
+                  {(closeModal) => (
+                    <>
+                      <div className="flex flex-col gap-2 p-4">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-accent/20">
+                              <th className="p-2 text-right text-primary">
+                                شعبه
+                              </th>
+                              <th className="p-2 text-right text-primary">
+                                نقش
+                              </th>
+                              <th className="p-2 text-right text-primary">
+                                تاریخ
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Array.from(
+                              selectedPerson.sparkData.reduce((map, day) => {
+                                const key = `${day.BranchName}-${day.Role}`;
+                                if (!map.has(key)) {
+                                  map.set(key, {
+                                    branch: day.BranchName,
+                                    role: day.Role,
+                                    startDates: [],
+                                  });
+                                }
+                                map.get(key)!.startDates.push(day.Start_Date);
+                                return map;
+                              }, new Map<string, { branch: string; role: string; startDates: string[] }>()),
+                            ).map(([key, day]) => (
+                              <tr
+                                key={key}
+                                className="border-b border-accent/10"
+                              >
+                                <td className="p-2 text-accent">
+                                  {day.branch || "نامشخص"}
+                                </td>
+                                <td className="p-2 text-accent">
+                                  {day.role || "نامشخص"}
+                                </td>
+                                <td className="p-2 text-accent">
+                                  {day.startDates.length > 1 ? (
+                                    <ButtonWithModal
+                                      buttonProps={{
+                                        className:
+                                          "text-accent hover:text-primary bg-accent/10",
+                                      }}
+                                      buttonChildren={
+                                        <>
+                                          <span className="text-contrast">
+                                            تاریخ ها
+                                          </span>
+                                        </>
+                                      }
+                                      modalProps={{
+                                        title: "تاریخ",
+                                        size: "sm",
+                                        center: true,
+                                        className: "bg-secondary",
+                                      }}
+                                    >
+                                      {(closeModal) => (
+                                        <div className="flex flex-col gap-2 p-4">
+                                          {day.startDates
+                                            .slice(1)
+                                            .map((date, i) => (
+                                              <div
+                                                key={i}
+                                                className="text-accent"
+                                              >
+                                                {date}
+                                              </div>
+                                            ))}
+                                        </div>
+                                      )}
+                                    </ButtonWithModal>
+                                  ) : day.startDates.length > 0 ? (
+                                    day.startDates[0]
+                                  ) : (
+                                    "نامشخص"
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </ButtonWithModal>
 
                 <div className="relative col-span-2 w-full overflow-hidden rounded-xl bg-accent/10  p-1">
                   {selectedPerson.sparkData.length > 0 ? (
