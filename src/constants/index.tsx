@@ -50,12 +50,18 @@ export const MENU = [
     link: "/dashboard/personnels",
   },
   {
-    value: "Bi",
-    link: "/dashboard/bi",
-  },
-  {
-    value: "ارزیابان برتر",
-    link: "/bests",
+    value: "گزارش ها",
+    link: "#",
+    subMenu: [
+      {
+        value: "Bi",
+        link: "/dashboard/bi",
+      },
+      {
+        value: "ارزیابان برتر",
+        link: "/dashboard/bests",
+      },
+    ],
   },
 ];
 

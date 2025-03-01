@@ -1,18 +1,11 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import type { ColumnDef } from "@tanstack/react-table";
+import { useState, useMemo } from "react";
 import Table from "~/features/table";
-import { SelectColumnFilter, SelectControlled } from "~/features/checkbox-list";
+import { SelectColumnFilter } from "~/features/checkbox-list";
 import { api } from "~/utils/api";
 import DatePickerPeriodic from "~/features/date-picker-periodic";
-import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
-import {
-  arrIncludeExcat,
-  en,
-  getEnglishToPersianCity,
-  getPersianToEnglishCity,
-} from "~/utils/util";
+import { arrIncludeExcat, en, getEnglishToPersianCity } from "~/utils/util";
 
 import BlurBackground from "~/ui/blur-backgrounds";
 import Head from "next/head";
@@ -21,6 +14,10 @@ import { InPageMenu } from "~/features/menu";
 import { LayoutGroup } from "framer-motion";
 import moment from "jalali-moment";
 import { performanceLevels } from "~/constants/personnel-performance";
+import { CSVLink } from "react-csv";
+import { DownloadCloudIcon } from "lucide-react";
+import { FileBarChart2Icon } from "lucide-react";
+import Button from "~/ui/buttons";
 
 export default function BestsPage() {
   // const users = api.example.getAll.useQuery();
@@ -97,36 +94,36 @@ export function BestsTable() {
           return (
             <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">استان</span>
-              {
-                <LayoutGroup id="CityLevelMenu">
-                  <InPageMenu
-                    list={City_Levels.map((a) => a.name)}
-                    startIndex={-1}
-                    onChange={(value) => {
-                      const { setFilterValue } = column;
-                      const cities = City_Levels.find(
-                        (a) => a.name === value.item.name,
-                      ).cities.map(getEnglishToPersianCity);
 
-                      // beacuse our system is permission based we need to show only allowed cities.
-                      // const canFilterCities = cities
-                      //   .filter(
-                      //     (city) =>
-                      //       getInitialCities?.data?.Cities.map((initCity) =>
-                      //         getPersianToEnglishCity(initCity.CityName),
-                      //       ).includes(city),
-                      //   )
-                      //   .map((cityName) => getEnglishToPersianCity(cityName));
+              <LayoutGroup id="CityLevelMenu">
+                <InPageMenu
+                  list={City_Levels.map((a) => a.name)}
+                  startIndex={-1}
+                  onChange={(value) => {
+                    const { setFilterValue } = column;
+                    const cities = City_Levels.find(
+                      (a) => a.name === value.item.name,
+                    ).cities.map(getEnglishToPersianCity);
 
-                      if (cities.length <= 0) {
-                        setFilterValue(
-                          getInitialCities?.data?.Cities.map((a) => a.CityName),
-                        );
-                      } else setFilterValue(cities);
-                    }}
-                  />
-                </LayoutGroup>
-              }
+                    // beacuse our system is permission based we need to show only allowed cities.
+                    // const canFilterCities = cities
+                    //   .filter(
+                    //     (city) =>
+                    //       getInitialCities?.data?.Cities.map((initCity) =>
+                    //         getPersianToEnglishCity(initCity.CityName),
+                    //       ).includes(city),
+                    //   )
+                    //   .map((cityName) => getEnglishToPersianCity(cityName));
+
+                    if (cities.length <= 0) {
+                      setFilterValue(
+                        getInitialCities?.data?.Cities.map((a) => a.CityName),
+                      );
+                    } else setFilterValue(cities);
+                  }}
+                />
+              </LayoutGroup>
+
               <SelectColumnFilter column={column} data={data} />
             </div>
           );
@@ -146,6 +143,7 @@ export function BestsTable() {
       {
         header: "عملکرد",
         accessorKey: "PerformanceText",
+        filterFn: arrIncludeExcat,
         cell: ({ row }) => {
           return (
             <>
@@ -159,6 +157,14 @@ export function BestsTable() {
                 {row.original.PerformanceText}
               </span>
             </>
+          );
+        },
+        Filter: ({ column }) => {
+          return (
+            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <span className="font-bold text-primary">عملکرد</span>
+              <SelectColumnFilter column={column} data={data} />
+            </div>
           );
         },
       },
@@ -212,6 +218,51 @@ export function BestsTable() {
             />
           </div>
         )}
+        renderAfterFilterView={(flatRows) => {
+          return (
+            <>
+              <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl bg-secbuttn p-5 xl:flex-row">
+                <FileBarChart2Icon className="stroke-accent" />
+                <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-sm  font-semibold text-emerald-900">
+                  <DownloadCloudIcon />
+                  <CSVLink
+                    filename="برترین ها.csv"
+                    headers={columns
+                      .map((item) => {
+                        return {
+                          label: item.header,
+                          //@ts-ignore
+                          key: item.accessorKey,
+                        };
+                      })
+                      .filter((f) => f.key != "Id")}
+                    data={data}
+                  >
+                    دانلود دیتای کامل
+                  </CSVLink>
+                </Button>
+                <Button className="font-bo font flex justify-center gap-1 rounded-3xl bg-amber-300 text-sm font-semibold text-amber-900">
+                  <DownloadCloudIcon />
+                  <CSVLink
+                    filename="برترین ها (فیلتر شده).csv"
+                    headers={columns
+                      .map((item) => {
+                        return {
+                          label: item.header,
+                          //@ts-ignore
+                          key: item.accessorKey,
+                        };
+                      })
+                      .filter((f) => f.key != "Id")}
+                    data={flatRows}
+                  >
+                    دانلود دیتای فیلتر شده
+                  </CSVLink>
+                </Button>
+              </div>
+            </>
+          );
+        }}
       />
     </div>
   );
