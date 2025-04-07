@@ -75,23 +75,25 @@ export const depoRouter = createTRPCRouter({
         // // end temprory
         filter.CityName = cities;
 
-        let queryStart = `SELECT DISTINCT 
+        const preName = "depos";
+        let queryStart = `
+        use RAMP_Daily
+        
+        SELECT DISTINCT 
            ServiceName
           ,CityName
           ,DocumentType
-          ,SUM(depos.EntryCount) AS EntryCount
-          ,SUM(depos.Capicity) AS Capicity,
-           SUM(depos.DepoCount) AS DepoCount,Start_Date FROM `;
-        let dbName = "";
+          ,SUM(EntryCount) AS EntryCount
+          ,SUM(Capicity) AS Capicity,
+           SUM(DepoCount) AS DepoCount,Start_Date FROM  `;
+
+        let dbName = preName;
         let whereClause = "";
 
         if (input.periodType === "روزانه") {
-          dbName = "RAMP_Daily.dbo.depos";
           whereClause = generateWhereClause(filter);
           whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date ORDER BY CityName,Start_Date`;
         } else if (input.periodType === "هفتگی") {
-          dbName = "RAMP_Daily.dbo.depos";
-
           queryStart = `SELECT DISTINCT 
           ServiceName
          ,CityName
@@ -108,8 +110,6 @@ export const depoRouter = createTRPCRouter({
           whereClause = generateWhereClause(filter);
           whereClause += ` Group By CityName,ServiceName,DocumentType ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
-          dbName = "RAMP_Daily.dbo.depos";
-
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
@@ -117,7 +117,7 @@ export const depoRouter = createTRPCRouter({
           let dates = filter.Start_Date.map((d) => {
             const _d = d.split("/");
 
-            return `LIKE '${_d[0]}/${_d[1]}/%'`;
+            return `${_d[0]}/${_d[1]}/%`;
           });
 
           const date = filter.Start_Date.at(-1).split("/");
@@ -129,24 +129,35 @@ export const depoRouter = createTRPCRouter({
 
           const dateResult = await sql.query(`
 
+                 use RAMP_Daily
                   SELECT TOP 1 
               COALESCE(
-                (SELECT MAX(Start_Date) FROM dbo.depos WHERE Start_Date = '${secondDayOfNextMonth}'),
-                (SELECT MAX(Start_Date) FROM dbo.depos)
+                (SELECT MAX(Start_Date) FROM depos WHERE Start_Date = '${secondDayOfNextMonth}'),
+                (SELECT MAX(Start_Date) FROM depos)
               ) AS LastDate
-            FROM dbo.depos
+            FROM depos
             `);
 
           const lastDate = dateResult.recordset[0].LastDate;
-          const likeConditions = dates
-            .map((date) => `Start_Date  ${date} `)
+          const lastDateMonth = lastDate.split("/")[1];
+          const datesMonths = dates.map((date) => date.split("/")[1]);
+
+          const likeConditionsGeneral = [
+            ...dates,
+            ...(datesMonths.includes(lastDateMonth) ? [] : [lastDate]),
+          ]
+            .map((date) => `Start_Date LIKE '${date}' `)
+            .join(" OR ");
+
+          const likeConditionsForEachProperty = [...dates]
+            .map((date) => `Start_Date LIKE '${date}' `)
             .join(" OR ");
           // const secondDate = secondDayOfNextMonth.split("/");
           whereClause = generateWhereClause(
             filter,
             ["Start_Date"],
             undefined,
-            likeConditions + " AND ",
+            `(${likeConditionsGeneral})` + " AND ",
           );
           whereClause += ` group by ServiceName,DocumentType,CityName ORDER BY CityName`;
 
@@ -168,17 +179,17 @@ export const depoRouter = createTRPCRouter({
           // `;
 
           queryStart = `
-          SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,
+          SELECT distinct ServiceName,CityName,DocumentType,
 
                SUM(CASE 
-              WHEN ${likeConditions} 
+              WHEN ${likeConditionsForEachProperty} 
               THEN EntryCount 
               ELSE 0 
           END) AS EntryCount,
 
 
           SUM(CASE 
-             WHEN ${likeConditions} 
+             WHEN ${likeConditionsForEachProperty} 
               THEN Capicity 
               ELSE 0 
           END) AS Capicity,
@@ -249,7 +260,7 @@ export const depoRouter = createTRPCRouter({
         };
         // Respond with the fetched data
       } catch (error) {
-        console.error("Error fetching data:", error.message);
+        console.error("Error fetching data:", error, error.message);
         return error;
       }
     }),
@@ -264,7 +275,7 @@ export const depoRouter = createTRPCRouter({
         .map((permission) => permission.enLabel);
 
       const whereClause = generateWhereClause({ CityName: cities });
-      const queryCities = `use RAMP_Daily  SELECT DISTINCT CityName FROM RAMP_Daily.dbo.depos ${whereClause} ORDER BY CityName ASC
+      const queryCities = `use RAMP_Daily  SELECT DISTINCT CityName FROM depos ${whereClause} ORDER BY CityName ASC
       `;
 
       const resultOfCities = await sql.query(queryCities);
