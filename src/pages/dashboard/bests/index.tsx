@@ -236,7 +236,7 @@ export function BestsTable() {
                         };
                       })
                       .filter((f) => f.key != "Id")}
-                    data={data}
+                    data={data ?? []}
                   >
                     دانلود دیتای کامل
                   </CSVLink>
@@ -254,7 +254,7 @@ export function BestsTable() {
                         };
                       })
                       .filter((f) => f.key != "Id")}
-                    data={flatRows}
+                    data={flatRows ?? []}
                   >
                     دانلود دیتای فیلتر شده
                   </CSVLink>
