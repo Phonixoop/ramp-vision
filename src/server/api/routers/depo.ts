@@ -77,38 +77,93 @@ export const depoRouter = createTRPCRouter({
 
         const preName = "depos";
         let queryStart = `
-        use RAMP_Daily
-        
-        SELECT DISTINCT 
-           ServiceName
-          ,CityName
-          ,DocumentType
-          ,SUM(EntryCount) AS EntryCount
-          ,SUM(Capicity) AS Capicity,
-           SUM(DepoCount) AS DepoCount,Start_Date FROM  `;
+`;
 
         let dbName = preName;
         let whereClause = "";
 
         if (input.periodType === "روزانه") {
-          whereClause = generateWhereClause(filter);
-          whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date ORDER BY CityName,Start_Date`;
-        } else if (input.periodType === "هفتگی") {
-          queryStart = `SELECT DISTINCT 
-          ServiceName
-         ,CityName
-         ,DocumentType
-         ,SUM(depos.EntryCount) AS EntryCount
-         ,SUM(depos.Capicity) AS Capicity,
-          SUM(depos.DepoCount) AS DepoCount FROM `;
+          const dates = filter.Start_Date;
+          // Convert date list to a SQL-safe list of N-prefixed quoted strings
+          const dateList = dates.map((d) => `N'${d}'`).join(", ");
 
-          filter.Start_Date = getDatesBetweenTwoDates(
+          // For DepoCount, pick a specific date (you used `at(-2)` before)
+          const depoDate = dates.at(-1); // Optional: add fallback logic if needed
+
+          queryStart = `
+           USE RAMP_Daily;
+           
+           SELECT 
+             DISTINCT 
+             depos.ServiceName,
+             depos.CityName,
+             depos.DocumentType,
+           
+             SUM(CASE 
+               WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
+               ELSE 0 
+             END) AS EntryCount,
+           
+             SUM(CASE 
+               WHEN Start_Date IN (${dateList}) THEN depos.Capicity 
+               ELSE 0 
+             END) AS Capicity,
+           
+             SUM(CASE 
+               WHEN Start_Date = N'${depoDate}' THEN depos.DepoCount 
+               ELSE 0 
+             END) AS DepoCount
+           
+           FROM 
+             depos
+           `;
+
+          whereClause = generateWhereClause(filter);
+          whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date ORDER BY CityName`;
+        } else if (input.periodType === "هفتگی") {
+          const dates = getDatesBetweenTwoDates(
             filter.Start_Date[0],
             filter.Start_Date[1],
           );
 
+          // Convert date list to a SQL-safe list of N-prefixed quoted strings
+          const dateList = dates.map((d) => `N'${d}'`).join(", ");
+
+          // For DepoCount, pick a specific date (you used `at(-2)` before)
+          const depoDate = dates.at(-2); // Optional: add fallback logic if needed
+
+          queryStart = `
+          USE RAMP_Daily;
+          
+          SELECT 
+            DISTINCT 
+            depos.ServiceName,
+            depos.CityName,
+            depos.DocumentType,
+          
+            SUM(CASE 
+              WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
+              ELSE 0 
+            END) AS EntryCount,
+          
+            SUM(CASE 
+              WHEN Start_Date IN (${dateList}) THEN depos.Capicity 
+              ELSE 0 
+            END) AS Capicity,
+          
+            SUM(CASE 
+              WHEN Start_Date = N'${depoDate}' THEN depos.DepoCount 
+              ELSE 0 
+            END) AS DepoCount
+          
+          FROM 
+            depos
+          `;
+
+          filter.Start_Date = dates;
+
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,ServiceName,DocumentType ORDER BY CityName`;
+          whereClause += ` GROUP BY CityName, ServiceName, DocumentType ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
