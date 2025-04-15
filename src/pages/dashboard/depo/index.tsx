@@ -22,6 +22,7 @@ import {
   en,
   getEnglishToPersianCity,
   getPersianToEnglishCity,
+  humanizeDuration,
   processDataForChart,
   processDepoCompleteTimeData,
   sumColumnBasedOnRowValue,
@@ -1076,18 +1077,24 @@ const Child = memo(function Child({
                           valueFormatter={commify}
                           noDataText={Text.noData.fa}
                         /> */}
-                        {depo.data?.periodType && totalComplete > 0 && (
-                          <p className="w-full">
-                            <span className="text-accent">
-                              {Math.round(depoEstimate?.data?.estimate)}{" "}
-                              {Reports_Period[depo.data?.periodType]}{" "}
-                              {/* {humanizeDuration(
-                            maxDepoTime,
-                            Reports_Period[depo.data?.periodType],
-                          )} */}
-                            </span>
-                            <span className="text-primary">تا اتمام دپو</span>
-                          </p>
+                        {depo.data?.periodType && (
+                          <div className="w-full">
+                            <div className="text-accent">
+                              {depoEstimate?.data?.estimate <= 0 ? (
+                                "دپو ای وجود ندارد"
+                              ) : (
+                                <p>
+                                  {humanizeDuration(
+                                    depoEstimate?.data?.estimate,
+                                    Reports_Period[depo.data?.periodType],
+                                  )}{" "}
+                                  <span className="text-primary">
+                                    تا اتمام دپو
+                                  </span>
+                                </p>
+                              )}
+                            </div>{" "}
+                          </div>
                         )}
                       </div>
                     </Loading>
