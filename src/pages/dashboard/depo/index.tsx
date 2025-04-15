@@ -141,6 +141,10 @@ function DeposTable({ sessionData }) {
     refetchOnWindowFocus: false,
   });
 
+  const depoEstimate = api.depo.getDepoEstimate.useQuery(deferredFilter, {
+    enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
+    refetchOnWindowFocus: false,
+  });
   // const depo.data: any = useMemo(() => {
   //   return depo.data?.pages.map((page) => page).flat(1) || [];
   // }, [depo]);
@@ -494,6 +498,7 @@ function DeposTable({ sessionData }) {
                   <Child //@ts-ignore
                     flatRows={flatRows}
                     depo={depo}
+                    depoEstimate={depoEstimate}
                   />
                 </>
               );
@@ -555,7 +560,19 @@ function DeposTable({ sessionData }) {
 //   );
 // }
 //@ts-ignore
-const Child = memo(function Child({ children, flatRows = [], depo }) {
+type ChildProps = {
+  children?: React.ReactNode;
+  flatRows?: any[];
+  depo: any;
+  depoEstimate?: any;
+};
+
+const Child = memo(function Child({
+  children,
+  flatRows = [],
+  depo,
+  depoEstimate,
+}: ChildProps) {
   // const dateDate = processDataForChart(flatRows, "Start_Date", [
   //   "DepoCount",
   //   "EntryCount",
@@ -699,6 +716,30 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
       fill: "#0d9488",
       headClassName: "text-lg text-cyan-600 bg-secondary rounded-tl-xl ",
       rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-bl-xl",
+    },
+  ];
+
+  const depoEstimateData = [
+    {
+      name: "ورودی",
+      value: depoEstimate?.data?.entryTotal,
+      fill: "#06B6D4",
+      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
+      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
+    },
+    {
+      name: "رسیدگی ماه قبل",
+      value: depoEstimate?.data?.prevMonthCapicity,
+      fill: "#059669",
+      headClassName: "text-lg text-emerald-600 bg-secondary",
+      rowClassName: "text-lg  text-emerald-600 bg-secondary",
+    },
+    {
+      name: `دپو ${depoEstimate?.data?.depoDate}`,
+      value: depoEstimate?.data?.latestDepo,
+      fill: "#65a30d",
+      headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
+      rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
     },
   ];
 
@@ -988,10 +1029,10 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                   </div>
                   <div className="flex w-full shrink-0  flex-col justify-between  gap-5 rounded-2xl  p-5 xl:max-w-md">
                     <Loading
-                      isLoading={depo.isLoading}
+                      isLoading={depoEstimate.isLoading}
                       LoadingComponent={DepoTimeSkeletonLoading}
                     >
-                      <div className="flex h-full w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn  p-5 xl:max-w-md">
+                      <div className="flex h-full w-full flex-col justify-between gap-5 rounded-2xl bg-secbuttn p-5  text-primary xl:max-w-md">
                         <H2>
                           زمان کلی اتمام دپو{" "}
                           {depo.data?.periodType && (
@@ -1003,7 +1044,23 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                             </>
                           )}
                         </H2>
-                        <DonutChart
+                        <p dir="rtl"> (رسیدگی شده ماه فبل - ورودی) / دپو </p>
+                        <SimpleTable
+                          className="flex justify-start border-none"
+                          data={{
+                            title: "",
+                            table: dataAsTable(depoEstimateData),
+                          }}
+                        >
+                          <ResponsiveContainer width={"100%"} height={"50%"}>
+                            <CustomPieChart
+                              className="rounded-xl bg-secondary "
+                              data={depoEstimateData}
+                              index="value"
+                            />
+                          </ResponsiveContainer>
+                        </SimpleTable>
+                        {/* <DonutChart
                           label={maxDepoTime.toFixed(2)}
                           data={depoCompletionTime}
                           category={"DepoCompleteTime"}
@@ -1018,12 +1075,11 @@ const Child = memo(function Child({ children, flatRows = [], depo }) {
                           ]}
                           valueFormatter={commify}
                           noDataText={Text.noData.fa}
-                        />
-
+                        /> */}
                         {depo.data?.periodType && totalComplete > 0 && (
                           <p className="w-full">
                             <span className="text-accent">
-                              {Math.round(maxDepoTime)}{" "}
+                              {Math.round(depoEstimate?.data?.estimate)}{" "}
                               {Reports_Period[depo.data?.periodType]}{" "}
                               {/* {humanizeDuration(
                             maxDepoTime,

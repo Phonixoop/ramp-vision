@@ -455,6 +455,121 @@ export const depoRouter = createTRPCRouter({
         return error;
       }
     }),
+  getDepoEstimate: protectedProcedure
+    .input(
+      z.object({
+        periodType: z
+          .string(z.enum(["روزانه", "هفتگی", "ماهانه"]))
+          .default("روزانه"),
+        filter: z.object({
+          ServiceName: z.array(z.string()).nullish(),
+          CityName: z.array(z.string()).nullish(),
+          DocumentType: z.array(z.string()).nullish(),
+          Start_Date: z.array(z.string()).min(1).max(10),
+        }),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        console.log("START ESTIMATE");
+        const permissions = await getPermission({ ctx });
+        const cities = permissions
+          .find((p) => p.id === "ViewCities")
+          .subPermissions.filter((p) => p.isActive)
+          .map((p) => p.enLabel);
+
+        const filter = input.filter;
+        filter.CityName = cities;
+
+        const date = filter.Start_Date.at(-1).split("/");
+
+        const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
+          parseInt(date[0]),
+          parseInt(date[1]),
+        );
+
+        const dateResult = await sql.query(`
+
+               use RAMP_Daily
+                SELECT TOP 1 
+            COALESCE(
+              (SELECT MAX(Start_Date) FROM depos WHERE Start_Date = '${secondDayOfNextMonth}'),
+              (SELECT MAX(Start_Date) FROM depos)
+            ) AS LastDate
+          FROM depos
+          `);
+
+        const lastDate = dateResult.recordset[0].LastDate;
+
+        const dates = filter.Start_Date;
+        const depoDate =
+          input.periodType === "روزانه"
+            ? dates.at(-1)
+            : input.periodType === "هفتگی"
+            ? dates.at(-2)
+            : lastDate;
+
+        // 🔁 Convert Jalali to previous month
+        const startDateJalali = moment(dates[0], "jYYYY/jMM/jDD");
+        const oneMonthAgoJalali = startDateJalali.subtract(1, "jMonth");
+        const prevMonthYear = oneMonthAgoJalali.format("jYYYY");
+        const prevMonthMonth = oneMonthAgoJalali.format("jMM");
+        const prevMonthLike = `${prevMonthYear}/${prevMonthMonth}/%`;
+
+        // 👇 query Capicity for previous month
+        const prevMonthCapicityQuery = `
+          USE RAMP_Daily;
+          SELECT SUM(Capicity) as TotalCapicity
+          FROM depos
+          WHERE Start_Date LIKE N'${prevMonthLike}'
+        `;
+        console.log(`%c${prevMonthCapicityQuery}`, "color: green;");
+        const prevMonthCapicityResult = await sql.query(prevMonthCapicityQuery);
+        const prevMonthCapicity =
+          prevMonthCapicityResult.recordset[0]?.TotalCapicity ?? 1;
+
+        // 👇 query latest depo
+        const depoQuery = `
+          USE RAMP_Daily;
+          SELECT SUM(DepoCount) as DepoTotal
+          FROM depos
+          WHERE Start_Date = N'${depoDate}'
+        `;
+        console.log(`%c${depoQuery}`, "color: green;");
+        const depoResult = await sql.query(depoQuery);
+        const latestDepo = depoResult.recordset[0]?.DepoTotal ?? 0;
+
+        // 👇 query EntryCount in selected range
+        const dateList = dates.map((d) => `N'${d}'`).join(", ");
+        const entryQuery = `
+          USE RAMP_Daily;
+          SELECT SUM(EntryCount) as EntryTotal
+          FROM depos
+          WHERE Start_Date IN (${dateList})
+        `;
+        console.log(`%c${entryQuery}`, "color: green;");
+        const entryResult = await sql.query(entryQuery);
+        const entryTotal = entryResult.recordset[0]?.EntryTotal ?? 0;
+
+        // ✅ Calculate estimate
+        const estimate = latestDepo / (prevMonthCapicity - entryTotal);
+
+        console.log("END ESTIMATE");
+        return {
+          latestDepo,
+          depoDate,
+          prevMonthCapicity,
+          entryTotal,
+          estimate,
+        };
+      } catch (err) {
+        console.error("Error calculating depoEstimate:", err);
+        return {
+          error: true,
+          message: err.message,
+        };
+      }
+    }),
 });
 
 function generateFilterOnlySelect(filter: string[]) {
