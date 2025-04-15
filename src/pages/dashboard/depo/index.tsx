@@ -723,21 +723,21 @@ const Child = memo(function Child({
   const depoEstimateData = [
     {
       name: "ورودی",
-      value: depoEstimate?.data?.entryTotal,
+      value: depoEstimate?.data?.entryTotal ?? 0,
       fill: "#06B6D4",
       headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
       rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
     },
     {
-      name: "رسیدگی ماه قبل",
-      value: depoEstimate?.data?.prevMonthCapicity,
+      name: "رسیدگی",
+      value: depoEstimate?.data?.prevCapicity ?? 0,
       fill: "#059669",
       headClassName: "text-lg text-emerald-600 bg-secondary",
       rowClassName: "text-lg  text-emerald-600 bg-secondary",
     },
     {
       name: `دپو ${depoEstimate?.data?.depoDate}`,
-      value: depoEstimate?.data?.latestDepo,
+      value: depoEstimate?.data?.latestDepo ?? 0,
       fill: "#65a30d",
       headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
       rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
@@ -1045,10 +1045,7 @@ const Child = memo(function Child({
                             </>
                           )}
                         </H2>
-                        <p dir="rtl" className="text-primary">
-                          {" "}
-                          ( ورودی - رسیدگی شده ماه قبل ) / دپو{" "}
-                        </p>
+
                         <SimpleTable
                           className="flex justify-start border-none"
                           data={{
@@ -1080,10 +1077,15 @@ const Child = memo(function Child({
                           valueFormatter={commify}
                           noDataText={Text.noData.fa}
                         /> */}
-                        <span className="text-primary">
+                        <p className="text-primary">
                           نتیجه عددی فرمول :{" "}
-                          {parseFloat(depoEstimate?.data?.estimate.toFixed(2))}
-                        </span>
+                          <span dir="ltr">
+                            {" "}
+                            {parseFloat(
+                              depoEstimate?.data?.estimate.toFixed(2),
+                            )}
+                          </span>
+                        </p>
                         {depo.data?.periodType && (
                           <div className="w-full">
                             <div className="text-accent">

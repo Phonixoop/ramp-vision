@@ -481,52 +481,92 @@ export const depoRouter = createTRPCRouter({
         const filter = input.filter;
         filter.CityName = cities;
 
-        const date = filter.Start_Date.at(-1).split("/");
+        const dates = filter.Start_Date;
+        const date = dates.at(-1).split("/");
 
         const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
           parseInt(date[0]),
           parseInt(date[1]),
         );
 
-        const dateResult = await sql.query(`
+        let depoDate = null;
 
-               use RAMP_Daily
-                SELECT TOP 1 
+        console.log({ dates, m2: dates.at(-2) });
+        // ✅ Get prevCapicity based on periodType
+        let prevCapicity = 1;
+
+        if (input.periodType === "ماهانه") {
+          const dateResult = await sql.query(`
+          USE RAMP_Daily;
+          SELECT TOP 1 
             COALESCE(
               (SELECT MAX(Start_Date) FROM depos WHERE Start_Date = '${secondDayOfNextMonth}'),
               (SELECT MAX(Start_Date) FROM depos)
             ) AS LastDate
-          FROM depos
-          `);
+        `);
+          const lastDate = dateResult.recordset[0].LastDate;
+          depoDate = lastDate;
+          const startDateJalali = moment(dates[0], "jYYYY/jMM/jDD");
+          const oneMonthAgoJalali = startDateJalali.subtract(1, "jMonth");
+          const prevMonthYear = oneMonthAgoJalali.format("jYYYY");
+          const prevMonthMonth = oneMonthAgoJalali.format("jMM");
+          const prevMonthLike = `${prevMonthYear}/${prevMonthMonth}/%`;
 
-        const lastDate = dateResult.recordset[0].LastDate;
+          const prevMonthCapicityQuery = `
+            USE RAMP_Daily;
+            SELECT SUM(Capicity) as TotalCapicity
+            FROM depos
+            WHERE Start_Date LIKE N'${prevMonthLike}'
+          `;
+          const result = await sql.query(prevMonthCapicityQuery);
+          prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
+        } else if (input.periodType === "هفتگی") {
+          const dates = getDatesBetweenTwoDates(
+            filter.Start_Date[0],
+            filter.Start_Date[1],
+          );
+          depoDate = dates.at(-2);
 
-        const dates = filter.Start_Date;
-        const depoDate =
-          input.periodType === "روزانه"
-            ? dates.at(-1)
-            : input.periodType === "هفتگی"
-            ? dates.at(-2)
-            : lastDate;
+          const start = moment(dates[0], "jYYYY/jMM/jDD").subtract(7, "days");
+          const end = moment(dates[0], "jYYYY/jMM/jDD").subtract(1, "days");
 
-        // 🔁 Convert Jalali to previous month
-        const startDateJalali = moment(dates[0], "jYYYY/jMM/jDD");
-        const oneMonthAgoJalali = startDateJalali.subtract(1, "jMonth");
-        const prevMonthYear = oneMonthAgoJalali.format("jYYYY");
-        const prevMonthMonth = oneMonthAgoJalali.format("jMM");
-        const prevMonthLike = `${prevMonthYear}/${prevMonthMonth}/%`;
+          const jalaliRange = [];
+          for (let d = start.clone(); d.isSameOrBefore(end); d.add(1, "days")) {
+            jalaliRange.push(`N'${d.format("jYYYY/jMM/jDD")}'`);
+          }
 
-        // 👇 query Capicity for previous month
-        const prevMonthCapicityQuery = `
-          USE RAMP_Daily;
-          SELECT SUM(Capicity) as TotalCapicity
-          FROM depos
-          WHERE Start_Date LIKE N'${prevMonthLike}'
-        `;
-        console.log(`%c${prevMonthCapicityQuery}`, "color: green;");
-        const prevMonthCapicityResult = await sql.query(prevMonthCapicityQuery);
-        const prevMonthCapicity =
-          prevMonthCapicityResult.recordset[0]?.TotalCapicity ?? 1;
+          const weekCapicityQuery = `
+            USE RAMP_Daily;
+            SELECT SUM(Capicity) as TotalCapicity
+            FROM depos
+            WHERE Start_Date IN (${jalaliRange.join(", ")})
+          `;
+          const result = await sql.query(weekCapicityQuery);
+          prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
+        } else if (input.periodType === "روزانه") {
+          depoDate = dates.at(-1);
+          const numDays = dates.length;
+          const start = moment(dates[0], "jYYYY/jMM/jDD").subtract(
+            numDays,
+            "days",
+          );
+
+          const jalaliRange = [];
+          for (let i = 0; i < numDays; i++) {
+            jalaliRange.push(
+              `N'${start.clone().add(i, "days").format("jYYYY/jMM/jDD")}'`,
+            );
+          }
+
+          const dailyCapicityQuery = `
+            USE RAMP_Daily;
+            SELECT SUM(Capicity) as TotalCapicity
+            FROM depos
+            WHERE Start_Date IN (${jalaliRange.join(", ")})
+          `;
+          const result = await sql.query(dailyCapicityQuery);
+          prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
+        }
 
         // 👇 query latest depo
         const depoQuery = `
@@ -535,7 +575,6 @@ export const depoRouter = createTRPCRouter({
           FROM depos
           WHERE Start_Date = N'${depoDate}'
         `;
-        console.log(`%c${depoQuery}`, "color: green;");
         const depoResult = await sql.query(depoQuery);
         const latestDepo = depoResult.recordset[0]?.DepoTotal ?? 0;
 
@@ -547,18 +586,18 @@ export const depoRouter = createTRPCRouter({
           FROM depos
           WHERE Start_Date IN (${dateList})
         `;
-        console.log(`%c${entryQuery}`, "color: green;");
+
         const entryResult = await sql.query(entryQuery);
         const entryTotal = entryResult.recordset[0]?.EntryTotal ?? 0;
 
         // ✅ Calculate estimate
-        const estimate = latestDepo / (prevMonthCapicity - entryTotal);
+        const estimate = latestDepo / (prevCapicity - entryTotal || 1);
 
         console.log("END ESTIMATE");
         return {
           latestDepo,
           depoDate,
-          prevMonthCapicity,
+          prevCapicity,
           entryTotal,
           estimate,
         };
