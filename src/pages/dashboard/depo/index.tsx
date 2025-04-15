@@ -1047,7 +1047,7 @@ const Child = memo(function Child({
                         </H2>
                         <p dir="rtl" className="text-primary">
                           {" "}
-                          ( ورودی - رسیدگی شده ماه فبل ) / دپو{" "}
+                          ( ورودی - رسیدگی شده ماه قبل ) / دپو{" "}
                         </p>
                         <SimpleTable
                           className="flex justify-start border-none"
