@@ -1077,6 +1077,10 @@ const Child = memo(function Child({
                           valueFormatter={commify}
                           noDataText={Text.noData.fa}
                         /> */}
+                        <span className="text-primary">
+                          نتیجه عددی فرمول :{" "}
+                          {parseFloat(depoEstimate?.data?.estimate.toFixed(2))}
+                        </span>
                         {depo.data?.periodType && (
                           <div className="w-full">
                             <div className="text-accent">
