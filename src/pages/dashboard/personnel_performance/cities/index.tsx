@@ -396,7 +396,7 @@ export default function CitiesPage({ children }) {
                         <SelectControlled
                           withSelectAll
                           title={"نام شهر"}
-                          list={getInitialFilters.data.TownNames}
+                          list={getInitialFilters.data?.TownNames ?? []}
                           value={filters.filter.TownName ?? []}
                           onChange={(values) => {
                             //@ts-ignore
