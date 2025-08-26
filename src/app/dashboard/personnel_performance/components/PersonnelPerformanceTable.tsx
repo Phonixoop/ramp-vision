@@ -1,0 +1,352 @@
+"use client";
+import { useSession } from "next-auth/react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { api } from "~/trpc/react";
+import moment from "jalali-moment";
+import { toast } from "sonner";
+
+import Table from "~/features/table";
+import { FilterType, PeriodType } from "~/context/personnel-filter.context";
+import {
+  distinctPersonnelPerformanceData,
+  getPerformanceMetric,
+} from "~/utils/personnel-performance";
+import {
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtRoles,
+  getDefaultRoleTypesBaseOnContractType,
+} from "~/constants/personnel-performance";
+import { getPersianToEnglishCity } from "~/utils/util";
+import {
+  CustomColumnDef,
+  PersonnelPerformanceColumns,
+} from "./PersonnelPerformanceColumns";
+import { PersonnelPerformanceFilters } from "./PersonnelPerformanceFilters";
+import { PersonnelPerformanceSummary } from "./PersonnelPerformanceSummary";
+import { PersonnelPerformanceExport } from "./PersonnelPerformanceExport";
+import { ColumnDef } from "@tanstack/react-table";
+import { PersonnelPerformanceData } from "~/app/dashboard/personnel_performance/types";
+
+interface PersonnelPerformanceTableProps {
+  sessionData: any;
+}
+
+export function PersonnelPerformanceTable({
+  sessionData,
+}: PersonnelPerformanceTableProps) {
+  const [toggleDistinctData, setToggleDistinctData] = useState<
+    "Distincted" | "Pure"
+  >("Distincted");
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
+
+  // API Queries
+  const getInitialCities = api.personnelPerformance.getInitialCities.useQuery(
+    undefined,
+    {
+      enabled: sessionData?.user !== undefined,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  const getLastDate = api.personnelPerformance.getLastDate.useQuery(undefined, {
+    enabled: sessionData?.user !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
+
+  // State Management
+  const [filters, setDataFilters] = useState<FilterType>({
+    periodType: reportPeriod,
+    filter: {
+      CityName: getInitialCities.data?.Cities,
+      Start_Date: [
+        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+      ],
+    },
+  });
+
+  const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
+    useState({
+      periodType: reportPeriod,
+      filter: {
+        ContractType: defualtContractTypes,
+        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+      },
+    });
+
+  // Update filters when last date is available
+  useEffect(() => {
+    if (getLastDate.data) {
+      setDataFilters((prev) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          Start_Date: [getLastDate.data],
+        },
+      }));
+    }
+  }, [getLastDate.data]);
+
+  // Update filters when initial cities are available
+  useEffect(() => {
+    if (getInitialCities.data?.Cities) {
+      setDataFilters((prev) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          CityName: getInitialCities.data.Cities,
+        },
+      }));
+    }
+  }, [getInitialCities.data?.Cities]);
+
+  // Update filters when default date info is available
+  useEffect(() => {
+    if (defualtDateInfo.data) {
+      setDataFilters((prev) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          DateInfo: [defualtDateInfo.data],
+        },
+      }));
+    }
+  }, [defualtDateInfo.data]);
+
+  // Update filters when default contract types are available
+  useEffect(() => {
+    if (defualtContractTypes.length > 0) {
+      setFiltersWithNoNetworkRequest((prev) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          ContractType: defualtContractTypes,
+          RoleTypes:
+            getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+        },
+      }));
+    }
+  }, [defualtContractTypes]);
+
+  // Update filters when report period changes
+  useEffect(() => {
+    setDataFilters((prev) => ({
+      ...prev,
+      periodType: reportPeriod,
+    }));
+    setFiltersWithNoNetworkRequest((prev) => ({
+      ...prev,
+      periodType: reportPeriod,
+    }));
+  }, [reportPeriod]);
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      // Cleanup any pending operations
+      setDataFilters({
+        periodType: "روزانه",
+        filter: {
+          CityName: [],
+          Start_Date: [],
+        },
+      });
+      setFiltersWithNoNetworkRequest({
+        periodType: "روزانه",
+        filter: {
+          ContractType: [],
+          RoleTypes: [],
+        },
+      });
+    };
+  }, []);
+
+  // Initial filters query
+  const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
+    {
+      filter: {
+        DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data ?? ""],
+        ProjectType: filters.filter.ProjectType,
+      },
+    },
+    {
+      enabled: sessionData?.user !== undefined,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  // Update filters when initial filters are available
+  useEffect(() => {
+    if (initialFilters.data) {
+      setDataFilters((prev) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          ProjectType: initialFilters.data.ProjectType,
+        },
+      }));
+    }
+  }, [initialFilters.data]);
+
+  // Deferred filter for performance
+  const deferredFilter = useDeferredValue({
+    ...filters,
+    periodType: filters.periodType,
+    filter: {
+      ...filters.filter,
+      DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
+      ProjectType: filters.filter.ProjectType,
+    },
+  });
+
+  // Main data query
+  const personnelPerformance = api.personnelPerformance.getAll.useQuery(
+    deferredFilter,
+    {
+      enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
+      refetchOnWindowFocus: false,
+    },
+  );
+  console.log(personnelPerformance.data);
+  // Derived data
+  const distincedData = useMemo(
+    () =>
+      distinctPersonnelPerformanceData(
+        personnelPerformance.data,
+        ["NationalCode", "NameFamily", "CityName"],
+        [
+          "CityName",
+          "NationalCode",
+          "NameFamily",
+          "TownName",
+          "BranchCode",
+          "BranchName",
+          "BranchType",
+          "SabtAvalieAsnad",
+          "PazireshVaSabtAvalieAsnad",
+          "ArzyabiAsanadBimarsetaniDirect",
+          "ArzyabiAsnadBimarestaniIndirect",
+          "ArzyabiAsnadDandanVaParaDirect",
+          "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDaroDirect",
+          "ArzyabiAsnadDaroIndirect",
+          "WithScanCount",
+          "WithoutScanCount",
+          "WithoutScanInDirectCount",
+          "ArchiveDirectCount",
+          "ArchiveInDirectCount",
+          "ArzyabiVisitDirectCount",
+          "Role",
+          "RoleType",
+          "ContractType",
+          "ProjectType",
+          "TotalPerformance",
+          "DirectPerFormance",
+          "InDirectPerFormance",
+          "Start_Date",
+          "DateInfo",
+          "HasTheDayOff",
+        ],
+        { HasTheDayOff: false },
+      ),
+    [personnelPerformance.data],
+  );
+
+  // Table columns configuration
+  const columns = useMemo<CustomColumnDef<PersonnelPerformanceData, any>[]>(
+    () =>
+      PersonnelPerformanceColumns({
+        personnelPerformance: personnelPerformance.data,
+        initialFilters: initialFilters.data,
+        filters,
+        filtersWithNoNetworkRequest,
+        setDataFilters,
+        setFiltersWithNoNetworkRequest,
+        reportPeriod,
+        getLastDate,
+      }),
+    [
+      personnelPerformance.data,
+      filtersWithNoNetworkRequest,
+      filters,
+      initialFilters.data,
+      reportPeriod,
+      getLastDate,
+    ],
+  );
+
+  // Handle row click
+  const handleRowClick = (row: any) => {
+    const original = row.original;
+    toast(original.NameFamily, {
+      description: `عملکرد : ${Math.round(
+        original.TotalPerformance,
+      )} | ${getPerformanceMetric(original.TotalPerformance)?.tooltip.text}`,
+      action: {
+        label: "باشه",
+        onClick: () => {},
+      },
+    });
+  };
+
+  // Toggle data view
+  const toggleDataView = () => {
+    setToggleDistinctData((prev) =>
+      prev === "Distincted" ? "Pure" : "Distincted",
+    );
+  };
+
+  const tableData =
+    toggleDistinctData === "Distincted"
+      ? distincedData
+      : personnelPerformance?.data?.result;
+
+  return (
+    <div
+      className="flex w-full flex-col items-center justify-center gap-5"
+      dir="rtl"
+    >
+      <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
+        جزئیات عملکرد پرسنل شعب (جدول)
+      </h1>
+
+      <div className="flex w-full items-center justify-center rounded-lg py-5 text-center">
+        <Table<PersonnelPerformanceData>
+          hasClickAction
+          onClick={handleRowClick}
+          isLoading={personnelPerformance.isLoading}
+          data={tableData}
+          columns={columns as ColumnDef<PersonnelPerformanceData>[]}
+          renderInFilterView={() => (
+            <PersonnelPerformanceFilters
+              filters={deferredFilter}
+              reportPeriod={reportPeriod}
+              setReportPeriod={setReportPeriod}
+              setDataFilters={setDataFilters}
+              getLastDate={getLastDate}
+            />
+          )}
+          // renderAfterFilterView={(flatRows) => (
+          //   <PersonnelPerformanceExport
+          //     flatRows={flatRows}
+          //     columns={columns as ColumnDef<PersonnelPerformanceData>[]}
+          //     personnelPerformance={personnelPerformance.data}
+          //     filters={filters}
+          //     toggleDistinctData={toggleDistinctData}
+          //     distincedData={distincedData}
+          //   />
+          // )}
+          renderChild={(flatRows) => (
+            <PersonnelPerformanceSummary
+              flatRows={flatRows}
+              toggleDistinctData={toggleDistinctData}
+              onToggleDataView={toggleDataView}
+            />
+          )}
+        />
+      </div>
+    </div>
+  );
+}

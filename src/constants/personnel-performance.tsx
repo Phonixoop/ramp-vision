@@ -99,9 +99,11 @@ export const defualtRoleTypesForMoshavere = [
   "کارشناس ارزیاب اسناد دارویی",
 ];
 
-export function getDefaultRoleTypesBaseOnContractType(projectType) {
+export function getDefaultRoleTypesBaseOnContractType(
+  projectType: string[] = [],
+): string[] {
   if (Array.isArray(projectType)) {
-    const roleTypes = new Set();
+    const roleTypes = new Set<string>();
 
     if (projectType.includes("پرکیس")) {
       defualtRoleTypesForPercase.forEach((roleType) => roleTypes.add(roleType));

@@ -5,7 +5,7 @@ import {
   Loader2Icon,
   LoaderIcon,
 } from "lucide-react";
-import {
+import React, {
   RefObject,
   useDeferredValue,
   useEffect,
@@ -30,6 +30,7 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   FilterFn,
+  Header,
 } from "@tanstack/react-table";
 
 import {
@@ -62,37 +63,39 @@ import Button from "~/ui/buttons";
 import TextField from "~/ui/forms/text-field";
 import withLabel from "~/ui/forms/with-label";
 import useDebounce from "~/hooks/useDebounce";
+import { CustomColumnDef } from "~/app/dashboard/personnel_performance/components/PersonnelPerformanceColumns";
 
-type Props = {
+type Props<TData> = {
   isLoading?: boolean;
-  columns: ColumnDef<any>[];
-  data: any[];
+  columns: CustomColumnDef<TData, string | number | null>[];
+  data: TData[];
   initialFilters?: any;
   clickedRowIndex?: string;
   hasClickAction?: boolean;
-  onClick?: (cell: any) => void;
-  renderChild?: (rows: any[]) => JSX.Element;
-  renderAfterTable?: (rows: any[]) => JSX.Element;
+  onClick?: (cell: TData) => void;
+  renderChild?: (rows: TData[]) => JSX.Element;
+  renderAfterTable?: (rows: TData[]) => JSX.Element;
   renderInFilterView?: () => JSX.Element;
-  renderAfterFilterView?: (rows: Row<any>[]) => JSX.Element;
+  renderAfterFilterView?: (rows: Row<TData>[]) => JSX.Element;
 };
-export default function Table({
+
+export default function Table<TData>({
   isLoading = false,
   columns = [],
   data = [],
   initialFilters = undefined,
   clickedRowIndex = "",
   hasClickAction = false,
-  onClick = (cell) => {},
-  renderChild = (rows) => <></>,
-  renderAfterTable = (rows) => <></>,
+  onClick = (cell: TData) => {},
+  renderChild = (rows: TData[]) => <></>,
+  renderAfterTable = (rows: TData[]) => <></>,
   renderInFilterView = undefined,
-  renderAfterFilterView = (rows) => <></>,
-}: Props) {
+  renderAfterFilterView = (rows: Row<TData>[]) => <></>,
+}: Props<TData>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const table = useReactTable({
+  const table = useReactTable<TData>({
     data: data,
     columns,
 
@@ -182,19 +185,23 @@ export default function Table({
                     {renderInFilterView()}
                     {table.getHeaderGroups().map((headerGroup) => {
                       return headerGroup.headers.map((header, index) => {
-                        //@ts-ignore
-
-                        if (columns[index].Filter)
-                          //@ts-ignore
-                          return <>{columns[index].Filter(header)}</>;
+                        if (columns[index]?.Filter)
+                          return (
+                            <React.Fragment key={`filter-${header.id}`}>
+                              {columns[index].Filter(
+                                header as Header<TData, string | number | null>,
+                              )}
+                            </React.Fragment>
+                          );
+                        return null;
                       });
                     })}
                   </div>
                 </div>
               )}
-              {renderInFilterView !== undefined && (
+              {/* {renderInFilterView !== undefined && (
                 <div> {renderAfterFilterView(flatRows)}</div>
-              )}
+              )} */}
             </>
           )}
         </ResponsiveView>
@@ -344,7 +351,7 @@ export default function Table({
                         // Apply the row props
                         <tr
                           style={{ overflowAnchor: "none" }}
-                          onClick={() => onClick(row)}
+                          onClick={() => onClick(row.original)}
                           key={index}
                           // {...restRowProps}
 
@@ -459,6 +466,12 @@ function DebouncedInput({
   label = "",
   placeholder = "",
   delay = 250,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  label?: string;
+  placeholder?: string;
+  delay?: number;
 }) {
   const [inputValue, setInputValue] = useState(value);
 
@@ -470,7 +483,7 @@ function DebouncedInput({
    */
   useEffect(() => {
     onChange(deferredValue);
-  }, [deferredValue]);
+  }, [deferredValue, onChange]);
 
   return (
     <div className="flex flex-col items-end justify-center ">

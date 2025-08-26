@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+html[data-theme="theme-light-4"] {
+  --primary: 8, 12, 10;
+  --secondary: 206, 204, 188;
+  --primbuttn: 61, 87, 71;
+  --secbuttn: 197, 188, 171;
+  --accent: 85, 119, 97;
+}
+
+html[data-theme="theme-dark-1"] {
+  --primary: 244, 246, 245;
+  --secondary: 10, 10, 10;
+
+  --primbuttn: 198, 88, 97;
+
+  --secbuttn: 23, 23, 23;
+
+  --accent: 237, 33, 124;
+}
+
+/* backup */
+/* --primary: 244, 246, 245;
+  --secondary: 7, 12, 19;
+  --primbuttn: 198, 88, 97;
+  --secbuttn: 13, 20, 33;
+  --accent: 237, 33, 124; */
+
+/* --primbuttn: 75, 113, 100; */
+/* --primbuttn: 141, 165, 163; */
+/* --secbuttn: 10, 10, 10; */
+/* --accent: 190, 255, 255; */
+
 .theme-light-1 {
   --primary: 29, 13, 7;
   --secondary: 250, 239, 235;
@@ -104,7 +135,7 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
-  @font-face {
+  /* @font-face {
     font-family: "Iransans";
     src:
       local("Iransans"),
@@ -112,7 +143,7 @@
     font-weight: 400;
     font-display: swap;
     font-style: normal;
-  }
+  } */
 }
 
 h1,
@@ -461,9 +492,9 @@ input[type="number"] {
 
 /*  svg animtion */
 
-.animate-path {
+/* .animate-path {
   stroke-dasharray: 7;
-}
+} */
 
 /* guage */
 

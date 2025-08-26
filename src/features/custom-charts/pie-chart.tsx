@@ -89,16 +89,26 @@ const renderActiveShape = (props) => {
   );
 };
 
-export default function CustomPieChart({ className = "", data = [], index }) {
+export default function CustomPieChart<
+  T extends { name: string; value: number },
+>({
+  className = "",
+  data = [],
+  index,
+}: {
+  className?: string;
+  data: T[];
+  index: keyof T;
+}) {
   const [activeBar, setActiveBar] = useState({
     index: 0,
-    name: data[0].name,
+    name: data[0]?.name,
   });
 
-  function onPieEnter(data, index) {
+  function onPieEnter(data, name, index) {
     setActiveBar({
       index,
-      name: data.name,
+      name,
     });
   }
   // function onPieLeave() {

@@ -59,7 +59,7 @@ export default function DatePickerPeriodic({
         }}
       >
         {hidePeriodSelection == false && (
-          <LayoutGroup id="DateMenu">
+          <LayoutGroup id="DatePickerPeriodicMenu">
             <div
               dir={"rtl"}
               className="mx-0  w-fit rounded-lg bg-secondary p-2"
@@ -73,6 +73,7 @@ export default function DatePickerPeriodic({
                     ? 1
                     : 2
                 }
+                collapsedUi={false}
                 onChange={(value) => {
                   // openCalendar();
                   setReportPeriod(value.item.name);

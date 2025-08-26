@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 
 type TUserContext = {
   user: User;

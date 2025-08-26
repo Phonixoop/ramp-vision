@@ -34,7 +34,7 @@ export const reloadSession = () => {
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function en(inputString): string {
+export function en(inputString: string): string {
   const persianToEnglishMap = {
     "۰": "0",
     "۱": "1",
@@ -168,19 +168,20 @@ export function en(inputString): string {
 //   }, []);
 // }
 
-export function processDataForChart(
-  rawData,
-  // can be array
-  groupBy,
-  values = [],
-  where = {},
-  options = { max: [] },
-) {
-  return rawData.reduce((acc, current) => {
+type ProcessDataForChartOptions = {
+  rawData: any[];
+  groupBy: string | string[];
+  values: string[];
+  where?: Record<string, string | string[]>;
+  options?: { max: string[] };
+};
+export function processDataForChart(input: ProcessDataForChartOptions) {
+  const { rawData, groupBy, values, where, options } = input;
+  return rawData?.reduce((acc, current) => {
     const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
 
     // Check if the current item meets the 'where' conditions
-    const meetsConditions = Object.entries(where).every(
+    const meetsConditions = Object.entries(where ?? {}).every(
       ([conditionKey, conditionValues]) => {
         if (Array.isArray(conditionValues)) {
           return conditionValues.includes(current[conditionKey]);
@@ -201,7 +202,7 @@ export function processDataForChart(
 
     if (existingGroupIndex !== -1) {
       for (const value of values) {
-        if (options.max && options.max.includes(value)) {
+        if (options?.max && options.max.includes(value)) {
           // If it's in the max array, keep the maximum value
           acc[existingGroupIndex][value] = Math.max(
             acc[existingGroupIndex][value] || 0,
@@ -445,7 +446,7 @@ export function humanizeDuration(value, tag) {
   const minutes = Math.floor((seconds % secondsPerHour) / secondsPerMinute);
   const remainingSeconds = seconds % secondsPerMinute;
 
-  const timeComponents = [];
+  const timeComponents = [""];
 
   if (years > 0) timeComponents.push(`${years} سال`);
   if (months > 0) timeComponents.push(`${months} ماه`);
@@ -508,7 +509,7 @@ export function updateDynamicPermissions(
     if (dynamicPermissionMap.has(staticPermission.id)) {
       // If the permission exists in dynamic, use it
       updatedDynamicPermissions.push(
-        dynamicPermissionMap.get(staticPermission.id),
+        dynamicPermissionMap.get(staticPermission.id) ?? staticPermission,
       );
     } else {
       // If the permission doesn't exist in dynamic, use the static one
@@ -521,7 +522,7 @@ export function updateDynamicPermissions(
 
 export function DistinctData(data = [], dateLength) {
   const result = Object.values(
-    data.reduce((acc, item) => {
+    data.reduce((acc, item: any) => {
       const key = item.NameFamily;
       if (!acc[key]) {
         acc[key] = {
@@ -559,7 +560,7 @@ export function DistinctData(data = [], dateLength) {
 export function calculateAggregateByFields(data = [], operations) {
   const aggregatedData = {};
 
-  data.forEach((item) => {
+  data.forEach((item: any) => {
     const key = item.CityName;
     if (!aggregatedData[key]) {
       aggregatedData[key] = { CityName: key };
@@ -629,9 +630,11 @@ export function analyzePerformanceTrend(
   let stable = 0;
 
   for (let i = 1; i < values?.length; i++) {
-    if (values[i] > values[i - 1]) {
+    const current = values[i];
+    const previous = values[i - 1];
+    if (current && previous && current > previous) {
       growing++;
-    } else if (values[i] < values[i - 1]) {
+    } else if (current && previous && current < previous) {
       goingDown++;
     } else {
       stable++;

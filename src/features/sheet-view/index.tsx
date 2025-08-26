@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "~/components/ui/sheet";
+} from "~/components/shadcn/sheet";
 
 import React from "react";
 import Button from "~/ui/buttons";

@@ -50,7 +50,7 @@ export const personnelRouter = createTRPCRouter({
       try {
         // Connect to SQL Server
 
-        let finalResult = [];
+        // let finalResult = [];
         const permissions = await getPermission({ ctx });
         const cities = permissions
           .find((permission) => permission.id === "ViewCities")
@@ -71,7 +71,7 @@ export const personnelRouter = createTRPCRouter({
 
          ${whereClause}`;
 
-        console.log(query);
+        // console.log(query);
         const result = await sql.query(query);
 
         //  console.log(result.recordsets[0]);

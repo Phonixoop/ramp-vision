@@ -4,7 +4,7 @@ import { Permission } from "~/types";
 export const MENU = [
   {
     value: "خانه",
-    link: "/",
+    link: "",
   },
   {
     value: "راهنما",
@@ -114,7 +114,6 @@ export const City_Levels: {
     name: "درجه دو",
     cities: [
       "Chahar Mahaal and Bakhtiari",
-      ,
       "Khorasan, North",
       "Khorasan, South",
       "Kurdistan",

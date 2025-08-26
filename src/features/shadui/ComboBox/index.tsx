@@ -4,19 +4,19 @@ import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "~/lib/utils";
-import { Button } from "~/components/ui/button";
+import { Button } from "~/components/shadcn/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "~/components/ui/command";
+} from "~/components/shadcn/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/ui/popover";
+} from "~/components/shadcn/popover";
 
 type Input = {
   label: string;
@@ -63,7 +63,7 @@ export function ComboBox({
                 key={item.value}
                 onSelect={(currentValue) => {
                   const v = values.find(
-                    (item) => item.label === currentValue
+                    (item) => item.label === currentValue,
                   ).value;
                   onChange(v);
 
@@ -73,7 +73,7 @@ export function ComboBox({
                 <Check
                   className={cn(
                     "ml-2 h-4 w-4 stroke-accent text-primbuttn",
-                    value === item.value ? " opacity-100" : "opacity-0"
+                    value === item.value ? " opacity-100" : "opacity-0",
                   )}
                 />
                 {value === item.value + "s"}

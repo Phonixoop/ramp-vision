@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table";
+} from "~/components/shadcn/table";
 import { TableJson } from "~/types";
 import H2 from "~/ui/heading/h2";
 import { commify, isNumber } from "~/utils/util";

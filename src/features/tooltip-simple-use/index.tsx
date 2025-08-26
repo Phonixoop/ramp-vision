@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "~/components/ui/tooltip";
+} from "~/components/shadcn/tooltip";
 export default function ToolTipSimple({
   children,
   tooltip = <></>,

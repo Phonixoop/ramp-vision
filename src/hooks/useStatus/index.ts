@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect } from "react";
-import { toast } from "~/components/ui/toast/use-toast";
+import { toast } from "~/components/shadcn/toast/use-toast";
 
 export default function useStatus() {
   const [isOnline, setIsOnline] = useState<boolean>(true);
@@ -16,13 +16,20 @@ export default function useStatus() {
 
   const useIsomorphicLayoutEffect = canUseDOM ? useLayoutEffect : useEffect;
 
+  const handleOffline = () => {
+    toast({
+      title: "آفلاین",
+    });
+    setIsOnline(false);
+  };
+
+  const handleOnline = () => {
+    setIsOnline(true);
+  };
+
   useIsomorphicLayoutEffect(() => {
-    window.addEventListener("offline", () => {
-      setIsOnline(false);
-    });
-    window.addEventListener("online", () => {
-      setIsOnline(true);
-    });
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleOnline);
     if (
       navigator.userAgent.match(/Android/i) ||
       navigator.userAgent.match(/webOS/i) ||
@@ -43,15 +50,8 @@ export default function useStatus() {
       });
     }
     return () => {
-      window.removeEventListener("offline", () => {
-        toast({
-          title: "آفلاین",
-        });
-        setIsOnline(false);
-      });
-      window.removeEventListener("online", () => {
-        setIsOnline(true);
-      });
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", handleOnline);
     };
   }, []);
 

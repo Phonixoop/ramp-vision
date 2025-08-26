@@ -12,6 +12,7 @@ function withOpacity(variableName: string) {
 export default {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/app/**/*.{js,ts,jsx,tsx}",
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}", // Tremor module
   ],
   theme: {
@@ -19,7 +20,7 @@ export default {
     current: "currentColor",
     extend: {
       fontFamily: {
-        iransans: "Iransans",
+        iransans: ["var(--font-iransans)"],
       },
       textColor: {
         primary: withOpacity("--primary"),
@@ -282,6 +283,7 @@ export default {
     require("tailwind-scrollbar")({ nocompatible: true }),
     require("@headlessui/tailwindcss"),
     require("tailwindcss-bg-patterns"),
+    require("tailwindcss-aria-attributes"),
     function ({ matchUtilities, addUtilities, theme }) {
       matchUtilities({
         "ss-text": (value) => {

@@ -4,7 +4,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "~/components/ui/tooltip";
+} from "~/components/shadcn/tooltip";
 import { analyzePerformanceTrend } from "~/utils/util";
 
 export function TrendDecider({ values }: { values: number[] }) {

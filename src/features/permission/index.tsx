@@ -1,7 +1,7 @@
 import { ListRestartIcon } from "lucide-react";
 import { useState } from "react";
 import { Permission } from "~/types";
-import { Switch } from "~/components/ui/switch";
+import { Switch } from "~/components/shadcn/switch";
 import { PERMISSIONS } from "~/constants";
 import Button from "~/ui/buttons";
 

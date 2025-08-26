@@ -2,6 +2,7 @@ import React, { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { motion, MotionProps } from "framer-motion";
 import { twMerge } from "tailwind-merge";
+import { cn } from "~/lib/utils";
 
 type ButtonProps = {
   children: ReactNode;
@@ -28,7 +29,7 @@ export default function Button({
   ...rest
 }: ButtonProps) {
   const enabledClass = `hover:bg-opacity-95 cursor-pointer`;
-  const busyClass = `bg-gray-200 text-gray-500 cursor-not-allowed`;
+  const busyClass = `bg-gray-200  text-gray-500 cursor-not-allowed`;
 
   return (
     <motion.button
@@ -43,10 +44,10 @@ export default function Button({
       dir="rtl"
       type={type}
       onClick={onClick}
-      className={twMerge(
-        "duration-400 relative flex select-none items-center justify-center rounded-lg p-2 text-primary",
+      className={cn(
+        "duration-400 relative flex select-none items-center justify-center rounded-lg p-2 text-primary ",
         className,
-        !disabled ? enabledClass : busyClass,
+        disabled ? busyClass : enabledClass,
         isLoading ? "bg-opacity-10" : "",
       )}
       {...rest}

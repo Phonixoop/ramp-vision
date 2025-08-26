@@ -16,7 +16,7 @@ import {
   defualtRoles,
 } from "~/constants/personnel-performance";
 import H2 from "~/ui/heading/h2";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import {
   calculateAggregateByFields,
   getPersianToEnglishCity,

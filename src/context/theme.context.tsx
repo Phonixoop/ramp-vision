@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Default_Theme } from "~/constants/theme";
 
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 
 type TThemeContext = {
   theme: string;

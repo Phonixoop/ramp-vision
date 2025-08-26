@@ -80,15 +80,15 @@ export function distinctDataAndCalculatePerformance(
   //   };
   // });
 
-  const citiesWithPerformanceData = processDataForChart(
-    data?.result ?? [],
+  const citiesWithPerformanceData = processDataForChart({
+    rawData: data?.result ?? [],
     groupBy,
     values,
     where,
     // {
     //   max: ["COUNT"],
     // },
-  );
+  });
   const r = mapToCitiesWithPerformance({
     dateLengthPerCity: data?.dateLength,
     result: citiesWithPerformanceData,
@@ -132,13 +132,12 @@ export function distinctPersonnelPerformanceData(
   //     TotalPerformance: 5,
   //   };
   // });
-  return processDataForChart(
-    data?.result ?? [],
-
+  return processDataForChart({
+    rawData: data?.result ?? [],
     groupBy,
     values,
     where,
-  ).map((item) => {
+  }).map((item) => {
     // const city =
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
@@ -190,9 +189,10 @@ export function sparkChartForPersonnel(
 ) {
   return data
     ?.filter(
-      (a) => a[propertyToCheck] === valueToCheck && a.HasTheDayOff === false,
+      (a: any) =>
+        a[propertyToCheck] === valueToCheck && a.HasTheDayOff === false,
     )
-    .map((item) => {
+    .map((item: any) => {
       // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
       return {
@@ -200,7 +200,7 @@ export function sparkChartForPersonnel(
         Start_Date: item.Start_Date,
         Benchmark: 75,
         Benchmark2: 120,
-        ...selectExtraProperty.reduce((acc, curr) => {
+        ...selectExtraProperty.reduce((acc: any, curr) => {
           acc[curr] = item[curr];
           return acc;
         }, {}),
@@ -211,7 +211,7 @@ export function sparkChartForPersonnel(
 export function sparkChartForCity(data = [], propertyToCheck, valueToCheck) {
   return data
     ?.filter((a) => a[propertyToCheck] === valueToCheck)
-    .map((item) => {
+    .map((item: any) => {
       // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
       return {
@@ -247,7 +247,7 @@ export function getMonthNamesFromJOINED_date_strings(
     // if (datesSplitted.length >= 2)
     //   return `${datesSplitted[0]} ~ ${datesSplitted[datesSplitted.length - 1]}`;
     // return dates;
-    const date = datesSplitted[datesSplitted.length - 1];
+    const date = datesSplitted[datesSplitted.length - 1] ?? "";
 
     const weekNumber = getWeekOfMonth(date);
     const weekName = `هفته ${weekNumber} ${getMonthName(date)}`;

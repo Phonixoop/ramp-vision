@@ -19,7 +19,13 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": false
   },
   "include": [
     ".eslintrc.cjs",
@@ -28,8 +34,8 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "src/pages/_document.jsx",
-    "src/ui/forms/search-field/index.jsx"
+    "src/ui/forms/search-field/index.jsx",
+    ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "src/pages1/**/*"]
 }

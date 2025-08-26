@@ -1,0 +1,28 @@
+export type PersonnelPerformanceData = {
+  Id: number;
+  CityName: string;
+  NameFamily: string;
+  ProjectType: string;
+  ContractType: string;
+  Role: string;
+  RoleType: string;
+  TotalPerformance: number;
+  DirectPerFormance: number;
+  InDirectPerFormance: number;
+  SabtAvalieAsnad: number;
+  PazireshVaSabtAvalieAsnad: number;
+  ArzyabiAsanadBimarsetaniDirect: number;
+  ArzyabiAsnadBimarestaniIndirect: number;
+  ArzyabiAsnadDandanVaParaDirect: number;
+  ArzyabiAsnadDandanVaParaIndirect: number;
+  ArzyabiAsnadDaroDirect: number;
+  ArzyabiAsnadDaroIndirect: number;
+  WithScanCount: number;
+  WithoutScanInDirectCount: number;
+  WithoutScanCount: number;
+  ArchiveDirectCount: number;
+  ArchiveInDirectCount: number;
+  ArzyabiVisitDirectCount: number;
+  Start_Date: string;
+  DateInfo: string;
+};

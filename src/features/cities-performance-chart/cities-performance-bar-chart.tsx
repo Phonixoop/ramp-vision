@@ -1,6 +1,6 @@
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import {
   distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
@@ -136,11 +136,11 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
     );
 
     const rrr = Object.entries(resultGroupByStartDate)?.map(([key, value]) => {
-      const vv: any = processDataForChart(
-        value,
-        ["Start_Date", "CityName"],
-        ["TotalPerformance", "COUNT"],
-      );
+      const vv: any = processDataForChart({
+        rawData: value,
+        groupBy: ["Start_Date", "CityName"],
+        values: ["TotalPerformance", "COUNT"],
+      });
 
       return {
         key: { Start_Date: key },

@@ -8,6 +8,7 @@ import { getPathName } from "~/utils/util";
 import { twMerge } from "tailwind-merge";
 import { ChevronDownIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "~/ui/buttons";
+import { usePathname } from "next/navigation";
 export type MenuItem = {
   value: string;
   link: string;
@@ -28,8 +29,8 @@ export default function Menu({
   isSub = false,
 }: MenuInput) {
   const [activeIndex, setActiveIndex] = useState(-1);
-  const router = useRouter();
-  const pathName = router.asPath;
+
+  const pathName = usePathname();
 
   return (
     <motion.div
@@ -81,7 +82,7 @@ function MenuItem({
 
   const { link, value } = item;
   return (
-    <Link href={`${rootPath}/${link}`} className=" group w-full text-center">
+    <Link href={link} className=" group w-full text-center">
       <div
         className={twMerge(
           "  relative z-0 flex items-center justify-center  gap-2 rounded-sm px-3 py-2 text-sm",
@@ -93,20 +94,21 @@ function MenuItem({
       >
         {isHovered && (
           <motion.div
+            key={`bg-follower-${index}`}
             transition={{
               duration: 0.15,
             }}
-            layoutId="bg-follower"
+            layoutId={`bg-follower-${theme}`}
             className={twMerge(
-              "absolute inset-0 -z-10 bg-primary text-accent  opacity-0 transition-opacity duration-1000 group-hover:opacity-100 ",
-              theme === "solid" ? "rounded-md" : "rounded-full ",
+              "absolute inset-0 -z-10 bg-primary text-accent opacity-0 transition-opacity duration-1000 group-hover:opacity-100",
+              theme === "solid" ? "rounded-md" : "rounded-full",
             )}
           />
         )}
 
         {isActive && (
           <motion.div
-            layoutId="underline"
+            layoutId={`underline-${theme}`}
             className="absolute -bottom-[5px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primary text-accent"
           />
         )}
@@ -146,7 +148,7 @@ export function InPageMenu({
   className = "",
   startIndex = -1,
   index = -1,
-  list = [],
+  list = [""],
   collapsedUi = false,
   onChange = (value) => {},
 }) {
@@ -276,7 +278,7 @@ function InPageMenuItem({ text, isHovered = false, isActive = false }) {
           transition={{
             duration: 0.15,
           }}
-          layoutId="bg-follower-inpage"
+          layoutId="bg-follower-inpage-hover"
           className="absolute inset-0 -z-10 h-[80%] rounded-md bg-primbuttn/30 opacity-0 transition-opacity duration-1000 group-hover:opacity-100 "
         />
       )}
@@ -284,14 +286,14 @@ function InPageMenuItem({ text, isHovered = false, isActive = false }) {
       {isActive && (
         <>
           <motion.div
-            layoutId="underline-inpage"
+            layoutId="underline-inpage-active"
             className="absolute -bottom-[2px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primbuttn"
           />
           <motion.div
             transition={{
               duration: 0.15,
             }}
-            layoutId="bg-follower-inpage"
+            layoutId="bg-follower-inpage-active"
             className="absolute inset-0 -z-10 h-[80%] rounded-md border border-primary  transition-opacity duration-1000  "
           />
         </>

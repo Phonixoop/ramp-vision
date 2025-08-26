@@ -23,6 +23,7 @@ export default function ResponsiveView({
         {icon}
       </Button>
       <Modal
+        key={`responsive-modal-${isOpen}`}
         isOpen={isOpen}
         onClose={() => {
           setIsOpen(false);

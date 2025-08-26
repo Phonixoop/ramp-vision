@@ -7,7 +7,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "~/components/ui/drawer";
+} from "~/components/shadcn/drawer";
 
 import React from "react";
 import Button from "~/ui/buttons";
