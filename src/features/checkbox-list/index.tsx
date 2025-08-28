@@ -447,6 +447,7 @@ type SelectColumnFilterOptimizedProps<T> = {
 };
 export function SelectColumnFilterOptimized<T>({
   column,
+
   values,
   initialFilters = [""],
   selectedValues = [""],
@@ -459,17 +460,21 @@ export function SelectColumnFilterOptimized<T>({
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
   const { getFilterValue, setFilterValue } = column as Column<T>;
+
   const [isProcessing, setIsProcessing] = useState(false);
 
   const [uniqueValues, setUniqueValues] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredValues = getFilterValue() as T[];
+  const filteredValues = (getFilterValue() as T[]) ?? [];
 
   // Memoize unique values calculation to avoid recalculating on every render
   useLayoutEffect(() => {
-    if (!values || values.length === 0) return;
+    if (!values || values.length === 0) {
+      setUniqueValues(initialFilters as string[]);
+      return;
+    }
 
     const processData = () => {
       const unique: string[] = Array.from(
@@ -504,7 +509,7 @@ export function SelectColumnFilterOptimized<T>({
   const finalValues =
     selectedValues?.length <= 0 ? filteredValues : selectedValues ?? [];
 
-  const selectedCount = finalValues ? (finalValues as any).length : 0;
+  // const selectedCount = finalValues ? (finalValues as any).length : 0;
   const isAllSelected = filteredValues.length === uniqueValues.length;
 
   const handleFilterChange = (values: string[]) => {
@@ -537,7 +542,8 @@ export function SelectColumnFilterOptimized<T>({
       values: values,
     });
   };
-
+  console.log("uniqueValues", uniqueValues);
+  console.log("filteredValues", filteredValues);
   // Filter and paginate items
   const filteredItems = uniqueValues.filter((item) =>
     item.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -555,29 +561,26 @@ export function SelectColumnFilterOptimized<T>({
 
   return (
     <div className="flex w-full items-center justify-center gap-2 px-2 text-center text-primary sm:px-0 ">
-      <span> {uniqueValues.length}</span>
-      <span> {JSON.stringify(filteredValues)}</span>
-
       <MultiSelect
-        defaultValues={uniqueValues}
+        singleSelect={singleSelect}
         values={filteredValues as string[]}
-        onValuesChange={handleFilterChange}
+        onValuesChange={(values) => {
+          console.log("values", values);
+          console.log("filteredValues", filteredValues);
+          handleFilterChange(values as string[]);
+        }}
       >
         <MultiSelectTrigger className="min-w-0">
           <MultiSelectValue overflowBehavior="cutoff" placeholder="جستجو..." />
         </MultiSelectTrigger>
-        <MultiSelectContent
-          search={{
-            emptyMessage: "موردی یافت نشد",
-            placeholder: "جستجو...",
-          }}
-        >
-          <CommandInput
-            placeholder="جستجو..."
-            value={searchTerm}
-            onValueChange={handleSearchChange}
-            className="border-0 focus:ring-0"
-          />
+        {/* <CommandInput
+          placeholder="جستجو..."
+          value={searchTerm}
+          onValueChange={handleSearchChange}
+          className="sticky top-0  border-0 bg-secbuttn focus:ring-0"
+        /> */}
+
+        <MultiSelectContent search={false}>
           <MultiSelectGroup>
             {isProcessing ? (
               <div className="flex items-center justify-center p-4 text-sm text-primary/60">
@@ -593,38 +596,35 @@ export function SelectColumnFilterOptimized<T>({
                     </p>
                   </MultiSelectItem>
                 ))}
-
-                {/* Pagination for large datasets */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 border-t border-primary/10 p-2">
-                    <Button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs "
-                    >
-                      قبلی
-                    </Button>
-                    <div className="flex items-center gap-2 text-xs text-primary/60">
-                      <span className="text-primary">{totalPages}</span>
-                      <span>از </span>
-                      <span className="text-primary">{currentPage}</span>
-                    </div>
-                    <Button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs hover:bg-primary/10"
-                    >
-                      بعدی
-                    </Button>
-                  </div>
-                )}
               </>
             )}
           </MultiSelectGroup>
+          {/* Pagination for large datasets */}
+          {totalPages > 1 && (
+            <div className="sticky bottom-0 flex items-center justify-center gap-2 border-t border-primary/10 bg-secbuttn p-2">
+              <Button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs "
+              >
+                قبلی
+              </Button>
+              <div className="flex items-center gap-2 text-xs text-primary/60">
+                <span className="text-primary">{totalPages}</span>
+                <span>از </span>
+                <span className="text-primary">{currentPage}</span>
+              </div>
+              <Button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs hover:bg-primary/10"
+              >
+                بعدی
+              </Button>
+            </div>
+          )}
         </MultiSelectContent>
       </MultiSelect>
 
@@ -643,7 +643,7 @@ export function SelectColumnFilterOptimized<T>({
                       : "border border-primary/10  p-1 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20",
                   )}
                   onClick={() => {
-                    if (selectedCount == uniqueValues.length) {
+                    if (isAllSelected) {
                       handleFilterChange([]);
                     } else {
                       handleFilterChange(uniqueValues);

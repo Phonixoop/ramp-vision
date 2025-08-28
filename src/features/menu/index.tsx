@@ -33,7 +33,7 @@ export default function Menu({
   const pathName = usePathname();
 
   return (
-    <motion.div
+    <motion.li
       className={twMerge(
         "  z-0 flex w-full cursor-pointer  items-stretch gap-3 overflow-hidden overflow-x-auto  px-1 py-1  scrollbar-none md:w-fit md:max-w-full",
         theme === "solid" ? "" : "rounded-[30px]  bg-secbuttn",
@@ -64,7 +64,7 @@ export default function Menu({
           </motion.span>
         );
       })}
-    </motion.div>
+    </motion.li>
   );
 }
 
@@ -82,8 +82,9 @@ function MenuItem({
 
   const { link, value } = item;
   return (
-    <Link href={link} className=" group w-full text-center">
-      <div
+    <div className=" group w-full text-center">
+      <Link
+        href={link}
         className={twMerge(
           "  relative z-0 flex items-center justify-center  gap-2 rounded-sm px-3 py-2 text-sm",
           isActive ? "text-primary hover:text-secondary" : " text-primary",
@@ -94,11 +95,11 @@ function MenuItem({
       >
         {isHovered && (
           <motion.div
-            key={`bg-follower-${index}`}
+            key={`bg-follower`}
             transition={{
               duration: 0.15,
             }}
-            layoutId={`bg-follower-${theme}`}
+            layoutId={`bg-follower`}
             className={twMerge(
               "absolute inset-0 -z-10 bg-primary text-accent opacity-0 transition-opacity duration-1000 group-hover:opacity-100",
               theme === "solid" ? "rounded-md" : "rounded-full",
@@ -108,7 +109,7 @@ function MenuItem({
 
         {isActive && (
           <motion.div
-            layoutId={`underline-${theme}`}
+            layoutId={`underline`}
             className="absolute -bottom-[5px] left-0 -z-10 h-[3px]  w-full  rounded-full bg-primary text-accent"
           />
         )}
@@ -119,7 +120,7 @@ function MenuItem({
         {item.subMenu && (
           <ChevronDownIcon className="stroke-primary group-hover:stroke-secondary" />
         )}
-      </div>
+      </Link>
 
       {item.subMenu && item.subMenu.length > 0 && (
         <ul className="absolute hidden rounded group-hover:block">
@@ -130,7 +131,7 @@ function MenuItem({
           />
         </ul>
       )}
-    </Link>
+    </div>
   );
 }
 type InPageMenuType = {

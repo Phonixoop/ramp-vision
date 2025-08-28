@@ -5,7 +5,8 @@
 html[data-theme="theme-light-4"] {
   --primary: 8, 12, 10;
   --secondary: 206, 204, 188;
-  --primbuttn: 61, 87, 71;
+  /* --primbuttn: 61, 87, 71; */
+  --primbuttn: 76, 170, 136;
   --secbuttn: 197, 188, 171;
   --accent: 85, 119, 97;
 }
@@ -14,7 +15,7 @@ html[data-theme="theme-dark-1"] {
   --primary: 244, 246, 245;
   --secondary: 10, 10, 10;
 
-  --primbuttn: 198, 88, 97;
+  --primbuttn: 76, 170, 136;
 
   --secbuttn: 23, 23, 23;
 
@@ -860,4 +861,8 @@ input[type="number"] {
 }
 .sizeforh2 {
   font-size: clamp(0.2rem, 12vw + 1rem, 1.875rem);
+}
+.liquid-filter {
+  -webkit-filter: url(#liquid);
+  filter: url(#liquid);
 }

@@ -418,7 +418,7 @@ export default function Table<TData>({
                 <tfoot>
                   {table.getFooterGroups().map((footerGroup) => {
                     return (
-                      <>
+                      <React.Fragment key={footerGroup.id}>
                         <tr key={footerGroup.id}>
                           {footerGroup.headers.map((header) => {
                             const content = flexRender(
@@ -444,7 +444,7 @@ export default function Table<TData>({
                             );
                           })}
                         </tr>
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </tfoot>

@@ -64,24 +64,24 @@ export default function Home() {
       <div className=" flex min-h-screen w-full flex-col items-center justify-center  overflow-hidden bg-secondary py-5 transition-colors duration-1000 ">
         <section
           dir="rtl"
-          className=" relative mx-auto flex h-[70vh]  max-w-[1000px] flex-col items-center justify-center gap-7 p-5"
+          className=" relative mx-auto flex h-[70vh]  max-w-5xl flex-col items-center justify-center gap-7 p-5"
         >
           <div
             dir="rtl"
-            className=" relative mx-auto flex  max-w-[1000px] flex-col items-center justify-center gap-7 p-5"
+            className=" relative mx-auto flex  w-full flex-col items-center justify-center gap-7 p-5"
           >
             <div className=" hidden items-center justify-center gap-5 text-primary lg:flex">
               <span className="flex items-center justify-center rounded-full bg-teal-900 px-2 py-0.5 text-sm text-teal-300">
                 جدید
               </span>
-              <p className="text-primary/60">
+              <p className="text-basee text-primary/60">
                 <span className="text-primary">ویژگی</span> های نسخه جدید، سرعت
                 بهتر در مقایسه بیشتر، بهبود امکانات آنالیز و اضافه شدن گزارش
                 گیری ماهانه.
               </p>
               <Link
                 href={"/about"}
-                className="flex items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary px-4 py-1 text-primary"
+                className="flex shrink-0 items-center justify-center gap-2 rounded-full border border-gray-700/50 bg-secondary px-4 py-1 text-primary"
               >
                 بیشتر بخوانید
                 <ChevronLeftIcon className="h-3 w-3 fill-none stroke-primary stroke-2" />

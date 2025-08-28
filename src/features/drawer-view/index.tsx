@@ -23,7 +23,7 @@ export default function DrawerView({
     <>
       <Drawer>
         <DrawerTrigger>
-          <Button className="bg-secondary text-primary">{icon}</Button>
+          <span className="bg-secondary text-primary">{icon}</span>
         </DrawerTrigger>
 
         <DrawerContent className={className}>

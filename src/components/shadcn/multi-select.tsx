@@ -61,7 +61,17 @@ export function MultiSelect({
   );
   const [items, setItems] = useState<Map<string, ReactNode>>(new Map());
 
+  // update selectedValues on values change
+  useEffect(() => {
+    setSelectedValues(new Set(values ?? defaultValues));
+  }, [values, defaultValues]);
+
   function toggleValue(value: string) {
+    if (singleSelect) {
+      setSelectedValues(new Set([value]));
+      onValuesChange?.([value]);
+      return;
+    }
     const getNewSet = (prev: Set<string>) => {
       const newSet = new Set(prev);
       if (newSet.has(value)) {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect } from "react";
-import { toast } from "~/components/shadcn/toast/use-toast";
+import { toast } from "sonner";
 
 export default function useStatus() {
   const [isOnline, setIsOnline] = useState<boolean>(true);
@@ -17,9 +17,7 @@ export default function useStatus() {
   const useIsomorphicLayoutEffect = canUseDOM ? useLayoutEffect : useEffect;
 
   const handleOffline = () => {
-    toast({
-      title: "آفلاین",
-    });
+    toast.error("آفلاین");
     setIsOnline(false);
   };
 

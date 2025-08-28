@@ -1,7 +1,6 @@
 import React, { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { motion, MotionProps } from "framer-motion";
-import { twMerge } from "tailwind-merge";
 import { cn } from "~/lib/utils";
 
 type ButtonProps = {
