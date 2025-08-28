@@ -506,8 +506,8 @@ export function SelectColumnFilterOptimized<T>({
 
   if (!values || values.length === 0) return <></>;
 
-  const finalValues =
-    selectedValues?.length <= 0 ? filteredValues : selectedValues ?? [];
+  // const finalValues =
+  //   selectedValues?.length <= 0 ? filteredValues : selectedValues ?? [];
 
   // const selectedCount = finalValues ? (finalValues as any).length : 0;
   const isAllSelected = filteredValues.length === uniqueValues.length;
@@ -542,8 +542,7 @@ export function SelectColumnFilterOptimized<T>({
       values: values,
     });
   };
-  console.log("uniqueValues", uniqueValues);
-  console.log("filteredValues", filteredValues);
+
   // Filter and paginate items
   const filteredItems = uniqueValues.filter((item) =>
     item.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -632,39 +631,38 @@ export function SelectColumnFilterOptimized<T>({
         !singleSelect &&
         uniqueValues.length > 0 &&
         !isProcessing && (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  className={cn(
-                    "rounded-xl font-bold",
-                    isAllSelected
-                      ? "border border-primary/10  bg-primary/10 p-1 text-rose-600 transition-all duration-300 hover:bg-primary/20"
-                      : "border border-primary/10  p-1 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20",
-                  )}
-                  onClick={() => {
-                    if (isAllSelected) {
-                      handleFilterChange([]);
-                    } else {
-                      handleFilterChange(uniqueValues);
-                    }
-                  }}
-                >
-                  {isAllSelected ? <ListXIcon /> : <ListChecksIcon />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent
-                className={cn(
-                  "pointer-events-none",
-                  isAllSelected ? "bg-emerald-200" : "bg-rose-200",
-                )}
-              >
-                <p className="text-secondary">
-                  {isAllSelected ? "انتخاب همه" : "پاک کردن انتخاب ها"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button
+            className={cn(
+              "rounded-xl font-bold",
+              isAllSelected
+                ? "border border-primary/10  bg-primary/10 p-1 text-rose-600 transition-all duration-300 hover:bg-primary/20"
+                : "border border-primary/10  p-1 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20",
+            )}
+            onClick={() => {
+              if (isAllSelected) {
+                handleFilterChange([]);
+              } else {
+                handleFilterChange(uniqueValues);
+              }
+            }}
+          >
+            {isAllSelected ? <ListXIcon /> : <ListChecksIcon />}
+          </Button>
+          // <TooltipProvider delayDuration={0}>
+          //   <Tooltip>
+          //     <TooltipTrigger></TooltipTrigger>
+          //     <TooltipContent
+          //       className={cn(
+          //         "pointer-events-none",
+          //         !isAllSelected ? "bg-emerald-200" : "bg-rose-200",
+          //       )}
+          //     >
+          //       <p className="text-secondary">
+          //         {!isAllSelected ? "انتخاب همه" : "پاک کردن انتخاب ها"}
+          //       </p>
+          //     </TooltipContent>
+          //   </Tooltip>
+          // </TooltipProvider>
         )}
     </div>
   );

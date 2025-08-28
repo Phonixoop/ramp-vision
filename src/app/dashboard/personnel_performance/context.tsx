@@ -1,0 +1,110 @@
+"use client";
+
+import React, { createContext, useContext, useEffect, useState } from "react";
+import moment from "jalali-moment";
+import {
+  PersonnelPerformanceContextType,
+  FilterType,
+  PeriodType,
+} from "./types";
+import {
+  defualtContractTypes,
+  getDefaultRoleTypesBaseOnContractType,
+} from "~/constants/personnel-performance";
+
+const PersonnelPerformanceContext = createContext<
+  PersonnelPerformanceContextType | undefined
+>(undefined);
+
+export function usePersonnelPerformance() {
+  const context = useContext(PersonnelPerformanceContext);
+  if (context === undefined) {
+    throw new Error(
+      "usePersonnelPerformance must be used within a PersonnelPerformanceProvider",
+    );
+  }
+  return context;
+}
+
+interface PersonnelPerformanceProviderProps {
+  children: React.ReactNode;
+}
+
+export function PersonnelPerformanceProvider({
+  children,
+}: PersonnelPerformanceProviderProps) {
+  // Report period state
+  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
+
+  // Toggle state for distinct data
+  const [toggleDistinctData, setToggleDistinctData] = useState<
+    "Distincted" | "Pure"
+  >("Distincted");
+
+  // Filters state
+  const [filters, setDataFilters] = useState<FilterType>({
+    periodType: reportPeriod,
+    filter: {
+      Start_Date: [
+        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+      ],
+    },
+  });
+
+  // Filters without network request
+  const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
+    useState({
+      periodType: reportPeriod,
+      filter: {
+        ContractType: defualtContractTypes,
+        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+      },
+    });
+
+  // Update report period in filters when it changes
+  useEffect(() => {
+    setDataFilters((prev) => ({
+      ...prev,
+      periodType: reportPeriod,
+    }));
+    setFiltersWithNoNetworkRequest((prev) => ({
+      ...prev,
+      periodType: reportPeriod,
+    }));
+  }, [reportPeriod]);
+
+  const value: PersonnelPerformanceContextType = {
+    reportPeriod,
+    setReportPeriod,
+    filters,
+    setDataFilters: (newFilters) => {
+      if (typeof newFilters === "function") {
+        setDataFilters(newFilters);
+      } else {
+        setDataFilters(newFilters);
+      }
+    },
+    toggleDistinctData,
+    setToggleDistinctData: (newToggle) => {
+      if (typeof newToggle === "function") {
+        setToggleDistinctData(newToggle);
+      } else {
+        setToggleDistinctData(newToggle);
+      }
+    },
+    filtersWithNoNetworkRequest,
+    setFiltersWithNoNetworkRequest: (newFilters) => {
+      if (typeof newFilters === "function") {
+        setFiltersWithNoNetworkRequest(newFilters);
+      } else {
+        setFiltersWithNoNetworkRequest(newFilters);
+      }
+    },
+  };
+
+  return (
+    <PersonnelPerformanceContext.Provider value={value}>
+      {children}
+    </PersonnelPerformanceContext.Provider>
+  );
+}

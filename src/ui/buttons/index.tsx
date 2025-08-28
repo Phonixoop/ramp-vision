@@ -34,7 +34,7 @@ export default function Button({
     <motion.button
       whileTap={{
         scale: disabled || isLoading ? 1 : 0.95,
-        transition: { duration: 0 },
+        transition: { duration: 0.1, ease: "easeOut" },
       }}
       initial={{ y: initialtranslateY }}
       animate={{ y: translateY }}
@@ -44,7 +44,7 @@ export default function Button({
       type={type}
       onClick={onClick}
       className={cn(
-        "duration-400 relative flex select-none items-center justify-center rounded-lg p-2 text-primary ",
+        "duration-400 relative flex select-none items-center justify-center rounded-lg p-2 text-primary transition-all duration-100 ease-out hover:scale-105 active:scale-95",
         className,
         disabled ? busyClass : enabledClass,
         isLoading ? "bg-opacity-10" : "",

@@ -1,68 +1,123 @@
 "use client";
-import DatePickerPeriodic from "~/features/date-picker-periodic";
+import moment from "jalali-moment";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { en } from "~/utils/util";
-import { FilterType, PeriodType } from "~/context/personnel-filter.context";
+import { PeriodType } from "../types";
+import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
+import { useState, useEffect } from "react";
+import { usePersonnelPerformance } from "../context";
 
 interface PersonnelPerformanceFiltersProps {
-  filters: FilterType;
-  reportPeriod: PeriodType;
-  setReportPeriod: (period: PeriodType) => void;
-  setDataFilters: (filters: FilterType) => void;
   getLastDate: any;
 }
 
 export function PersonnelPerformanceFilters({
-  filters,
-  reportPeriod,
-  setReportPeriod,
-  setDataFilters,
   getLastDate,
 }: PersonnelPerformanceFiltersProps) {
-  const handleDateChange = (date: any) => {
-    if (!date) return;
+  const { filters, setDataFilters, reportPeriod, setReportPeriod } =
+    usePersonnelPerformance();
 
-    if (Array.isArray(date) && date.length <= 0) return;
-
-    let dates = [""];
-
-    if (Array.isArray(date)) {
-      dates = date
-        .filter((a: any) => a.format() !== "")
-        .map((a: any) => en(a.format("YYYY/MM/DD")));
-    } else {
-      if (date.format() !== "") {
-        dates = [en(date.format("YYYY/MM/DD"))];
-      }
+  // Convert moment dates to string format for the new API
+  const selectedDates = filters.filter.Start_Date.map((dateStr) => {
+    let date = moment(dateStr, "YYYY/MM/DD");
+    if (!date.isValid()) {
+      date = moment(dateStr, "jYYYY/jMM/jDD");
     }
+    // Convert to YYYY-MM-DD format for the new API
+    return date.format("YYYY/MM/DD");
+  });
 
-    if (dates.length <= 0) return;
+  // Convert period type to calendar period type
+  const getCalendarPeriodType = (
+    period: PeriodType,
+  ): "daily" | "weekly" | "monthly" => {
+    switch (period) {
+      case "روزانه":
+        return "daily";
+      case "هفتگی":
+        return "weekly";
+      case "ماهانه":
+        return "monthly";
+      default:
+        return "daily";
+    }
+  };
 
-    setDataFilters({
-      ...filters,
-      periodType: reportPeriod,
-      filter: {
-        ...filters.filter,
-        Start_Date: dates,
-      },
-    });
+  // Convert calendar period type to PeriodType
+  const getPeriodType = (
+    periodType: "daily" | "weekly" | "monthly",
+  ): PeriodType => {
+    switch (periodType) {
+      case "daily":
+        return "روزانه";
+      case "weekly":
+        return "هفتگی";
+      case "monthly":
+        return "ماهانه";
+      default:
+        return "روزانه";
+    }
+  };
+
+  // Handle calendar submit
+  const handleCalendarSubmit = ({
+    reportPeriod,
+    selectedDates,
+  }: {
+    reportPeriod: "daily" | "weekly" | "monthly";
+    selectedDates: string[];
+  }) => {
+    // Convert reportPeriod to PeriodType
+    const newPeriodType = getPeriodType(reportPeriod);
+    setReportPeriod(newPeriodType);
+
+    // Update filters with the selected dates array and period type
+    if (selectedDates.length > 0) {
+      setDataFilters({
+        ...filters,
+        periodType: newPeriodType,
+        filter: {
+          ...filters.filter,
+          Start_Date: selectedDates, // Send the entire selectedDates array
+        },
+      });
+    }
+  };
+
+  // Convert string dates back to moment for display
+  const getDisplayDates = () => {
+    return selectedDates.map((dateStr) => moment(dateStr, "YYYY-MM-DD"));
   };
 
   return (
     <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
       <span className="font-bold text-primary">بازه گزارش</span>
 
+      <CalendarButton
+        disabled={getLastDate.isLoading}
+        onSelect={handleCalendarSubmit}
+        selectedDates={selectedDates}
+        periodType={getCalendarPeriodType(reportPeriod)}
+        placeholder="انتخاب بازه زمانی"
+        className="w-full"
+      />
       {getLastDate.isLoading ? (
         <div className="text-primary">
           <ThreeDotsWave />
         </div>
       ) : (
-        <DatePickerPeriodic
-          filter={filters}
-          reportPeriod={reportPeriod}
-          onChange={handleDateChange}
-          setReportPeriod={setReportPeriod}
-        />
+        <>
+          <div className="flex w-full flex-col items-center justify-center gap-3">
+            <span className="font-bold text-primary">
+              {getPeriodType(getCalendarPeriodType(reportPeriod))}
+            </span>
+            {/* <p className="text-primary">
+              {getDisplayDates()
+                .map((date) => date.format("YYYY/MM/DD"))
+                .join(" - ")} 
+            </p> */}
+          </div>
+        </>
       )}
     </div>
   );

@@ -53,19 +53,6 @@ export function PersonnelPerformanceColumns({
   PersonnelPerformanceData,
   string | number | null
 >[] {
-  useEffect(() => {
-    // if reportPeriod is monthly, set only one cityname to the SelectColumnFilterOptimized CityName filter if there is more than 1 already
-    if (reportPeriod === "ماهانه") {
-      const cityNames = initialFilters?.Cities?.slice(0, 1);
-      setDataFilters((prev: any) => ({
-        ...prev,
-        filter: {
-          ...prev.filter,
-          CityName: cityNames,
-        },
-      }));
-    }
-  }, [reportPeriod]);
   return [
     {
       header: "ردیف",
@@ -83,56 +70,63 @@ export function PersonnelPerformanceColumns({
       Filter: ({ column }) => (
         <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
           <span className="font-bold text-primary">استان</span>
-          <LayoutGroup id="PersonnelPerformanceCityLevelMenu">
-            <InPageMenu
-              list={City_Levels.map((a) => a.name)}
-              startIndex={-1}
-              collapsedUi={false}
-              onChange={(value) => {
-                const { setFilterValue } = column;
-                const cities: string[] =
-                  City_Levels.find((a) => a.name === value?.item?.name)
-                    ?.cities ?? [];
+          {reportPeriod !== "ماهانه" && (
+            <LayoutGroup id="PersonnelPerformanceCityLevelMenu">
+              <InPageMenu
+                list={City_Levels.map((a) => a.name)}
+                startIndex={-1}
+                collapsedUi={false}
+                onChange={(value) => {
+                  const { setFilterValue } = column;
+                  const cities: string[] =
+                    City_Levels.find((a) => a.name === value?.item?.name)
+                      ?.cities ?? [];
 
-                console.log("cities from City_Levels:", cities);
-                console.log("initialFilters?.Cities:", initialFilters?.Cities);
+                  // console.log("cities from City_Levels:", cities);
+                  // console.log("initialFilters?.Cities:", initialFilters?.Cities);
 
-                const canFilterCities = cities
-                  .filter((city) => {
-                    const mappedCities = initialFilters?.Cities?.map(
-                      (initCity: string) => getPersianToEnglishCity(initCity),
-                    );
-                    console.log("mappedCities:", mappedCities);
-                    console.log("checking if", city, "is in", mappedCities);
-                    return mappedCities?.includes(city) ?? false;
-                  })
-                  .map((cityName) => {
-                    const persianName = getEnglishToPersianCity(cityName);
-                    console.log("mapping", cityName, "to", persianName);
-                    return persianName;
-                  });
+                  const canFilterCities = cities
+                    .filter((city) => {
+                      const mappedCities = initialFilters?.Cities?.map(
+                        (initCity: string) => getPersianToEnglishCity(initCity),
+                      );
+                      // console.log("mappedCities:", mappedCities);
+                      // console.log("checking if", city, "is in", mappedCities);
+                      return mappedCities?.includes(city) ?? false;
+                    })
+                    .map((cityName) => {
+                      const persianName = getEnglishToPersianCity(cityName);
+                      // console.log("mapping", cityName, "to", persianName);
+                      return persianName;
+                    });
 
-                if (cities.length <= 0) {
-                  setFilterValue(initialFilters?.Cities ?? []);
-                } else {
-                  setFilterValue(canFilterCities);
-                }
+                  if (cities.length <= 0) {
+                    setFilterValue(initialFilters?.Cities ?? []);
+                  } else {
+                    setFilterValue(canFilterCities);
+                  }
 
-                const cityNames = canFilterCities.map(getPersianToEnglishCity);
-                console.log("Setting CityName filter with:", cityNames);
-                console.log("canFilterCities:", canFilterCities);
-                console.log("initialFilters?.Cities:", initialFilters?.Cities);
+                  const cityNames = canFilterCities.map(
+                    getPersianToEnglishCity,
+                  );
+                  // console.log("Setting CityName filter with:", cityNames);
+                  // console.log("canFilterCities:", canFilterCities);
+                  // console.log(
+                  //   "initialFilters?.Cities:",
+                  //   initialFilters?.Cities,
+                  // );
 
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    CityName: cityNames,
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
-              }}
-            />
-          </LayoutGroup>
+                  setDataFilters((prev: any) => ({
+                    ...prev,
+                    filter: {
+                      CityName: cityNames,
+                      Start_Date: prev.filter?.Start_Date ?? [],
+                    },
+                  }));
+                }}
+              />
+            </LayoutGroup>
+          )}
 
           <SelectColumnFilterOptimized<
             Pick<PersonnelPerformanceData, "CityName">
@@ -141,17 +135,17 @@ export function PersonnelPerformanceColumns({
             column={column}
             values={initialFilters?.Cities ?? []}
             initialFilters={initialFilters?.Cities ?? []}
-
-            // onChange={(filter) => {
-            //   setDataFilters((prev: any) => ({
-            //     ...prev,
-            //     filter: {
-            //       ...prev.filter,
-            //       CityName: filter.values.map(getPersianToEnglishCity),
-            //       Start_Date: prev.filter?.Start_Date ?? [],
-            //     },
-            //   }));
-            // }}
+            onChange={(data) => {
+              console.log("data", data);
+              // setDataFilters((prev: any) => ({
+              //   ...prev,
+              //   filter: {
+              //     ...prev.filter,
+              //     CityName: data.values.map(getPersianToEnglishCity),
+              //     Start_Date: prev.filter?.Start_Date ?? [],
+              //   },
+              // }));
+            }}
           />
         </div>
       ),

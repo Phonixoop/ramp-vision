@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { SearchConfigurationMultiSelect } from "~/features/checkbox-list";
-import PersianCalendarPicker from "~/features/persian-calendar-picker";
+import SimplifiedPersianCalendarPicker from "~/features/persian-calendar-picker/simplified";
 import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
 import moment from "jalali-moment";
 
@@ -13,37 +13,56 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/shadcn/popover";
+import { PersianCalendarExample } from "~/features/persian-calendar-picker/example";
 
 export default function TestPage() {
-  const [selectedDate, setSelectedDate] = useState<moment.Moment | undefined>();
-  const [selectedDates, setSelectedDates] = useState<moment.Moment[]>([]);
-  const [selectedWeek, setSelectedWeek] = useState<
-    { start: moment.Moment; end: moment.Moment } | undefined
-  >();
-  const [selectedMonth, setSelectedMonth] = useState<
-    { start: moment.Moment; end: moment.Moment } | undefined
-  >();
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [periodType, setPeriodType] = useState<"daily" | "weekly" | "monthly">(
+    "daily",
+  );
+  const [allowMultiSelection, setAllowMultiSelection] = useState(true);
 
-  // Handle date selection with toggle functionality
-  const handleDateSelect = (date: moment.Moment) => {
-    // For backward compatibility - single date selection
-    setSelectedDate(date);
+  // Handle selection changes from the simplified calendar
+  const handleSelectionChange = (selection: {
+    dates: string[];
+    periodType: "daily" | "weekly" | "monthly";
+  }) => {
+    setSelectedDates(selection.dates);
+    setPeriodType(selection.periodType);
   };
 
-  // Handle multiple date selection
-  const handleDatesSelect = (dates: moment.Moment[]) => {
-    setSelectedDates(dates);
-    setSelectedDate(dates[0] || undefined);
+  // Handle calendar button selection
+  const handleCalendarButtonSelect = (data: {
+    reportPeriod: "daily" | "weekly" | "monthly";
+    selectedDates: string[];
+  }) => {
+    setSelectedDates(data.selectedDates);
+    setPeriodType(data.reportPeriod);
   };
 
-  // Handle week selection with toggle functionality
-  const handleWeekSelect = (start: moment.Moment, end: moment.Moment) => {
-    setSelectedWeek({ start, end });
+  // Convert string dates to moment objects for display
+  const convertStringToMoment = (dateString: string): moment.Moment => {
+    return moment(dateString, "YYYY-MM-DD").locale("fa");
   };
 
-  // Handle month selection with toggle functionality
-  const handleMonthSelect = (start: moment.Moment, end: moment.Moment) => {
-    setSelectedMonth({ start, end });
+  // Get display text for selected dates
+  const getDisplayText = () => {
+    if (selectedDates.length === 0) return "None selected";
+
+    if (periodType === "daily") {
+      if (selectedDates.length === 1) {
+        const date = convertStringToMoment(selectedDates[0]);
+        return date.format("jYYYY/jMM/jDD");
+      } else {
+        return `${selectedDates.length} date(s) selected`;
+      }
+    } else if (periodType === "weekly") {
+      return `${selectedDates.length} week(s) selected`;
+    } else if (periodType === "monthly") {
+      return `${selectedDates.length} month(s) selected`;
+    }
+
+    return "None selected";
   };
 
   return (
@@ -61,133 +80,87 @@ export default function TestPage() {
 
           <div className="flex flex-wrap gap-4">
             <CalendarButton
-              onDateSelect={handleDateSelect}
-              onDatesSelect={handleDatesSelect}
-              selectedDate={selectedDate}
+              onSelect={handleCalendarButtonSelect}
               selectedDates={selectedDates}
+              periodType={periodType}
+              allowMultiSelection={allowMultiSelection}
               buttonText="انتخاب تاریخ"
-              buttonVariant="default"
-            />
-
-            <CalendarButton
-              onWeekSelect={handleWeekSelect}
-              selectedWeek={selectedWeek}
-              buttonText="انتخاب هفته"
-              buttonVariant="outline"
-            />
-
-            <CalendarButton
-              onMonthSelect={handleMonthSelect}
-              selectedMonth={selectedMonth}
-              buttonText="انتخاب ماه"
-              buttonVariant="ghost"
-            />
-
-            <CalendarButton
-              onDateSelect={handleDateSelect}
-              onDatesSelect={handleDatesSelect}
-              selectedDate={selectedDate}
-              selectedDates={selectedDates}
-              showIcon={false}
-              placeholder="تاریخ را انتخاب کنید"
             />
           </div>
         </div>
 
-        <div className="grid max-w-4xl grid-cols-1  gap-8 lg:grid-cols-2">
-          <div className="w-full">
-            <h2 className="mb-4 text-lg font-semibold text-primary">
-              Calendar Picker (Inline)
-            </h2>
-            <PersianCalendarPicker
-              onDateSelect={handleDateSelect}
-              onDatesSelect={handleDatesSelect}
-              onWeekSelect={handleWeekSelect}
-              onMonthSelect={handleMonthSelect}
-              selectedDate={selectedDate}
-              selectedDates={selectedDates}
-              selectedWeek={selectedWeek}
-              selectedMonth={selectedMonth}
-            />
-          </div>
+        {/* Simplified Calendar Picker */}
+        <div className="mb-8 space-y-4">
+          <h2 className="text-lg font-semibold text-primary">
+            Simplified Calendar Picker
+          </h2>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-primary">
-              Selected Values
-            </h2>
-
-            <div className="rounded-lg bg-secondary p-4">
-              <h3 className="mb-2 font-medium text-primary">Selected Date:</h3>
-              <p className="text-primary">
-                {selectedDate
-                  ? selectedDate.format("jYYYY/jMM/jDD")
-                  : "None selected"}
-              </p>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={allowMultiSelection}
+                  onChange={(e) => setAllowMultiSelection(e.target.checked)}
+                  className="rounded border-primary bg-secondary text-accent focus:ring-accent"
+                />
+                Allow Multiple Selection
+              </label>
             </div>
 
-            <div className="rounded-lg bg-secondary p-4">
-              <h3 className="mb-2 font-medium text-primary">
-                Selected Dates (Multiple):
-              </h3>
-              <p className="text-primary">
-                {selectedDates.length > 0
-                  ? selectedDates.map((date, index) => (
+            <PersianCalendarExample />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-primary">
+            Selected Values
+          </h2>
+
+          <div className="rounded-lg bg-secondary p-4">
+            <h3 className="mb-2 font-medium text-primary">Period Type:</h3>
+            <p className="text-primary">{periodType}</p>
+          </div>
+
+          <div className="rounded-lg bg-secondary p-4">
+            <h3 className="mb-2 font-medium text-primary">Selected Dates:</h3>
+            <p className="text-primary">
+              {selectedDates.length > 0
+                ? selectedDates.map((dateStr, index) => {
+                    const date = convertStringToMoment(dateStr);
+                    return (
                       <span key={index}>
                         {date.format("jYYYY/jMM/jDD")}
                         {index < selectedDates.length - 1 ? ", " : ""}
                       </span>
-                    ))
-                  : "None selected"}
-              </p>
-              <p className="mt-1 text-sm text-primary/70">
-                Total: {selectedDates.length} date(s) selected
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-secondary p-4">
-              <h3 className="mb-2 font-medium text-primary">Selected Week:</h3>
-              <p className="text-primary">
-                {selectedWeek
-                  ? `${selectedWeek.start.format(
-                      "jYYYY/jMM/jDD",
-                    )} - ${selectedWeek.end.format("jYYYY/jMM/jDD")}`
-                  : "None selected"}
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-secondary p-4">
-              <h3 className="mb-2 font-medium text-primary">Selected Month:</h3>
-              <p className="text-primary">
-                {selectedMonth
-                  ? `${selectedMonth.start.format(
-                      "jYYYY/jMM/jDD",
-                    )} - ${selectedMonth.end.format("jYYYY/jMM/jDD")}`
-                  : "None selected"}
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-secondary p-4">
-              <h3 className="mb-2 font-medium text-primary">Instructions:</h3>
-              <ul className="space-y-1 text-sm text-primary">
-                <li>• Click any date to select it</li>
-                <li>• At least one selection is always maintained</li>
-                <li>• Switch between tabs to change selection mode</li>
-                <li>• Use navigation arrows to change months</li>
-                <li>• Click "برو به امروز" to go to today</li>
-                <li>• Try the calendar buttons above for modal experience</li>
-              </ul>
-            </div>
+                    );
+                  })
+                : "None selected"}
+            </p>
+            <p className="mt-1 text-sm text-primary/70">
+              Total: {selectedDates.length} item(s) selected
+            </p>
           </div>
-        </div>
-      </div>
 
-      <div className="border-t pt-8">
-        <h2 className="mb-4 text-lg font-semibold text-primary">
-          Other Components
-        </h2>
-        <SearchConfigurationMultiSelect />
-        <div className="mt-4">
-          <PopoverDemo />
+          <div className="rounded-lg bg-secondary p-4">
+            <h3 className="mb-2 font-medium text-primary">Display Text:</h3>
+            <p className="text-primary">{getDisplayText()}</p>
+          </div>
+
+          <div className="rounded-lg bg-secondary p-4">
+            <h3 className="mb-2 font-medium text-primary">Raw Data:</h3>
+            <pre className="text-xs text-primary">
+              {JSON.stringify(
+                {
+                  periodType,
+                  selectedDates,
+                  count: selectedDates.length,
+                },
+                null,
+                2,
+              )}
+            </pre>
+          </div>
         </div>
       </div>
     </div>

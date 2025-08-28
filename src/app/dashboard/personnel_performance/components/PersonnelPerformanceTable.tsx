@@ -6,7 +6,7 @@ import moment from "jalali-moment";
 import { toast } from "sonner";
 
 import Table from "~/features/table";
-import { FilterType, PeriodType } from "~/context/personnel-filter.context";
+import { PersonnelPerformanceTableProps } from "../types";
 import {
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
@@ -26,19 +26,20 @@ import { PersonnelPerformanceFilters } from "./PersonnelPerformanceFilters";
 import { PersonnelPerformanceSummary } from "./PersonnelPerformanceSummary";
 import { PersonnelPerformanceExport } from "./PersonnelPerformanceExport";
 import { ColumnDef } from "@tanstack/react-table";
-import { PersonnelPerformanceData } from "~/app/dashboard/personnel_performance/types";
-
-interface PersonnelPerformanceTableProps {
-  sessionData: any;
-}
+import { PersonnelPerformanceData } from "../types";
+import { usePersonnelPerformance } from "../context";
 
 export function PersonnelPerformanceTable({
   sessionData,
 }: PersonnelPerformanceTableProps) {
-  const [toggleDistinctData, setToggleDistinctData] = useState<
-    "Distincted" | "Pure"
-  >("Distincted");
-  const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
+  const {
+    toggleDistinctData,
+    setToggleDistinctData,
+    filters,
+    setDataFilters,
+    filtersWithNoNetworkRequest,
+    setFiltersWithNoNetworkRequest,
+  } = usePersonnelPerformance();
 
   // API Queries
   const getInitialCities = api.personnelPerformance.getInitialCities.useQuery(
@@ -57,24 +58,24 @@ export function PersonnelPerformanceTable({
   const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery();
 
   // State Management
-  const [filters, setDataFilters] = useState<FilterType>({
-    periodType: reportPeriod,
-    filter: {
-      CityName: getInitialCities.data?.Cities,
-      Start_Date: [
-        moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
-      ],
-    },
-  });
+  // const [filters, setDataFilters] = useState<FilterType>({
+  //   periodType: reportPeriod,
+  //   filter: {
+  //     CityName: getInitialCities.data?.Cities,
+  //     Start_Date: [
+  //       moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),
+  //     ],
+  //   },
+  // });
 
-  const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
-    useState({
-      periodType: reportPeriod,
-      filter: {
-        ContractType: defualtContractTypes,
-        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
-      },
-    });
+  // const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
+  //   useState({
+  //     periodType: reportPeriod,
+  //     filter: {
+  //       ContractType: defualtContractTypes,
+  //       RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+  //     },
+  //   });
 
   // Update filters when last date is available
   useEffect(() => {
@@ -134,13 +135,13 @@ export function PersonnelPerformanceTable({
   useEffect(() => {
     setDataFilters((prev) => ({
       ...prev,
-      periodType: reportPeriod,
+      periodType: filters.periodType,
     }));
     setFiltersWithNoNetworkRequest((prev) => ({
       ...prev,
-      periodType: reportPeriod,
+      periodType: filters.periodType,
     }));
-  }, [reportPeriod]);
+  }, [filters.periodType]);
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
@@ -209,7 +210,7 @@ export function PersonnelPerformanceTable({
       refetchOnWindowFocus: false,
     },
   );
-  console.log(personnelPerformance.data);
+  // console.log(personnelPerformance.data);
   // Derived data
   const distincedData = useMemo(
     () =>
@@ -253,7 +254,19 @@ export function PersonnelPerformanceTable({
       ),
     [personnelPerformance.data],
   );
-
+  useEffect(() => {
+    // if reportPeriod is monthly, set only one cityname to the SelectColumnFilterOptimized CityName filter if there is more than 1 already
+    if (filters.periodType === "ماهانه") {
+      const cityNames = getInitialCities.data?.Cities?.slice(0, 1);
+      setDataFilters((prev: any) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          CityName: cityNames,
+        },
+      }));
+    }
+  }, [filters.periodType]);
   // Table columns configuration
   const columns = useMemo<CustomColumnDef<PersonnelPerformanceData, any>[]>(
     () =>
@@ -264,7 +277,7 @@ export function PersonnelPerformanceTable({
         filtersWithNoNetworkRequest,
         setDataFilters,
         setFiltersWithNoNetworkRequest,
-        reportPeriod,
+        reportPeriod: filters.periodType,
         getLastDate,
       }),
     [
@@ -272,7 +285,7 @@ export function PersonnelPerformanceTable({
       filtersWithNoNetworkRequest,
       filters,
       initialFilters.data,
-      reportPeriod,
+      filters.periodType,
       getLastDate,
     ],
   );
@@ -305,9 +318,10 @@ export function PersonnelPerformanceTable({
 
   return (
     <div
-      className="flex w-full flex-col items-center justify-center gap-5"
+      className="flex w-full flex-col items-center justify-center gap-5 text-primary"
       dir="rtl"
     >
+      {JSON.stringify(filters, null, 2)}
       <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
         جزئیات عملکرد پرسنل شعب (جدول)
       </h1>
@@ -320,13 +334,7 @@ export function PersonnelPerformanceTable({
           data={tableData}
           columns={columns as ColumnDef<PersonnelPerformanceData>[]}
           renderInFilterView={() => (
-            <PersonnelPerformanceFilters
-              filters={deferredFilter}
-              reportPeriod={reportPeriod}
-              setReportPeriod={setReportPeriod}
-              setDataFilters={setDataFilters}
-              getLastDate={getLastDate}
-            />
+            <PersonnelPerformanceFilters getLastDate={getLastDate} />
           )}
           // renderAfterFilterView={(flatRows) => (
           //   <PersonnelPerformanceExport
