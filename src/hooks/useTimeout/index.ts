@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useLayoutEffect, useRef } from "react";
 
 const canUseDOM = !!(
@@ -8,7 +10,7 @@ const canUseDOM = !!(
 
 const useIsomorphicLayoutEffect = canUseDOM ? useLayoutEffect : useEffect;
 
-function useTimeout(callback = () => {}, delay) {
+function useTimeout(callback: () => void = () => {}, delay: number | null): void {
   const savedCallback = useRef(callback);
 
   // Remember the latest callback if it changes.

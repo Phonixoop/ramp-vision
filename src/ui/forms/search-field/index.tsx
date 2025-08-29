@@ -1,10 +1,18 @@
+"use client";
+
 import { SearchIcon } from "lucide-react";
+
+interface SearchFieldProps {
+  value?: string;
+  title?: string;
+  onChange?: (value: string) => void;
+}
 
 export default function SearchField({
   value = "",
   title = "",
   onChange = (value) => {},
-}) {
+}: SearchFieldProps) {
   return (
     <div dir="rtl" className="flex w-full rounded-xl bg-gray-50/80">
       <div className="caret-atysa-secondry flex w-full flex-row-reverse items-center justify-end  gap-3 rounded-2xl px-4  py-3 md:flex-grow ">

@@ -1,4 +1,24 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
+
+interface MultiBoxItem {
+  id?: string | number;
+  [key: string]: any;
+}
+
+interface MultiBoxProps {
+  className?: string;
+  initialKeys?: MultiBoxItem[] | (string | number)[];
+  list?: MultiBoxItem[];
+  min?: number;
+  max?: number;
+  multiple?: boolean;
+  onClick?: (value: MultiBoxItem) => void;
+  onContextMenu?: (value: MultiBoxItem) => void;
+  onChange?: (values: MultiBoxItem[]) => void;
+  renderItem?: (value: MultiBoxItem, isSelected: () => boolean) => React.ReactNode;
+}
 
 export default function MultiBox({
   className = "",
@@ -10,8 +30,8 @@ export default function MultiBox({
   onClick = () => {},
   onContextMenu = () => {},
   onChange = () => {},
-  renderItem = (value, isSelected = () => {}) => value,
-}) {
+  renderItem = (value, isSelected = () => false) => value,
+}: MultiBoxProps) {
   const listWithKey = useMemo(
     () =>
       list.map((item) => {
@@ -22,12 +42,12 @@ export default function MultiBox({
       }),
     [list]
   );
-  const [selectedKeys, setSelectedKeys] = useState(
-    initialKeys.map((item) => item.id || item)
+  const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(
+    initialKeys.map((item) => (item as MultiBoxItem).id || item as string | number)
   );
-  const isSelected = (item) => selectedKeys?.includes(item.key);
+  const isSelected = (item: { key: string | number }) => selectedKeys?.includes(item.key);
 
-  function handleChange(item) {
+  function handleChange(item: { key: string | number; value: MultiBoxItem }) {
     setSelectedKeys((prevKeys) => {
       const keys = multiple
         ? prevKeys.includes(item.key)
@@ -51,27 +71,15 @@ export default function MultiBox({
       return keys;
     });
   }
-  function handleClick(e, item) {
+  function handleClick(e: React.MouseEvent, item: { key: string | number; value: MultiBoxItem }) {
     handleChange(item);
 
     onClick(item.value);
   }
-  function handleContextMenu(e, item) {
+  function handleContextMenu(e: React.MouseEvent, item: { key: string | number; value: MultiBoxItem }) {
     e.preventDefault();
     onContextMenu(item.value);
   }
-
-  // useEffect(() => {
-  //   onChange(
-  //     listWithKey
-  //       .filter((item) => {
-  //         return selectedKeys.some((element) => {
-  //           return element === item.key;
-  //         });
-  //       })
-  //       .map((item) => item.value)
-  //   );
-  // }, [selectedKeys]);
 
   return (
     <div className={className}>
@@ -87,7 +95,7 @@ export default function MultiBox({
               handleContextMenu(e, item);
             }}
           >
-            {renderItem(item.value, isSelected(item))}
+            {renderItem(item.value, () => isSelected(item))}
           </div>
         );
       })}

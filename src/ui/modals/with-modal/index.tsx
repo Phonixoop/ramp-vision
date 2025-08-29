@@ -1,5 +1,22 @@
-import Modal from "ui/modals";
-export default function withModal(Component) {
+"use client";
+
+import Modal from "~/ui/modals";
+
+interface WithModalProps {
+  children?: React.ReactNode;
+  isOpen?: boolean;
+  size?: string;
+  center?: boolean;
+  title?: string;
+  onClose?: () => void;
+  columns?: any[];
+  data?: any[];
+  [key: string]: any;
+}
+
+export default function withModal<P extends WithModalProps>(
+  Component: React.ComponentType<P>
+) {
   return function WrappedwithModal({
     children,
     isOpen,
@@ -10,10 +27,10 @@ export default function withModal(Component) {
     columns = [],
     data = [],
     ...rest
-  }) {
+  }: P) {
     return (
       <>
-        <Component {...{ columns, data, ...rest }} />
+        <Component {...{ columns, data, ...rest } as P} />
 
         <Modal {...{ isOpen, center, size, title, onClose }}>
           <div

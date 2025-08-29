@@ -1,3 +1,5 @@
+"use client";
+
 import * as XLSX from "xlsx";
 import Button from "~/ui/buttons";
 import {

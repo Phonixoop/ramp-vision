@@ -1,3 +1,5 @@
+"use client";
+
 import { MinusIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import {
   Tooltip,

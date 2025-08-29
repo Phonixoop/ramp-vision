@@ -1,3 +1,5 @@
+"use client";
+
 import moment from "jalali-moment";
 import React, { PureComponent } from "react";
 import {

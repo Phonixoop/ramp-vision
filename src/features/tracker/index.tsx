@@ -1,3 +1,5 @@
+"use client";
+
 import { Tracker } from "@tremor/react";
 import {
   ArrowDownRightIcon,

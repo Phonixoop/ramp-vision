@@ -1,5 +1,14 @@
+"use client";
+
 import React from "react";
 import { motion } from "framer-motion";
+
+interface CartButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}
+
 export default function CartButton({
   children,
   className,
@@ -7,7 +16,7 @@ export default function CartButton({
   disabled = false,
   onClick = () => {},
   ...rest
-}) {
+}: CartButtonProps) {
   const activeClass = "text-atysa-main hover:bg-atysa-main hover:text-white";
   const disabledClass =
     "text-[rgb(166,170,173)] bg-[rgb(237,239,240)] border-gray-200";

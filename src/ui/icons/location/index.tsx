@@ -1,8 +1,14 @@
+"use client";
+
 import Image from "next/image";
+
+interface LocationIconProps {
+  className?: string;
+}
 
 export default function LocationIcon({
   className = "min-w-5 min-h-[25px] pr-2 rounded-2xl ",
-}) {
+}: LocationIconProps) {
   return (
     <>
       <Image
@@ -10,7 +16,8 @@ export default function LocationIcon({
         src={"/images/image-icons/location.png"}
         width={35}
         height={35}
-        objectFit="contain"
+        alt="Location icon"
+        style={{ objectFit: "contain" }}
       />
     </>
   );

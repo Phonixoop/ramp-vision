@@ -1,7 +1,12 @@
+"use client";
+
 import { useEffect } from "react";
 
-export default function useKeyPress(callback, keyCodes) {
-  const handler = ({ code }) => {
+export default function useKeyPress(
+  callback: () => void,
+  keyCodes: string[]
+): void {
+  const handler = ({ code }: KeyboardEvent) => {
     if (keyCodes.includes(code)) {
       callback();
     }
@@ -12,5 +17,5 @@ export default function useKeyPress(callback, keyCodes) {
     return () => {
       window.removeEventListener("keyup", handler);
     };
-  }, []);
+  }, [callback, keyCodes]);
 }

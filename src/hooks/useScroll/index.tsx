@@ -1,21 +1,25 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 const ScrollDirection = {
   up: "up",
   down: "down",
-};
+} as const;
 
-export default function useScroll() {
+type ScrollDirectionType = typeof ScrollDirection[keyof typeof ScrollDirection];
+
+export default function useScroll(): ScrollDirectionType {
   const threshold = 100;
-  const [scrollDir, setScrollDir] = useState(ScrollDirection.up);
+  const [scrollDir, setScrollDir] = useState<ScrollDirectionType>(ScrollDirection.up);
 
   useEffect(() => {
     let previousScrollYPosition = window.scrollY;
 
-    const scrolledMoreThanThreshold = (currentScrollYPosition) =>
+    const scrolledMoreThanThreshold = (currentScrollYPosition: number): boolean =>
       Math.abs(currentScrollYPosition - previousScrollYPosition) > threshold;
 
-    const isScrollingUp = (currentScrollYPosition) =>
+    const isScrollingUp = (currentScrollYPosition: number): boolean =>
       currentScrollYPosition > previousScrollYPosition &&
       !(previousScrollYPosition > 0 && currentScrollYPosition === 0) &&
       !(currentScrollYPosition > 0 && previousScrollYPosition === 0);

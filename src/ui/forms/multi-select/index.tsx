@@ -1,18 +1,32 @@
-import { useEffect } from "react";
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
+
+interface MultiSelectItem {
+  key: string;
+  value: string;
+}
+
+interface MultiSelectBoxProps {
+  className?: string;
+  values?: string[];
+  list?: MultiSelectItem[];
+  onChange?: (selectedKeys: string[]) => void;
+}
 
 export default function MultiSelectBox({
   className = "bg-green-700 text-white shadow-2xl shadow-green-700",
   values = [],
   list = [],
   onChange = () => {},
-}) {
-  const [selectedKeys, setSelectedKeys] = useState(values);
-  const isSelected = (key) => selectedKeys.includes(key);
+}: MultiSelectBoxProps) {
+  const [selectedKeys, setSelectedKeys] = useState<string[]>(values);
+  const isSelected = (key: string) => selectedKeys.includes(key);
 
   useEffect(() => {
     onChange(selectedKeys);
-  }, [selectedKeys]);
+  }, [selectedKeys, onChange]);
+
   return (
     <>
       <div className="flex gap-2">

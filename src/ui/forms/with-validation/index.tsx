@@ -1,14 +1,31 @@
+"use client";
+
 import { useState, useEffect } from "react";
 
-export default function withValidation(Component) {
+interface ValidationResult {
+  errors: string[];
+  touched: boolean;
+}
+
+interface WithValidationProps {
+  onChange?: (value: any) => void;
+  value?: any;
+  validations?: Array<((value: any) => string) | [(value: any, params: any) => string, any]>;
+  onValidation?: (errors: string[]) => void;
+  [key: string]: any;
+}
+
+export default function withValidation<P extends WithValidationProps>(
+  Component: React.ComponentType<P>
+) {
   return function WrappedComponent({
     onChange = () => {},
     value = "",
     validations = [],
     onValidation = () => {},
     ...rest
-  }) {
-    const [errors, setErrors] = useState([]);
+  }: P) {
+    const [errors, setErrors] = useState<string[]>([]);
     const [touched, setTouched] = useState(false);
 
     useEffect(() => {
@@ -25,12 +42,12 @@ export default function withValidation(Component) {
         onValidation(errors);
         return errors;
       });
-    }, [value, touched]);
+    }, [value, touched, validations, onValidation]);
 
     return (
       <>
         <Component
-          onChange={(value) => {
+          onChange={(value: any) => {
             setTouched(true);
             return onChange(value);
           }}

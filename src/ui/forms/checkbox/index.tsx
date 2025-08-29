@@ -1,8 +1,16 @@
+"use client";
+
+interface CheckBoxProps {
+  children: React.ReactNode;
+  value?: boolean;
+  onChange?: (checked: boolean) => void;
+}
+
 export default function CheckBox({
   children,
   value = false,
   onChange = () => {},
-}) {
+}: CheckBoxProps) {
   return (
     <>
       <input
@@ -11,7 +19,7 @@ export default function CheckBox({
         checked={value}
         onChange={(e) => onChange(e.target.checked)}
       />
-      <label htmlFor="avtive">{children}</label>
+      <label htmlFor="active">{children}</label>
     </>
   );
 }

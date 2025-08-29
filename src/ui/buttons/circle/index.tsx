@@ -1,12 +1,20 @@
+"use client";
+
 import React from "react";
-import CartButton from "ui/buttons/cartButton";
+import CartButton from "~/ui/buttons/cartButton";
 import { motion } from "framer-motion";
+
+interface CircleButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  className?: string;
+}
+
 export default function CircleButton({
   type = "button",
   children,
   className,
   ...rest
-}) {
+}: CircleButtonProps) {
   return (
     <motion.button
       type={type}

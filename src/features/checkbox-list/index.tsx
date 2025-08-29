@@ -1,3 +1,5 @@
+"use client";
+
 import { Column } from "@tanstack/react-table";
 
 import { ListXIcon, ListChecksIcon } from "lucide-react";
