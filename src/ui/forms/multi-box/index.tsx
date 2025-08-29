@@ -17,7 +17,10 @@ interface MultiBoxProps {
   onClick?: (value: MultiBoxItem) => void;
   onContextMenu?: (value: MultiBoxItem) => void;
   onChange?: (values: MultiBoxItem[]) => void;
-  renderItem?: (value: MultiBoxItem, isSelected: () => boolean) => React.ReactNode;
+  renderItem?: (
+    value: MultiBoxItem,
+    isSelected: () => boolean,
+  ) => React.ReactNode;
 }
 
 export default function MultiBox({
@@ -30,7 +33,9 @@ export default function MultiBox({
   onClick = () => {},
   onContextMenu = () => {},
   onChange = () => {},
-  renderItem = (value, isSelected = () => false) => value,
+  renderItem = (value, isSelected = () => false) => (
+    <div>{JSON.stringify(value)}</div>
+  ),
 }: MultiBoxProps) {
   const listWithKey = useMemo(
     () =>
@@ -40,12 +45,15 @@ export default function MultiBox({
           value: item,
         };
       }),
-    [list]
+    [list],
   );
   const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(
-    initialKeys.map((item) => (item as MultiBoxItem).id || item as string | number)
+    initialKeys.map(
+      (item) => (item as MultiBoxItem).id || (item as string | number),
+    ),
   );
-  const isSelected = (item: { key: string | number }) => selectedKeys?.includes(item.key);
+  const isSelected = (item: { key: string | number }) =>
+    selectedKeys?.includes(item.key);
 
   function handleChange(item: { key: string | number; value: MultiBoxItem }) {
     setSelectedKeys((prevKeys) => {
@@ -71,12 +79,18 @@ export default function MultiBox({
       return keys;
     });
   }
-  function handleClick(e: React.MouseEvent, item: { key: string | number; value: MultiBoxItem }) {
+  function handleClick(
+    e: React.MouseEvent,
+    item: { key: string | number; value: MultiBoxItem },
+  ) {
     handleChange(item);
 
     onClick(item.value);
   }
-  function handleContextMenu(e: React.MouseEvent, item: { key: string | number; value: MultiBoxItem }) {
+  function handleContextMenu(
+    e: React.MouseEvent,
+    item: { key: string | number; value: MultiBoxItem },
+  ) {
     e.preventDefault();
     onContextMenu(item.value);
   }

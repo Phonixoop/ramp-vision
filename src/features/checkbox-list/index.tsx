@@ -215,14 +215,6 @@ export function SelectColumnFilter({
     setLocalFilterValue(initialFilters);
   }, []);
 
-  if (!data || data.length === 0) return <></>;
-
-  const finalValues =
-    selectedValues?.length <= 0 ? getFilterValue() : selectedValues ?? [];
-
-  const selectedCount = finalValues ? (finalValues as any).length : 0;
-  const selectAllState = selectedCount < uniqueValues.length;
-
   const handleFilterChange = useCallback(
     (values: string[]) => {
       // Immediately update local state for instant feedback
@@ -255,6 +247,14 @@ export function SelectColumnFilter({
     },
     [column.id, onChange, cleanup],
   );
+
+  if (!data || data.length === 0) return <></>;
+
+  const finalValues =
+    selectedValues?.length <= 0 ? getFilterValue() : selectedValues ?? [];
+
+  const selectedCount = finalValues ? (finalValues as any).length : 0;
+  const selectAllState = selectedCount < uniqueValues.length;
 
   return (
     <div className=" flex w-full items-center justify-center gap-2 px-2 text-center sm:px-0 ">

@@ -1,6 +1,19 @@
 import { useState } from "react";
 import Modal from "~/ui/modals";
-export default function withModalState(Component) {
+
+interface WithModalStateProps {
+  content?: React.ReactNode;
+  isOpen?: boolean;
+  size?: string;
+  center?: boolean;
+  title?: string;
+  closeBtn?: React.ReactNode;
+  onClose?: () => void;
+  render?: (closeModal: () => void) => React.ReactNode;
+  [key: string]: any;
+}
+
+export default function withModalState(Component: React.ComponentType<any>) {
   return function WrappedwithModal({
     content,
     isOpen = false,
@@ -9,9 +22,9 @@ export default function withModalState(Component) {
     title = "",
     closeBtn = <></>,
     onClose = () => {},
-    render = (closeModal) => {},
+    render = () => null,
     ...rest
-  }) {
+  }: WithModalStateProps) {
     const [modal, setModal] = useState({ isOpen: false });
 
     const openModal = () => setModal({ isOpen: true });

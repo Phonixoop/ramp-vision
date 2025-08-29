@@ -1,8 +1,5 @@
 import moment from "jalali-moment";
 import { Permission } from "~/types";
-import { MENU } from "~/components/main/nav-bar";
-
-export { MENU };
 
 // export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
 

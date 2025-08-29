@@ -47,10 +47,13 @@ export function NavBar({ menuItems, className }: NavBarProps) {
   const [dir, setDir] = useState<null | "l" | "r">(null);
 
   const handleSetSelected = (val: string | null) => {
-    if (selected && val) {
-      const selectedIndex = menuItems.findIndex((item) => item.id === selected);
-      const newIndex = menuItems.findIndex((item) => item.id === val);
-      setDir(selectedIndex > newIndex ? "r" : "l");
+    if (val !== null && selected !== null && val !== selected) {
+      const currentIndex = menuItems.findIndex((item) => item.id === selected);
+      const nextIndex = menuItems.findIndex((item) => item.id === val);
+
+      // Use math to determine direction: positive = going right, negative = going left
+      const direction = nextIndex - currentIndex;
+      setDir(direction > 0 ? "r" : "l");
     } else if (val === null) {
       setDir(null);
     }
@@ -95,7 +98,7 @@ export function NavBar({ menuItems, className }: NavBarProps) {
           </Tab>
         ))}
 
-        <Content dir={dir} selected={selected} menuItems={menuItems} />
+        <Content dir={dir} selected={selected} menuItems={itemsWithSubMenu} />
       </div>
     </div>
   );
@@ -144,10 +147,11 @@ function Content({
 }) {
   const selectedItem = menuItems.find((item) => item.id === selected);
 
-  if (!selectedItem || !selectedItem.subMenu) return null;
+  if (!selectedItem) return null;
 
   return (
     <motion.div
+      layout
       id="overlay-content"
       initial={{
         opacity: 0,
@@ -161,33 +165,72 @@ function Content({
         opacity: 0,
         y: 8,
       }}
-      className=" absolute left-0 top-[calc(100%_+_24px)] w-96 rounded-lg bg-secbuttn p-4 supports-[backdrop-filter]:bg-secbuttn/50 supports-[backdrop-filter]:backdrop-blur-lg"
+      className=" absolute left-0 top-[calc(100%_+_24px)] w-96 rounded-lg bg-secbuttn  supports-[backdrop-filter]:bg-secbuttn/50 supports-[backdrop-filter]:backdrop-blur-lg"
     >
       <Bridge />
       <Nub selected={selected} />
 
-      {menuItems.map((item) => {
-        return (
-          <div className="overflow-hidden" key={item.id}>
-            {selected === item.id && item.subMenu && (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  x: dir === "l" ? 100 : dir === "r" ? -100 : 0,
-                }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{
-                  opacity: 0,
-                  x: dir === "l" ? 100 : dir === "r" ? -100 : 0,
-                }}
-                transition={{ duration: 0.25, ease: "easeInOut" }}
-              >
-                <SubMenuContent subMenu={item.subMenu} />
-              </motion.div>
-            )}
-          </div>
-        );
-      })}
+      <div className="relative min-h-[300px] w-full overflow-hidden">
+        {menuItems.map((item, i) => {
+          const isSelected = selected === item.id;
+          const currentIndex = menuItems.findIndex(
+            (menuItem) => menuItem.id === item.id,
+          );
+          const selectedIndex = selected
+            ? menuItems.findIndex((menuItem) => menuItem.id === selected)
+            : -1;
+
+          // Use math to determine animation values
+          const indexDiff = currentIndex - selectedIndex;
+          const isSelectedItem = isSelected;
+
+          // Calculate x values using math
+          const xInitial = isSelectedItem
+            ? dir === null
+              ? 0 // First time or after reset - no directional animation
+              : dir === "r"
+              ? "100%"
+              : "-100%"
+            : 0;
+
+          const xAnimate = isSelectedItem
+            ? 0
+            : indexDiff < 0
+            ? "-100%"
+            : "100%";
+
+          // Determine data-motion based on position relative to selected
+          const dataMotion = isSelectedItem
+            ? dir === null
+              ? "from-center" // First time or after reset
+              : dir === "r"
+              ? "from-end"
+              : "from-start"
+            : indexDiff < 0
+            ? "to-start"
+            : "to-end";
+
+          return (
+            <motion.div
+              key={item.id}
+              className="absolute left-0 top-0 flex h-full w-full items-stretch justify-center p-4"
+              data-motion={dataMotion}
+              aria-hidden={!isSelectedItem}
+              initial={{
+                opacity: isSelectedItem ? 1 : 0,
+                x: xInitial,
+              }}
+              animate={{
+                opacity: isSelectedItem ? 1 : 0,
+                x: xAnimate,
+              }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+            >
+              <SubMenuContent subMenu={item.subMenu} />
+            </motion.div>
+          );
+        })}
+      </div>
     </motion.div>
   );
 }
@@ -221,7 +264,7 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
 
   // Multi-column layout for categorized items
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid w-full grid-cols-2 gap-4">
       {categories.map((category) => (
         <div
           key={category}

@@ -38,9 +38,7 @@ export default function Button({
         scale: disabled || isLoading ? 1 : 0.95,
         transition: { duration: 0.1, ease: "easeOut" },
       }}
-      whileHover={{
-        width: fillWidthOnHover && "100%",
-      }}
+      {...(fillWidthOnHover ? { whileHover: { width: "100%" } } : {})}
       initial={{ y: initialtranslateY }}
       animate={{ y: translateY }}
       transition={{ duration: 0.2, ease: "linear" }}

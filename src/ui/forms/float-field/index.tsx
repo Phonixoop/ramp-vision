@@ -8,7 +8,11 @@ interface FloatFieldProps {
   [key: string]: any;
 }
 
-export default function FloatField({ value, onChange = () => {}, ...rest }: FloatFieldProps) {
+export default function FloatField({
+  value,
+  onChange = () => {},
+  ...rest
+}: FloatFieldProps) {
   function parse(val: string): string {
     function reverse(val: string): string {
       return val.split("").reverse().join("");
@@ -18,9 +22,9 @@ export default function FloatField({ value, onChange = () => {}, ...rest }: Floa
 
   return (
     <TextField
-      value={value}
+      value={value?.toString()}
       isRtl={false}
-      onChange={(val) => onChange(parse(val))}
+      onValueChange={(val) => onChange(parse(val))}
       {...rest}
     />
   );

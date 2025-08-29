@@ -24,13 +24,11 @@ import Button from "~/ui/buttons";
 
 import InputError from "~/ui/forms/input-error";
 import PasswordField from "~/ui/forms/password-field";
-import TextField from "~/ui/forms/text-field";
-import withLabel from "~/ui/forms/with-label";
+
 import { delay } from "~/utils/util";
 
+import { TextFieldWithLabel } from "~/ui/forms/with-lables";
 import { useRouter } from "next/navigation";
-
-const TextFieldWithLable = withLabel(TextField);
 
 const icons = [
   <UserIcon key={1} className="stroke-inherit" />,
@@ -114,7 +112,7 @@ export function CreateAccountForm() {
               key={0}
               className="relative flex w-full flex-col items-center justify-center gap-5 "
             >
-              <TextFieldWithLable
+              <TextFieldWithLabel
                 label={"نام کاربری"}
                 name="username"
                 id="username"

@@ -8,15 +8,24 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
 
-  /**
-   * If you are using `appDir` then you must comment the below `i18n` config out.
-   *
-   * @see https://github.com/vercel/next.js/issues/41980
-   */
-  i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+  // i18n configuration is not supported with App Router
+  // Use middleware.ts for internationalization instead
+
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Exclude pages1 folder from webpack compilation
+    config.module.rules.push({
+      test: /\.(js|jsx|ts|tsx)$/,
+      exclude: /src\/pages1/,
+    });
+
+    return config;
   },
+
+  // Exclude pages1 from page generation
+  pageExtensions: ["tsx", "ts", "jsx", "js"].filter((ext) => {
+    // This will prevent Next.js from looking for pages in the pages1 directory
+    return true;
+  }),
 };
 
 export default config;

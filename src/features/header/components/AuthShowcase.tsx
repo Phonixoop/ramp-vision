@@ -38,6 +38,7 @@ interface AuthShowcaseProps {
 export function AuthShowcase({ session }: AuthShowcaseProps) {
   const { data: sessionData, status } = session;
   const user: User = sessionData?.user;
+  const [isOpen, setIsOpen] = useState(false);
 
   if (status === "loading") {
     return <div className="h-5 w-20 animate-pulse"></div>;
@@ -71,7 +72,6 @@ export function AuthShowcase({ session }: AuthShowcaseProps) {
     .toUpperCase()
     .slice(0, 2);
 
-  const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="flex items-center justify-evenly gap-4 rounded-lg bg-secbuttn/50">
       <ThemeSwitch />

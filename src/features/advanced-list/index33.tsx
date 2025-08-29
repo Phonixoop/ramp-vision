@@ -55,6 +55,8 @@ const Row = memo<{ index: number; style: React.CSSProperties; data: any }>(
   areEqual,
 );
 
+Row.displayName = 'Row';
+
 export default function AdvancedList2<T = any>({
   className = "",
   title,

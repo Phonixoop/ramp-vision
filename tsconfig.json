@@ -37,5 +37,12 @@
     "src/ui/forms/search-field/index.jsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "src/pages1/**/*"]
+  "exclude": [
+    "node_modules",
+    "pages1/**/*",
+    "pages1/**/*.js",
+    "pages1/**/*.jsx",
+    "pages1/**/*.ts",
+    "pages1/**/*.tsx"
+  ]
 }
