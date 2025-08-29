@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import React from "react";
 import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
 
@@ -148,7 +149,8 @@ export default function MultiStep({
         </div>
       </div>
       {steps.map((_, i) => {
-        if (i === currentStep) return <>{steps[currentStep]}</>;
+        if (i === currentStep)
+          return <React.Fragment key={i}>{steps[currentStep]}</React.Fragment>;
       })}
     </div>
   );

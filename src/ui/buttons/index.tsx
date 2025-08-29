@@ -1,6 +1,6 @@
 import React, { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
-import { motion, MotionProps } from "framer-motion";
+import { motion, type MotionProps } from "motion/react";
 import { cn } from "~/lib/utils";
 
 type ButtonProps = {
@@ -9,6 +9,7 @@ type ButtonProps = {
   initialtranslateY?: number;
   translateY?: number;
   styles?: CSSProperties;
+  fillWidthOnHover?: boolean;
 } & Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   "onAnimationStart" | "onDrag" | "onDragEnd" | "onDragStart" | "ref"
@@ -23,6 +24,7 @@ export default function Button({
   className = "",
   initialtranslateY = 0,
   translateY = 0,
+  fillWidthOnHover = false,
   onClick,
   styles,
   ...rest
@@ -35,6 +37,9 @@ export default function Button({
       whileTap={{
         scale: disabled || isLoading ? 1 : 0.95,
         transition: { duration: 0.1, ease: "easeOut" },
+      }}
+      whileHover={{
+        width: fillWidthOnHover && "100%",
       }}
       initial={{ y: initialtranslateY }}
       animate={{ y: translateY }}

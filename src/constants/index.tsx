@@ -1,69 +1,8 @@
 import moment from "jalali-moment";
 import { Permission } from "~/types";
+import { MENU } from "~/components/main/nav-bar";
 
-export const MENU = [
-  {
-    value: "خانه",
-    link: "",
-  },
-  {
-    value: "راهنما",
-    link: "/guide",
-  },
-  {
-    value: "درباره RAMP",
-    link: "/about",
-  },
-  {
-    value: "جزئیات عملکرد شعب",
-    link: "/dashboard/depo",
-  },
-  {
-    value: "جزئیات عملکرد پرسنل شعب (نمودار)",
-    link: "/dashboard/personnel_performance/cities",
-
-    subMenu: [
-      {
-        value: "جزئیات عملکرد پرسنل شعب (جدول)",
-        link: "/dashboard/personnel_performance",
-      },
-      {
-        value: "جزئیات ورودی اسناد مستقیم شعب",
-        link: "/dashboard/personnel_performance/pishkhan",
-      },
-    ],
-  },
-  {
-    value: "حواله خسارت",
-    link: "/dashboard/havale_khesarat",
-  },
-  {
-    value: "ورودی مستقیم ماهانه",
-    link: "/dashboard/insurance_metrics",
-  },
-  {
-    value: "گیج عملکرد استان ها",
-    link: "/dashboard/gauges",
-  },
-  {
-    value: "پرسنل",
-    link: "/dashboard/personnels",
-  },
-  {
-    value: "گزارش ها",
-    link: "#",
-    subMenu: [
-      {
-        value: "Bi",
-        link: "/dashboard/bi",
-      },
-      {
-        value: "ارزیابان برتر",
-        link: "/dashboard/bests",
-      },
-    ],
-  },
-];
+export { MENU };
 
 // export const Reports_Period = ["روزانه", "هفتگی", "ماهانه"];
 

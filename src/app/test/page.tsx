@@ -14,6 +14,8 @@ import {
   PopoverTrigger,
 } from "~/components/shadcn/popover";
 import { PersianCalendarExample } from "~/features/persian-calendar-picker/example";
+import Navbar from "~/components/Navbar";
+import { ShiftingDropDown } from "~/components/main/nav-tst";
 
 export default function TestPage() {
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -71,7 +73,8 @@ export default function TestPage() {
         <h1 className="mb-4 text-2xl font-bold text-primary">
           Persian Calendar Picker Demo
         </h1>
-
+        <ShiftingDropDown />
+        <Navbar />
         {/* Calendar Button Examples */}
         <div className="mb-8 space-y-4">
           <h2 className="text-lg font-semibold text-primary">
