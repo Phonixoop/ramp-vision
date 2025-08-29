@@ -4,6 +4,7 @@
 
 html[data-theme="theme-light-4"] {
   --primary: 8, 12, 10;
+  --primary-muted: 92, 91, 84;
   --secondary: 206, 204, 188;
   /* --primbuttn: 61, 87, 71; */
   --primbuttn: 76, 170, 136;
@@ -14,6 +15,7 @@ html[data-theme="theme-light-4"] {
 
 html[data-theme="theme-dark-1"] {
   --primary: 244, 246, 245;
+  --primary-muted: 157, 153, 154;
   --secondary: 10, 10, 10;
 
   --primbuttn: 76, 170, 136;

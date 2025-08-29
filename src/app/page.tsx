@@ -112,7 +112,7 @@ export default function Home() {
             <h1 className="relative p-5 text-center text-4xl font-bold text-primary">
               <FloatDiv
                 className="line_width_animation_140  absolute -left-[20%] 
-                top-0 h-[1px] w-[140%] bg-gradient-to-r  from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
+                top-0 h-[1px] w-[140%] bg-gradient-to-r from-transparent from-0% via-primary/30 via-50% to-transparent to-100%  "
               />
               نرم افزار جامع مدیریت و تحلیل عملکرد پرسنل و شعب
             </h1>
@@ -132,7 +132,7 @@ export default function Home() {
               />
               <div className="relative flex items-center justify-between gap-4  ">
                 <Link
-                  className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm  font-medium text-secondary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium  text-secondary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                   href={"about"}
                 >
                   درباره RAMP
@@ -273,7 +273,7 @@ function InfoCard({ children, className = "", title = "عنوان", icon = <></>
       <div
         dir="rtl"
         className={twMerge(
-          "foundation_card__v7VKB  flex max-w-md flex-col items-center justify-start gap-4 rounded-lg  border border-secbuttn bg-secbuttn p-4",
+          "foundation_card__v7VKB  flex max-w-md flex-col items-center justify-start gap-4 rounded-lg  border border-secbuttn bg-secondary p-4",
           className,
         )}
       >

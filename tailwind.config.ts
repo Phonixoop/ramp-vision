@@ -24,6 +24,7 @@ export default {
       },
       textColor: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -37,6 +38,7 @@ export default {
       },
       backgroundColor: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -59,6 +61,7 @@ export default {
       },
       borderColor: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -71,6 +74,7 @@ export default {
       },
       boxShadowColor: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -79,6 +83,7 @@ export default {
       },
       fill: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -87,6 +92,7 @@ export default {
       },
       stroke: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -95,6 +101,7 @@ export default {
       },
       ringColor: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -105,6 +112,7 @@ export default {
       },
       ringOffsetColor: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -113,6 +121,7 @@ export default {
       },
       gradientColorStops: {
         primary: withOpacity("--primary"),
+        "primary-muted": withOpacity("--primary-muted"),
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
@@ -122,6 +131,7 @@ export default {
       patterns: {
         colors: {
           primary: withOpacity("--primary"),
+          "primary-muted": withOpacity("--primary-muted"),
           secondary: withOpacity("--secondary"),
           primbuttn: withOpacity("--primbuttn"),
           secbuttn: withOpacity("--secbuttn"),

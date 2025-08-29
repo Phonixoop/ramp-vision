@@ -75,7 +75,7 @@ export function NavBar({ menuItems, className }: NavBarProps) {
         <Link
           key={item.id}
           href={item.link}
-          className="flex items-start justify-center gap-1 rounded-full px-3 py-1.5 text-sm text-primary/70 transition-colors hover:text-primary"
+          className="text-primary-muted flex items-start justify-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary"
         >
           {item.icon && <item.icon className="size-4" />}
           <span>{item.value}</span>
@@ -98,7 +98,9 @@ export function NavBar({ menuItems, className }: NavBarProps) {
           </Tab>
         ))}
 
-        <Content dir={dir} selected={selected} menuItems={itemsWithSubMenu} />
+        {selected && (
+          <Content dir={dir} selected={selected} menuItems={itemsWithSubMenu} />
+        )}
       </div>
     </div>
   );
@@ -122,7 +124,9 @@ function Tab({
       onClick={() => handleSetSelected(item.id)}
       className={cn(
         "flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors",
-        selected === item.id ? "bg-secbuttn text-primary" : "text-primary/70",
+        selected === item.id
+          ? "bg-secbuttn text-primary"
+          : "text-primary-muted",
       )}
     >
       <span>{children}</span>
@@ -146,9 +150,18 @@ function Content({
   menuItems: MenuItem[];
 }) {
   const selectedItem = menuItems.find((item) => item.id === selected);
+  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
+  const measureRef = React.useRef(null);
 
-  if (!selectedItem) return null;
-
+  // Recalculate dimensions whenever selection changes
+  React.useLayoutEffect(() => {
+    if (measureRef.current) {
+      setDimensions({
+        width: measureRef.current.offsetWidth,
+        height: measureRef.current.offsetHeight + 20,
+      });
+    }
+  }, [selected]);
   return (
     <motion.div
       layout
@@ -165,12 +178,22 @@ function Content({
         opacity: 0,
         y: 8,
       }}
-      className=" absolute left-0 top-[calc(100%_+_24px)] w-96 rounded-lg bg-secbuttn  supports-[backdrop-filter]:bg-secbuttn/50 supports-[backdrop-filter]:backdrop-blur-lg"
+      className=" absolute left-0 top-[calc(100%_+_24px)] min-w-96 rounded-lg border  border-primary/5 bg-secbuttn supports-[backdrop-filter]:bg-secondary/80 supports-[backdrop-filter]:backdrop-blur-lg"
     >
       <Bridge />
       <Nub selected={selected} />
 
-      <div className="relative min-h-[300px] w-full overflow-hidden">
+      <motion.div
+        className="relative  w-full overflow-hidden"
+        animate={{ height: dimensions.height }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+      >
+        {/* A normal-flow measuring node for the selected content */}
+        <div className="pointer-events-none invisible">
+          <div ref={measureRef}>
+            {selectedItem && <SubMenuContent subMenu={selectedItem.subMenu} />}
+          </div>
+        </div>
         {menuItems.map((item, i) => {
           const isSelected = selected === item.id;
           const currentIndex = menuItems.findIndex(
@@ -230,7 +253,7 @@ function Content({
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -270,7 +293,7 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
           key={category}
           className="flex flex-col items-center justify-stretch"
         >
-          <h3 className="mb-2 text-sm font-medium text-primary/20">
+          <h3 className="text-primary-muted mb-2 text-sm font-medium">
             {category === "default" ? "سایر" : category}
           </h3>
           <div className="space-y-1">
@@ -290,10 +313,12 @@ function SubMenuItem({ item }: { item: MenuItem }) {
   return (
     <Link
       href={item.link}
-      className="flex w-full flex-col  items-center justify-center py-2 text-primary/70 transition-colors hover:text-primary"
+      className="text-primary-muted group flex  w-full flex-col items-center justify-center py-2 transition-colors hover:text-primary"
     >
-      {IconComponent && <IconComponent className="mb-2 text-xl " />}
-      <span className="text-xs">{item.value}</span>
+      {IconComponent && (
+        <IconComponent className="mb-2 size-10 rounded-md border border-primary/10 p-2 text-xl group-hover:bg-primary group-hover:stroke-secondary " />
+      )}
+      <span className="text-sm">{item.value}</span>
     </Link>
   );
 }
