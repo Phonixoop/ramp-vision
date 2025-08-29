@@ -39,6 +39,7 @@ export function PersonnelPerformanceTable({
     setDataFilters,
     filtersWithNoNetworkRequest,
     setFiltersWithNoNetworkRequest,
+    isFiltering,
   } = usePersonnelPerformance();
 
   // API Queries
@@ -197,8 +198,8 @@ export function PersonnelPerformanceTable({
     periodType: filters.periodType,
     filter: {
       ...filters.filter,
-      DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
-      ProjectType: filters.filter.ProjectType,
+      // DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
+      // ProjectType: filters.filter.ProjectType,
     },
   });
 
@@ -326,11 +327,12 @@ export function PersonnelPerformanceTable({
         جزئیات عملکرد پرسنل شعب (جدول)
       </h1>
 
-      <div className="flex w-full items-center justify-center rounded-lg py-5 text-center">
+      <div className="relative flex w-full items-center justify-center rounded-lg py-5 text-center">
         <Table<PersonnelPerformanceData>
           hasClickAction
           onClick={handleRowClick}
           isLoading={personnelPerformance.isLoading}
+          isFiltering={isFiltering}
           data={tableData}
           columns={columns as ColumnDef<PersonnelPerformanceData>[]}
           renderInFilterView={() => (

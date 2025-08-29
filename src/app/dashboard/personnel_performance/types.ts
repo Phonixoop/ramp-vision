@@ -47,36 +47,21 @@ export type FilterType = {
   };
 };
 
-export type PersonnelPerformanceContextType = {
-  // Report period state
+export interface PersonnelPerformanceContextType {
   reportPeriod: PeriodType;
   setReportPeriod: (period: PeriodType) => void;
-
-  // Filters state
   filters: FilterType;
-  setDataFilters: (
-    filters: FilterType | ((prev: FilterType) => FilterType),
-  ) => void;
-
-  // Toggle state for distinct data
+  setDataFilters: (filters: FilterType | ((prev: FilterType) => FilterType)) => void;
   toggleDistinctData: "Distincted" | "Pure";
-  setToggleDistinctData: (
-    toggle:
-      | "Distincted"
-      | "Pure"
-      | ((prev: "Distincted" | "Pure") => "Distincted" | "Pure"),
-  ) => void;
-
-  // Filters without network request
-  filtersWithNoNetworkRequest: {
-    periodType: PeriodType;
-    filter: {
-      ContractType?: string[];
-      RoleTypes?: string[];
-    };
-  };
-  setFiltersWithNoNetworkRequest: (filters: any | ((prev: any) => any)) => void;
-};
+  setToggleDistinctData: (toggle: "Distincted" | "Pure" | ((prev: "Distincted" | "Pure") => "Distincted" | "Pure")) => void;
+  filtersWithNoNetworkRequest: any;
+  setFiltersWithNoNetworkRequest: (filters: any) => void;
+  // Optimistic filtering state
+  isFiltering: boolean;
+  setIsFiltering: (isFiltering: boolean) => void;
+  optimisticFilters: FilterType;
+  setOptimisticFilters: (filters: FilterType | ((prev: FilterType) => FilterType)) => void;
+}
 
 // Component Props Types
 export type PersonnelPerformanceTableProps = {

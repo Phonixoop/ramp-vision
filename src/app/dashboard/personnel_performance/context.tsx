@@ -61,6 +61,11 @@ export function PersonnelPerformanceProvider({
       },
     });
 
+  // Optimistic filtering state
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [optimisticFilters, setOptimisticFilters] =
+    useState<FilterType>(filters);
+
   // Update report period in filters when it changes
   useEffect(() => {
     setDataFilters((prev) => ({
@@ -100,6 +105,11 @@ export function PersonnelPerformanceProvider({
         setFiltersWithNoNetworkRequest(newFilters);
       }
     },
+    // Optimistic filtering state
+    isFiltering,
+    setIsFiltering,
+    optimisticFilters,
+    setOptimisticFilters,
   };
 
   return (

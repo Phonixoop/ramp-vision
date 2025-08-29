@@ -1,7 +1,5 @@
 "use client";
 import { ColumnDef, Header } from "@tanstack/react-table";
-import { LayoutGroup } from "framer-motion";
-import { InPageMenu } from "~/features/menu";
 import { SelectColumnFilterOptimized } from "~/features/checkbox-list";
 import { City_Levels } from "~/constants";
 import {
@@ -18,7 +16,9 @@ import {
 } from "~/constants/personnel-performance";
 import { sortDates } from "~/lib/utils";
 import { PersonnelPerformanceData } from "../types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { usePersonnelPerformance } from "../context";
+import { CityLevelTabs } from "./CityLevelTabs";
 
 // Extend ColumnDef to include custom properties used by the table component
 export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
@@ -71,61 +71,11 @@ export function PersonnelPerformanceColumns({
         <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
           <span className="font-bold text-primary">استان</span>
           {reportPeriod !== "ماهانه" && (
-            <LayoutGroup id="PersonnelPerformanceCityLevelMenu">
-              <InPageMenu
-                list={City_Levels.map((a) => a.name)}
-                startIndex={-1}
-                collapsedUi={false}
-                onChange={(value) => {
-                  const { setFilterValue } = column;
-                  const cities: string[] =
-                    City_Levels.find((a) => a.name === value?.item?.name)
-                      ?.cities ?? [];
-
-                  // console.log("cities from City_Levels:", cities);
-                  // console.log("initialFilters?.Cities:", initialFilters?.Cities);
-
-                  const canFilterCities = cities
-                    .filter((city) => {
-                      const mappedCities = initialFilters?.Cities?.map(
-                        (initCity: string) => getPersianToEnglishCity(initCity),
-                      );
-                      // console.log("mappedCities:", mappedCities);
-                      // console.log("checking if", city, "is in", mappedCities);
-                      return mappedCities?.includes(city) ?? false;
-                    })
-                    .map((cityName) => {
-                      const persianName = getEnglishToPersianCity(cityName);
-                      // console.log("mapping", cityName, "to", persianName);
-                      return persianName;
-                    });
-
-                  if (cities.length <= 0) {
-                    setFilterValue(initialFilters?.Cities ?? []);
-                  } else {
-                    setFilterValue(canFilterCities);
-                  }
-
-                  const cityNames = canFilterCities.map(
-                    getPersianToEnglishCity,
-                  );
-                  // console.log("Setting CityName filter with:", cityNames);
-                  // console.log("canFilterCities:", canFilterCities);
-                  // console.log(
-                  //   "initialFilters?.Cities:",
-                  //   initialFilters?.Cities,
-                  // );
-
-                  setDataFilters((prev: any) => ({
-                    ...prev,
-                    filter: {
-                      CityName: cityNames,
-                      Start_Date: prev.filter?.Start_Date ?? [],
-                    },
-                  }));
-                }}
-              />
-            </LayoutGroup>
+            <CityLevelTabs
+              initialFilters={initialFilters}
+              setDataFilters={setDataFilters}
+              setFilterValue={column.setFilterValue}
+            />
           )}
 
           <SelectColumnFilterOptimized<
@@ -137,14 +87,14 @@ export function PersonnelPerformanceColumns({
             initialFilters={initialFilters?.Cities ?? []}
             onChange={(data) => {
               console.log("data", data);
-              // setDataFilters((prev: any) => ({
-              //   ...prev,
-              //   filter: {
-              //     ...prev.filter,
-              //     CityName: data.values.map(getPersianToEnglishCity),
-              //     Start_Date: prev.filter?.Start_Date ?? [],
-              //   },
-              // }));
+              setDataFilters((prev: any) => ({
+                ...prev,
+                filter: {
+                  ...prev.filter,
+                  CityName: data.values.map(getPersianToEnglishCity),
+                  Start_Date: prev.filter?.Start_Date ?? [],
+                },
+              }));
             }}
           />
         </div>
