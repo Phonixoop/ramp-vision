@@ -43,13 +43,11 @@ export function PersonnelPerformanceTable({
   } = usePersonnelPerformance();
 
   // API Queries
-  const getInitialCities = api.personnelPerformance.getInitialCities.useQuery(
-    undefined,
-    {
+  const getInitialCities =
+    api.personnelPerformance.getInitialCityNames.useQuery(undefined, {
       enabled: sessionData?.user !== undefined,
       refetchOnWindowFocus: false,
-    },
-  );
+    });
 
   const getLastDate = api.personnelPerformance.getLastDate.useQuery(undefined, {
     enabled: sessionData?.user !== undefined,
@@ -93,16 +91,16 @@ export function PersonnelPerformanceTable({
 
   // Update filters when initial cities are available
   useEffect(() => {
-    if (getInitialCities.data?.Cities) {
+    if (getInitialCities.data?.CityNames) {
       setDataFilters((prev) => ({
         ...prev,
         filter: {
           ...prev.filter,
-          CityName: getInitialCities.data.Cities,
+          CityName: getInitialCities.data.CityNames,
         },
       }));
     }
-  }, [getInitialCities.data?.Cities]);
+  }, [getInitialCities.data?.CityNames]);
 
   // Update filters when default date info is available
   useEffect(() => {
@@ -258,7 +256,7 @@ export function PersonnelPerformanceTable({
   useEffect(() => {
     // if reportPeriod is monthly, set only one cityname to the SelectColumnFilterOptimized CityName filter if there is more than 1 already
     if (filters.periodType === "ماهانه") {
-      const cityNames = getInitialCities.data?.Cities?.slice(0, 1);
+      const cityNames = getInitialCities.data?.CityNames?.slice(0, 1);
       setDataFilters((prev: any) => ({
         ...prev,
         filter: {
@@ -317,12 +315,34 @@ export function PersonnelPerformanceTable({
       ? distincedData
       : personnelPerformance?.data?.result;
 
+  const toSelectionSet = (data, { lowerCaseKeys = true } = {}) => {
+    const norm = (k) =>
+      lowerCaseKeys ? k.charAt(0).toLowerCase() + k.slice(1) : k;
+
+    const render = (x) => {
+      if (Array.isArray(x)) return render(x[0] ?? {});
+      if (x && typeof x === "object") {
+        const fields = Object.keys(x).map((k) => {
+          const v = x[k];
+          const key = norm(k);
+          if (v && typeof v === "object") return `${key} ${render(v)}`;
+          return key;
+        });
+        return `{${fields.join(", ")}}`;
+      }
+      return ""; // primitives produce no inner shape
+    };
+
+    return render(data);
+  };
+
+  // const shape = toSelectionSet(tableData);
+  console.log({ initialFilters: initialFilters.data });
   return (
     <div
       className="flex w-full flex-col items-center justify-center gap-5 text-primary"
       dir="rtl"
     >
-      {JSON.stringify(filters, null, 2)}
       <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
         جزئیات عملکرد پرسنل شعب (جدول)
       </h1>

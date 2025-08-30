@@ -1,76 +1,148 @@
 "use client";
 
-import { useState } from "react";
+import { Column } from "@tanstack/react-table";
+import { useState, useEffect, useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger } from "~/components/shadcn/tabs";
 import { City_Levels } from "~/constants";
+import { cn } from "~/lib/utils";
+import Button from "~/ui/buttons";
 import { getEnglishToPersianCity, getPersianToEnglishCity } from "~/utils/util";
 
 interface CityLevelTabsProps {
-  initialFilters: any;
-  setDataFilters: (filters: any) => void;
-  setFilterValue: (value: string[]) => void;
-  onChange?: (selectedTab: string) => void;
+  initialCities: string[];
+  column: Column<any>;
+  onChange?: (filter: { id: string; values: string[] }) => void;
 }
 
 export function CityLevelTabs({
-  initialFilters,
-  setDataFilters,
-  setFilterValue,
+  column,
   onChange,
+  initialCities,
 }: CityLevelTabsProps) {
-  const [activeTab, setActiveTab] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const { getFilterValue } = column as Column<any>;
+  const filterValue = getFilterValue() as string[];
 
-  function handleTabChange(value: string) {
-    setActiveTab(value);
+  // Convert filter values to English city names for comparison
+  const currentFilterCities = useMemo(() => {
+    const converted =
+      filterValue?.map((city: any) => getPersianToEnglishCity(city)) || [];
+    console.log("Converting filter values:", { filterValue, converted });
+    return converted;
+  }, [filterValue]);
 
-    // Call the onChange callback if provided
-    onChange?.(value);
+  // Determine active tab based on current filter values
+  useEffect(() => {
+    console.log("currentFilterCities changed:", currentFilterCities);
+
+    if (!currentFilterCities || currentFilterCities.length === 0) {
+      console.log("No cities selected, setting activeTab to null");
+      setActiveTab(null);
+      return;
+    }
+
+    const matchingTab = City_Levels.find((level) => {
+      const tabCities = level.cities;
+      const currentCitiesSet = new Set(currentFilterCities);
+      const tabCitiesSet = new Set(tabCities);
+
+      // Check if current cities are exactly the same as tab cities
+      const isMatch =
+        currentCitiesSet.size === tabCitiesSet.size &&
+        [...currentCitiesSet].every((city) => tabCitiesSet.has(city));
+
+      console.log(`Checking tab "${level.name}":`, {
+        tabCities,
+        currentCities: currentFilterCities,
+        currentSize: currentCitiesSet.size,
+        tabSize: tabCitiesSet.size,
+        isMatch,
+      });
+
+      return isMatch;
+    });
+
+    console.log("Matching tab found:", matchingTab?.name || "none");
+    setActiveTab(matchingTab?.name || null);
+  }, [currentFilterCities]);
+
+  function handleTabChange(selectedTab: string) {
+    setActiveTab(selectedTab);
 
     const cities: string[] =
-      City_Levels.find((a) => a.name === value)?.cities ?? [];
+      City_Levels.find((a) => a.name === selectedTab)?.cities ?? [];
 
+    // Filter cities based on permissions (initialCities)
     const canFilterCities = cities
       .filter((city) => {
-        const mappedCities = initialFilters?.Cities?.map((initCity: any) =>
-          getPersianToEnglishCity(initCity.CityName),
+        const mappedInitialCities = initialCities?.map((initCity: any) =>
+          getPersianToEnglishCity(initCity),
         );
-        return mappedCities?.includes(city) ?? false;
+        return mappedInitialCities?.includes(city) ?? false;
       })
       .map((cityName) => {
         const persianName = getEnglishToPersianCity(cityName);
         return persianName;
       });
 
-    if (cities.length <= 0) {
-      setFilterValue(initialFilters?.Cities ?? []);
-    } else {
-      setFilterValue(canFilterCities);
-    }
+    const finalCities = canFilterCities;
 
-    const cityNames = canFilterCities.map(getPersianToEnglishCity);
+    console.log({
+      selectedTab,
+      cities,
+      canFilterCities,
+      finalCities,
+      initialCities,
+      mappedInitialCities: initialCities?.map((initCity: any) =>
+        getPersianToEnglishCity(initCity),
+      ),
+    });
 
-    setDataFilters((prev: any) => ({
-      ...prev,
-      filter: {
-        CityName: cityNames,
-        Start_Date: prev.filter?.Start_Date ?? [],
-      },
-    }));
+    // Let the parent handle the filtering through onChange
+    onChange?.({ id: column.id, values: finalCities });
   }
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 bg-secondary">
-        {City_Levels.map((level) => (
-          <TabsTrigger
-            key={level.name}
-            value={level.name}
-            className="text-primary data-[state=active]:bg-accent data-[state=active]:text-secondary"
-          >
-            {level.name}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
+    <TabComponent
+      tabs={City_Levels.map((level) => level.name)}
+      onChange={handleTabChange}
+      activeTab={activeTab}
+    />
+  );
+}
+
+interface CustomTabButtonProps {
+  tabs: string[];
+  onChange: (tab: string) => void;
+  activeTab?: string | null;
+}
+
+function TabComponent({ tabs, activeTab, onChange }: CustomTabButtonProps) {
+  const [isSelected, setIsSelected] = useState<string | null>(
+    activeTab || null,
+  );
+
+  useEffect(() => {
+    setIsSelected(activeTab || null);
+  }, [activeTab]);
+
+  return (
+    <div className="flex flex-row items-center justify-center">
+      {tabs.map((tab) => (
+        <Button
+          key={tab}
+          className={cn(
+            "rounded-full px-4 py-2",
+            isSelected === tab && "bg-accent text-primary",
+          )}
+          onClick={() => {
+            setIsSelected(tab);
+            onChange(tab);
+          }}
+        >
+          {tab}
+        </Button>
+      ))}
+    </div>
   );
 }

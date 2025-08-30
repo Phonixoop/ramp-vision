@@ -11,6 +11,7 @@ import { CalendarTab } from "./types";
 import SelectedItemsPanel from "./selected-items-panel";
 import { SimplifiedPersianCalendarPicker } from "~/features/persian-calendar-picker/simplified";
 import { PersianCalendarPicker } from "~/features/persian-calendar-picker";
+import LoaderAnim from "~/components/main/loader-anim";
 
 interface CalendarButtonProps {
   onSelect?: (data: {
@@ -29,10 +30,10 @@ interface CalendarButtonProps {
   placeholder?: string;
   allowMultiSelection?: boolean;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export default function CalendarButton({
-  disabled,
   onSelect,
   selectedDates = [],
   periodType = "daily",
@@ -43,6 +44,8 @@ export default function CalendarButton({
   showIcon = true,
   placeholder = "انتخاب تاریخ",
   allowMultiSelection = true,
+  disabled,
+  isLoading,
 }: CalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -89,8 +92,6 @@ export default function CalendarButton({
     dates: string[];
     periodType: "daily" | "weekly" | "monthly";
   }) => {
-    console.log("selection", selection);
-
     // Update the appropriate tab's dates based on the current period type
     switch (selection.periodType) {
       case "daily":
@@ -198,6 +199,9 @@ export default function CalendarButton({
   return (
     <div className="relative">
       <Button
+        loadType="circle"
+        loaderWrapper="replace"
+        isLoading={isLoading}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center gap-2 bg-secbuttn hover:bg-primary/10",
@@ -205,7 +209,7 @@ export default function CalendarButton({
         )}
       >
         {showIcon && <Calendar className="h-4 w-4" />}
-        {buttonText || getDisplayText()}
+        {(!isLoading && buttonText) || getDisplayText()}
       </Button>
 
       {/* Modal Overlay */}
@@ -273,7 +277,7 @@ export default function CalendarButton({
               "w-full",
               hasSelectedDates()
                 ? "bg-accent text-primary hover:bg-accent/90"
-                : "bg-muted text-muted-foreground cursor-not-allowed",
+                : "cursor-not-allowed bg-muted text-muted-foreground",
             )}
           >
             ثبت

@@ -1,5 +1,5 @@
 "use client";
-import { ColumnDef, Header } from "@tanstack/react-table";
+import { Column, ColumnDef, Header } from "@tanstack/react-table";
 import { SelectColumnFilterOptimized } from "~/features/checkbox-list";
 import { City_Levels } from "~/constants";
 import {
@@ -67,38 +67,76 @@ export function PersonnelPerformanceColumns({
       header: "استان",
       accessorKey: "CityName",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => (
-        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-          <span className="font-bold text-primary">استان</span>
-          {reportPeriod !== "ماهانه" && (
-            <CityLevelTabs
-              initialFilters={initialFilters}
-              setDataFilters={setDataFilters}
-              setFilterValue={column.setFilterValue}
-            />
-          )}
+      Filter: ({ column }) => {
+        // Track selected city values for tabs integration
+        const [selectedCityValues, setSelectedCityValues] = useState<string[]>(
+          [],
+        );
 
-          <SelectColumnFilterOptimized<
-            Pick<PersonnelPerformanceData, "CityName">
-          >
-            singleSelect={reportPeriod === "ماهانه"}
-            column={column}
-            values={initialFilters?.Cities ?? []}
-            initialFilters={initialFilters?.Cities ?? []}
-            onChange={(data) => {
-              console.log("data", data);
-              setDataFilters((prev: any) => ({
-                ...prev,
-                filter: {
-                  ...prev.filter,
-                  CityName: data.values.map(getPersianToEnglishCity),
-                  Start_Date: prev.filter?.Start_Date ?? [],
-                },
-              }));
-            }}
-          />
-        </div>
-      ),
+        // Update column filter when selectedCityValues changes
+        useEffect(() => {
+          const { setFilterValue } = column as Column<any>;
+          if (selectedCityValues.length === 0) {
+            setFilterValue(undefined);
+          } else {
+            setFilterValue(selectedCityValues);
+          }
+        }, [selectedCityValues, column]);
+
+        return (
+          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <span className="font-bold text-primary">استان</span>
+            {reportPeriod !== "ماهانه" && (
+              <CityLevelTabs
+                initialCities={initialFilters?.CityNames ?? []}
+                column={column}
+                onChange={(data) => {
+                  console.log({ dataTabs: data });
+                  setSelectedCityValues(data.values);
+
+                  setDataFilters((prev: any) => ({
+                    ...prev,
+                    filter: {
+                      ...prev.filter,
+                      CityName: data.values.map(getPersianToEnglishCity),
+                      Start_Date: prev.filter?.Start_Date ?? [],
+                    },
+                  }));
+                }}
+              />
+            )}
+
+            <SelectColumnFilterOptimized<
+              Pick<PersonnelPerformanceData, "CityName">
+            >
+              singleSelect={reportPeriod === "ماهانه"}
+              column={column}
+              values={
+                initialFilters?.CityNames?.map((a: any) => ({
+                  CityName: a,
+                })) ?? []
+              }
+              initialFilters={
+                initialFilters?.CityNames?.map((a: any) => ({
+                  CityName: a,
+                })) ?? []
+              }
+              onChange={(data) => {
+                setSelectedCityValues(data.values);
+
+                setDataFilters((prev: any) => ({
+                  ...prev,
+                  filter: {
+                    ...prev.filter,
+                    CityName: data.values.map(getPersianToEnglishCity),
+                    Start_Date: prev.filter?.Start_Date ?? [],
+                  },
+                }));
+              }}
+            />
+          </div>
+        );
+      },
     },
     {
       header: "پرسنل",
@@ -213,10 +251,6 @@ export function PersonnelPerformanceColumns({
           <span className="font-bold text-primary">نوع سمت</span>
           <SelectColumnFilterOptimized<PersonnelPerformanceData>
             initialFilters={getDefaultRoleTypesBaseOnContractType(
-              filtersWithNoNetworkRequest?.filter?.ContractType ??
-                defualtContractTypes,
-            )}
-            selectedValues={getDefaultRoleTypesBaseOnContractType(
               filtersWithNoNetworkRequest?.filter?.ContractType ??
                 defualtContractTypes,
             )}

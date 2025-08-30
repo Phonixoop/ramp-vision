@@ -25,6 +25,7 @@ import {
 import { defaultProjectTypes } from "~/constants/personnel-performance";
 import { getUserPermissions } from "~/lib/user.util";
 import { sortDates } from "~/lib/utils";
+import { queryWithParams, buildWhere } from "~/lib/sql";
 import sql from "mssql";
 const config = {
   user: process.env.SQL_USER,
@@ -93,9 +94,8 @@ export const personnelPerformanceRouter = createTRPCRouter({
         //     "more than 3 cities in monthly filter is not allowed",
         //   );
 
-        let queryStart = `
+        const baseQuery = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
-
         TownName,
         BranchCode,
         BranchName,
@@ -103,191 +103,51 @@ export const personnelPerformanceRouter = createTRPCRouter({
         
         SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
         SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-	    	SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-	    	SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-	      SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect,
+        SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect,
+        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect,
+        SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect,
+        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect,
+        SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect,
         SUM(WithScanCount) as WithScanCount,
         SUM(WithoutScanCount) as WithoutScanCount,
         SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
         SUM(ArchiveDirectCount) as ArchiveDirectCount,
         SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
         SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
-      
-
         SUM(TotalPerformance) as TotalPerformance, 
-        
         SUM(DirectPerFormance) as DirectPerFormance, 
         SUM(InDirectPerFormance) as InDirectPerFormance, 
+        DateInfo,Start_Date 
+        FROM RAMP_Daily.dbo.personnel_performance as p
+        JOIN RAMP_Daily.dbo.users_info as u on p.NationalCode = u.NationalCode`;
 
-        DateInfo,Start_Date from dbName1 as p
-        JOIN dbName2 as u on p.NationalCode = u.NationalCode  
-         `;
-        let dbName1 = "";
-        let dbName2 = "";
-        let whereClause = "";
+        let queryFilter = { ...filter };
+        let groupByClause = ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
+        BranchCode,
+        BranchName,
+        BranchType
+        Order By CityName,NameFamily`;
 
-        if (input.periodType === "روزانه") {
-          dbName1 = "RAMP_Daily.dbo.personnel_performance";
-          dbName2 = "RAMP_Daily.dbo.users_info";
-          whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
-          BranchCode,
-          BranchName,
-          BranchType
-
-          Order By CityName,NameFamily `;
-        } else if (input.periodType === "هفتگی") {
-          dbName1 = "RAMP_Daily.dbo.personnel_performance";
-          dbName2 = "RAMP_Daily.dbo.users_info";
-          filter.Start_Date = getDatesBetweenTwoDates(
+        if (input.periodType === "هفتگی") {
+          queryFilter.Start_Date = getDatesBetweenTwoDates(
             filter.Start_Date[0],
             filter.Start_Date[1],
           );
-
-          whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
-          BranchCode,
-          BranchName,
-          BranchType
-
-          Order By CityName,NameFamily `;
         } else if (input.periodType === "ماهانه") {
-          queryStart = `SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
-          TownName,
-          BranchCode,
-          BranchName,
-          BranchType,
-
-          SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-          SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-          SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-          SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-          SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-          SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-          SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-          SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-          SUM(WithScanCount) as WithScanCount,
-          SUM(WithoutScanCount) as WithoutScanCount,
-          SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
-          SUM(ArchiveDirectCount) as ArchiveDirectCount,
-          SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-          SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
-          SUM(TotalPerformance) as TotalPerformance,DateInfo,Start_Date,
-          
-          SUM(DirectPerFormance) as DirectPerFormance, 
-          SUM(InDirectPerFormance) as InDirectPerFormance
-
-          from dbName1 as p
-          JOIN dbName2 as u on p.NationalCode = u.NationalCode  
-           `;
-
-          dbName1 = "RAMP_Daily.dbo.personnel_performance";
-          dbName2 = "RAMP_Daily.dbo.users_info";
-
-          filter.Start_Date = filter.Start_Date.map((d) => {
+          queryFilter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
           });
-
-          // let dates = filter.Start_Date.map((d) => {
-          //   const _d = d.split("/");
-          //   return `'${_d[0]}/${_d[1]}'`;
-          // });
-
-          let dates = filter.Start_Date.map((d) => {
-            const _d = d.split("/");
-
-            return `LIKE '${_d[0]}/${_d[1]}/%'`;
-          });
-          const likeConditions = dates
-            .map((date) => `Start_Date  ${date} `)
-            .join(" OR ");
-          whereClause = generateWhereClause(
-            filter,
-            ["Start_Date"],
-            undefined,
-            likeConditions + " AND ",
-            //    `SUBSTRING(Start_Date, 1, 7) IN (${dates.join(",")}) AND `,
-          );
-
-          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
-          BranchCode,
-          BranchName,
-          BranchType
-            
-          Order By CityName,NameFamily `;
-          // const date = filter.Start_Date[0].split("/");
-          // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
-          //   parseInt(date[0]),
-          //   parseInt(date[1]),
-          // );
-
-          // console.log(date, lastWeek);
-          // const monthName = moment()
-          //   .locale("fa")
-          //   .month(parseInt(date[1]) - 1)
-          //   .format("MMMM");
-          //   queryStart = `
-          //   SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
-          //   SUM(CASE WHEN Start_Date = '${lastWeek}' THEN DepoCount ELSE 0 END) AS DepoCount
-
-          //   FROM
-          //   `;
         }
 
-        queryStart = queryStart.replace("dbName1", dbName1);
-        queryStart = queryStart.replace("dbName2", dbName2);
-        let query = `
-        ${queryStart}
-       
-        ${whereClause}
-        `;
+        const { text: whereClause, params } = buildWhere(queryFilter);
+        const query = `${baseQuery}${whereClause}${groupByClause}`;
 
         console.log(query);
-        const result = await sql.query(query);
-        if (input.periodType === "روزانه") {
-          finalResult = result.recordsets[0];
-        }
-        if (input.periodType === "هفتگی") {
-          // const date = filter.Start_Date[0].split("/");
+        const result = await queryWithParams(query, params);
+        finalResult = result;
 
-          // const monthName = moment()
-          //   .locale("fa")
-          //   .month(parseInt(date[1]) - 1)
-          //   .format("MMMM");
-
-          // const weekNumber = getWeekOfMonth(filter.Start_Date[0]);
-          // const weekName = `هفته ${weekNumber} ${monthName}`;
-
-          // finalResult = result.recordsets[0].map((record) => {
-          //   return {
-          //     ...record,
-          //     Start_Date: weekName,
-          //   };
-          // });
-          finalResult = result.recordsets[0];
-        }
-
-        if (input.periodType === "ماهانه") {
-          // const date = filter.Start_Date[0].split("/");
-
-          // const monthName = moment()
-          //   .locale("fa")
-          //   .month(parseInt(date[1]) - 1)
-          //   .format("MMMM");
-
-          // finalResult = result.recordsets[0].map((record) => {
-          //   return {
-          //     ...record,
-          //     Start_Date: monthName,
-          //   };
-          // });
-          finalResult = result.recordsets[0];
-        }
-
-        const uniqueData = result.recordsets[0].filter(
+        const uniqueData = result.filter(
           (obj, index, self) =>
             index ===
             self.findIndex(
@@ -551,12 +411,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
         return {
           usersInfo: result.recordsets[0],
 
-          Cities: result.recordsets[1]
+          CityNames: result.recordsets[1]
             .filter((c) => c.CityName !== "")
             .map((c) => {
-              return {
-                CityName: getEnglishToPersianCity(c.CityName),
-              };
+              return getEnglishToPersianCity(c.CityName);
             }),
           DateInfos: result.recordsets[2],
           ProjectTypes: result.recordsets[3].map((c) => c.ProjectType),
@@ -667,7 +525,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         return error;
       }
     }),
-  getInitialCities: protectedProcedure.query(async ({ ctx }) => {
+  getInitialCityNames: protectedProcedure.query(async ({ ctx }) => {
     const permissions = await getPermission({ ctx });
     const cities = permissions
       .find((permission) => permission.id === "ViewCities")
@@ -691,11 +549,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
     const result = await sql.query(query);
 
     const r = {
-      Cities: result.recordsets[0]
+      CityNames: result.recordsets[0]
         .filter((c) => c.CityName !== "")
-        .map((c) => {
-          return getEnglishToPersianCity(c.CityName);
-        }),
+        .map((c) => getEnglishToPersianCity(c.CityName)),
     };
 
     return r;
@@ -714,11 +570,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
     const result = await sql.query(query);
 
     const r = {
-      Cities: result.recordsets[0]
+      CityNames: result.recordsets[0]
         .filter((c) => c.CityName !== "")
-        .map((c) => {
-          return getEnglishToPersianCity(c.CityName);
-        }),
+        .map((c) => getEnglishToPersianCity(c.CityName)),
     };
 
     return r;
@@ -797,7 +651,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
         // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
         const result = {
-          Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
+          CityNames: resultOfCities.recordsets[0]
+            .filter((c) => c.CityName !== "")
+            .map((c) => getEnglishToPersianCity(c.CityName)),
         };
 
         return result;

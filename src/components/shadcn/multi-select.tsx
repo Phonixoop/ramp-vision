@@ -286,15 +286,8 @@ export function MultiSelectContent({
         className="min-w-[var(--radix-popover-trigger-width)] p-0"
       >
         <Command {...props}>
-          {canSearch ? (
-            <CommandInput
-              placeholder={
-                typeof search === "object" ? search.placeholder : undefined
-              }
-            />
-          ) : (
-            <button autoFocus className="sr-only" />
-          )}
+          <CommandInput placeholder={"جستجو"} />
+
           <CommandList className="max-h-[300px] overflow-y-auto">
             {canSearch && (
               <CommandEmpty>

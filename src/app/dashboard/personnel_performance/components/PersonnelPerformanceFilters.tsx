@@ -6,6 +6,7 @@ import { PeriodType } from "../types";
 import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
 import { useState, useEffect } from "react";
 import { usePersonnelPerformance } from "../context";
+import LoaderAnim from "~/components/main/loader-anim";
 
 interface PersonnelPerformanceFiltersProps {
   getLastDate: any;
@@ -100,11 +101,10 @@ export function PersonnelPerformanceFilters({
         periodType={getCalendarPeriodType(reportPeriod)}
         placeholder="انتخاب بازه زمانی"
         className="w-full"
+        isLoading={getLastDate.isLoading}
       />
       {getLastDate.isLoading ? (
-        <div className="text-primary">
-          <ThreeDotsWave />
-        </div>
+        <div className="mt-5 h-4 w-12 animate-pulse rounded-md bg-secbuttn"></div>
       ) : (
         <>
           <div className="flex w-full flex-col items-center justify-center gap-3">

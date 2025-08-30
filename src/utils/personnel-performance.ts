@@ -142,7 +142,8 @@ export function distinctPersonnelPerformanceData(
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
     return {
-      ...item,
+      ...item.key, // Spread the key properties to make them top-level
+      ...item, // Spread the aggregated values
       TotalPerformance: item.TotalPerformance / item.key.rowCount,
       DirectPerFormance: item.DirectPerFormance / item.key.rowCount,
       InDirectPerFormance: item.InDirectPerFormance / item.key.rowCount,

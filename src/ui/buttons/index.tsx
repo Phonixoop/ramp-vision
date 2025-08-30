@@ -2,6 +2,7 @@ import React, { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { motion, type MotionProps } from "motion/react";
 import { cn } from "~/lib/utils";
+import LoaderAnim from "~/components/main/loader-anim";
 
 type ButtonProps = {
   children: ReactNode;
@@ -10,6 +11,8 @@ type ButtonProps = {
   translateY?: number;
   styles?: CSSProperties;
   fillWidthOnHover?: boolean;
+  loadType?: "three-dots" | "circle";
+  loaderWrapper?: "replace" | "next-to-children";
 } & Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   "onAnimationStart" | "onDrag" | "onDragEnd" | "onDragStart" | "ref"
@@ -21,6 +24,8 @@ export default function Button({
   type = "button",
   disabled = false,
   isLoading = false,
+  loadType = "three-dots",
+  loaderWrapper = "next-to-children",
   className = "",
   initialtranslateY = 0,
   translateY = 0,
@@ -54,13 +59,18 @@ export default function Button({
       )}
       {...rest}
     >
-      {children}
+      {/* render children when is not loading, render children when is loading and loaderWrapper is next-to-children */}
+      {(isLoading && loaderWrapper === "next-to-children" && children) ||
+        (!isLoading && children)}
       {isLoading && (
         <div
           dir="rtl"
-          className="absolute top-7 flex h-fit w-fit items-center justify-start"
+          className={cn(
+            " top-7 flex h-fit w-fit items-center justify-start",
+            loaderWrapper === "replace" ? "relative" : "absolute",
+          )}
         >
-          <ThreeDotsWave />
+          {loadType === "three-dots" ? <ThreeDotsWave /> : <LoaderAnim />}
         </div>
       )}
     </motion.button>

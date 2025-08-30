@@ -273,6 +273,11 @@ export function SelectColumnFilter({
           }}
         >
           <MultiSelectGroup>
+            <input
+              type="text"
+              placeholder="جستجو..."
+              className="sticky top-0 w-full rounded-full bg-secbuttn"
+            />
             {isProcessing ? (
               <div className="flex items-center justify-center p-4 text-sm text-primary/60">
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary/20 border-t-primary"></div>
@@ -441,7 +446,6 @@ type SelectColumnFilterOptimizedProps<T> = {
   column: Column<any>;
   values: T[];
   initialFilters?: string[];
-  selectedValues?: string[];
   onChange?: (filter: { id: string; values: string[] }) => void;
   withSelectAll?: boolean;
   singleSelect?: boolean;
@@ -451,7 +455,6 @@ export function SelectColumnFilterOptimized<T>({
   column,
   values,
   initialFilters = [""],
-  selectedValues = [""],
   onChange = (filter) => {},
   withSelectAll = true,
   singleSelect = false,
@@ -477,6 +480,7 @@ export function SelectColumnFilterOptimized<T>({
   // Initialize optimistic values only once and when filteredValues actually change
   useEffect(() => {
     const currentFilteredValues = filteredValues as string[];
+
     setOptimisticValues((prev) => {
       // Only update if the values are actually different
       if (JSON.stringify(prev) !== JSON.stringify(currentFilteredValues)) {
@@ -557,7 +561,9 @@ export function SelectColumnFilterOptimized<T>({
 
   // Filter and paginate items
   const filteredItems = uniqueValues.filter((item) =>
-    item.toLowerCase().includes(searchTerm.toLowerCase()),
+    String(item || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
@@ -571,8 +577,8 @@ export function SelectColumnFilterOptimized<T>({
   };
 
   return (
-    <div className="flex w-full items-center justify-center gap-2 px-2 text-center text-primary sm:px-0 ">
-      <div className="relative flex w-full items-center gap-2">
+    <div className="flex w-full  items-center justify-between gap-2 px-2 text-center text-primary sm:px-0 ">
+      <div className="relative flex w-full max-w-[350px] items-center gap-2">
         <MultiSelect
           singleSelect={singleSelect}
           values={optimisticValues}
@@ -583,7 +589,10 @@ export function SelectColumnFilterOptimized<T>({
           }}
         >
           <MultiSelectTrigger className="min-w-0">
-            <MultiSelectValue overflowBehavior="cutoff" placeholder="جستجو..." />
+            <MultiSelectValue
+              overflowBehavior="cutoff"
+              placeholder="جستجو..."
+            />
           </MultiSelectTrigger>
 
           <MultiSelectContent search={false}>
@@ -609,7 +618,9 @@ export function SelectColumnFilterOptimized<T>({
             {totalPages > 1 && (
               <div className="sticky bottom-0 flex items-center justify-center gap-2 border-t border-primary/10 bg-secbuttn p-2">
                 <Button
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }
                   disabled={currentPage === 1}
                   className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs "
                 >
