@@ -1,3 +1,4 @@
+"use client";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";
@@ -25,7 +26,7 @@ import {
 } from "~/constants/personnel-performance";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 import { useMemo } from "react";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
@@ -54,6 +55,8 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
   );
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const distinctData = useMemo(() => {
     return distinctPersonnelPerformanceData(
@@ -95,9 +98,9 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
   //   );
   // }, [router.query.NameFamily]);
   const selectedUserData = useMemo(() => {
+    const nameFamily = searchParams.get("NameFamily");
     const spark = getCitysUsersPerformance?.data?.result?.filter(
-      (a) =>
-        a.NameFamily === router.query.NameFamily && a.HasTheDayOff === false,
+      (a) => a.NameFamily === nameFamily && a.HasTheDayOff === false,
     );
 
     const data = {
@@ -151,7 +154,7 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
     });
 
     return rrr;
-  }, [router.query.NameFamily, filters, getCitysUsersPerformance?.data]);
+  }, [searchParams, filters, getCitysUsersPerformance?.data]);
 
   return (
     <>
@@ -168,21 +171,9 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
                 //   "_blank",
                 // );
 
-                router.push(
-                  {
-                    href: router.pathname,
-
-                    query: {
-                      ...router.query,
-                      NameFamily: data["نام"],
-                    },
-                  },
-                  undefined,
-                  {
-                    scroll: false,
-                    shallow: true,
-                  },
-                );
+                const params = new URLSearchParams(searchParams);
+                params.set("NameFamily", data["نام"]);
+                router.push(`${pathname}?${params.toString()}`);
               }}
               width={500}
               height={500}
@@ -233,11 +224,11 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
       )}
 
       <>
-        {router.query.NameFamily && (
+        {searchParams.get("NameFamily") && (
           <ResponsiveContainer width="99%" height="auto">
             <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
               <H2 className="font-bold">
-                نمودار زمانی عملکرد {router.query.NameFamily}
+                نمودار زمانی عملکرد {searchParams.get("NameFamily")}
               </H2>
               <CustomBarChart
                 width={500}

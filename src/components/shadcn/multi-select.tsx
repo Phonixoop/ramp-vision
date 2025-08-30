@@ -193,19 +193,26 @@ export function MultiSelectValue({
   }, [selectedValues, checkOverflow, shouldWrap]);
 
   const handleResize = useCallback(
-    (node: HTMLDivElement) => {
-      valueRef.current = node;
-
-      const observer = new ResizeObserver(checkOverflow);
-      observer.observe(node);
-
-      return () => {
-        observer.disconnect();
-        valueRef.current = null;
-      };
+    (node: HTMLDivElement | null) => {
+      if (node) {
+        valueRef.current = node;
+        const observer = new ResizeObserver(checkOverflow);
+        observer.observe(node);
+        // Store observer for cleanup
+        (node as any)._resizeObserver = observer;
+      }
     },
     [checkOverflow],
   );
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (valueRef.current && (valueRef.current as any)._resizeObserver) {
+        (valueRef.current as any)._resizeObserver.disconnect();
+      }
+    };
+  }, []);
 
   if (selectedValues.size === 0 && placeholder) {
     return (

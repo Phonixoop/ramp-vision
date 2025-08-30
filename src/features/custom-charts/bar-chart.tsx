@@ -250,14 +250,12 @@ export default function CustomBarChart({
 function CustomLegend({ bars = [], ...rest }) {
   return (
     <div className="flex items-center justify-center gap-5 ">
-      {bars.map((bar) => {
+      {bars.map((bar, i) => {
         return (
-          <>
-            <div className="flex items-center justify-center gap-2">
-              <SquircleIcon className={twMerge("stroke-none", bar.className)} />
-              <span className="text-primary">{bar.name}</span>
-            </div>
-          </>
+          <div key={i} className="flex items-center justify-center gap-2">
+            <SquircleIcon className={twMerge("stroke-none", bar.className)} />
+            <span className="text-primary">{bar.name}</span>
+          </div>
         );
       })}
     </div>

@@ -1,3 +1,4 @@
+"use client";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";

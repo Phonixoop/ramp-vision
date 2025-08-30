@@ -119,7 +119,14 @@ export default function CalendarButton({
       } else if (periodType === "weekly") {
         return `${selectedDates.length / 2} هفته انتخاب شده`;
       } else if (periodType === "monthly") {
-        return `${selectedDates.length} ماه انتخاب شده`;
+        if (selectedDates.length === 1) {
+          // sh
+          return moment(selectedDates[0], "jYYYY/jMM/jDD")
+            .locale("fa")
+            .format("MMMM");
+        } else {
+          return `${selectedDates.length} ماه انتخاب شده`;
+        }
       }
     }
     return placeholder;
@@ -204,7 +211,7 @@ export default function CalendarButton({
         isLoading={isLoading}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-2 bg-secbuttn hover:bg-primary/10",
+          "flex min-w-[150px] items-center gap-2 bg-secbuttn hover:bg-primary/10",
           className,
         )}
       >

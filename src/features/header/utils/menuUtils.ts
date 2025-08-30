@@ -52,14 +52,14 @@ export const MENU: MenuItem[] = [
       {
         id: "personnel-chart",
         value: "عملکرد پرسنل (نمودار)",
-        link: "/dashboard/personnel_performance/cities",
+        link: "/dashboard/personnel_performance/chart",
         icon: PieChartIcon,
         category: "عملکرد پرسنل",
       },
       {
         id: "personnel-table",
         value: "عملکرد پرسنل (جدول)",
-        link: "/dashboard/personnel_performance",
+        link: "/dashboard/personnel_performance/table",
         icon: ClipboardListIcon,
         category: "عملکرد پرسنل",
       },

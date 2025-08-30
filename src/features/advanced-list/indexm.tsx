@@ -4,7 +4,7 @@ import {
   DownloadCloudIcon,
   Tally5Icon,
 } from "lucide-react";
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
 import { CSVLink } from "react-csv";
@@ -76,6 +76,11 @@ export default function AdvancedList({
   }, [sortOrder, correctList, computedList, selectProperty, onChange]);
 
   const myDisabled = computedList.length <= 0 || disabled;
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <div
@@ -145,15 +150,22 @@ export default function AdvancedList({
       </div>
 
       <Button className="sticky bottom-1 w-full bg-accent text-secondary">
-        <CSVLink
-          className="flex w-full justify-center gap-1"
-          headers={headers}
-          data={dataToDownload}
-          filename={`${downloadFileName}.csv`}
-        >
-          <DownloadCloudIcon />
-          دانلود لیست
-        </CSVLink>
+        {isClient ? (
+          <CSVLink
+            className="flex w-full justify-center gap-1"
+            headers={headers}
+            data={dataToDownload}
+            filename={`${downloadFileName}.csv`}
+          >
+            <DownloadCloudIcon />
+            دانلود لیست
+          </CSVLink>
+        ) : (
+          <div className="flex w-full justify-center gap-1">
+            <DownloadCloudIcon />
+            دانلود لیست
+          </div>
+        )}
       </Button>
     </div>
   );

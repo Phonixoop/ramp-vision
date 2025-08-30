@@ -192,7 +192,9 @@ export default function AdvancedListFast<T>({
             itemSize={rowHeight}
             width="100%"
           >
-            {({ index, style }) => renderItem(sorted[index], index)}
+            {({ index, style }) => (
+              <div style={style}>{renderItem(sorted[index], index)}</div>
+            )}
           </VList>
         ) : (
           <div className="flex h-full w-full items-center justify-center">

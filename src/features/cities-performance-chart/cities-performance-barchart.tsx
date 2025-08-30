@@ -1,3 +1,4 @@
+"use client";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";
@@ -20,7 +21,7 @@ import {
 } from "~/constants/personnel-performance";
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
 import { twMerge } from "tailwind-merge";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 import { useMemo } from "react";
 import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
@@ -32,6 +33,7 @@ export function CitiesPerformanceBarChart({
   filters: FilterType;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -80,19 +82,9 @@ export function CitiesPerformanceBarChart({
                 //   "_blank",
                 // );
 
-                router.push(
-                  {
-                    href: router.pathname,
-                    query: {
-                      performance_CityName: data.CityName_En,
-                    },
-                  },
-                  undefined,
-                  {
-                    scroll: false,
-                    shallow: true,
-                  },
-                );
+                const params = new URLSearchParams(searchParams);
+                params.set("performance_CityName", data.CityName_En);
+                router.push(`?${params.toString()}`);
               }}
               data={(getCitiesWithPerformance?.data.result ?? []).map((row) => {
                 return {
@@ -154,11 +146,11 @@ export function CitiesPerformanceBarChart({
         </div>
       )}
 
-      {!!router.query.performance_CityName && (
+      {!!searchParams.get("performance_CityName") && (
         <>
           <CityPerformanceWithUsersChart
             filters={filters}
-            cityName_En={router.query.performance_CityName as string}
+            cityName_En={searchParams.get("performance_CityName") as string}
           />
 
           <CitiesWithDatesPerformanceBarChart
@@ -166,7 +158,7 @@ export function CitiesPerformanceBarChart({
               ...filters,
               filter: {
                 ...filters.filter,
-                CityName: [router.query.performance_CityName as string],
+                CityName: [searchParams.get("performance_CityName") as string],
               },
             }}
           />

@@ -64,73 +64,221 @@ export default function CheckboxList({ checkboxes, onCheckboxChange }) {
   );
 }
 
+type SelectControlledProps = {
+  list?: string[];
+  value?: string[];
+  onChange?: (values: string[]) => void;
+  title?: string;
+  className?: string;
+  withSelectAll?: boolean;
+  singleSelect?: boolean;
+  itemsPerPage?: number;
+};
+
 export function SelectControlled({
   list = [""],
   value = [""],
-  onChange,
+  onChange = () => {},
   title,
   className = "",
   withSelectAll = false,
-}) {
-  const selectAllState = value.length < list.length;
+  singleSelect = false,
+  itemsPerPage = 50,
+}: SelectControlledProps) {
+  const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [optimisticValues, setOptimisticValues] = useState<string[]>(value);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Memoize filtered values to prevent infinite re-renders
+  const filteredValues = useMemo(() => {
+    return value ?? [];
+  }, [value]);
+
+  // Initialize optimistic values only once and when filteredValues actually change
+  useEffect(() => {
+    const currentFilteredValues = filteredValues as string[];
+
+    setOptimisticValues((prev) => {
+      // Only update if the values are actually different
+      if (JSON.stringify(prev) !== JSON.stringify(currentFilteredValues)) {
+        return currentFilteredValues;
+      }
+      return prev;
+    });
+  }, [filteredValues]);
+
+  // Memoize unique values calculation to avoid recalculating on every render
+  useLayoutEffect(() => {
+    if (!list || list.length === 0) {
+      setOptimisticValues(value);
+      return;
+    }
+
+    const processData = () => {
+      const unique: string[] = Array.from(
+        new Set(list.filter(Boolean)),
+      ).toSorted();
+
+      setIsProcessing(false);
+    };
+
+    // For large datasets, use a more controlled approach
+    if (list.length > 1000) {
+      setIsProcessing(true);
+      // Use a shorter timeout to avoid long delays
+      const timer = setTimeout(processData, 16); // ~60fps
+      return () => clearTimeout(timer);
+    } else {
+      processData();
+    }
+  }, [list]);
+
+  if (!list || list.length === 0) return <></>;
+
+  const isAllSelected = filteredValues.length === list.length;
+
+  const handleFilterChange = (values: string[]) => {
+    // Immediately update optimistic state for instant feedback
+    setOptimisticValues(values);
+    setIsFiltering(true);
+
+    // Defer the actual filter application to avoid blocking UI
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(
+        () => {
+          onChange(values);
+          setIsFiltering(false);
+        },
+        { timeout: 100 },
+      );
+    } else {
+      setTimeout(() => {
+        onChange(values);
+        setIsFiltering(false);
+      }, 0);
+    }
+  };
+
+  // Filter and paginate items
+  const filteredItems = list.filter((item) =>
+    String(item || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
+  );
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = filteredItems.slice(startIndex, endIndex);
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
   return (
     <div
-      className={twMerge(
-        " flex w-full items-center justify-center gap-1 px-2 text-center sm:px-0 ",
+      className={cn(
+        "flex w-full items-center justify-between gap-2 px-2 text-center text-primary sm:px-0",
         className,
       )}
     >
-      <MultiSelect
-        values={value}
-        defaultValues={list}
-        onValuesChange={onChange}
-      >
-        <MultiSelectTrigger className="min-w-0">
-          <MultiSelectValue placeholder={title} />
-        </MultiSelectTrigger>
-        <MultiSelectContent>
-          <MultiSelectGroup>
-            {list.map((item) => {
-              return (
-                <MultiSelectItem key={item} value={item}>
-                  <p className="px-2 text-right text-primary hover:text-accent">
-                    {item}
-                  </p>
-                </MultiSelectItem>
-              );
-            })}
-          </MultiSelectGroup>
-        </MultiSelectContent>
-      </MultiSelect>
-      {withSelectAll && list.length > 0 && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                className={twMerge(
-                  "font-bold",
-                  selectAllState
-                    ? " border border-primary/20  p-1.5 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20"
-                    : "border border-primary/20  bg-primary/10 p-1.5 text-rose-600 transition-all duration-300 hover:bg-primary/20",
-                )}
-                onClick={() => {
-                  if (value.length == list.length) {
-                    onChange([]);
-                  } else {
-                    onChange(list);
+      <div className="relative flex w-full max-w-[350px] items-center gap-2">
+        <MultiSelect
+          singleSelect={singleSelect}
+          values={optimisticValues}
+          onValuesChange={(values) => {
+            handleFilterChange(values as string[]);
+          }}
+        >
+          <MultiSelectTrigger className="min-w-0">
+            <MultiSelectValue
+              overflowBehavior="cutoff"
+              placeholder={title || "جستجو..."}
+            />
+          </MultiSelectTrigger>
+
+          <MultiSelectContent search={false}>
+            <MultiSelectGroup>
+              {isProcessing ? (
+                <div className="flex items-center justify-center p-4 text-sm text-primary/60">
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary/20 border-t-primary"></div>
+                  در حال پردازش... (CPU شما)
+                </div>
+              ) : (
+                <>
+                  {currentItems.map((item) => (
+                    <MultiSelectItem key={item} value={item}>
+                      <p className="px-2 text-right text-primary hover:text-accent">
+                        {item}
+                      </p>
+                    </MultiSelectItem>
+                  ))}
+                </>
+              )}
+            </MultiSelectGroup>
+            {/* Pagination for large datasets */}
+            {totalPages > 1 && (
+              <div className="sticky bottom-0 flex items-center justify-center gap-2 border-t border-primary/10 bg-secbuttn p-2">
+                <Button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
                   }
-                }}
-              >
-                {selectAllState ? <ListChecksIcon /> : <ListXIcon />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="bg-primary">
-              <p className="text-secondary">
-                {selectAllState ? "انتخاب همه" : "پاک کردن انتخاب ها"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+                  disabled={currentPage === 1}
+                  className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs "
+                >
+                  قبلی
+                </Button>
+                <div className="flex items-center gap-2 text-xs text-primary/60">
+                  <span className="text-primary">{totalPages}</span>
+                  <span>از </span>
+                  <span className="text-primary">{currentPage}</span>
+                </div>
+                <Button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="h-6 border border-primary/10 bg-primary/5 px-2 text-xs hover:bg-primary/10"
+                >
+                  بعدی
+                </Button>
+              </div>
+            )}
+          </MultiSelectContent>
+        </MultiSelect>
+
+        {/* Loading indicator for filtering */}
+        {isFiltering && (
+          <div className="absolute -right-2 top-1/2 -translate-y-1/2">
+            <div className="h-3 w-3 animate-spin rounded-full border border-primary/20 border-t-primary"></div>
+          </div>
+        )}
+      </div>
+
+      {withSelectAll && !singleSelect && list.length > 0 && !isProcessing && (
+        <Button
+          className={cn(
+            "rounded-xl font-bold",
+            isAllSelected
+              ? "border border-primary/10  bg-primary/10 p-1 text-rose-600 transition-all duration-300 hover:bg-primary/20"
+              : "border border-primary/10  p-1 text-emerald-600 transition-all duration-300 hover:bg-emerald-50/20",
+          )}
+          onClick={() => {
+            if (isAllSelected) {
+              handleFilterChange([]);
+            } else {
+              handleFilterChange(list);
+            }
+          }}
+        >
+          {isAllSelected ? <ListXIcon /> : <ListChecksIcon />}
+        </Button>
       )}
     </div>
   );

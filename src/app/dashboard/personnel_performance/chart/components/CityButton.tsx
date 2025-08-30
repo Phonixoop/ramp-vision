@@ -1,0 +1,82 @@
+import React from "react";
+import { SparkAreaChart } from "@tremor/react";
+import { ChevronLeftIcon } from "lucide-react";
+import { cn } from "~/lib/utils";
+import Button from "~/ui/buttons";
+import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
+import { TrendDecider } from "~/features/trend-decider";
+import { CityWithPerformanceData } from "~/types";
+
+interface CityButtonProps {
+  item: CityWithPerformanceData;
+  index: number;
+  isActive: boolean;
+  isNavigating: boolean;
+  sparkChartData: any[];
+  cityPerformances: number[];
+  onNavigate: (cityName: string) => void;
+}
+
+export const CityButton = React.memo<CityButtonProps>(
+  ({
+    item,
+    index,
+    isActive,
+    isNavigating,
+    sparkChartData,
+    cityPerformances,
+    onNavigate,
+  }) => {
+    return (
+      <Button
+        key={item.CityName_En ?? index}
+        className={cn(
+          "w-full cursor-pointer rounded-xl py-2 transition-all duration-200 ease-out",
+          isActive
+            ? "sticky top-24 z-20 bg-primary/30 text-secondary backdrop-blur-md"
+            : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
+          isNavigating && "pointer-events-none animate-pulse bg-accent/20",
+        )}
+        onClick={() => onNavigate(item.CityName_En)}
+      >
+        <div className="relative flex w-full items-center justify-between gap-2 px-2 text-right text-inherit duration-1000">
+          <span className="w-full text-sm">{item.CityName_Fa}</span>
+          <div className="flex w-full items-center justify-center">
+            <SparkAreaChart
+              data={sparkChartData}
+              noDataText="بدون داده"
+              categories={[
+                "TotalPerformance",
+                "Benchmark",
+                "Benchmark2",
+                "Benchmark3",
+              ]}
+              index="Start_Date"
+              colors={["purple", "rose", "cyan"]}
+              className={cn(
+                "dash-a pointer-events-none h-10 w-36",
+                isActive
+                  ? "animate-path animate-[move_100s_linear_infinite]"
+                  : "",
+              )}
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <TrendDecider values={cityPerformances} />
+            {Math.round(item.TotalPerformance)}%
+          </div>
+
+          <div className="w-10">
+            {isActive ? (
+              <BarChart3Loading />
+            ) : (
+              <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
+            )}
+          </div>
+        </div>
+      </Button>
+    );
+  },
+);
+
+CityButton.displayName = "CityButton";
