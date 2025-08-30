@@ -291,8 +291,9 @@ export function PersonnelPerformanceTable({
 
   // Handle row click
   const handleRowClick = (row: any) => {
-    const original = row.original;
-    toast(original.NameFamily, {
+    const original = row;
+
+    toast.info(original.NameFamily, {
       description: `عملکرد : ${Math.round(
         original.TotalPerformance,
       )} | ${getPerformanceMetric(original.TotalPerformance)?.tooltip.text}`,
@@ -337,7 +338,7 @@ export function PersonnelPerformanceTable({
   };
 
   // const shape = toSelectionSet(tableData);
-  console.log({ initialFilters: initialFilters.data });
+
   return (
     <div
       className="flex w-full flex-col items-center justify-center gap-5 text-primary"

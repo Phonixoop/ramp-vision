@@ -7,6 +7,8 @@ import Header from "~/features/header";
 import Footer from "~/features/footer";
 import { Metadata } from "next";
 import { Providers } from "~/app/providers";
+import { Toaster } from "sonner";
+// import { Toaster } from "~/components/shadcn/sonner";
 
 export const metadata: Metadata = {
   title: "رمپ",
@@ -87,13 +89,12 @@ export default function RootLayout({
           ></div>
 
           <div id="toast"></div>
-
+          <Toaster className="border-primary-muted bg-secondary text-primary" />
           <TRPCReactProvider>
             <Header />
 
             {children}
             {/* {process.env.NODE_ENV === "development" && <ScreenSize />} */}
-
             <Footer />
           </TRPCReactProvider>
         </Providers>

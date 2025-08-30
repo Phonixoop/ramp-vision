@@ -35,7 +35,8 @@
     "**/*.cjs",
     "**/*.mjs",
     "src/ui/forms/search-field/index.jsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/app/work/api/export/personnel/route"
   ],
   "exclude": [
     "node_modules",
