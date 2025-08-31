@@ -1,4 +1,5 @@
 "use client";
+import React, { Suspense } from "react";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";
@@ -33,7 +34,7 @@ import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performanc
 import { groupBy, uniqueArrayWithCounts } from "~/lib/utils";
 import moment from "jalali-moment";
 
-export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
+function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
@@ -276,6 +277,23 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
         )}
       </>
     </>
+  );
+}
+
+export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-96 w-full items-center justify-center">
+          در حال بارگذاری...
+        </div>
+      }
+    >
+      <CityPerformanceWithUsersChartContent
+        filters={filters}
+        cityName_En={cityName_En}
+      />
+    </Suspense>
   );
 }
 

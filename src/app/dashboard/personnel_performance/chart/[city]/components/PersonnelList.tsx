@@ -4,7 +4,7 @@ import { Contact2Icon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import AdvancedList from "~/features/advanced-list/indexm";
 import Button from "~/ui/buttons";
-import { PersonnelRow } from "./PersonnelRow";
+import { PersonnelRowOptimized } from "./PersonnelRowOptimized";
 import { performanceLevels } from "~/constants/personnel-performance";
 import { getEnglishToPersianCity } from "~/utils/util";
 
@@ -106,7 +106,7 @@ export const PersonnelList = React.memo<PersonnelListProps>(
           </div>
         )}
         renderItem={(user: PersonRecord, index: number) => (
-          <PersonnelRow
+          <PersonnelRowOptimized
             key={`${user?.NationalCode || "unknown"}-${
               user?.NameFamily || "unknown"
             }-${user?.Role || "unknown"}-${user?.BranchName || "unknown"}-${

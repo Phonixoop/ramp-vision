@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { usePersonnelPerformanceChart } from "../context";
@@ -69,7 +69,14 @@ export const usePersonnelChart = () => {
     setListView(distincedData ?? []);
   }, [distincedData]);
 
-  const activeCity = typeof params?.city === "string" ? params.city : "";
+  const activeCity = React.useMemo(() => {
+    if (typeof params?.city !== "string") return "";
+    try {
+      return decodeURIComponent(params.city);
+    } catch {
+      return params.city;
+    }
+  }, [params?.city]);
 
   // Reset navigation state when route changes
   useEffect(() => {

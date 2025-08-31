@@ -1,12 +1,11 @@
 import React from "react";
 import { SparkAreaChart } from "@tremor/react";
 import { ChevronLeftIcon } from "lucide-react";
-
+import { cn } from "~/lib/utils";
 import Button from "~/ui/buttons";
 import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
 import { TrendDecider } from "~/features/trend-decider";
 import { sparkChartForPersonnel } from "~/utils/personnel-performance";
-import { cn } from "~/lib/utils";
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
@@ -16,15 +15,15 @@ type PersonRecord = Record<string, any> & {
   key?: { CityName: string; NameFamily: string; NationalCode: string };
 };
 
-interface PersonnelRowProps {
+interface PersonnelRowOptimizedProps {
   user: PersonRecord;
   activeKey: { nc?: string; id?: string | number };
   getAllData: any[];
   onSelect: (sparkData: any[]) => void;
 }
 
-export const PersonnelRow = React.memo<PersonnelRowProps>(
-  function PersonnelRow({ user, activeKey, getAllData, onSelect }) {
+export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
+  ({ user, activeKey, getAllData, onSelect }) => {
     const userPerformances = React.useMemo(() => {
       return (getAllData || [])
         .filter((x: any) => x.NameFamily === user.NameFamily)
@@ -37,6 +36,17 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
         "Role",
       ]);
     }, [getAllData, user.NameFamily]);
+
+    const isActive = React.useMemo(() => {
+      return (
+        user.NationalCode === activeKey?.nc &&
+        (user as any)?.Id === activeKey?.id
+      );
+    }, [user.NationalCode, user.Id, activeKey?.nc, activeKey?.id]);
+
+    const handleClick = React.useCallback(() => {
+      onSelect(sparkData);
+    }, [onSelect, sparkData]);
 
     if (!user?.NationalCode) {
       return (
@@ -51,23 +61,12 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
       );
     }
 
-    const isActive = React.useMemo(() => {
-      return (
-        user.NationalCode === activeKey?.nc &&
-        (user as any)?.Id === activeKey?.id
-      );
-    }, [user.NationalCode, user.Id, activeKey?.nc, activeKey?.id]);
-
-    const handleClick = React.useCallback(() => {
-      onSelect(sparkData);
-    }, [onSelect, sparkData]);
-
     return (
       <Button
         className={cn(
           "w-full cursor-pointer rounded-xl py-2 transition-all duration-200 ease-out",
           isActive
-            ? "sticky top-24 z-10 bg-primary/30 text-secondary backdrop-blur-md"
+            ? "sticky top-24 z-10 bg-primary/60 text-secondary backdrop-blur-md"
             : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
         )}
         onClick={handleClick}
@@ -78,7 +77,7 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
               {isActive ? (
                 <BarChart3Loading />
               ) : (
-                <ChevronLeftIcon className="h-4 w-4 fill-none stroke-primary" />
+                <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
               )}
             </div>
           )}
@@ -98,7 +97,7 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
                 "Benchmark3",
               ]}
               noDataText="بدون داده"
-              index={"Start_Date"}
+              index="Start_Date"
               colors={["purple", "rose", "cyan"]}
               className={cn(
                 "dash-a pointer-events-none h-10 w-36",
@@ -126,4 +125,4 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
   },
 );
 
-PersonnelRow.displayName = "PersonnelRow";
+PersonnelRowOptimized.displayName = "PersonnelRowOptimized";

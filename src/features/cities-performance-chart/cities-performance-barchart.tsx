@@ -1,17 +1,18 @@
 "use client";
-import { FilterType } from "~/context/personnel-filter.context";
-import H2 from "~/ui/heading/h2";
+import React, { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ResponsiveContainer } from "recharts";
 import { api } from "~/trpc/react";
+import { FilterType } from "~/context/personnel-filter.context";
 import {
   distinctDataAndCalculatePerformance,
-  distinctPersonnelPerformanceData,
   getPerformanceMetric,
-  sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
-import { commify, getEnglishToPersianCity } from "~/utils/util";
-
-import { Cell, ResponsiveContainer } from "recharts";
-
+import {
+  commify,
+  getEnglishToPersianCity,
+} from "~/utils/util";
+import H2 from "~/ui/heading/h2";
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 import {
   Performance_Levels_Gauge,
@@ -19,15 +20,10 @@ import {
   defualtContractTypes,
   defualtRoles,
 } from "~/constants/personnel-performance";
-import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
-import { twMerge } from "tailwind-merge";
-import { useRouter, useSearchParams } from "next/navigation";
-import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
-import { useMemo } from "react";
-import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { Cell } from "recharts";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 
-export function CitiesPerformanceBarChart({
+function CitiesPerformanceBarChartContent({
   filters,
 }: {
   filters: FilterType;
@@ -142,28 +138,25 @@ export function CitiesPerformanceBarChart({
         </ResponsiveContainer>
       ) : (
         <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
-          <BarChartSkeletonLoading />
+          <H2 className="font-bold">در حال بارگذاری...</H2>
         </div>
       )}
 
-      {!!searchParams.get("performance_CityName") && (
-        <>
-          <CityPerformanceWithUsersChart
-            filters={filters}
-            cityName_En={searchParams.get("performance_CityName") as string}
-          />
-
-          <CitiesWithDatesPerformanceBarChart
-            filters={{
-              ...filters,
-              filter: {
-                ...filters.filter,
-                CityName: [searchParams.get("performance_CityName") as string],
-              },
-            }}
-          />
-        </>
+      {searchParams.get("performance_CityName") && (
+        <CitiesWithDatesPerformanceBarChart filters={filters} />
       )}
     </>
+  );
+}
+
+export function CitiesPerformanceBarChart({
+  filters,
+}: {
+  filters: FilterType;
+}) {
+  return (
+    <Suspense fallback={<div className="flex h-96 w-full items-center justify-center">در حال بارگذاری...</div>}>
+      <CitiesPerformanceBarChartContent filters={filters} />
+    </Suspense>
   );
 }

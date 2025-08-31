@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { usePersonnelPerformanceChart } from "../context";
@@ -22,7 +28,14 @@ type PersonRecord = Record<string, any> & {
 
 export const useCityPage = () => {
   const params = useParams<{ city: string }>();
-  const currentCity = params.city;
+  const currentCity = React.useMemo(() => {
+    if (!params.city) return "";
+    try {
+      return decodeURIComponent(params.city);
+    } catch {
+      return params.city;
+    }
+  }, [params.city]);
 
   const { filters } = usePersonnelPerformanceChart();
 

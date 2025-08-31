@@ -1,10 +1,11 @@
 // app/dashboard/personnel_performance/chart/layout.tsx
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { PersonnelPerformanceChart } from "./components/PersonnelPerformanceChart";
 import { PersonnelPerformanceChartProvider } from "./context";
 import { useSession } from "next-auth/react";
+import LoaderAnim from "~/components/main/loader-anim";
 
 export default function ChartLayout({
   children,
@@ -17,9 +18,11 @@ export default function ChartLayout({
     <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000">
       <div className="w-full sm:p-0 ">
         <PersonnelPerformanceChartProvider>
-          <PersonnelPerformanceChart sessionData={session}>
-            {children}
-          </PersonnelPerformanceChart>
+          <Suspense fallback={<LoaderAnim />}>
+            <PersonnelPerformanceChart sessionData={session}>
+              {children}
+            </PersonnelPerformanceChart>
+          </Suspense>
         </PersonnelPerformanceChartProvider>
       </div>
     </div>

@@ -106,7 +106,7 @@ export function CitiesWithDatesPerformanceBarChart({
         </p>
       </>
     );
-
+  console.log({ getCitiesWithPerformance: getCitiesWithPerformance.data });
   return (
     <>
       <PerformanceBadges />

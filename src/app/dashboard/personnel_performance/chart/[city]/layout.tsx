@@ -28,7 +28,7 @@ export default function CityPage() {
   }
 
   return (
-    <div className="flex  items-center justify-between gap-5  transition-colors duration-1000">
+    <div className="flex  flex-col items-center justify-between gap-5  transition-colors duration-1000">
       <div className="flex w-full flex-row-reverse justify-start gap-4  divide-secbuttn ">
         {/* Personnel List */}
         <div className=" min-w-[380px]">
@@ -59,12 +59,12 @@ export default function CityPage() {
         </div>
 
         {/* City Overview */}
-        {/* <CityOverview
-            currentCity={currentCity}
-            filters={filters}
-            selectedPerson={selectedPerson}
-          /> */}
       </div>
+      <CityOverview
+        currentCity={currentCity}
+        filters={filters}
+        selectedPerson={selectedPerson}
+      />
     </div>
   );
 }
