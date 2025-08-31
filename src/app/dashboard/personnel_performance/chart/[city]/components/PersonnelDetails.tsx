@@ -1,7 +1,8 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { ResponsiveContainer } from "recharts";
-import { twMerge } from "tailwind-merge";
+import { cn } from "~/lib/utils";
+import moment from "jalali-moment";
 import PerformanceBadgesLazy from "~/components/main/performance-badges";
 import {
   PersonnelPerformanceIcons,
@@ -11,10 +12,17 @@ import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performanc
 import ToolTipSimple from "~/features/tooltip-simple-use";
 import { ButtonWithModal } from "~/ui/button-with-modal";
 import H2 from "~/ui/heading/h2";
+import Button from "~/ui/buttons";
 import { commify } from "~/utils/util";
-import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
+import { uniqueArray } from "~/lib/utils";
+import {
+  getMonthNamesFromJOINED_date_strings,
+  distinctPersonnelPerformanceData,
+  getPerformanceMetric,
+} from "~/utils/personnel-performance";
+import { getMonthNumber } from "~/utils/date-utils";
 
-const Calender = dynamic(() => import("~/features/calender"), { ssr: false });
+const Calendar = dynamic(() => import("~/features/calendar"), { ssr: false });
 const Gauge = dynamic(() => import("~/features/gauge"), { ssr: false });
 
 type PersonRecord = Record<string, any> & {
@@ -76,14 +84,14 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
               return (
                 <React.Fragment key={key}>
                   <div
-                    className={twMerge(
+                    className={cn(
                       "group flex flex-col justify-center gap-2 p-2 last:bg-primary/80 hover:opacity-100 md:col-span-1",
                       isZero ? "opacity-50" : "bg-secbuttn",
                     )}
                   >
                     <div className="flex h-full w-full items-center justify-between gap-4 rounded-xl p-2">
                       <span
-                        className={twMerge(
+                        className={cn(
                           !isZero
                             ? "animate-path animate-[move_200s_linear_infinite]"
                             : "",
@@ -92,7 +100,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                         {PersonnelPerformanceIcons[key]}
                       </span>
                       <span
-                        className={twMerge(
+                        className={cn(
                           "text-primary group-last:text-secondary",
                           !isZero ? "font-bold" : "text-sm",
                         )}
@@ -100,7 +108,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                         {PersonnelPerformanceTranslate[key]}
                       </span>
                       <span
-                        className={twMerge(
+                        className={cn(
                           "text-primary group-last:text-secondary",
                           !isZero ? "font-bold" : "text-sm",
                         )}
@@ -144,7 +152,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                   }
                 >
                   <div
-                    className={twMerge(
+                    className={cn(
                       "flex min-w-[150px] cursor-auto items-center justify-center gap-2 rounded-2xl bg-secondary p-2",
                       isLastItem || index === 0
                         ? "md:col-span-2"
@@ -164,20 +172,91 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             {/* Calendar */}
             <div className="relative col-span-2 w-full overflow-hidden rounded-xl bg-accent/10 p-1">
               {(selectedPerson as any)?.sparkData?.length > 0 ? (
-                <Calender
+                <Calendar
                   withMonthMenu
                   collapsedUi
-                  listOfDates={[]} // This will be handled by the calendar component
-                  year={new Date().getFullYear()}
-                  defaultMonth={new Date().getMonth()}
+                  listOfDates={uniqueArray(
+                    (selectedPerson as any).sparkData.map((a: any) =>
+                      moment(a.Start_Date, "jYYYY/jMM/jDD")
+                        .format("jYYYY/jMM")
+                        .slice(0, 7),
+                    ),
+                  ).map((a) => moment(a, "jYYYY/jMM "))}
+                  year={Number.parseInt(
+                    (selectedPerson as any).sparkData[0].Start_Date.split(
+                      "/",
+                    )[0],
+                  )}
+                  defaultMonth={getMonthNumber(
+                    (selectedPerson as any).sparkData[0].Start_Date,
+                  )}
                   onDate={(date, monthNumber) => {
-                    // Calendar date handling logic
-                    return (
+                    const userCalData = (selectedPerson as any).sparkData.find(
+                      (d: any) => d.Start_Date === date.format("YYYY/MM/DD"),
+                    );
+                    const userMetric = getPerformanceMetric(
+                      userCalData?.TotalPerformance,
+                    );
+                    const hasTheDayOff = getAll.data?.result?.find(
+                      (a: any) =>
+                        a.Start_Date === date.format("YYYY/MM/DD") &&
+                        a.NationalCode ===
+                          (selectedPerson as any).key.NationalCode,
+                    )?.HasTheDayOff;
+
+                    return Number.parseInt(date.format("M")) !==
+                      monthNumber + 1 ? (
                       <div className="flex h-full w-full items-center justify-center">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-primary/50">
+                        <span
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-primary/50"
+                          style={{
+                            backgroundColor: userCalData
+                              ? userMetric.color
+                              : undefined,
+                          }}
+                        >
                           {date.format("D")}
                         </span>
                       </div>
+                    ) : (
+                      <ToolTipSimple
+                        className={cn(
+                          "cursor-default bg-secondary",
+                          !hasTheDayOff &&
+                            !userCalData?.TotalPerformance &&
+                            "hidden",
+                        )}
+                        tooltip={
+                          <span
+                            style={{
+                              color: userCalData ? userMetric.color : undefined,
+                            }}
+                            className="text-base text-primary"
+                          >
+                            {hasTheDayOff
+                              ? "مرخصی"
+                              : userCalData?.TotalPerformance?.toFixed(2)}
+                          </span>
+                        }
+                      >
+                        <div
+                          className={cn(
+                            "flex w-max cursor-default items-center justify-center rounded-lg p-2",
+                            hasTheDayOff === true
+                              ? "bg-primary text-secondary"
+                              : "bg-primary-muted/10 text-primary-muted",
+                          )}
+                          style={{
+                            backgroundColor: userCalData
+                              ? userMetric.color
+                              : undefined,
+                          }}
+                        >
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-black">
+                            {date.format("D")}
+                          </span>
+                        </div>
+                      </ToolTipSimple>
                     );
                   }}
                 />

@@ -1,10 +1,7 @@
 import moment, { Moment } from "jalali-moment";
-import { ChevronLeft, ChevronRight, MegaphoneIcon } from "lucide-react";
-import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import { InPageMenu } from "~/features/menu";
 import { LayoutGroup } from "framer-motion";
-import Button from "~/ui/buttons";
 
 function getMonthDays(m: Moment): Moment[] {
   let calendarTemp = [];
@@ -84,7 +81,7 @@ type Props = {
   listOfDates?: Moment[];
 };
 
-export default function Calender({
+export default function Calendar({
   onDate,
   onMonthChange,
   onClick = () => {},
@@ -96,7 +93,7 @@ export default function Calender({
   collapsedUi = false,
   listOfDates = [],
 }: Props) {
-  const [calendar, setCalender] = useState(
+  const [calendar, setCalendar] = useState(
     getMonthDays(
       defaultMonth >= 0
         ? moment().locale("fa").jYear(year).jMonth(defaultMonth)
@@ -126,7 +123,7 @@ export default function Calender({
                 .jMonth(calendar[16].jMonth()),
             );
 
-            setCalender(newCalendar);
+            setCalendar(newCalendar);
             // onMonthChange(
             //   newCalendar.at(0),
             //   newCalendar.at(newCalendar.length - 1),
@@ -152,8 +149,8 @@ export default function Calender({
               const newCalendar = getMonthDays(
                 moment().locale("fa").jYear(year).jMonth(monthIndex),
               );
-              console.log(value.index);
-              setCalender(newCalendar);
+
+              setCalendar(newCalendar);
               // onMonthChange(
               //   newCalendar.at(0),
               //   newCalendar.at(newCalendar.length - 1),
@@ -164,11 +161,11 @@ export default function Calender({
       )}
 
       <div className="grid grid-cols-7 gap-3 text-center text-xs text-accent md:text-base">
-        {defaultWeekdays.map((week) => {
+        {defaultWeekdays.map((week, i) => {
           return (
-            <>
-              <span className="w-full ">{week}</span>
-            </>
+            <span key={i} className="w-full ">
+              {week}
+            </span>
           );
         })}
       </div>

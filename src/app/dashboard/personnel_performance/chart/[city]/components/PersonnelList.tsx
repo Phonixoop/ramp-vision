@@ -118,7 +118,7 @@ export const PersonnelList = React.memo<PersonnelListProps>(
               id: (selectedPerson as any)?.Id,
             }}
             getAllData={getAll?.data?.result ?? []}
-            onSelect={(sparkData) => onSelectPerson({ ...user, sparkData })}
+            onSelect={(sparkData) => onSelectPerson(user, sparkData)}
           />
         )}
       />
