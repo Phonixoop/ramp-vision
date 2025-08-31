@@ -28,8 +28,8 @@ export default function CityPage() {
   }
 
   return (
-    <div className="flex  flex-col items-center justify-between gap-5  transition-colors duration-1000">
-      <div className="flex w-full flex-row-reverse justify-start gap-4  divide-secbuttn ">
+    <div className="flex h-full w-full  flex-col items-center justify-between gap-5  transition-colors duration-1000">
+      <div className="flex h-full w-full flex-row-reverse justify-start gap-4  divide-secbuttn ">
         {/* Personnel List */}
         <div className=" min-w-[380px]">
           <PersonnelList
@@ -44,27 +44,25 @@ export default function CityPage() {
             onSelectPerson={onSelectPerson}
           />
         </div>
-
-        <div className="w-full">
-          {/* Personnel Details */}
+        <div className="flex w-full flex-col items-center justify-between gap-2">
           {selectedPerson && (
-            <PersonnelDetails
-              selectedPerson={selectedPerson}
-              currentCity={currentCity}
-              filters={filters}
-              getAll={getAll}
-              setSelectedPerson={setSelectedPerson}
-            />
+            <div className="w-full">
+              <PersonnelDetails
+                selectedPerson={selectedPerson}
+                currentCity={currentCity}
+                filters={filters}
+                getAll={getAll}
+                setSelectedPerson={setSelectedPerson}
+              />
+            </div>
           )}
+          <CityOverview
+            currentCity={currentCity}
+            filters={filters}
+            selectedPerson={selectedPerson}
+          />
         </div>
-
-        {/* City Overview */}
       </div>
-      <CityOverview
-        currentCity={currentCity}
-        filters={filters}
-        selectedPerson={selectedPerson}
-      />
     </div>
   );
 }

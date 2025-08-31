@@ -160,7 +160,11 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   return (
     <>
       {!getCitysUsersPerformance.isLoading ? (
-        <ResponsiveContainer width="99%" height="auto">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          className={"min-h-[70vh] "}
+        >
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
             <H2 className="font-bold">
               نمودار عملکرد پرسنل شهر {getEnglishToPersianCity(cityName_En)}
@@ -200,20 +204,14 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
               customBars={(data) => {
                 if (data.length <= 0) return <></>;
 
-                return (
-                  <>
-                    {data.map((item, index) => {
-                      return (
-                        <>
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={getPerformanceMetric(item["عملکرد"]).color}
-                          />
-                        </>
-                      );
-                    })}
-                  </>
-                );
+                return data.map((item, index) => {
+                  return (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={getPerformanceMetric(item["عملکرد"]).color}
+                    />
+                  );
+                });
               }}
             />
           </div>
@@ -226,7 +224,11 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
 
       <>
         {searchParams.get("NameFamily") && (
-          <ResponsiveContainer width="99%" height="auto">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            className={"min-h-[70vh]"}
+          >
             <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
               <H2 className="font-bold">
                 نمودار زمانی عملکرد {searchParams.get("NameFamily")}
@@ -256,20 +258,14 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
                 customBars={(data) => {
                   if (data.length <= 0) return <></>;
 
-                  return (
-                    <>
-                      {data.map((item, index) => {
-                        return (
-                          <>
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={getPerformanceMetric(item["عملکرد"]).color}
-                            />
-                          </>
-                        );
-                      })}
-                    </>
-                  );
+                  return data.map((item, index) => {
+                    return (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={getPerformanceMetric(item["عملکرد"]).color}
+                      />
+                    );
+                  });
                 }}
               />
             </div>

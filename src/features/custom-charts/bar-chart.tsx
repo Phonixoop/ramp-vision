@@ -15,7 +15,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { twMerge } from "tailwind-merge";
+import { cn } from "~/lib/utils";
 
 const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
 
@@ -129,7 +129,7 @@ export default function CustomBarChart({
   customXTick = false,
   customYTick = false,
   brushKey,
-  formatter = (num: number) => "",
+  formatter = (label) => label,
   customBars = undefined,
   onBarClick = (data, index) => {},
 }: CustomBarChartOptions) {
@@ -178,53 +178,51 @@ export default function CustomBarChart({
             );
           })}
 
-        {bars.map((bar) => {
+        {bars.map((bar, i) => {
           return (
-            <>
-              <Bar
-                dataKey={bar.name}
-                className={bar.className}
-                onClick={(data, index) => onBarClick(data, index)}
-                shape={<RectangleBar />}
-              >
-                {customBars && customBars(data)}
+            <Bar
+              key={i}
+              dataKey={bar.name}
+              className={bar.className}
+              onClick={(data, index) => onBarClick(data, index)}
+              shape={<RectangleBar />}
+            >
+              {customBars && customBars(data)}
 
-                {bar.labelClassName && (
-                  <LabelList
-                    style={{ pointerEvents: "none" }}
-                    formatter={formatter}
-                    dataKey={bar.name}
-                    className={twMerge(
-                      bar?.labelClassName ?? "fill-cyan-400 text-sm",
-                      "text-sm",
-                    )}
-                    position={bar?.position ?? "centerTop"}
-                    angle={bar?.angle ?? -90}
-                  />
-                )}
-              </Bar>
-            </>
+              {bar.labelClassName && (
+                <LabelList
+                  style={{ pointerEvents: "none" }}
+                  formatter={(label) => formatter(label)}
+                  dataKey={bar.name}
+                  className={cn(
+                    bar?.labelClassName ?? "fill-cyan-400 text-sm",
+                    "text-sm",
+                  )}
+                  position={bar?.position ?? "centerTop"}
+                  angle={bar?.angle ?? -90}
+                />
+              )}
+            </Bar>
           );
         })}
-        {keys.map((key) => {
+        {keys.map((key, i) => {
           return (
-            <>
-              <XAxis
-                height={customXTick ? 160 : 80}
-                interval={0}
-                orientation="bottom"
-                dataKey={key}
-                scale="auto"
-                //  padding={{ left: bars.length * 35, right: bars.length * 35 }}
-                tickFormatter={(value, index) => formatter(value)}
-                tick={
-                  <CustomizedXAxisTick
-                    customXTick={customXTick}
-                    className={nameClassName}
-                  />
-                }
-              />
-            </>
+            <XAxis
+              key={i}
+              height={customXTick ? 160 : 80}
+              interval={0}
+              orientation="bottom"
+              dataKey={key}
+              scale="auto"
+              //  padding={{ left: bars.length * 35, right: bars.length * 35 }}
+              tickFormatter={(value, index) => formatter(value)}
+              tick={
+                <CustomizedXAxisTick
+                  customXTick={customXTick}
+                  className={nameClassName}
+                />
+              }
+            />
           );
         })}
         <YAxis
@@ -238,7 +236,7 @@ export default function CustomBarChart({
 
         <Legend content={<CustomLegend bars={bars} />} />
         <Tooltip
-          content={<CustomTooltip bars={bars} />}
+          content={<CustomTooltip key={"tooltip"} bars={bars} />}
           labelFormatter={(value, index) => formatter(value)}
         />
         {brushKey && <Brush dataKey={brushKey} height={30} />}
@@ -253,7 +251,7 @@ function CustomLegend({ bars = [], ...rest }) {
       {bars.map((bar, i) => {
         return (
           <div key={i} className="flex items-center justify-center gap-2">
-            <SquircleIcon className={twMerge("stroke-none", bar.className)} />
+            <SquircleIcon className={cn("stroke-none", bar.className)} />
             <span className="text-primary">{bar.name}</span>
           </div>
         );
@@ -271,23 +269,24 @@ function CustomTooltip({ bars = [], ...rest }) {
           <p className=" py-2 text-primary ">{label}</p>
         </div>
         <div className="flex w-full flex-col items-center justify-center gap-2 pb-3 ">
-          {payload.map((p) => {
+          {payload.map((p, i) => {
             const theBar = bars.find((b) => b.name === p.name);
             const valueFormat = labelFormatter
               ? labelFormatter(p.value)
               : p.value;
             return (
-              <>
-                <div className="flex w-full items-center justify-between gap-5 ">
-                  <span className="text-primary">{valueFormat}</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-primary">{p.name}</span>
-                    <SquircleIcon
-                      className={twMerge("stroke-none", theBar.className)}
-                    />
-                  </div>
+              <div
+                key={i}
+                className="flex w-full items-center justify-between gap-5 "
+              >
+                <span className="text-primary">{valueFormat}</span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-primary">{p.name}</span>
+                  <SquircleIcon
+                    className={cn("stroke-none", theBar.className)}
+                  />
                 </div>
-              </>
+              </div>
             );
           })}
         </div>

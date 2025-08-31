@@ -22,6 +22,8 @@ import {
 import moment from "jalali-moment";
 import { groupBy, uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
 import PerformanceBadges from "~/components/main/performance-badges";
+import { BarChart } from "recharts";
+import React from "react";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
@@ -106,26 +108,65 @@ export function CitiesWithDatesPerformanceBarChart({
         </p>
       </>
     );
-  console.log({ getCitiesWithPerformance: getCitiesWithPerformance.data });
+  // console.log({
+  //   dataLength: getCitiesWithPerformance?.data?.length,
+  //   mappedData: (getCitiesWithPerformance?.data ?? [])
+  //     .map((row) => {
+  //       const startDate = row.Start_Date || row.key?.Start_Date || row.تاریخ;
+  //       const totalPerformance = row.TotalPerformance || 0;
+  //       const count = row.COUNT || row.key?.rowCount || 1;
+
+  //       return {
+  //         تاریخ: startDate,
+  //         عملکرد: Math.round(totalPerformance / count),
+  //       };
+  //     })
+  //     .filter((item) => item.تاریخ && item.عملکرد > 0),
+  //   filters: filters.filter.CityName,
+  //   isLoading: getCitiesWithPerformance.isLoading,
+  //   isError: getCitiesWithPerformance.isError,
+  //   error: getCitiesWithPerformance.error,
+  // });
+
+  const chartData = (getCitiesWithPerformance?.data ?? [])
+    .map((row) => {
+      // Handle different data structures
+      // distinctPersonnelPerformanceData spreads item.key to top level
+      const startDate = row.Start_Date || row.key?.Start_Date || row.تاریخ;
+      const totalPerformance = row.TotalPerformance || 0;
+      const count = row.COUNT || row.key?.rowCount || 1;
+
+      return {
+        تاریخ: startDate,
+        عملکرد: Math.round(totalPerformance / count),
+      };
+    })
+    .filter((item) => item.تاریخ && item.عملکرد > 0);
+
+  const hasData = chartData.length > 0;
+
   return (
     <>
+      {/* Simple fake data for demonstration */}
+
       <PerformanceBadges />
+      {getCitiesWithPerformance.isError && (
+        <p className="rounded-xl bg-red-100 p-3 text-red-800">
+          خطا در دریافت داده‌ها: {getCitiesWithPerformance.error?.message}
+        </p>
+      )}
       {!getCitiesWithPerformance.isLoading ? (
-        <ResponsiveContainer width="99%" height="auto">
+        <ResponsiveContainer width="100%" height="100%">
           <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
             <H2 className="font-bold">
               نمودار زمانی عملکرد شهر{" "}
               {getEnglishToPersianCity(filters.filter.CityName[0])}
             </H2>
+
             <CustomBarChart
               width={500}
               height={500}
-              data={(getCitiesWithPerformance?.data ?? []).map((row) => {
-                return {
-                  تاریخ: row.key.Start_Date,
-                  عملکرد: Math.round(row.TotalPerformance / row.COUNT),
-                };
-              })}
+              data={chartData}
               bars={[
                 {
                   name: "عملکرد",
@@ -156,22 +197,21 @@ export function CitiesWithDatesPerformanceBarChart({
               customBars={(data) => {
                 if (data.length <= 0) return <></>;
 
-                return (
-                  <>
-                    {data.map((item, index) => {
-                      return (
-                        <>
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={getPerformanceMetric(item["عملکرد"]).color}
-                          />
-                        </>
-                      );
-                    })}
-                  </>
-                );
+                return data.map((item, index) => {
+                  return (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={getPerformanceMetric(item["عملکرد"]).color}
+                    />
+                  );
+                });
               }}
             />
+            {!hasData && (
+              <p className="rounded-xl bg-yellow-100 p-3 text-yellow-800">
+                هیچ داده‌ای برای نمایش وجود ندارد
+              </p>
+            )}
           </div>
         </ResponsiveContainer>
       ) : (

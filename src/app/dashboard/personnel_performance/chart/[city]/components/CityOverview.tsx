@@ -15,18 +15,16 @@ export const CityOverview = React.memo<CityOverviewProps>(
       <div
         dir="rtl"
         className={twMerge(
-          "flex w-full flex-col items-center justify-center gap-2 rounded-xl p-5",
+          "flex min-h-[700px] w-full flex-col items-center justify-center gap-2  rounded-xl bg-secbuttn p-5",
           selectedPerson ? "" : "",
         )}
       >
-        <ResponsiveContainer width="99%" height="auto">
-          <CitiesWithDatesPerformanceBarChart
-            filters={{
-              ...filters,
-              filter: { ...filters.filter, CityName: [currentCity] },
-            }}
-          />
-        </ResponsiveContainer>
+        <CitiesWithDatesPerformanceBarChart
+          filters={{
+            ...filters,
+            filter: { ...filters.filter, CityName: [currentCity] },
+          }}
+        />
       </div>
     );
   },
