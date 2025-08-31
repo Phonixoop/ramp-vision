@@ -44,7 +44,10 @@ export function getSecondOrLaterDayOfNextMonth(year: number, month: number) {
 }
 
 export function getWeekOfMonth(date: string) {
+  if (!date || typeof date !== "string" || date.trim() === "") return "";
+
   const currentDate = moment(date);
+  if (!currentDate.isValid()) return "";
 
   const [jalaliYear, jalaliMonth] = currentDate
     .format("YYYY/MM")
@@ -109,16 +112,31 @@ export function getDatesBetweenTwoDates(startDate, endDate) {
   return dates;
 }
 export function getMonthName(date: string) {
-  if (!date) return date;
+  if (!date || typeof date !== "string" || date.trim() === "") return "";
+
+  const dateParts = date.split("/");
+  if (dateParts.length < 2) return "";
+
+  const monthNumber = parseInt(dateParts[1]);
+  if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) return "";
+
   return moment()
     .locale("fa")
-    .month(parseInt(date.split("/")[1]) - 1)
+    .month(monthNumber - 1)
     .format("MMMM");
 }
 
 export function getMonthNumber(date: string) {
+  if (!date || typeof date !== "string" || date.trim() === "") return 0;
+
+  const dateParts = date.split("/");
+  if (dateParts.length < 2) return 0;
+
+  const monthNumber = parseInt(dateParts[1]);
+  if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) return 0;
+
   return moment()
     .locale("fa")
-    .month(parseInt(date.split("/")[1]) - 1)
+    .month(monthNumber - 1)
     .jMonth();
 }

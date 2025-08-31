@@ -5,3 +5,4 @@ export { CitiesList } from "./CitiesList";
 export { RightPane } from "./RightPane";
 export { BottomChart } from "./BottomChart";
 export { CityButton } from "./CityButton";
+export { FilterSkeleton, FilterSectionSkeleton } from "./FilterSkeleton";

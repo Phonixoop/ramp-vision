@@ -7,6 +7,7 @@ import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
 import { useState, useEffect } from "react";
 import { usePersonnelPerformance } from "../context";
 import LoaderAnim from "~/components/main/loader-anim";
+import { TableFilterSkeleton } from "./TableFilterSkeleton";
 
 interface PersonnelPerformanceFiltersProps {
   getLastDate: any;
@@ -18,15 +19,30 @@ export function PersonnelPerformanceFilters({
   const { filters, setDataFilters, reportPeriod, setReportPeriod } =
     usePersonnelPerformance();
 
+  // Safety check for filters and Start_Date
+  if (
+    !filters?.filter?.Start_Date ||
+    !Array.isArray(filters.filter.Start_Date)
+  ) {
+    return (
+      <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
+        <span className="font-bold text-primary">بازه گزارش</span>
+        <div className="text-sm text-primary">در حال بارگذاری...</div>
+      </div>
+    );
+  }
+
   // Convert moment dates to string format for the new API
   const selectedDates = filters.filter.Start_Date.map((dateStr) => {
+    if (!dateStr || typeof dateStr !== "string") return "";
+
     let date = moment(dateStr, "YYYY/MM/DD");
     if (!date.isValid()) {
       date = moment(dateStr, "jYYYY/jMM/jDD");
     }
     // Convert to YYYY-MM-DD format for the new API
-    return date.format("YYYY/MM/DD");
-  });
+    return date.isValid() ? date.format("YYYY/MM/DD") : "";
+  }).filter((date) => date !== "");
 
   // Convert period type to calendar period type
   const getCalendarPeriodType = (
@@ -94,16 +110,21 @@ export function PersonnelPerformanceFilters({
     <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
       <span className="font-bold text-primary">بازه گزارش</span>
 
-      <CalendarButton
-        disabled={getLastDate.isLoading}
-        onSelect={handleCalendarSubmit}
-        selectedDates={selectedDates}
-        periodType={getCalendarPeriodType(reportPeriod)}
-        placeholder="انتخاب بازه زمانی"
-        className="w-full"
-        isLoading={getLastDate.isLoading}
-      />
-      {getLastDate.isLoading ? (
+      {!getLastDate || getLastDate.isLoading ? (
+        <TableFilterSkeleton />
+      ) : (
+        <CalendarButton
+          disabled={!getLastDate || getLastDate.isLoading}
+          onSelect={handleCalendarSubmit}
+          selectedDates={selectedDates}
+          periodType={getCalendarPeriodType(reportPeriod)}
+          placeholder="انتخاب بازه زمانی"
+          className="w-full"
+          isLoading={!getLastDate || getLastDate.isLoading}
+        />
+      )}
+
+      {!getLastDate || getLastDate.isLoading ? (
         <div className="mt-5 h-4 w-12 animate-pulse rounded-md bg-secbuttn"></div>
       ) : (
         <>

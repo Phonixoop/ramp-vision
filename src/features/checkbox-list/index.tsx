@@ -176,10 +176,10 @@ export function SelectControlled({
   const endIndex = startIndex + itemsPerPage;
   const currentItems = filteredItems.slice(startIndex, endIndex);
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page when searching
-  };
+  // const handleSearchChange = (value: string) => {
+  //   setSearchTerm(value);
+  //   setCurrentPage(1); // Reset to first page when searching
+  // };
 
   return (
     <div
@@ -719,10 +719,10 @@ export function SelectColumnFilterOptimized<T>({
   const endIndex = startIndex + itemsPerPage;
   const currentItems = filteredItems.slice(startIndex, endIndex);
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page when searching
-  };
+  // const handleSearchChange = (value: string) => {
+  //   setSearchTerm(value);
+  //   setCurrentPage(1); // Reset to first page when searching
+  // };
 
   return (
     <div className="flex w-full  items-center justify-between gap-2 px-2 text-center text-primary sm:px-0 ">
@@ -731,8 +731,6 @@ export function SelectColumnFilterOptimized<T>({
           singleSelect={singleSelect}
           values={optimisticValues}
           onValuesChange={(values) => {
-            console.log("values", values);
-            console.log("filteredValues", filteredValues);
             handleFilterChange(values as string[]);
           }}
         >

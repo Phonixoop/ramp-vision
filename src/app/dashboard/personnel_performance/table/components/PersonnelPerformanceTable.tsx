@@ -28,6 +28,7 @@ import { PersonnelPerformanceExport } from "./PersonnelPerformanceExport";
 import { ColumnDef } from "@tanstack/react-table";
 import { PersonnelPerformanceData } from "../types";
 import { usePersonnelPerformance } from "../context";
+import { TableFiltersContainerSkeleton } from "./TableFilterSkeleton";
 
 export function PersonnelPerformanceTable({
   sessionData,
@@ -193,9 +194,9 @@ export function PersonnelPerformanceTable({
   // Deferred filter for performance
   const deferredFilter = useDeferredValue({
     ...filters,
-    periodType: filters.periodType,
+    periodType: filters?.periodType,
     filter: {
-      ...filters.filter,
+      ...filters?.filter,
       // DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
       // ProjectType: filters.filter.ProjectType,
     },
@@ -210,6 +211,7 @@ export function PersonnelPerformanceTable({
     },
   );
   // console.log(personnelPerformance.data);
+
   // Derived data
   const distincedData = useMemo(
     () =>
@@ -253,11 +255,12 @@ export function PersonnelPerformanceTable({
       ),
     [personnelPerformance.data],
   );
+
   useEffect(() => {
     // if reportPeriod is monthly, set only one cityname to the SelectColumnFilterOptimized CityName filter if there is more than 1 already
-    if (filters.periodType === "ماهانه") {
+    if (filters?.periodType === "ماهانه") {
       const cityNames = getInitialCities.data?.CityNames?.slice(0, 1);
-      setDataFilters((prev: any) => ({
+      setDataFilters?.((prev: any) => ({
         ...prev,
         filter: {
           ...prev.filter,
@@ -265,7 +268,8 @@ export function PersonnelPerformanceTable({
         },
       }));
     }
-  }, [filters.periodType]);
+  }, [filters?.periodType, getInitialCities.data?.CityNames, setDataFilters]);
+
   // Table columns configuration
   const columns = useMemo<CustomColumnDef<PersonnelPerformanceData, any>[]>(
     () =>
@@ -276,7 +280,7 @@ export function PersonnelPerformanceTable({
         filtersWithNoNetworkRequest,
         setDataFilters,
         setFiltersWithNoNetworkRequest,
-        reportPeriod: filters.periodType,
+        reportPeriod: filters?.periodType,
         getLastDate,
       }),
     [
@@ -284,7 +288,7 @@ export function PersonnelPerformanceTable({
       filtersWithNoNetworkRequest,
       filters,
       initialFilters.data,
-      filters.periodType,
+      filters?.periodType,
       getLastDate,
     ],
   );
@@ -359,16 +363,16 @@ export function PersonnelPerformanceTable({
           renderInFilterView={() => (
             <PersonnelPerformanceFilters getLastDate={getLastDate} />
           )}
-          // renderAfterFilterView={(flatRows) => (
-          //   <PersonnelPerformanceExport
-          //     flatRows={flatRows}
-          //     columns={columns as ColumnDef<PersonnelPerformanceData>[]}
-          //     personnelPerformance={personnelPerformance.data}
-          //     filters={filters}
-          //     toggleDistinctData={toggleDistinctData}
-          //     distincedData={distincedData}
-          //   />
-          // )}
+          renderAfterFilterView={(flatRows) => (
+            <PersonnelPerformanceExport
+              flatRows={flatRows}
+              columns={columns as ColumnDef<PersonnelPerformanceData>[]}
+              personnelPerformance={personnelPerformance.data}
+              filters={filters}
+              toggleDistinctData={toggleDistinctData}
+              distincedData={distincedData}
+            />
+          )}
           renderChild={(flatRows) => (
             <PersonnelPerformanceSummary
               flatRows={flatRows}

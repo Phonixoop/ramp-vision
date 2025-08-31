@@ -241,7 +241,7 @@ export function getMonthNamesFromJOINED_date_strings(
   dates: string,
   reportPeriod: PeriodType,
 ) {
-  if (typeof dates !== "string") return "";
+  if (!dates || typeof dates !== "string" || dates.trim() === "") return "";
 
   if (reportPeriod === "هفتگی") {
     const datesSplitted = dates.split(",");

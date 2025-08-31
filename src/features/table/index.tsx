@@ -79,7 +79,7 @@ type Props<TData> = {
   renderChild?: (rows: TData[]) => JSX.Element;
   renderAfterTable?: (rows: TData[]) => JSX.Element;
   renderInFilterView?: () => JSX.Element;
-  renderAfterFilterView?: (rows: Row<TData>[]) => JSX.Element;
+  renderAfterFilterView?: (rows: TData[]) => JSX.Element;
 };
 
 export default function Table<TData>({
@@ -94,7 +94,7 @@ export default function Table<TData>({
   renderChild = (rows: TData[]) => <></>,
   renderAfterTable = (rows: TData[]) => <></>,
   renderInFilterView = undefined,
-  renderAfterFilterView = (rows: Row<TData>[]) => <></>,
+  renderAfterFilterView = (rows: TData[]) => <></>,
 }: Props<TData>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -205,9 +205,9 @@ export default function Table<TData>({
                   </div>
                 </div>
               )}
-              {/* {renderInFilterView !== undefined && (
+              {renderInFilterView !== undefined && (
                 <div> {renderAfterFilterView(flatRows)}</div>
-              )} */}
+              )}
             </>
           )}
         </ResponsiveView>
