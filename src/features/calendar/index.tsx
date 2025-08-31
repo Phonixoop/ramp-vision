@@ -1,5 +1,5 @@
 import moment, { Moment } from "jalali-moment";
-import { useState } from "react";
+import React, { useState } from "react";
 import { InPageMenu } from "~/features/menu";
 import { LayoutGroup } from "framer-motion";
 
@@ -175,7 +175,7 @@ export default function Calendar({
             moment().locale("fa").format("D MMMM yyyy") ===
             item.locale("fa").format("D MMMM yyyy");
           return (
-            <>
+            <React.Fragment key={i}>
               {/* <button
                 onClick={() => onClick(item)}
                 key={i}
@@ -195,7 +195,7 @@ export default function Calendar({
               
               </button> */}
               {onDate(item, calendar[16].jMonth())}
-            </>
+            </React.Fragment>
           );
         })}
       </div>
