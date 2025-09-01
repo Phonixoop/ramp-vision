@@ -144,10 +144,6 @@ export function SelectControlled({
     }
   }, [list]);
 
-  if (!list || list.length === 0) return <></>;
-
-  const isAllSelected = filteredValues.length === list.length;
-
   const handleFilterChange = useCallback((values: string[]) => {
     // Immediately update optimistic state for instant feedback
     setOptimisticValues(values);
@@ -169,6 +165,10 @@ export function SelectControlled({
       }, 0);
     }
   }, []);
+
+  if (!list || list.length === 0) return <></>;
+
+  const isAllSelected = filteredValues.length === list.length;
 
   // Filter and paginate items
   const filteredItems = uniqueValues.filter((item) =>
