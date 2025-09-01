@@ -1,0 +1,710 @@
+"use client";
+import { ColumnDef, Header, Column } from "@tanstack/react-table";
+import {
+  commify,
+  getEnglishToPersianCity,
+  getPersianToEnglishCity,
+} from "~/utils/util";
+import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
+import { sortDates } from "~/lib/utils";
+import { PersonnelPerformanceData } from "../types";
+import { useMemo, memo, useCallback } from "react";
+import { SelectColumnFilterOptimized } from "~/features/checkbox-list";
+import { CityLevelTabs } from "./CityLevelTabs";
+import { FilterSkeleton } from "~/components/skeletons/FilterSkeleton";
+import {
+  defaultProjectTypes,
+  defualtContractTypes,
+  defualtRoles,
+  getDefaultRoleTypesBaseOnContractType,
+} from "~/constants/personnel-performance";
+
+// Extend ColumnDef to include custom properties used by the table component
+export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
+  hSticky?: boolean;
+  accessorKey?: string;
+  width?: number;
+  Filter?: React.ComponentType<{ column: Column<TData, TValue> }>;
+};
+
+interface PersonnelPerformanceColumnsProps {
+  personnelPerformance: any;
+  initialFilters: any;
+  filters: any;
+  filtersWithNoNetworkRequest: any;
+  setDataFilters: (filters: any) => void;
+  setFiltersWithNoNetworkRequest: (filters: any) => void;
+  reportPeriod: string;
+  getLastDate: any;
+}
+
+export function PersonnelPerformanceColumns({
+  personnelPerformance,
+  initialFilters,
+  filters,
+  filtersWithNoNetworkRequest,
+  setDataFilters,
+  setFiltersWithNoNetworkRequest,
+  reportPeriod,
+  getLastDate,
+}: PersonnelPerformanceColumnsProps): CustomColumnDef<
+  PersonnelPerformanceData,
+  string | number | null
+>[] {
+  // Memoized Filter Components - defined inside the columns factory to access props
+  const CityNameFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize city values to prevent unnecessary re-renders
+      const cityValues = useMemo(() => {
+        return filters.filter?.CityName?.map(getPersianToEnglishCity) ?? [];
+      }, [filters.filter?.CityName]);
+
+      const handleChange = useCallback(
+        (filter: { id: string; values: string[] }) => {
+          setDataFilters((prev: any) => ({
+            ...prev,
+            filter: {
+              ...prev.filter,
+              CityName: filter.values.map(getPersianToEnglishCity),
+            },
+          }));
+        },
+        [setDataFilters],
+      );
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">استان</span>
+          <SelectColumnFilterOptimized<
+            Pick<PersonnelPerformanceData, "CityName">
+          >
+            singleSelect={reportPeriod === "ماهانه"}
+            column={column}
+            values={cityValues.map((city) => ({ CityName: city }))}
+            initialFilters={cityValues}
+            onChange={handleChange}
+          />
+        </div>
+      );
+    },
+  );
+
+  const NameFamilyFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize personnel data
+      const personnelValues = useMemo(() => {
+        return personnelPerformance?.data?.result ?? [];
+      }, [personnelPerformance?.data?.result]);
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">پرسنل</span>
+          <SelectColumnFilterOptimized<
+            Pick<PersonnelPerformanceData, "NameFamily">
+          >
+            column={column}
+            values={personnelValues}
+          />
+        </div>
+      );
+    },
+  );
+
+  const ProjectTypeFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize project type options
+      const projectTypeOptions = useMemo(() => {
+        return (initialFilters?.ProjectTypes ?? []).map((a: string) => ({
+          ProjectType: a,
+        }));
+      }, [initialFilters?.ProjectTypes]);
+
+      const handleChange = useCallback(
+        (filter: { id: string; values: string[] }) => {
+          setDataFilters((prev: any) => ({
+            ...prev,
+            filter: {
+              ...prev.filter,
+              [filter.id]: filter.values,
+            },
+          }));
+        },
+        [setDataFilters],
+      );
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">نوع پروژه</span>
+          <SelectColumnFilterOptimized<
+            Pick<PersonnelPerformanceData, "ProjectType">
+          >
+            initialFilters={filters?.filter?.ProjectType ?? defaultProjectTypes}
+            column={column}
+            values={projectTypeOptions}
+            onChange={handleChange}
+          />
+        </div>
+      );
+    },
+  );
+
+  const ContractTypeFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize contract type options
+      const contractTypeOptions = useMemo(() => {
+        return defualtContractTypes.map((a: string) => ({ ContractType: a }));
+      }, []);
+
+      const handleChange = useCallback(
+        (filter: { id: string; values: string[] }) => {
+          setFiltersWithNoNetworkRequest((prev: any) => ({
+            ...prev,
+            filter: {
+              ...prev.filter,
+              [filter.id]: filter.values,
+            },
+          }));
+        },
+        [setFiltersWithNoNetworkRequest],
+      );
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">نوع قرارداد</span>
+          <SelectColumnFilterOptimized<
+            Pick<PersonnelPerformanceData, "ContractType">
+          >
+            initialFilters={
+              filtersWithNoNetworkRequest?.filter?.ContractType ??
+              defualtContractTypes
+            }
+            column={column}
+            values={contractTypeOptions}
+            onChange={handleChange}
+          />
+        </div>
+      );
+    },
+  );
+
+  const RoleFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize role options
+      const roleOptions = useMemo(() => {
+        return defualtRoles.map((a: string) => ({ Role: a }));
+      }, []);
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">سمت</span>
+          <SelectColumnFilterOptimized<Pick<PersonnelPerformanceData, "Role">>
+            initialFilters={defualtRoles}
+            column={column}
+            values={roleOptions}
+          />
+        </div>
+      );
+    },
+  );
+
+  const RoleTypeFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize role type options based on contract type
+      const roleTypeOptions = useMemo(() => {
+        return getDefaultRoleTypesBaseOnContractType(
+          filtersWithNoNetworkRequest?.filter?.ContractType ??
+            defualtContractTypes,
+        ).map((a: string) => ({ RoleType: a }));
+      }, [filtersWithNoNetworkRequest?.filter?.ContractType]);
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">نوع سمت</span>
+          <SelectColumnFilterOptimized<
+            Pick<PersonnelPerformanceData, "RoleType">
+          >
+            initialFilters={getDefaultRoleTypesBaseOnContractType(
+              filtersWithNoNetworkRequest?.filter?.ContractType ??
+                defualtContractTypes,
+            )}
+            column={column}
+            values={roleTypeOptions}
+          />
+        </div>
+      );
+    },
+  );
+
+  const DateInfoFilter = memo(
+    ({ column }: { column: Column<PersonnelPerformanceData, any> }) => {
+      // Memoize date info options
+      const dateInfoOptions = useMemo(() => {
+        if (!initialFilters?.DateInfos) return [];
+        const _DateInfos: string[] = initialFilters.DateInfos.map(
+          (a: any) => a.DateInfo,
+        );
+        const DateInfos = sortDates({ dates: _DateInfos });
+        return DateInfos.map((a: string) => ({ DateInfo: a }));
+      }, [initialFilters?.DateInfos]);
+
+      const initialDateInfo = useMemo(() => {
+        if (!initialFilters?.DateInfos) return [];
+        const _DateInfos: string[] = initialFilters.DateInfos.map(
+          (a: any) => a.DateInfo,
+        );
+        const DateInfos = sortDates({ dates: _DateInfos });
+        return (
+          filters?.filter?.DateInfo ??
+          (DateInfos.length > 0 ? [DateInfos.at(-1)!] : [])
+        );
+      }, [initialFilters?.DateInfos, filters?.filter?.DateInfo]);
+
+      const handleChange = useCallback(
+        (filter: { id: string; values: string[] }) => {
+          setDataFilters((prev: any) => ({
+            ...prev,
+            filter: {
+              ...prev.filter,
+              [filter.id]: filter.values.filter((a: string) => a),
+            },
+          }));
+        },
+        [setDataFilters],
+      );
+
+      if (!initialFilters?.DateInfos) return null;
+
+      return (
+        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+          <span className="font-bold text-primary">تاریخ گزارش پرسنل</span>
+          <SelectColumnFilterOptimized<
+            Pick<PersonnelPerformanceData, "DateInfo">
+          >
+            singleSelect
+            column={column}
+            initialFilters={initialDateInfo}
+            values={dateInfoOptions}
+            onChange={handleChange}
+          />
+        </div>
+      );
+    },
+  );
+
+  return [
+    {
+      header: "ردیف",
+      accessorKey: "Id",
+      cell: ({ row }) => (
+        <div className="w-full cursor-pointer rounded-full px-2 py-2 text-primary">
+          {row.index + 1}
+        </div>
+      ),
+    },
+    {
+      header: "استان",
+      accessorKey: "CityName",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: CityNameFilter,
+    },
+    {
+      header: "پرسنل",
+      hSticky: true,
+      width: 200,
+      accessorKey: "NameFamily",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: NameFamilyFilter,
+    },
+    {
+      header: "نوع پروژه",
+      hSticky: true,
+      width: 200,
+      accessorKey: "ProjectType",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: ProjectTypeFilter,
+    },
+    {
+      header: "نوع قرارداد",
+      hSticky: true,
+      width: 200,
+      accessorKey: "ContractType",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: ContractTypeFilter,
+    },
+    {
+      header: "سمت",
+      hSticky: true,
+      width: 250,
+      accessorKey: "Role",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: RoleFilter,
+    },
+    {
+      header: "نوع سمت",
+      enablePinning: true,
+      hSticky: false,
+      accessorKey: "RoleType",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: RoleTypeFilter,
+    },
+    // Performance columns
+    {
+      header: "عملکرد کلی",
+      accessorKey: "TotalPerformance",
+      cell: ({ row }) => (
+        <span>{row.original.TotalPerformance?.toFixed(2) ?? "0.00"}</span>
+      ),
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            Math.round(
+              filteredRows.reduce(
+                (total, row) =>
+                  total + (Number(row.getValue("TotalPerformance")) || 0),
+                0,
+              ),
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "عملکرد مستقیم",
+      accessorKey: "DirectPerFormance",
+      cell: ({ row }) => (
+        <span>{row.original.DirectPerFormance?.toFixed(2) ?? "0.00"}</span>
+      ),
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            Math.round(
+              filteredRows.reduce(
+                (total, row) =>
+                  total + (Number(row.getValue("DirectPerFormance")) || 0),
+                0,
+              ),
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "عملکرد غیر مستقیم",
+      accessorKey: "InDirectPerFormance",
+      cell: ({ row }) => (
+        <span>{row.original.InDirectPerFormance?.toFixed(2) ?? "0.00"}</span>
+      ),
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            Math.round(
+              filteredRows.reduce(
+                (total, row) =>
+                  total + (Number(row.getValue("InDirectPerFormance")) || 0),
+                0,
+              ),
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    // Document processing columns
+    {
+      header: "ثبت اولیه اسناد",
+      accessorKey: "SabtAvalieAsnad",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("SabtAvalieAsnad")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "پذیرش و ثبت اولیه اسناد",
+      accessorKey: "PazireshVaSabtAvalieAsnad",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total +
+                (Number(row.getValue("PazireshVaSabtAvalieAsnad")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی اسناد بیمارستانی مستقیم",
+      accessorKey: "ArzyabiAsanadBimarsetaniDirect",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total +
+                (Number(row.getValue("ArzyabiAsanadBimarsetaniDirect")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی اسناد بیمارستانی غیر مستقیم",
+      accessorKey: "ArzyabiAsnadBimarestaniIndirect",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total +
+                (Number(row.getValue("ArzyabiAsnadBimarestaniIndirect")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی اسناد دندان و پارا مستقیم",
+      accessorKey: "ArzyabiAsnadDandanVaParaDirect",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total +
+                (Number(row.getValue("ArzyabiAsnadDandanVaParaDirect")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی اسناد دندان و پارا غیر مستقیم",
+      accessorKey: "ArzyabiAsnadDandanVaParaIndirect",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total +
+                (Number(row.getValue("ArzyabiAsnadDandanVaParaIndirect")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی اسناد دارو مستقیم",
+      accessorKey: "ArzyabiAsnadDaroDirect",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("ArzyabiAsnadDaroDirect")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی اسناد دارو غیر مستقیم",
+      accessorKey: "ArzyabiAsnadDaroIndirect",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("ArzyabiAsnadDaroIndirect")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ثبت ارزیابی با اسکن مدارک",
+      accessorKey: "WithScanCount",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("WithScanCount")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
+      accessorKey: "WithoutScanInDirectCount",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("WithoutScanInDirectCount")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ثبت ارزیابی بدون اسکن مدارک",
+      accessorKey: "WithoutScanCount",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("WithoutScanCount")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "بایگانی مستقیم",
+      accessorKey: "ArchiveDirectCount",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("ArchiveDirectCount")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "بایگانی غیر مستقیم",
+      accessorKey: "ArchiveInDirectCount",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("ArchiveInDirectCount")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    {
+      header: "ارزیابی ویزیت",
+      accessorKey: "ArzyabiVisitDirectCount",
+      footer: ({ table }) => {
+        const filteredRows = table.getFilteredRowModel().rows;
+        const total = useMemo(
+          () =>
+            filteredRows.reduce(
+              (total, row) =>
+                total + (Number(row.getValue("ArzyabiVisitDirectCount")) || 0),
+              0,
+            ),
+          [filteredRows],
+        );
+        return commify(total);
+      },
+    },
+    // Date columns
+    {
+      header: "بازه گزارش",
+      accessorKey: "Start_Date",
+      filterFn: "arrIncludesSome",
+      cell: ({ row }) => {
+        if (personnelPerformance?.periodType === "هفتگی") {
+          return (
+            <span>
+              {getMonthNamesFromJOINED_date_strings(
+                filters?.filter?.Start_Date?.join(",") ?? "",
+                personnelPerformance.periodType,
+              )}
+            </span>
+          );
+        }
+
+        if (personnelPerformance?.periodType === "ماهانه") {
+          return (
+            <span>
+              {getMonthNamesFromJOINED_date_strings(
+                row.original.Start_Date ?? "",
+                personnelPerformance.periodType,
+              )}
+            </span>
+          );
+        }
+
+        if (personnelPerformance?.periodType === "روزانه") {
+          return <span>{filters?.filter?.Start_Date?.join(",") ?? ""}</span>;
+        }
+
+        return null;
+      },
+    },
+    {
+      header: "تاریخ گزارش پرسنل",
+      accessorKey: "DateInfo",
+      filterFn: "arrIncludesSome",
+      enableColumnFilter: true,
+      Filter: DateInfoFilter,
+    },
+  ];
+}

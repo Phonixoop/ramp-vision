@@ -38,6 +38,17 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
       ]);
     }, [getAllData, user.NameFamily]);
 
+    const isActive = React.useMemo(() => {
+      return (
+        user.NationalCode === activeKey?.nc &&
+        (user as any)?.Id === activeKey?.id
+      );
+    }, [user.NationalCode, user.Id, activeKey?.nc, activeKey?.id]);
+
+    const handleClick = React.useCallback(() => {
+      onSelect(sparkData);
+    }, [onSelect, sparkData]);
+
     if (!user?.NationalCode) {
       return (
         <div className="flex w-full animate-pulse flex-row-reverse items-center justify-between gap-2 rounded-xl bg-secondary/60 p-3 text-right text-primary">
@@ -50,17 +61,6 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
         </div>
       );
     }
-
-    const isActive = React.useMemo(() => {
-      return (
-        user.NationalCode === activeKey?.nc &&
-        (user as any)?.Id === activeKey?.id
-      );
-    }, [user.NationalCode, user.Id, activeKey?.nc, activeKey?.id]);
-
-    const handleClick = React.useCallback(() => {
-      onSelect(sparkData);
-    }, [onSelect, sparkData]);
 
     return (
       <Button

@@ -88,29 +88,35 @@ export function SelectControlled({
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+  const [uniqueValues, setUniqueValues] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
   const [optimisticValues, setOptimisticValues] = useState<string[]>(value);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+
+  // Store onChange in a ref to prevent infinite loops
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  // Store previous value to prevent unnecessary updates
+  const prevValueRef = useRef<string[]>(value ?? []);
 
   // Memoize filtered values to prevent infinite re-renders
   const filteredValues = useMemo(() => {
     return value ?? [];
   }, [value]);
 
-  // Initialize optimistic values only once and when filteredValues actually change
+  // Update optimistic values when value changes
   useEffect(() => {
-    const currentFilteredValues = filteredValues as string[];
+    const currentValue = value ?? [];
+    const prevValue = prevValueRef.current;
 
-    setOptimisticValues((prev) => {
-      // Only update if the values are actually different
-      if (JSON.stringify(prev) !== JSON.stringify(currentFilteredValues)) {
-        return currentFilteredValues;
-      }
-      return prev;
-    });
-  }, [filteredValues]);
+    // Only update if the values are actually different
+    if (JSON.stringify(prevValue) !== JSON.stringify(currentValue)) {
+      setOptimisticValues(currentValue);
+      prevValueRef.current = currentValue;
+    }
+  }, [value]);
 
   // Memoize unique values calculation to avoid recalculating on every render
   useLayoutEffect(() => {
@@ -120,10 +126,10 @@ export function SelectControlled({
     }
 
     const processData = () => {
-      const unique: string[] = Array.from(
-        new Set(list.filter(Boolean)),
-      ).toSorted();
-
+      const unique: string[] = Array.from(new Set(list.filter(Boolean)))
+        .filter((a) => a != "")
+        .toSorted();
+      setUniqueValues(unique);
       setIsProcessing(false);
     };
 
@@ -142,7 +148,7 @@ export function SelectControlled({
 
   const isAllSelected = filteredValues.length === list.length;
 
-  const handleFilterChange = (values: string[]) => {
+  const handleFilterChange = useCallback((values: string[]) => {
     // Immediately update optimistic state for instant feedback
     setOptimisticValues(values);
     setIsFiltering(true);
@@ -151,30 +157,30 @@ export function SelectControlled({
     if (typeof window !== "undefined" && "requestIdleCallback" in window) {
       (window as any).requestIdleCallback(
         () => {
-          onChange(values);
+          onChangeRef.current(values);
           setIsFiltering(false);
         },
         { timeout: 100 },
       );
     } else {
       setTimeout(() => {
-        onChange(values);
+        onChangeRef.current(values);
         setIsFiltering(false);
       }, 0);
     }
-  };
+  }, []);
 
   // Filter and paginate items
-  const filteredItems = list.filter((item) =>
-    String(item || "")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase()),
+  const filteredItems = uniqueValues.filter((item) =>
+    String(item || "").toLowerCase(),
   );
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredItems.slice(startIndex, endIndex);
+
+  // Get the paginated items to display
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
 
   // const handleSearchChange = (value: string) => {
   //   setSearchTerm(value);
@@ -212,7 +218,7 @@ export function SelectControlled({
                 </div>
               ) : (
                 <>
-                  {currentItems.map((item) => (
+                  {paginatedItems.map((item) => (
                     <MultiSelectItem key={item} value={item}>
                       <p className="px-2 text-right text-primary hover:text-accent">
                         {item}
@@ -260,7 +266,6 @@ export function SelectControlled({
           </div>
         )}
       </div>
-
       {withSelectAll && !singleSelect && list.length > 0 && !isProcessing && (
         <Button
           className={cn(
@@ -449,7 +454,7 @@ export function SelectColumnFilter({
         !isProcessing && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button
                   className={cn(
                     "rounded-xl font-bold",
@@ -608,6 +613,11 @@ export function SelectColumnFilterOptimized<T>({
   singleSelect = false,
   itemsPerPage = 50,
 }: SelectColumnFilterOptimizedProps<T>) {
+  // Use a more stable approach for initialFilters
+  const stableInitialFilters = useMemo(() => {
+    if (!initialFilters || initialFilters.length === 0) return [];
+    return initialFilters;
+  }, [initialFilters?.length, initialFilters?.join(",")]);
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
@@ -625,17 +635,10 @@ export function SelectColumnFilterOptimized<T>({
     return (getFilterValue() as string[]) ?? [];
   }, [getFilterValue]);
 
-  // Initialize optimistic values only once and when filteredValues actually change
+  // Initialize optimistic values when filteredValues change
   useEffect(() => {
     const currentFilteredValues = filteredValues as string[];
-
-    setOptimisticValues((prev) => {
-      // Only update if the values are actually different
-      if (JSON.stringify(prev) !== JSON.stringify(currentFilteredValues)) {
-        return currentFilteredValues;
-      }
-      return prev;
-    });
+    setOptimisticValues(currentFilteredValues);
   }, [filteredValues]);
 
   // Memoize unique values calculation to avoid recalculating on every render
@@ -669,9 +672,19 @@ export function SelectColumnFilterOptimized<T>({
     }
   }, [values, column.id]);
 
+  // Initialize filter value only once when component mounts
+  const hasInitialized = useRef(false);
+
   useIsomorphicLayoutEffect(() => {
-    setFilterValue(initialFilters);
-  }, []);
+    if (
+      !hasInitialized.current &&
+      stableInitialFilters &&
+      stableInitialFilters.length > 0
+    ) {
+      setFilterValue(stableInitialFilters);
+      hasInitialized.current = true;
+    }
+  }, [stableInitialFilters]);
 
   if (!values || values.length === 0) return <></>;
 
@@ -729,6 +742,7 @@ export function SelectColumnFilterOptimized<T>({
       <div className="relative flex w-full max-w-[350px] items-center gap-2">
         <MultiSelect
           singleSelect={singleSelect}
+          defaultValues={stableInitialFilters}
           values={optimisticValues}
           onValuesChange={(values) => {
             handleFilterChange(values as string[]);

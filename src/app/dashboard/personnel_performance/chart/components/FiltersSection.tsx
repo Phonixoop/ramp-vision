@@ -12,7 +12,10 @@ import {
 } from "~/components/shadcn/accordion";
 import { PeriodType } from "../types";
 import { cn, sortDates } from "~/lib/utils";
-import { FilterSectionSkeleton, FilterSkeleton } from "./FilterSkeleton";
+import {
+  FilterSectionSkeleton,
+  FilterSkeleton,
+} from "~/components/skeletons/FilterSkeleton";
 
 interface FiltersSectionProps {
   filters: any;

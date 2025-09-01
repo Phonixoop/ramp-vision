@@ -8,10 +8,7 @@ import {
   distinctDataAndCalculatePerformance,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
-import {
-  commify,
-  getEnglishToPersianCity,
-} from "~/utils/util";
+import { commify, getEnglishToPersianCity } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 import {
@@ -22,6 +19,8 @@ import {
 } from "~/constants/personnel-performance";
 import { Cell } from "recharts";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
+import { CityPerformanceWithUsersChart } from "~/features/cities-performance-chart/cities-performance-bar-chart";
+import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 
 function CitiesPerformanceBarChartContent({
   filters,
@@ -60,15 +59,15 @@ function CitiesPerformanceBarChartContent({
   return (
     <>
       {!getCitiesWithPerformance.isLoading ? (
-        <ResponsiveContainer width="99%" height="auto">
-          <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
-            <H2 className="font-bold">نمودار عملکرد شهر ها</H2>
-            <H2 className="font-bold">
-              {getCitiesWithPerformance?.data?.periodType}
-            </H2>
-            {/* <H2 className="font-bold">
-              {getCitiesWithPerformance?.data?.dateLength[""]} روز
-            </H2> */}
+        <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn/50 py-5 xl:p-5">
+          <H2 className="font-bold">نمودار عملکرد شهر ها</H2>
+          <H2 className="font-bold">
+            {getCitiesWithPerformance?.data?.periodType}
+          </H2>
+          {/* <H2 className="font-bold">
+            {getCitiesWithPerformance?.data?.dateLength[""]} روز
+          </H2> */}
+          <div className="h-[500px] w-full">
             <CustomBarChart
               width={500}
               height={500}
@@ -80,7 +79,7 @@ function CitiesPerformanceBarChartContent({
 
                 const params = new URLSearchParams(searchParams);
                 params.set("performance_CityName", data.CityName_En);
-                router.push(`?${params.toString()}`);
+                router.push(`?${params.toString()}`, { scroll: false });
               }}
               data={(getCitiesWithPerformance?.data.result ?? []).map((row) => {
                 return {
@@ -118,32 +117,41 @@ function CitiesPerformanceBarChartContent({
               customBars={(data) => {
                 if (data.length <= 0) return <></>;
 
-                return (
-                  <>
-                    {data.map((item, index) => {
-                      return (
-                        <>
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={getPerformanceMetric(item["عملکرد"]).color}
-                          />
-                        </>
-                      );
-                    })}
-                  </>
-                );
+                return data.map((item, index) => {
+                  return (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={getPerformanceMetric(item["عملکرد"]).color}
+                    />
+                  );
+                });
               }}
             />
           </div>
-        </ResponsiveContainer>
+        </div>
       ) : (
         <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
-          <H2 className="font-bold">در حال بارگذاری...</H2>
+          <BarChartSkeletonLoading />
         </div>
       )}
 
       {searchParams.get("performance_CityName") && (
-        <CitiesWithDatesPerformanceBarChart filters={filters} />
+        <>
+          <CityPerformanceWithUsersChart
+            filters={filters}
+            cityName_En={searchParams.get("performance_CityName") as string}
+          />
+
+          <CitiesWithDatesPerformanceBarChart
+            filters={{
+              ...filters,
+              filter: {
+                ...filters.filter,
+                CityName: [searchParams.get("performance_CityName") as string],
+              },
+            }}
+          />
+        </>
       )}
     </>
   );
@@ -155,7 +163,13 @@ export function CitiesPerformanceBarChart({
   filters: FilterType;
 }) {
   return (
-    <Suspense fallback={<div className="flex h-96 w-full items-center justify-center">در حال بارگذاری...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-96 w-full items-center justify-center">
+          در حال بارگذاری...
+        </div>
+      }
+    >
       <CitiesPerformanceBarChartContent filters={filters} />
     </Suspense>
   );

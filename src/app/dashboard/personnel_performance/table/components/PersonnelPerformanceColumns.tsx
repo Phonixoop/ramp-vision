@@ -1,6 +1,10 @@
 "use client";
 import { Column, ColumnDef, Header } from "@tanstack/react-table";
-import { SelectColumnFilterOptimized } from "~/features/checkbox-list";
+import {
+  SelectColumnFilter,
+  SelectColumnFilterOptimized,
+  SelectControlled,
+} from "~/features/checkbox-list";
 import { City_Levels } from "~/constants";
 import {
   commify,
@@ -16,16 +20,23 @@ import {
 } from "~/constants/personnel-performance";
 import { sortDates } from "~/lib/utils";
 import { PersonnelPerformanceData } from "../types";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { usePersonnelPerformance } from "../context";
 import { CityLevelTabs } from "./CityLevelTabs";
 import { TableFilterSkeleton } from "./TableFilterSkeleton";
+import { CityNameFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/cityName";
+import { PersonnelFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/personnel";
+import { ProjectTypeFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/projectType";
+import { ContractTypeFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/contractType";
+import { RoleFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/role";
+import { RoleTypeFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/roleType";
+import { DateInfoFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/dateInfo";
 
 // Extend ColumnDef to include custom properties used by the table component
 export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
-  Filter?: (
-    header: Header<TData, string | number | null>,
-  ) => JSX.Element | null;
+  Filter?: (props: {
+    column: Column<TData, string | number | null>;
+  }) => JSX.Element | null;
   hSticky?: boolean;
   accessorKey?: string;
   width?: number;
@@ -69,85 +80,14 @@ export function PersonnelPerformanceColumns({
       header: "استان",
       accessorKey: "CityName",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        // Track selected city values for tabs integration
-        const [selectedCityValues, setSelectedCityValues] = useState<string[]>(
-          [],
-        );
-
-        // Update column filter when selectedCityValues changes
-        useEffect(() => {
-          const { setFilterValue } = column as Column<any>;
-          if (selectedCityValues.length === 0) {
-            setFilterValue(undefined);
-          } else {
-            setFilterValue(selectedCityValues);
-          }
-        }, [selectedCityValues, column]);
-
-        // Check if initial filters are loading
-        const isCityNamesLoading = !initialFilters?.CityNames;
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">استان</span>
-            {isCityNamesLoading ? (
-              <TableFilterSkeleton />
-            ) : (
-              <>
-                {reportPeriod !== "ماهانه" && (
-                  <CityLevelTabs
-                    initialCities={initialFilters?.CityNames ?? []}
-                    column={column}
-                    onChange={(data) => {
-                      console.log({ dataTabs: data });
-                      setSelectedCityValues(data.values);
-
-                      setDataFilters((prev: any) => ({
-                        ...prev,
-                        filter: {
-                          ...prev.filter,
-                          CityName: data.values.map(getPersianToEnglishCity),
-                          Start_Date: prev.filter?.Start_Date ?? [],
-                        },
-                      }));
-                    }}
-                  />
-                )}
-
-                <SelectColumnFilterOptimized<
-                  Pick<PersonnelPerformanceData, "CityName">
-                >
-                  singleSelect={reportPeriod === "ماهانه"}
-                  column={column}
-                  values={
-                    initialFilters?.CityNames?.map((a: any) => ({
-                      CityName: a,
-                    })) ?? []
-                  }
-                  initialFilters={
-                    initialFilters?.CityNames?.map((a: any) => ({
-                      CityName: a,
-                    })) ?? []
-                  }
-                  onChange={(data) => {
-                    setSelectedCityValues(data.values);
-
-                    setDataFilters((prev: any) => ({
-                      ...prev,
-                      filter: {
-                        ...prev.filter,
-                        CityName: data.values.map(getPersianToEnglishCity),
-                        Start_Date: prev.filter?.Start_Date ?? [],
-                      },
-                    }));
-                  }}
-                />
-              </>
-            )}
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <CityNameFilter
+          column={column}
+          initialFilters={initialFilters}
+          reportPeriod={reportPeriod}
+          setDataFilters={setDataFilters}
+        />
+      ),
     },
     {
       header: "پرسنل",
@@ -155,29 +95,12 @@ export function PersonnelPerformanceColumns({
       width: 200,
       accessorKey: "NameFamily",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        // Check if personnel data is loading
-        const isPersonnelDataLoading = !personnelPerformance?.result;
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">پرسنل</span>
-            {isPersonnelDataLoading ? (
-              <TableFilterSkeleton />
-            ) : (
-              <SelectColumnFilterOptimized<
-                Pick<PersonnelPerformanceData, "NameFamily">
-              >
-                column={column}
-                values={personnelPerformance?.result ?? []}
-                onChange={(filter) => {
-                  // Personnel filter logic can be added here if needed
-                }}
-              />
-            )}
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <PersonnelFilter
+          column={column}
+          personnelPerformance={personnelPerformance}
+        />
+      ),
     },
     {
       header: "نوع پروژه",
@@ -185,42 +108,14 @@ export function PersonnelPerformanceColumns({
       width: 200,
       accessorKey: "ProjectType",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        // Check if project types are loading
-        const isProjectTypesLoading = !initialFilters?.ProjectTypes;
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">نوع پروژه</span>
-            {isProjectTypesLoading ? (
-              <TableFilterSkeleton />
-            ) : (
-              <SelectColumnFilterOptimized<
-                Pick<PersonnelPerformanceData, "ProjectType">
-              >
-                initialFilters={
-                  filters?.filter?.ProjectType ?? defaultProjectTypes
-                }
-                column={column}
-                values={(initialFilters?.ProjectTypes ?? []).map(
-                  (a: string) => ({
-                    ProjectType: a,
-                  }),
-                )}
-                onChange={(filter) => {
-                  setDataFilters((prev: any) => ({
-                    ...prev,
-                    filter: {
-                      ...prev.filter,
-                      [filter.id]: filter.values,
-                    },
-                  }));
-                }}
-              />
-            )}
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <ProjectTypeFilter
+          column={column}
+          initialFilters={initialFilters}
+          filters={filters}
+          setDataFilters={setDataFilters}
+        />
+      ),
     },
     {
       header: "نوع قرارداد",
@@ -228,39 +123,14 @@ export function PersonnelPerformanceColumns({
       width: 200,
       accessorKey: "ContractType",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        // Check if personnel data is loading (needed for contract type values)
-        const isPersonnelDataLoading = !personnelPerformance?.result;
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">نوع قرارداد</span>
-            {isPersonnelDataLoading ? (
-              <TableFilterSkeleton />
-            ) : (
-              <SelectColumnFilterOptimized<
-                Pick<PersonnelPerformanceData, "ContractType">
-              >
-                initialFilters={
-                  filtersWithNoNetworkRequest?.filter?.ContractType ??
-                  defualtContractTypes
-                }
-                column={column}
-                values={personnelPerformance?.result ?? []}
-                onChange={(filter) => {
-                  setFiltersWithNoNetworkRequest((prev: any) => ({
-                    ...prev,
-                    filter: {
-                      ...prev.filter,
-                      [filter.id]: filter.values,
-                    },
-                  }));
-                }}
-              />
-            )}
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <ContractTypeFilter
+          column={column}
+          personnelPerformance={personnelPerformance}
+          filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
+          setFiltersWithNoNetworkRequest={setFiltersWithNoNetworkRequest}
+        />
+      ),
     },
     {
       header: "سمت",
@@ -268,30 +138,12 @@ export function PersonnelPerformanceColumns({
       width: 250,
       accessorKey: "Role",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        // Check if personnel data is loading (needed for role values)
-        const isPersonnelDataLoading = !personnelPerformance?.result;
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">سمت</span>
-            {isPersonnelDataLoading ? (
-              <TableFilterSkeleton />
-            ) : (
-              <SelectColumnFilterOptimized<
-                Pick<PersonnelPerformanceData, "Role">
-              >
-                initialFilters={defualtRoles}
-                column={column}
-                values={personnelPerformance?.result ?? []}
-                onChange={(filter) => {
-                  // Role filter logic can be added here if needed
-                }}
-              />
-            )}
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <RoleFilter
+          column={column}
+          personnelPerformance={personnelPerformance}
+        />
+      ),
     },
     {
       header: "نوع سمت",
@@ -299,28 +151,13 @@ export function PersonnelPerformanceColumns({
       hSticky: false,
       accessorKey: "RoleType",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        // Check if personnel data is loading (needed for role type values)
-        const isPersonnelDataLoading = !personnelPerformance?.result;
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">نوع سمت</span>
-            {isPersonnelDataLoading ? (
-              <TableFilterSkeleton />
-            ) : (
-              <SelectColumnFilterOptimized<PersonnelPerformanceData>
-                initialFilters={getDefaultRoleTypesBaseOnContractType(
-                  filtersWithNoNetworkRequest?.filter?.ContractType ??
-                    defualtContractTypes,
-                )}
-                column={column}
-                values={personnelPerformance?.result ?? []}
-              />
-            )}
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <RoleTypeFilter
+          column={column}
+          personnelPerformance={personnelPerformance}
+          filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
+        />
+      ),
     },
     // Performance columns
     {
@@ -629,43 +466,15 @@ export function PersonnelPerformanceColumns({
       header: "تاریخ گزارش پرسنل",
       accessorKey: "DateInfo",
       filterFn: "arrIncludesSome",
-      Filter: ({ column }) => {
-        if (!initialFilters?.DateInfos) return null;
-
-        const _DateInfos: string[] = initialFilters.DateInfos.map(
-          (a: any) => a.DateInfo,
-        );
-        const DateInfos = sortDates({ dates: _DateInfos });
-
-        if (DateInfos.length <= 0) return null;
-
-        const initialDateInfo: string[] =
-          filters?.filter?.DateInfo ??
-          (DateInfos.length > 0 ? [DateInfos.at(-1)!] : []);
-
-        return (
-          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-            <span className="font-bold text-primary">تاریخ گزارش پرسنل</span>
-            <SelectColumnFilterOptimized<
-              Pick<PersonnelPerformanceData, "DateInfo">
-            >
-              singleSelect
-              column={column}
-              initialFilters={initialDateInfo}
-              values={DateInfos.map((a: string) => ({ DateInfo: a }))}
-              onChange={(filter) => {
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    [filter.id]: filter.values.filter((a: string) => a),
-                  },
-                }));
-              }}
-            />
-          </div>
-        );
-      },
+      Filter: ({ column }) => (
+        <DateInfoFilter
+          column={column}
+          initialFilters={initialFilters}
+          filters={filters}
+          personnelPerformance={personnelPerformance}
+          setDataFilters={setDataFilters}
+        />
+      ),
     },
   ];
 }

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import moment from "jalali-moment";
 import {
   PersonnelPerformanceContextType,
@@ -78,33 +84,42 @@ export function PersonnelPerformanceProvider({
     }));
   }, [reportPeriod]);
 
+  const memoizedSetDataFilters = useCallback((newFilters: any) => {
+    if (typeof newFilters === "function") {
+      setDataFilters(newFilters);
+    } else {
+      setDataFilters(newFilters);
+    }
+  }, []);
+
+  const memoizedSetToggleDistinctData = useCallback((newToggle: any) => {
+    if (typeof newToggle === "function") {
+      setToggleDistinctData(newToggle);
+    } else {
+      setToggleDistinctData(newToggle);
+    }
+  }, []);
+
+  const memoizedSetFiltersWithNoNetworkRequest = useCallback(
+    (newFilters: any) => {
+      if (typeof newFilters === "function") {
+        setFiltersWithNoNetworkRequest(newFilters);
+      } else {
+        setFiltersWithNoNetworkRequest(newFilters);
+      }
+    },
+    [],
+  );
+
   const value: PersonnelPerformanceContextType = {
     reportPeriod,
     setReportPeriod,
     filters,
-    setDataFilters: (newFilters) => {
-      if (typeof newFilters === "function") {
-        setDataFilters(newFilters);
-      } else {
-        setDataFilters(newFilters);
-      }
-    },
+    setDataFilters: memoizedSetDataFilters,
     toggleDistinctData,
-    setToggleDistinctData: (newToggle) => {
-      if (typeof newToggle === "function") {
-        setToggleDistinctData(newToggle);
-      } else {
-        setToggleDistinctData(newToggle);
-      }
-    },
+    setToggleDistinctData: memoizedSetToggleDistinctData,
     filtersWithNoNetworkRequest,
-    setFiltersWithNoNetworkRequest: (newFilters) => {
-      if (typeof newFilters === "function") {
-        setFiltersWithNoNetworkRequest(newFilters);
-      } else {
-        setFiltersWithNoNetworkRequest(newFilters);
-      }
-    },
+    setFiltersWithNoNetworkRequest: memoizedSetFiltersWithNoNetworkRequest,
     // Optimistic filtering state
     isFiltering,
     setIsFiltering,

@@ -146,7 +146,7 @@ export function CitiesWithDatesPerformanceBarChart({
   const hasData = chartData.length > 0;
 
   return (
-    <>
+    <div className="flex h-[700px] w-full flex-col items-center justify-center rounded-xl bg-secbuttn p-2">
       {/* Simple fake data for demonstration */}
 
       <PerformanceBadges />
@@ -219,6 +219,6 @@ export function CitiesWithDatesPerformanceBarChart({
           <BarChartSkeletonLoading />
         </div>
       )}
-    </>
+    </div>
   );
 }

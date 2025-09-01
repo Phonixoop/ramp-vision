@@ -140,19 +140,15 @@ export default function CustomBarChart({
   useEffect(() => {
     if (!container.current) return;
 
-    setContainerWidth(container.current.clientWidth);
-
-    const resizeObserver = new ResizeObserver(() => {
-      if (container.current) {
-        setContainerWidth(container.current.clientWidth);
-      }
+    const observer = new ResizeObserver((entries) => {
+      setContainerWidth(entries[0].contentRect.width);
     });
 
-    resizeObserver.observe(container.current);
+    observer.observe(container.current);
 
     // Clean up the observer on component unmount
     return () => {
-      resizeObserver.disconnect();
+      observer.disconnect();
     };
   }, []);
   return (

@@ -25,7 +25,7 @@ export default function MultiSelectBox({
 
   useEffect(() => {
     onChange(selectedKeys);
-  }, [selectedKeys, onChange]);
+  }, [selectedKeys]);
 
   return (
     <>
@@ -35,7 +35,7 @@ export default function MultiSelectBox({
             <span
               className={`${
                 isSelected(item.key) ? className : "ring-1 ring-gray-300"
-              } w-auto py-2 px-3  hover:shadow-md rounded-full cursor-pointer select-none`}
+              } w-auto cursor-pointer select-none  rounded-full px-3 py-2 hover:shadow-md`}
               key={item.key}
               onClick={() => {
                 setSelectedKeys((prev) => {

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import React, {
   RefObject,
+  useCallback,
   useDeferredValue,
   useEffect,
   useLayoutEffect,
@@ -66,6 +67,7 @@ import TextField from "~/ui/forms/text-field";
 import withLabel from "~/ui/forms/with-label";
 import useDebounce from "~/hooks/useDebounce";
 import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
+import { useTableData } from "~/context/table-data.context";
 
 type Props<TData> = {
   isLoading?: boolean;
@@ -98,6 +100,11 @@ export default function Table<TData>({
 }: Props<TData>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const { setFlatRows } = useTableData();
+
+  const handleGlobalFilterChange = useCallback((value: string) => {
+    setGlobalFilter(String(value));
+  }, []);
 
   const table = useReactTable<TData>({
     data: data,
@@ -133,6 +140,11 @@ export default function Table<TData>({
   //   tableInstance;
 
   const flatRows = useMemo(() => rows.map((row) => row.original), [rows]);
+
+  // Update the context with flatRows
+  useEffect(() => {
+    setFlatRows(flatRows);
+  }, [flatRows, setFlatRows]);
 
   // const { rows } = table.getRowModel();
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -231,7 +243,7 @@ export default function Table<TData>({
             <div className="m-auto flex w-full justify-start p-2">
               <DebouncedInput
                 value={globalFilter ?? " "}
-                onChange={(value) => setGlobalFilter(String(value))}
+                onChange={handleGlobalFilterChange}
                 label="جستجو..."
               />
             </div>
