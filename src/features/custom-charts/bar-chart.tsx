@@ -138,19 +138,23 @@ export default function CustomBarChart({
   const [containerWidth, setContainerWidth] = useState(width);
 
   useEffect(() => {
+    if (!container.current) return;
+
     setContainerWidth(container.current.clientWidth);
-    const handleResize = () => {
-      setContainerWidth(container.current.clientWidth);
-    };
 
-    // Add event listener to listen for window resize
-    window.addEventListener("resize", handleResize);
+    const resizeObserver = new ResizeObserver(() => {
+      if (container.current) {
+        setContainerWidth(container.current.clientWidth);
+      }
+    });
 
-    // Clean up the event listener on component unmount
+    resizeObserver.observe(container.current);
+
+    // Clean up the observer on component unmount
     return () => {
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
     };
-  }, []); // Empty dependency array ensures that the effect runs only once on mount
+  }, []);
   return (
     <div ref={container} className="h-full w-full">
       <BarChart
