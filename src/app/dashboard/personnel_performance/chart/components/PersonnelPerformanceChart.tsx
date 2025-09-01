@@ -29,16 +29,16 @@ export const PersonnelPerformanceChart = React.memo<{
     getCalendarPeriodType,
   } = usePersonnelChart();
 
-  // Show loading state if context is not initialized
-  if (isLoading && !filters) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg text-primary">در حال بارگذاری...</div>
-        </div>
-      </div>
-    );
-  }
+  // // Show loading state if context is not initialized
+  // if (isLoading && !filters) {
+  //   return (
+  //     <div className="flex min-h-screen w-full items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="text-lg text-primary">در حال بارگذاری...</div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -82,7 +82,9 @@ export const PersonnelPerformanceChart = React.memo<{
         </div>
 
         {/* Bottom chart */}
-        <BottomChart filters={filters} activeCity={activeCity} />
+        {activeCity && (
+          <BottomChart filters={filters} activeCity={activeCity} />
+        )}
       </div>
     </>
   );
