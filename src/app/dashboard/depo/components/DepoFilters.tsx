@@ -5,11 +5,6 @@ import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
 import { useDepo } from "../context";
 import { PeriodType } from "../types";
 import { DepoFiltersSkeleton } from "~/components/skeletons/FilterSkeleton";
-import { FilterSkeleton } from "~/components/skeletons/FilterSkeleton";
-import { getPersianToEnglishCity } from "~/utils/util";
-import { DepoData } from "../types";
-import { useState, useEffect, useMemo } from "react";
-import { SelectControlled } from "~/features/checkbox-list";
 
 interface DepoFiltersProps {
   initialFilters: any;
@@ -23,34 +18,6 @@ export function DepoFilters({
   columns,
 }: DepoFiltersProps) {
   const { filters, setDataFilters, reportPeriod, setReportPeriod } = useDepo();
-
-  // Memoize the filter lists to prevent unnecessary re-renders
-  const cityList = useMemo(
-    () => initialFilters?.data?.Cities?.map((a: any) => a.CityName) ?? [],
-    [initialFilters?.data?.Cities],
-  );
-
-  const serviceNameList = useMemo(
-    () =>
-      Array.from(
-        new Set(depo.data?.result?.map((item: any) => item.ServiceName) ?? []),
-      ) as string[],
-    [depo.data?.result],
-  );
-
-  const documentTypeList = useMemo(
-    () =>
-      Array.from(
-        new Set(depo.data?.result?.map((item: any) => item.DocumentType) ?? []),
-      ) as string[],
-    [depo.data?.result],
-  );
-
-  // Memoize the city values to prevent unnecessary re-renders
-  const cityValues = useMemo(
-    () => filters.filter.CityName?.map(getPersianToEnglishCity) ?? [],
-    [filters.filter.CityName],
-  );
 
   // Safety check for filters and Start_Date
   if (
@@ -135,81 +102,6 @@ export function DepoFilters({
           <span className="font-bold text-primary">
             {getPeriodType(getCalendarPeriodType(reportPeriod))}
           </span>
-        </div>
-      </div>
-
-      {/* Column Filters */}
-      <div className="flex w-full flex-col items-center justify-center gap-3">
-        {/* City Filter */}
-        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-          <span className="font-bold text-primary">استان</span>
-          {!initialFilters?.data?.Cities ? (
-            <FilterSkeleton />
-          ) : (
-            <SelectControlled
-              withSelectAll
-              list={cityList}
-              value={cityValues}
-              onChange={(selectedValues) => {
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    CityName: selectedValues.map(getPersianToEnglishCity),
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
-              }}
-            />
-          )}
-        </div>
-
-        {/* Service Name Filter */}
-        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-          <span className="font-bold text-primary">نوع فعالیت</span>
-          {depo.isLoading || !depo.data ? (
-            <FilterSkeleton />
-          ) : (
-            <SelectControlled
-              withSelectAll
-              list={serviceNameList}
-              value={filters.filter.ServiceName ?? []}
-              onChange={(selectedValues) => {
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    ServiceName: selectedValues,
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
-              }}
-            />
-          )}
-        </div>
-
-        {/* Document Type Filter */}
-        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-          <span className="font-bold text-primary">نوع پرونده</span>
-          {depo.isLoading || !depo.data ? (
-            <FilterSkeleton />
-          ) : (
-            <SelectControlled
-              withSelectAll
-              list={documentTypeList}
-              value={filters.filter.DocumentType ?? []}
-              onChange={(selectedValues) => {
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    DocumentType: selectedValues,
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
-              }}
-            />
-          )}
         </div>
       </div>
     </div>

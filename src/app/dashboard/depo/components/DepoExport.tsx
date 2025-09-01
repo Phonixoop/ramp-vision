@@ -5,16 +5,15 @@ import { CSVLink } from "react-csv";
 import Button from "~/ui/buttons";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
-import { useTableData } from "~/context/table-data.context";
 
 interface DepoExportProps {
   columns: CustomColumnDef<any, string | number>[];
   data: any[];
   isLoading: boolean;
+  flatRows?: any[];
 }
 
-export function DepoExport({ columns, data, isLoading }: DepoExportProps) {
-  const { flatRows } = useTableData();
+export function DepoExport({ columns, data, isLoading, flatRows = [] }: DepoExportProps) {
   if (isLoading || !data?.length) return null;
 
   return (

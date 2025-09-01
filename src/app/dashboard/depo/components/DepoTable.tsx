@@ -37,18 +37,6 @@ export function DepoTable({ sessionData }: DepoTableProps) {
     refetchOnWindowFocus: false,
   });
 
-  // console.log({
-  //   depo: depo.data,
-  //   depoResult: depo.data?.result,
-  //   depoResultLength: depo.data?.result?.length,
-  //   depoIsLoading: depo.isLoading,
-  //   depoIsError: depo.isError,
-  //   depoError: depo.error,
-  //   filters: filters,
-  //   deferredFilter: deferredFilter,
-  //   initialFiltersData: initialFilters.data,
-  // });
-  // Update filters when initial filters are available
   useEffect(() => {
     if (initialFilters.data?.Cities && !hasSetInitialCities.current) {
       hasSetInitialCities.current = true;
@@ -85,35 +73,46 @@ export function DepoTable({ sessionData }: DepoTableProps) {
   return (
     <TableDataProvider>
       <div
-        className="flex w-full items-stretch justify-between gap-5 "
+        className="flex w-full flex-col items-center justify-center gap-5 text-primary"
         dir="rtl"
       >
-        <div className="flex min-h-screen w-3/12 flex-col items-center justify-start gap-5  ">
-          <div className="sticky top-20 flex w-full flex-col gap-5 rounded-xl bg-secbuttn ">
-            <DepoFilters
-              initialFilters={initialFilters}
-              depo={depo}
-              columns={columns}
-            />
-            <DepoExport
-              columns={columns}
-              data={depo.data?.result ?? []}
-              isLoading={depo.isLoading}
-            />
-          </div>
-        </div>
-        <div className="flex h-full w-9/12 flex-col items-center justify-center rounded-lg  py-5 text-center">
-          <DepoSummary depo={depo} depoEstimate={depoEstimate} />
+        <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
+          جزئیات دپو (جدول)
+        </h1>
+
+        <div className="relative flex w-full items-center justify-center rounded-lg py-5 text-center">
           <Table
             isLoading={depo.isLoading}
             data={depo.data?.result ?? []}
             columns={columns}
+            renderInFilterView={() => (
+              <DepoFilters
+                initialFilters={initialFilters}
+                depo={depo}
+                columns={columns}
+              />
+            )}
+            renderAfterFilterView={(flatRows) => (
+              <DepoExport
+                columns={columns}
+                data={depo.data?.result ?? []}
+                isLoading={depo.isLoading}
+                flatRows={flatRows}
+              />
+            )}
+            renderChild={(flatRows) => (
+              <DepoSummary
+                depo={depo}
+                depoEstimate={depoEstimate}
+                flatRows={flatRows}
+              />
+            )}
           />
         </div>
+        <div className="flex w-full flex-col items-center justify-center gap-5 py-5">
+          <CitiesPerformanceBarChart filters={filters} />
+        </div>
       </div>
-      {/* <div className="flex w-full flex-col items-center justify-center gap-5">
-        <CitiesPerformanceBarChart filters={filters} />
-      </div> */}
     </TableDataProvider>
   );
 }

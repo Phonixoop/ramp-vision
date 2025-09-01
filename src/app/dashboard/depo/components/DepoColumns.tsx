@@ -4,6 +4,9 @@ import { arrIncludeExcat, commify } from "~/utils/util";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
 import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
 import { DepoData } from "../types";
+import { CityNameFilter } from "~/app/dashboard/depo/components/filter-components/cityName";
+import { ServiceNameFilter } from "~/app/dashboard/depo/components/filter-components/serviceName";
+import { DocumentTypeFilter } from "~/app/dashboard/depo/components/filter-components/documentType";
 
 interface DepoColumnsProps {
   initialFilters: any;
@@ -36,16 +39,37 @@ export function DepoColumns({
       header: "استان",
       accessorKey: "CityName",
       filterFn: "arrIncludesSome",
+      Filter: ({ column }) => (
+        <CityNameFilter
+          column={column}
+          initialFilters={initialFilters}
+          setDataFilters={setDataFilters}
+        />
+      ),
     },
     {
       header: "نوع فعالیت",
       accessorKey: "ServiceName",
       filterFn: "arrIncludesSome",
+      Filter: ({ column }) => (
+        <ServiceNameFilter
+          column={column}
+          depo={depo}
+          setDataFilters={setDataFilters}
+        />
+      ),
     },
     {
       header: "نوع پرونده",
       accessorKey: "DocumentType",
       filterFn: arrIncludeExcat,
+      Filter: ({ column }) => (
+        <DocumentTypeFilter
+          column={column}
+          depo={depo}
+          setDataFilters={setDataFilters}
+        />
+      ),
     },
     {
       header: "تعداد دپو",

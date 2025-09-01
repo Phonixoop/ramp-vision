@@ -67,6 +67,7 @@ import TextField from "~/ui/forms/text-field";
 import withLabel from "~/ui/forms/with-label";
 import useDebounce from "~/hooks/useDebounce";
 import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
+import { useTableData } from "~/context/table-data.context";
 
 type Props<TData> = {
   isLoading?: boolean;
@@ -99,6 +100,7 @@ export default function Table<TData>({
 }: Props<TData>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const { setFlatRows } = useTableData();
 
   const handleGlobalFilterChange = useCallback((value: string) => {
     setGlobalFilter(String(value));
@@ -138,6 +140,11 @@ export default function Table<TData>({
   //   tableInstance;
 
   const flatRows = useMemo(() => rows.map((row) => row.original), [rows]);
+
+  // Update the context with flatRows
+  useEffect(() => {
+    setFlatRows(flatRows);
+  }, [flatRows, setFlatRows]);
 
   // const { rows } = table.getRowModel();
   const tableContainerRef = useRef<HTMLDivElement>(null);
