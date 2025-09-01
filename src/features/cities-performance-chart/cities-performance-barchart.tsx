@@ -8,10 +8,7 @@ import {
   distinctDataAndCalculatePerformance,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
-import {
-  commify,
-  getEnglishToPersianCity,
-} from "~/utils/util";
+import { commify, getEnglishToPersianCity } from "~/utils/util";
 import H2 from "~/ui/heading/h2";
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 import {
@@ -118,20 +115,14 @@ function CitiesPerformanceBarChartContent({
               customBars={(data) => {
                 if (data.length <= 0) return <></>;
 
-                return (
-                  <>
-                    {data.map((item, index) => {
-                      return (
-                        <>
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={getPerformanceMetric(item["عملکرد"]).color}
-                          />
-                        </>
-                      );
-                    })}
-                  </>
-                );
+                return data.map((item, index) => {
+                  return (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={getPerformanceMetric(item["عملکرد"]).color}
+                    />
+                  );
+                });
               }}
             />
           </div>
@@ -155,7 +146,13 @@ export function CitiesPerformanceBarChart({
   filters: FilterType;
 }) {
   return (
-    <Suspense fallback={<div className="flex h-96 w-full items-center justify-center">در حال بارگذاری...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-96 w-full items-center justify-center">
+          در حال بارگذاری...
+        </div>
+      }
+    >
       <CitiesPerformanceBarChartContent filters={filters} />
     </Suspense>
   );

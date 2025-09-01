@@ -1,36 +1,29 @@
-import React, { createContext, useContext, ReactNode } from "react";
-import { Row } from "@tanstack/react-table";
+"use client";
+
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface TableDataContextType {
   flatRows: any[];
-  isLoading: boolean;
-  data: any[];
+  setFlatRows: (rows: any[]) => void;
 }
 
-const TableDataContext = createContext<TableDataContextType | undefined>(
-  undefined,
-);
+const TableDataContext = createContext<TableDataContextType | undefined>(undefined);
 
-export const useTableData = () => {
+export function TableDataProvider({ children }: { children: ReactNode }) {
+  const [flatRows, setFlatRows] = useState<any[]>([]);
+
+  const value: TableDataContextType = {
+    flatRows,
+    setFlatRows,
+  };
+
+  return <TableDataContext.Provider value={value}>{children}</TableDataContext.Provider>;
+}
+
+export function useTableData() {
   const context = useContext(TableDataContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useTableData must be used within a TableDataProvider");
   }
   return context;
-};
-
-interface TableDataProviderProps {
-  children: ReactNode;
-  value: TableDataContextType;
 }
-
-export const TableDataProvider: React.FC<TableDataProviderProps> = ({
-  children,
-  value,
-}) => {
-  return (
-    <TableDataContext.Provider value={value}>
-      {children}
-    </TableDataContext.Provider>
-  );
-};

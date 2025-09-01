@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Pie, Sector, ResponsiveContainer } from "recharts";
 import dynamic from "next/dynamic";
 import { commify } from "~/utils/util";
-import { twMerge } from "tailwind-merge";
 
-const PieChart = dynamic(
-  () => import("recharts").then((recharts) => recharts.PieChart),
-  { ssr: false },
-);
+import { cn } from "~/lib/utils";
 
+// const PieChart = dynamic(
+//   () => import("recharts").then((recharts) => recharts.PieChart),
+//   { ssr: false },
+// );
+
+import { PieChart } from "recharts";
 const dataa = [
   { name: "Group A", value: 400 },
   { name: "Group B", value: 300 },
@@ -105,12 +107,13 @@ export default function CustomPieChart<
     name: data[0]?.name,
   });
 
-  function onPieEnter(data, name, index) {
+  const onPieEnter = useCallback((data, name, index) => {
     setActiveBar({
       index,
       name,
     });
-  }
+  }, []);
+
   // function onPieLeave() {
   //   setActiveIndex(-1);
   // }
@@ -118,16 +121,18 @@ export default function CustomPieChart<
   return (
     <div
       dir="ltr"
-      className={twMerge("flex  w-full items-center justify-center", className)}
+      className={cn(
+        "flex min-h-[300px] min-w-[300px] items-center justify-center",
+        className,
+      )}
     >
       {isEmpty ? (
-        <div className="flex h-[300px] w-full items-center justify-center p-2 text-center text-primary">
+        <div className="flex min-h-[300px] w-full items-center justify-center p-2 text-center text-primary">
           <span>دیتا ای وجود ندارد</span>
         </div>
       ) : (
         <PieChart width={450} height={300}>
           <Pie
-            activeIndex={[activeBar.index]}
             activeShape={renderActiveShape}
             data={data}
             cx="50%"
@@ -139,11 +144,7 @@ export default function CustomPieChart<
             onMouseEnter={onPieEnter}
             // onMouseLeave={onPieLeave}
             // label={activeIndex === -1}
-            label={(entry) =>
-              `${
-                entry.name === activeBar.name ? "" : `${commify(entry.value)}`
-              }`
-            }
+            label={(entry) => `${commify(entry.value)}`}
           />
         </PieChart>
       )}

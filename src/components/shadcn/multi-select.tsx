@@ -164,7 +164,7 @@ export function MultiSelectValue({
     overflowBehavior === "wrap" ||
     (overflowBehavior === "wrap-when-open" && open);
 
-  const checkOverflow = useCallback(() => {
+  const checkOverflowRef = useRef(() => {
     if (valueRef.current == null) return;
 
     const containerElement = valueRef.current;
@@ -186,24 +186,23 @@ export function MultiSelectValue({
       overflowElement?.style.removeProperty("display");
     }
     setOverflowAmount(amount);
+  });
+
+  useEffect(() => {
+    // Use requestAnimationFrame to avoid layout thrashing
+    const rafId = requestAnimationFrame(() => checkOverflowRef.current());
+    return () => cancelAnimationFrame(rafId);
+  }, [selectedValues, shouldWrap]);
+
+  const handleResize = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      valueRef.current = node;
+      const observer = new ResizeObserver(() => checkOverflowRef.current());
+      observer.observe(node);
+      // Store observer for cleanup
+      (node as any)._resizeObserver = observer;
+    }
   }, []);
-
-  useLayoutEffect(() => {
-    checkOverflow();
-  }, [selectedValues, checkOverflow, shouldWrap]);
-
-  const handleResize = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (node) {
-        valueRef.current = node;
-        const observer = new ResizeObserver(checkOverflow);
-        observer.observe(node);
-        // Store observer for cleanup
-        (node as any)._resizeObserver = observer;
-      }
-    },
-    [checkOverflow],
-  );
 
   // Cleanup effect
   useEffect(() => {
@@ -324,7 +323,7 @@ export function MultiSelectItem({
 
   useEffect(() => {
     onItemAdded(value, badgeLabel ?? children);
-  }, [value, children, onItemAdded, badgeLabel]);
+  }, [value, onItemAdded]);
 
   return (
     <CommandItem

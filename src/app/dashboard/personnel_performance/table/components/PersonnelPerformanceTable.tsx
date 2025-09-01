@@ -270,7 +270,7 @@ export function PersonnelPerformanceTable({
     }
   }, [filters?.periodType, getInitialCities.data?.CityNames, setDataFilters]);
 
-  // Table columns configuration
+  // Table columns configuration - use a more stable approach
   const columns = useMemo<CustomColumnDef<PersonnelPerformanceData, any>[]>(
     () =>
       PersonnelPerformanceColumns({
@@ -285,11 +285,15 @@ export function PersonnelPerformanceTable({
       }),
     [
       personnelPerformance.data,
-      filtersWithNoNetworkRequest,
-      filters,
       initialFilters.data,
-      filters?.periodType,
       getLastDate,
+      // Only depend on the actual values we care about, not the entire objects
+      filters?.periodType,
+      filters?.filter?.CityName?.length,
+      filters?.filter?.ProjectType?.length,
+      filtersWithNoNetworkRequest?.filter?.ContractType?.length,
+      filtersWithNoNetworkRequest?.filter?.Role?.length,
+      filtersWithNoNetworkRequest?.filter?.RoleType?.length,
     ],
   );
 

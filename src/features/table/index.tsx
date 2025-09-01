@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import React, {
   RefObject,
+  useCallback,
   useDeferredValue,
   useEffect,
   useLayoutEffect,
@@ -98,6 +99,10 @@ export default function Table<TData>({
 }: Props<TData>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+
+  const handleGlobalFilterChange = useCallback((value: string) => {
+    setGlobalFilter(String(value));
+  }, []);
 
   const table = useReactTable<TData>({
     data: data,
@@ -231,7 +236,7 @@ export default function Table<TData>({
             <div className="m-auto flex w-full justify-start p-2">
               <DebouncedInput
                 value={globalFilter ?? " "}
-                onChange={(value) => setGlobalFilter(String(value))}
+                onChange={handleGlobalFilterChange}
                 label="جستجو..."
               />
             </div>

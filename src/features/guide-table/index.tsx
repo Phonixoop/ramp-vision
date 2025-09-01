@@ -1,6 +1,4 @@
 import React, { ReactElement, ReactNode } from "react";
-import { twMerge } from "tailwind-merge";
-import { z } from "zod";
 import {
   Table,
   TableBody,
@@ -10,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/shadcn/table";
+import { cn } from "~/lib/utils";
 import { TableJson } from "~/types";
 import H2 from "~/ui/heading/h2";
 import { commify, isNumber } from "~/utils/util";
@@ -27,8 +26,8 @@ export default function SimpleTable({
   const columns = Object.keys(table);
   return (
     <div
-      className={twMerge(
-        "flex max-w-sm flex-col items-center justify-center  gap-2 rounded-xl border  border-primary/20 bg-secbuttn p-2",
+      className={cn(
+        "flex max-w-sm  flex-col items-center justify-center  gap-2 rounded-xl border  border-primary/20 bg-secbuttn p-2",
         className,
       )}
     >
@@ -38,7 +37,7 @@ export default function SimpleTable({
           <TableRow>
             {columns.map((column) => (
               <TableHead
-                className={twMerge(
+                className={cn(
                   "border-b-2 border-primary/50 text-center  text-accent last:border-l-0",
                   table[column].headClassName,
                 )}
@@ -57,10 +56,7 @@ export default function SimpleTable({
             >
               {columns.map((column) => (
                 <TableCell
-                  className={twMerge(
-                    "text-primary",
-                    table[column].rowClassName,
-                  )}
+                  className={cn("text-primary", table[column].rowClassName)}
                   dir={isNumber(table[column].data[index]) ? "ltr" : "rtl"}
                   key={column}
                 >

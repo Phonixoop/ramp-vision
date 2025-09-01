@@ -89,3 +89,23 @@ export function FilterSectionSkeleton() {
     </div>
   );
 }
+
+// Depo specific skeleton
+export function DepoFiltersSkeleton() {
+  return (
+    <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
+      <div className="h-5 w-16 animate-pulse rounded bg-primary/10"></div>
+      
+      {/* Calendar button skeleton */}
+      <div className="flex w-full min-h-[38px] animate-pulse items-center justify-between rounded-xl border border-primary/10 bg-secondary/60 px-3 py-2">
+        <div className="h-4 w-2/3 rounded bg-primary/10"></div>
+        <div className="h-4 w-4 rounded bg-primary/10"></div>
+      </div>
+
+      {/* Period type display skeleton */}
+      <div className="flex w-full flex-col items-center justify-center gap-3">
+        <div className="h-5 w-12 animate-pulse rounded bg-primary/10"></div>
+      </div>
+    </div>
+  );
+}

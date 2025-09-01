@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { usePersonnelPerformance } from "../context";
 import LoaderAnim from "~/components/main/loader-anim";
 import { TableFilterSkeleton } from "./TableFilterSkeleton";
+import { toast } from "sonner";
 
 interface PersonnelPerformanceFiltersProps {
   getLastDate: any;
@@ -84,6 +85,17 @@ export function PersonnelPerformanceFilters({
     reportPeriod: "daily" | "weekly" | "monthly";
     selectedDates: string[];
   }) => {
+    console.log(reportPeriod + " " + filters.filter.CityName.length);
+    if (
+      (reportPeriod === "monthly" && filters.filter.CityName.length <= 0) ||
+      filters.filter.CityName.length > 1
+    ) {
+      toast(
+        "لطفا یک شهر انتخاب کنید و سپس مجدد تاریخ گزارش را به ماهانه تغییر دهید",
+      );
+      return;
+    }
+
     // Convert reportPeriod to PeriodType
     const newPeriodType = getPeriodType(reportPeriod);
     setReportPeriod(newPeriodType);
@@ -115,7 +127,7 @@ export function PersonnelPerformanceFilters({
       ) : (
         <CalendarButton
           disabled={!getLastDate || getLastDate.isLoading}
-          onSelect={handleCalendarSubmit}
+          onSelect={(data) => handleCalendarSubmit(data)}
           selectedDates={selectedDates}
           periodType={getCalendarPeriodType(reportPeriod)}
           placeholder="انتخاب بازه زمانی"
