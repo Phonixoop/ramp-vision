@@ -70,8 +70,7 @@ export const personnelRouter = createTRPCRouter({
           RAMP_Daily.dbo.users as u ON u.NationalCode = ui.NationalCode
 
          ${whereClause}`;
-
-        // console.log(query);
+        console.log(query);
         const result = await sql.query(query);
 
         //  console.log(result.recordsets[0]);

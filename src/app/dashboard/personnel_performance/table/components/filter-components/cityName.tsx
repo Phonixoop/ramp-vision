@@ -5,7 +5,7 @@ import type { Column } from "@tanstack/react-table";
 import { SelectControlled } from "~/features/checkbox-list";
 import { getPersianToEnglishCity } from "~/utils/util";
 import { TableFilterSkeleton } from "~/app/dashboard/personnel_performance/table/components/TableFilterSkeleton";
-import { CityLevelTabs } from "~/app/dashboard/personnel_performance/table/components/CityLevelTabs";
+import { CityLevelTabs } from "~/features/city-level-tab";
 import { toast } from "sonner";
 
 const same = (a?: string[], b?: string[]) =>

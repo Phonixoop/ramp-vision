@@ -42,7 +42,9 @@ export function DepoColumns({
       Filter: ({ column }) => (
         <CityNameFilter
           column={column}
-          initialFilters={initialFilters}
+          cityNames={
+            initialFilters?.data?.Cities?.map((a: any) => a.CityName) ?? []
+          }
           setDataFilters={setDataFilters}
         />
       ),

@@ -134,6 +134,11 @@ export default function Table<TData>({
     // debugColumns: false,
   });
 
+  console.log({
+    tableConfig: { dataLength: data.length, columnsLength: columns.length },
+  });
+  console.log({ tableState: table.getState() });
+
   const { rows } = table.getRowModel();
   // const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   // const { getTableProps, getTableBodyProps, headerGroups, prepareRow } =
@@ -141,6 +146,16 @@ export default function Table<TData>({
 
   const flatRows = useMemo(() => rows.map((row) => row.original), [rows]);
 
+  console.log({ flatRows });
+  console.log({ rows });
+  console.log({ data });
+  console.log({ tableRowModel: table.getRowModel() });
+  console.log({ tableState: table.getState() });
+  console.log({ tableColumns: table.getAllColumns() });
+  console.log({ tableRowModelRows: table.getRowModel().rows });
+  console.log({
+    tableRowModelFlatRows: table.getRowModel().rows.map((row) => row.original),
+  });
   // Update the context with flatRows
   useEffect(() => {
     setFlatRows(flatRows);
@@ -284,6 +299,7 @@ export default function Table<TData>({
                     // const { key, ...restHeaderGroupProps } =
                     //   headerGroup.getHeaderGroupProps();
                     let hasStickyCount = -1;
+
                     return (
                       <tr
                         className="text-center"
@@ -315,7 +331,7 @@ export default function Table<TData>({
                                 key={header.id}
                                 colSpan={header.colSpan}
                                 // {...restHeaderProps}
-                                className={twMerge(
+                                className={cn(
                                   "sticky top-0 z-0 w-5 bg-secbuttn px-6 py-3 text-center text-xs  font-black leading-4 tracking-wider text-accent   ",
 
                                   isSticky ? ` z-20 ` : "",

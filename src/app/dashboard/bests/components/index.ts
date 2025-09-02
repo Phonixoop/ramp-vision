@@ -1,0 +1,1 @@
+export { BestsTable } from "./BestsTable";

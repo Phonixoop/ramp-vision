@@ -51,18 +51,9 @@ export function CityLevelTabs({
         currentCitiesSet.size === tabCitiesSet.size &&
         [...currentCitiesSet].every((city) => tabCitiesSet.has(city));
 
-      console.log(`Checking tab "${level.name}":`, {
-        tabCities,
-        currentCities: currentFilterCities,
-        currentSize: currentCitiesSet.size,
-        tabSize: tabCitiesSet.size,
-        isMatch,
-      });
-
       return isMatch;
     });
 
-    console.log("Matching tab found:", matchingTab?.name || "none");
     setActiveTab(matchingTab?.name || null);
   }, [currentFilterCities]);
 
@@ -86,17 +77,6 @@ export function CityLevelTabs({
       });
 
     const finalCities = canFilterCities;
-
-    console.log({
-      selectedTab,
-      cities,
-      canFilterCities,
-      finalCities,
-      initialCities,
-      mappedInitialCities: initialCities?.map((initCity: any) =>
-        getPersianToEnglishCity(initCity),
-      ),
-    });
 
     // Let the parent handle the filtering through onChange
     onChange?.({ id: column.id, values: finalCities });

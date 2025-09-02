@@ -22,7 +22,7 @@ import { sortDates } from "~/lib/utils";
 import { PersonnelPerformanceData } from "../types";
 import { memo, useEffect, useState } from "react";
 import { usePersonnelPerformance } from "../context";
-import { CityLevelTabs } from "./CityLevelTabs";
+import { CityLevelTabs } from "../../../../../features/city-level-tab";
 import { TableFilterSkeleton } from "./TableFilterSkeleton";
 import { CityNameFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/cityName";
 import { PersonnelFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/personnel";

@@ -336,7 +336,7 @@ export const depoRouter = createTRPCRouter({
       const resultOfCities = await sql.query(queryCities);
 
       // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-      console.log(queryCities);
+
       // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
 
       const result = {
