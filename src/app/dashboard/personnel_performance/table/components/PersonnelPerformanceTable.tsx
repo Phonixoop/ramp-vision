@@ -18,10 +18,7 @@ import {
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
 import { getPersianToEnglishCity } from "~/utils/util";
-import {
-  CustomColumnDef,
-  PersonnelPerformanceColumns,
-} from "./PersonnelPerformanceColumns";
+import { PersonnelPerformanceColumns } from "./PersonnelPerformanceColumns";
 import { PersonnelPerformanceFilters } from "./PersonnelPerformanceFilters";
 import { PersonnelPerformanceSummary } from "./PersonnelPerformanceSummary";
 import { PersonnelPerformanceExport } from "./PersonnelPerformanceExport";
@@ -29,6 +26,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { PersonnelPerformanceData } from "../types";
 import { usePersonnelPerformance } from "../context";
 import { TableFiltersContainerSkeleton } from "./TableFilterSkeleton";
+import { CustomColumnDef } from "~/types/table";
 
 export function PersonnelPerformanceTable({
   sessionData,
