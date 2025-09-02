@@ -31,16 +31,7 @@ import { ContractTypeFilter } from "~/app/dashboard/personnel_performance/table/
 import { RoleFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/role";
 import { RoleTypeFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/roleType";
 import { DateInfoFilter } from "~/app/dashboard/personnel_performance/table/components/filter-components/dateInfo";
-
-// Extend ColumnDef to include custom properties used by the table component
-export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
-  Filter?: (props: {
-    column: Column<TData, string | number | null>;
-  }) => JSX.Element | null;
-  hSticky?: boolean;
-  accessorKey?: string;
-  width?: number;
-};
+import { CustomColumnDef } from "~/types/table";
 
 interface PersonnelPerformanceColumnsProps {
   personnelPerformance: any;

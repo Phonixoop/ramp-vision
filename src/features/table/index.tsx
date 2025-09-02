@@ -66,8 +66,8 @@ import Button from "~/ui/buttons";
 import TextField from "~/ui/forms/text-field";
 import withLabel from "~/ui/forms/with-label";
 import useDebounce from "~/hooks/useDebounce";
-import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
 import { useTableData } from "~/context/table-data.context";
+import { CustomColumnDef } from "~/types/table";
 
 type Props<TData> = {
   isLoading?: boolean;

@@ -9,6 +9,7 @@ import { arrIncludeExcat } from "~/utils/util";
 import { SelectColumnFilter } from "~/features/checkbox-list";
 import { useBI } from "../context";
 import { BITableProps } from "../types";
+import { CustomColumnDef } from "~/types/table";
 
 export function BITable({ sessionData }: BITableProps) {
   const { filters, setDataFilters, reportPeriod, setReportPeriod } = useBI();
@@ -25,7 +26,7 @@ export function BITable({ sessionData }: BITableProps) {
     },
   );
 
-  const columns = useMemo<ColumnDef<any>[]>(
+  const columns = useMemo<CustomColumnDef<any, string | number | null>[]>(
     () => [
       {
         header: "ردیف",
@@ -93,35 +94,51 @@ export function BITable({ sessionData }: BITableProps) {
     [data?.result],
   );
 
-
-
   return (
     <div className="flex w-full flex-col gap-5">
-      <div className="flex w-full items-center justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-primary">گزارش BI</h1>
+      <div className="flex w-full items-center justify-between gap-4 rounded-xl  p-4 shadow-sm">
+        <div className="flex w-full flex-col items-center justify-center gap-4">
+          <h1 className="w-full text-center text-2xl font-bold text-primary">
+            گزارش BI
+          </h1>
           <CalendarButton
             onSelect={(data) => {
-              setReportPeriod(data.reportPeriod === "daily" ? "روزانه" : data.reportPeriod === "weekly" ? "هفتگی" : "ماهانه");
+              setReportPeriod(
+                data.reportPeriod === "daily"
+                  ? "روزانه"
+                  : data.reportPeriod === "weekly"
+                  ? "هفتگی"
+                  : "ماهانه",
+              );
               setDataFilters((prev) => ({
                 ...prev,
-                periodType: data.reportPeriod === "daily" ? "روزانه" : data.reportPeriod === "weekly" ? "هفتگی" : "ماهانه",
+                periodType:
+                  data.reportPeriod === "daily"
+                    ? "روزانه"
+                    : data.reportPeriod === "weekly"
+                    ? "هفتگی"
+                    : "ماهانه",
                 filter: { ...prev.filter, DateFa: data.selectedDates },
               }));
             }}
             selectedDates={filters.filter.DateFa}
-            periodType={reportPeriod === "روزانه" ? "daily" : reportPeriod === "هفتگی" ? "weekly" : "monthly"}
+            periodType={
+              reportPeriod === "روزانه"
+                ? "daily"
+                : reportPeriod === "هفتگی"
+                ? "weekly"
+                : "monthly"
+            }
             buttonText={reportPeriod}
           />
         </div>
       </div>
 
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div dir="rtl" className="rounded-xl  p-4 shadow-sm">
         <Table
           data={data?.result || []}
           columns={columns}
           isLoading={isLoading}
-          className="w-full"
         />
       </div>
     </div>

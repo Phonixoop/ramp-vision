@@ -144,7 +144,8 @@ const CalendarHeader = ({
                 onClick={onToggleMonthPicker}
                 className="cursor-pointer text-lg font-semibold text-primary transition-colors hover:text-accent"
               >
-                {PERSIAN_MONTHS[currentDate.jMonth()]}
+                {activeTab !== "monthly" &&
+                  PERSIAN_MONTHS[currentDate.jMonth()]}
               </button>
               {showMonthPicker && (
                 <>
