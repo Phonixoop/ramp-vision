@@ -2,13 +2,12 @@
 import { Column } from "@tanstack/react-table";
 import { SelectControlled } from "~/features/checkbox-list";
 import { getPersianToEnglishCity } from "~/utils/util";
-import { DepoData } from "../../types";
 import { CityLevelTabs } from "~/features/city-level-tab";
 import { TableFilterSkeleton } from "~/app/dashboard/personnels/components";
 import { memo, useCallback } from "react";
 
 interface CityNameFilterProps {
-  column: Column<DepoData, string | number | null>;
+  column: Column<any, string | number | null>;
   cityNames: string[];
   setDataFilters: (filters: any) => void;
 }
@@ -18,6 +17,7 @@ const same = (a?: string[], b?: string[]) =>
     Array.isArray(b) &&
     a.length === b.length &&
     a.every((x, i) => x === b[i]));
+
 export const CityNameFilter = memo(function CityNameFilter({
   column,
   cityNames,

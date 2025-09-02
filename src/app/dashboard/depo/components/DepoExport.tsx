@@ -2,9 +2,9 @@
 
 import { DownloadCloudIcon, FileBarChart2 } from "lucide-react";
 import { CSVLink } from "react-csv";
+import { CustomColumnDef } from "~/types/table";
 import Button from "~/ui/buttons";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
-import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
 
 interface DepoExportProps {
   columns: CustomColumnDef<any, string | number>[];
@@ -13,7 +13,12 @@ interface DepoExportProps {
   flatRows?: any[];
 }
 
-export function DepoExport({ columns, data, isLoading, flatRows = [] }: DepoExportProps) {
+export function DepoExport({
+  columns,
+  data,
+  isLoading,
+  flatRows = [],
+}: DepoExportProps) {
   if (isLoading || !data?.length) return null;
 
   return (

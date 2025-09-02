@@ -27,16 +27,12 @@ export function CityLevelTabs({
   const currentFilterCities = useMemo(() => {
     const converted =
       filterValue?.map((city: any) => getPersianToEnglishCity(city)) || [];
-    console.log("Converting filter values:", { filterValue, converted });
     return converted;
   }, [filterValue]);
 
   // Determine active tab based on current filter values
   useEffect(() => {
-    console.log("currentFilterCities changed:", currentFilterCities);
-
     if (!currentFilterCities || currentFilterCities.length === 0) {
-      console.log("No cities selected, setting activeTab to null");
       setActiveTab(null);
       return;
     }

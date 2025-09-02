@@ -6,7 +6,10 @@ import Table from "~/features/table";
 import { api } from "~/trpc/react";
 import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
 import { arrIncludeExcat } from "~/utils/util";
-import { SelectColumnFilter } from "~/features/checkbox-list";
+import {
+  SelectColumnFilter,
+  SelectColumnFilterOptimized,
+} from "~/features/checkbox-list";
 import { useBI } from "../context";
 import { BITableProps } from "../types";
 import { CustomColumnDef } from "~/types/table";
@@ -47,7 +50,10 @@ export function BITable({ sessionData }: BITableProps) {
           return (
             <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">استان</span>
-              <SelectColumnFilter column={column} data={data?.result} />
+              <SelectColumnFilterOptimized
+                column={column}
+                values={data?.result.filter((item) => item)}
+              />
             </div>
           );
         },
@@ -139,6 +145,7 @@ export function BITable({ sessionData }: BITableProps) {
           data={data?.result || []}
           columns={columns}
           isLoading={isLoading}
+          renderInFilterView={() => <></>}
         />
       </div>
     </div>

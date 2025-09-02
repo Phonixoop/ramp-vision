@@ -2,11 +2,11 @@
 
 import { arrIncludeExcat, commify } from "~/utils/util";
 import { calculateDepoCompleteTime } from "~/utils/date-utils";
-import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
 import { DepoData } from "../types";
 import { CityNameFilter } from "~/app/dashboard/depo/components/filter-components/cityName";
 import { ServiceNameFilter } from "~/app/dashboard/depo/components/filter-components/serviceName";
 import { DocumentTypeFilter } from "~/app/dashboard/depo/components/filter-components/documentType";
+import { CustomColumnDef } from "~/types/table";
 
 interface DepoColumnsProps {
   initialFilters: any;

@@ -134,11 +134,6 @@ export default function Table<TData>({
     // debugColumns: false,
   });
 
-  console.log({
-    tableConfig: { dataLength: data.length, columnsLength: columns.length },
-  });
-  console.log({ tableState: table.getState() });
-
   const { rows } = table.getRowModel();
   // const tableInstance = useTable({ columns, data }, useFilters, useSortBy);
   // const { getTableProps, getTableBodyProps, headerGroups, prepareRow } =
@@ -146,16 +141,6 @@ export default function Table<TData>({
 
   const flatRows = useMemo(() => rows.map((row) => row.original), [rows]);
 
-  console.log({ flatRows });
-  console.log({ rows });
-  console.log({ data });
-  console.log({ tableRowModel: table.getRowModel() });
-  console.log({ tableState: table.getState() });
-  console.log({ tableColumns: table.getAllColumns() });
-  console.log({ tableRowModelRows: table.getRowModel().rows });
-  console.log({
-    tableRowModelFlatRows: table.getRowModel().rows.map((row) => row.original),
-  });
   // Update the context with flatRows
   useEffect(() => {
     setFlatRows(flatRows);

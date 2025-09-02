@@ -7,7 +7,7 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-
+  typedRoutes: true,
   // i18n configuration is not supported with App Router
   // Use middleware.ts for internationalization instead
 
