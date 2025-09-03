@@ -178,7 +178,7 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
 
                 const params = new URLSearchParams(searchParams);
                 params.set("NameFamily", data["نام"]);
-                router.push(`?${params.toString()}`);
+                router.push(`?${params.toString()}`, { scroll: false });
               }}
               width={500}
               height={500}
