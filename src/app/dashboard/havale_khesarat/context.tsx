@@ -15,6 +15,11 @@ export function HavaleKhesaratProvider({ children }: { children: ReactNode }) {
     filter: {
       CityName: [],
       Start_Date: [moment().locale("fa").subtract(1, "M").format("YYYY/MM/DD")],
+      Memtaz: [],
+      DarajeYek: [],
+      DarajeDo: [],
+      ServiceName: [],
+      HavaleType: [],
     },
   });
 

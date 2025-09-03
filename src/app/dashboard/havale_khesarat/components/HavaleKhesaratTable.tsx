@@ -14,6 +14,9 @@ import { api } from "~/trpc/react";
 import { useHavaleKhesarat } from "../context";
 import { HavaleKhesaratTableProps } from "../types";
 
+import { CustomColumnDef } from "~/types/table";
+import { CityNameFilter } from "~/app/dashboard/havale_khesarat/components/filter-components/cityLevel";
+
 export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
   const { filters, setDataFilters, reportPeriod, setReportPeriod } =
     useHavaleKhesarat();
@@ -32,11 +35,12 @@ export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
     },
   );
 
-  const columns = useMemo<ColumnDef<any>[]>(
+  const columns = useMemo<CustomColumnDef<any, string | number | null>[]>(
     () => [
       {
         header: "ردیف",
         accessorKey: "Id",
+        accessorFn: (row) => row.Id,
         cell: ({ row }) => {
           return (
             <div className="w-full cursor-pointer rounded-full px-2 py-2 text-primary">
@@ -48,32 +52,144 @@ export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
       {
         header: "استان",
         accessorKey: "CityName",
-        filterFn: "arrIncludesSome",
+        accessorFn: (row) => row.CityName,
+        filterFn: arrIncludeExcat,
+        Filter: ({ column }) => {
+          return (
+            <CityNameFilter
+              cityNames={
+                initialFilters.data?.Cities.map((city) => city.CityName).filter(
+                  (city) => city,
+                ) ?? []
+              }
+              column={column}
+              setDataFilters={setDataFilters}
+            />
+          );
+        },
+      },
+      {
+        header: "نوع فعالیت",
+        accessorKey: "ServiceName",
+        accessorFn: (row) => row.ServiceName,
+        filterFn: arrIncludeExcat,
         Filter: ({ column }) => {
           return (
             <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
-              <span className="font-bold text-primary">استان</span>
-              <LayoutGroup id="CityLevelMenu">
-                <InPageMenu
-                  list={City_Levels.map((a) => a.name)}
-                  selectedItems={filters.filter.CityName}
-                  onSelectionChange={(selected) =>
-                    setDataFilters((prev) => ({
-                      ...prev,
-                      filter: { ...prev.filter, CityName: selected },
-                    }))
-                  }
-                />
-              </LayoutGroup>
+              <span className="font-bold text-primary">نوع فعالیت</span>
+              <SelectControlled
+                withSelectAll
+                list={
+                  Array.from(
+                    new Set(
+                      havaleKhesarat.data?.map((item) => item.ServiceName) ??
+                        [],
+                    ),
+                  ).filter(Boolean) as string[]
+                }
+                value={(column.getFilterValue() as string[]) ?? []}
+                onChange={(selectedValues) => {
+                  column.setFilterValue(selectedValues);
+                  setDataFilters((prev: any) => ({
+                    ...prev,
+                    filter: {
+                      ...prev.filter,
+                      ServiceName: selectedValues,
+                    },
+                  }));
+                }}
+              />
             </div>
           );
         },
       },
-      { header: "تاریخ شروع", accessorKey: "Start_Date" },
-      { header: "تاریخ پایان", accessorKey: "End_Date" },
+      {
+        header: "نوع حواله",
+        accessorKey: "HavaleType",
+        accessorFn: (row) => row.HavaleType,
+        filterFn: arrIncludeExcat,
+        Filter: ({ column }) => {
+          return (
+            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+              <span className="font-bold text-primary">نوع حواله</span>
+              <SelectControlled
+                withSelectAll
+                list={
+                  Array.from(
+                    new Set(
+                      havaleKhesarat.data?.map((item) => item.HavaleType) ?? [],
+                    ),
+                  ).filter(Boolean) as string[]
+                }
+                value={(column.getFilterValue() as string[]) ?? []}
+                onChange={(selectedValues) => {
+                  column.setFilterValue(selectedValues);
+                  setDataFilters((prev: any) => ({
+                    ...prev,
+                    filter: {
+                      ...prev.filter,
+                      HavaleType: selectedValues,
+                    },
+                  }));
+                }}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        header: "صدور شده",
+        accessorKey: "SodorShode",
+        accessorFn: (row) => row.SodorShode,
+      },
+      {
+        header: "ابطال شده",
+        accessorKey: "EbtalShode",
+        accessorFn: (row) => row.EbtalShode,
+      },
+      {
+        header: "صادر شده",
+        accessorKey: "SaderShode",
+        accessorFn: (row) => row.SaderShode,
+      },
+      {
+        header: "درصد عودتی",
+        accessorKey: "OdatPercentage",
+        accessorFn: (row) => row.OdatPercentage,
+        cell: ({ row }) => {
+          return (
+            <div className="w-full cursor-pointer rounded-full px-2 py-2 text-primary">
+              {row.original.OdatPercentage.toFixed(2)}%
+            </div>
+          );
+        },
+      },
+      {
+        header: "درصد انحراف",
+        accessorKey: "DeviationPercentage",
+        accessorFn: (row) => row.DeviationPercentage,
+        cell: ({ row }) => {
+          return (
+            <div className="w-full cursor-pointer rounded-full px-2 py-2 text-primary">
+              {row.original.DeviationPercentage.toFixed(2)}%
+            </div>
+          );
+        },
+      },
+      {
+        header: "تاریخ شروع",
+        accessorKey: "Start_Date",
+        accessorFn: (row) => row.Start_Date,
+      },
+      {
+        header: "تاریخ پایان",
+        accessorKey: "End_Date",
+        accessorFn: (row) => row.End_Date,
+      },
       {
         header: "مبلغ حواله",
         accessorKey: "HavaleAmount",
+        accessorFn: (row) => row.HavaleAmount,
         cell: ({ row }) => {
           const amount = parseFloat(row.original.HavaleAmount);
           return (
@@ -86,6 +202,7 @@ export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
       {
         header: "مبلغ خسارت",
         accessorKey: "KhesaratAmount",
+        accessorFn: (row) => row.KhesaratAmount,
         cell: ({ row }) => {
           const amount = parseFloat(row.original.KhesaratAmount);
           return (
@@ -98,6 +215,7 @@ export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
       {
         header: "درصد خسارت",
         accessorKey: "KhesaratPercentage",
+        accessorFn: (row) => row.KhesaratPercentage,
         cell: ({ row }) => {
           const percentage = parseFloat(row.original.KhesaratPercentage);
           return (
@@ -119,12 +237,17 @@ export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
         },
       },
     ],
-    [filters.filter.CityName, setDataFilters],
+    [
+      filters.filter.CityName,
+      setDataFilters,
+      initialFilters.data?.Cities,
+      havaleKhesarat.data,
+    ],
   );
 
   return (
-    <div className="flex w-full flex-col gap-5">
-      <div className="flex w-full items-center justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
+    <div dir="rtl" className="flex w-full flex-col gap-5">
+      <div className="flex w-full items-center justify-between gap-4 rounded-xl  p-4 shadow-sm">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold text-primary">
             گزارش حواله و خسارت
@@ -162,12 +285,12 @@ export function HavaleKhesaratTable({ sessionData }: HavaleKhesaratTableProps) {
         </div>
       </div>
 
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="rounded-xl  p-4 shadow-sm">
         <Table
           data={havaleKhesarat.data || []}
           columns={columns}
           isLoading={havaleKhesarat.isLoading}
-          className="w-full"
+          renderInFilterView={() => <></>}
         />
       </div>
     </div>

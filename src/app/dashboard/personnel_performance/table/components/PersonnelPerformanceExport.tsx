@@ -4,8 +4,7 @@ import { CSVLink } from "react-csv";
 import { ColumnDef } from "@tanstack/react-table";
 import Button from "~/ui/buttons";
 import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
-import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
-
+import { CustomColumnDef } from "~/types/table";
 interface PersonnelPerformanceExportProps {
   flatRows: any[];
   columns: CustomColumnDef<any, any>[];

@@ -74,8 +74,10 @@ export function NavBar({ menuItems, className }: NavBarProps) {
       {itemsWithoutSubMenu.map((item) => (
         <Link
           key={item.id}
-          href={item.link}
-          className="text-primary-muted flex items-start justify-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary"
+          href={{
+            pathname: item.link,
+          }}
+          className="flex items-start justify-center gap-1 rounded-full px-3 py-1.5 text-sm text-primary-muted transition-colors hover:text-primary"
         >
           {item.icon && <item.icon className="size-4" />}
           <span>{item.value}</span>
@@ -293,7 +295,7 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
           key={category}
           className="flex flex-col items-center justify-stretch"
         >
-          <h3 className="text-primary-muted mb-2 text-sm font-medium">
+          <h3 className="mb-2 text-sm font-medium text-primary-muted">
             {category === "default" ? "سایر" : category}
           </h3>
           <div className="space-y-1">
@@ -312,8 +314,10 @@ function SubMenuItem({ item }: { item: MenuItem }) {
 
   return (
     <Link
-      href={item.link}
-      className="text-primary-muted group flex  w-full flex-col items-center justify-center py-2 transition-colors hover:text-primary"
+      href={{
+        pathname: item.link,
+      }}
+      className="group flex w-full  flex-col items-center justify-center py-2 text-primary-muted transition-colors hover:text-primary"
     >
       {IconComponent && (
         <IconComponent className="mb-2 size-10 rounded-md border border-primary/10 p-2 text-xl group-hover:bg-primary group-hover:stroke-secondary " />

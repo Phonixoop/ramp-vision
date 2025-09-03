@@ -11,8 +11,7 @@ import Button from "~/ui/buttons";
 import withConfirmation from "~/ui/with-confirmation";
 import { api } from "~/trpc/react";
 import { reloadSession } from "~/utils/util";
-import { CustomColumnDef } from "~/app/dashboard/personnel_performance/table/components/PersonnelPerformanceColumns";
-
+import { CustomColumnDef } from "~/types/table";
 const ButtonWithConfirmation = withConfirmation(Button);
 
 export default function UsersList() {

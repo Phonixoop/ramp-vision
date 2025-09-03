@@ -14,6 +14,11 @@ export type FilterType = {
   filter: {
     CityName: string[];
     Start_Date: string[];
+    Memtaz: string[];
+    DarajeYek: string[];
+    DarajeDo: string[];
+    ServiceName: string[];
+    HavaleType: string[];
   };
 };
 
