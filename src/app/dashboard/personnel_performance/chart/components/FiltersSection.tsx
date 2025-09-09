@@ -56,7 +56,7 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
         ...new Set(
           getInitialFilters?.data?.usersInfo
             ?.map((a: any) => a.Role as string)
-            ?.filter(Boolean) ?? [""],
+            ?.filter((role) => role && role.trim() !== "") ?? [],
         ),
       ],
       [getInitialFilters.data?.usersInfo],
@@ -143,7 +143,11 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
                 <SelectControlled
                   withSelectAll
                   title="نوع پروژه"
-                  list={getInitialFilters?.data?.ProjectTypes}
+                  list={
+                    getInitialFilters?.data?.ProjectTypes?.filter(
+                      (type: string) => type && type.trim() !== "",
+                    ) ?? []
+                  }
                   value={filters?.filter?.ProjectType}
                   onChange={(values) =>
                     onUpdateFilters({ ProjectType: values })

@@ -1,7 +1,14 @@
+import path from "path";
+
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
+// Skip environment validation during Docker builds
+if (process.env.BUILD_ENV === "docker" || process.env.DOCKER_BUILD === "true") {
+  process.env.SKIP_ENV_VALIDATION = "true";
+}
+
 await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
@@ -10,6 +17,9 @@ const config = {
   // typedRoutes: true,
   // i18n configuration is not supported with App Router
   // Use middleware.ts for internationalization instead
+
+  // Enable standalone output for Docker
+  output: "standalone",
 
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Exclude pages1 folder from webpack compilation

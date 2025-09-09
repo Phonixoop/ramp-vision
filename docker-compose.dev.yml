@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  # Next.js Application (Development)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXTAUTH_URL=http://localhost:3000
+      - DATABASE_URL=sqlserver://5.202.179.158:5090;database=RAMP_Vision;user=admin;password=Mohammad@2525;trustServerCertificate=true;encrypt=true
+      - NEXTAUTH_SECRET=your_actual_secret_here
+      - SQL_USER=admin
+      - SQL_PASSWORD=Mohammad@2525
+      - SQL_SERVERIP=5.202.179.158
+      - SQL_PORT=5090
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    networks:
+      - ramp-network
+    command: sh -c "npx prisma generate && npm run dev"
+
+  # Prisma Studio (Development)
+  prisma-studio:
+    image: node:24.7.0-alpine
+    working_dir: /app
+    volumes:
+      - ./prisma:/app/prisma
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+    environment:
+      - DATABASE_URL=sqlserver://5.202.179.158:5090;database=RAMP_Vision;user=admin;password=Mohammad@2525;trustServerCertificate=true;encrypt=true
+    ports:
+      - "5555:5555"
+    command: >
+      sh -c "npm install prisma && npx prisma generate && npx prisma studio --hostname 0.0.0.0 --port 5555"
+    networks:
+      - ramp-network
+
+networks:
+  ramp-network:
+    driver: bridge

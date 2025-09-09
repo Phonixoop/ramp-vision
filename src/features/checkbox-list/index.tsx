@@ -126,8 +126,8 @@ export function SelectControlled({
     }
 
     const processData = () => {
-      const unique: string[] = Array.from(new Set(list.filter(Boolean)))
-        .filter((a) => a != "")
+      const unique: string[] = Array.from(new Set(list))
+        .filter((a) => a != null && a !== "" && String(a).trim() !== "")
         .toSorted();
       setUniqueValues(unique);
       setIsProcessing(false);
@@ -145,22 +145,27 @@ export function SelectControlled({
   }, [list]);
 
   const handleFilterChange = useCallback((values: string[]) => {
+    // Filter out empty strings before updating
+    const filteredValues = values.filter(
+      (value) => value && value.trim() !== "",
+    );
+
     // Immediately update optimistic state for instant feedback
-    setOptimisticValues(values);
+    setOptimisticValues(filteredValues);
     setIsFiltering(true);
 
     // Defer the actual filter application to avoid blocking UI
     if (typeof window !== "undefined" && "requestIdleCallback" in window) {
       (window as any).requestIdleCallback(
         () => {
-          onChangeRef.current(values);
+          onChangeRef.current(filteredValues);
           setIsFiltering(false);
         },
         { timeout: 100 },
       );
     } else {
       setTimeout(() => {
-        onChangeRef.current(values);
+        onChangeRef.current(filteredValues);
         setIsFiltering(false);
       }, 0);
     }
@@ -344,7 +349,7 @@ export function SelectColumnFilter({
         new Set(
           (data as AnyRow[])
             .map((a) => getString((a as AnyRow)[column.id]))
-            .filter(Boolean),
+            .filter((v) => v && v.trim() !== ""),
         ),
       ).toSorted();
 

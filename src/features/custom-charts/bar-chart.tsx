@@ -1,5 +1,6 @@
+//  i
+import React, { useState, useEffect, useRef } from "react";
 import { SquircleIcon } from "lucide-react";
-import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -115,7 +116,7 @@ type CustomBarChartOptions = {
   customYTick?: boolean;
   brushKey?: string;
   formatter?: Function;
-  customBars?: (data) => ReactNode;
+  customBars?: (data) => React.ReactNode;
   onBarClick?: (data, index) => void;
 };
 export default function CustomBarChart({

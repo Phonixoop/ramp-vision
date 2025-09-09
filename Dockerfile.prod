@@ -1,0 +1,67 @@
+FROM node:24.7.0-alpine AS builder
+
+# Install OpenSSL and other required dependencies
+RUN apk add --no-cache openssl libc6-compat
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Copy Prisma schema (needed for postinstall script)
+COPY prisma ./prisma
+
+# Install all dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Set build-time environment variables (use build args)
+ARG DATABASE_URL
+ARG NEXTAUTH_SECRET
+ARG NEXTAUTH_URL
+ARG SQL_USER
+ARG SQL_PASSWORD
+ARG SQL_SERVERIP
+ARG SQL_PORT
+
+# Set them as environment variables for the build
+ENV DATABASE_URL=$DATABASE_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
+ENV SQL_USER=$SQL_USER
+ENV SQL_PASSWORD=$SQL_PASSWORD
+ENV SQL_SERVERIP=$SQL_SERVERIP
+ENV SQL_PORT=$SQL_PORT
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:24.7.0-alpine AS runner
+
+# Install OpenSSL
+RUN apk add --no-cache openssl libc6-compat
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Copy Prisma schema (needed for postinstall script)
+COPY prisma ./prisma
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Copy built application from builder stage
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
+# Expose port
+EXPOSE 3000
+
+# Start production server
+CMD ["npm", "start"]

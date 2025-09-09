@@ -148,9 +148,21 @@ export const usePersonnelChart = () => {
   };
 
   const updateFilters = (patch: any) => {
+    // Filter out empty strings from array values
+    const cleanedPatch = Object.entries(patch).reduce((acc, [key, value]) => {
+      if (Array.isArray(value)) {
+        acc[key] = value.filter(
+          (item: any) => item && String(item).trim() !== "",
+        );
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+
     setFilters({
       periodType: reportPeriod as any,
-      filter: { ...filters?.filter, ...patch },
+      filter: { ...filters?.filter, ...cleanedPatch },
     });
   };
 
