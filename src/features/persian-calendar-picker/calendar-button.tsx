@@ -48,6 +48,7 @@ export default function CalendarButton({
   isLoading,
 }: CalendarButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isModalReady, setIsModalReady] = useState(false);
 
   const [pendingPeriodType, setPendingPeriodType] = useState<
     "daily" | "weekly" | "monthly"
@@ -76,6 +77,7 @@ export default function CalendarButton({
   // Initialize pending state when modal opens or props change
   React.useEffect(() => {
     if (isOpen) {
+      // ✅ Sync state BEFORE showing modal content → prevents flicker!
       if (periodType === "daily") {
         setDailyDates(selectedDates ?? []);
       } else if (periodType === "weekly") {
@@ -84,6 +86,12 @@ export default function CalendarButton({
         setMonthlyDates(selectedDates ?? []);
       }
       setPendingPeriodType(periodType);
+
+      // Mark modal as ready after state is synchronized
+      setIsModalReady(true);
+    } else {
+      // Reset modal ready state when closed
+      setIsModalReady(false);
     }
   }, [isOpen, selectedDates, periodType]); // Added proper dependencies
 
@@ -229,67 +237,75 @@ export default function CalendarButton({
         className=" border-none bg-secbuttn"
         size="sm"
       >
-        <div className="flex gap-4">
-          {/* Calendar Section */}
-          <div className="w-full flex-1">
-            <SimplifiedPersianCalendarPicker
-              onActiveTabChange={(tab) => {
-                setPendingPeriodType(tab);
-              }}
-              onSelectionChange={(selection) => {
-                console.log("CalendarButton received selection:", selection);
-                // Update the appropriate state based on the selection
-                switch (selection.periodType) {
-                  case "daily":
-                    console.log("Setting daily dates:", selection.dates);
-                    setDailyDates(selection.dates);
-                    break;
-                  case "weekly":
-                    console.log("Setting weekly dates:", selection.dates);
-                    setWeeklyDates(selection.dates);
-                    break;
-                  case "monthly":
-                    console.log("Setting monthly dates:", selection.dates);
-                    setMonthlyDates(selection.dates);
-                    break;
-                }
-              }}
-              dailyDates={dailyDates}
-              weeklyDates={weeklyDates}
-              monthlyDates={monthlyDates}
-              periodType={pendingPeriodType}
-              allowMultiSelection={allowMultiSelection}
-              className="bg-transparent shadow-none"
-            />
-          </div>
+        {isModalReady ? (
+          <div className="flex gap-4">
+            {/* Calendar Section */}
+            <div className="w-full flex-1">
+              <SimplifiedPersianCalendarPicker
+                onActiveTabChange={(tab) => {
+                  setPendingPeriodType(tab);
+                }}
+                onSelectionChange={(selection) => {
+                  console.log("CalendarButton received selection:", selection);
+                  // Update the appropriate state based on the selection
+                  switch (selection.periodType) {
+                    case "daily":
+                      console.log("Setting daily dates:", selection.dates);
+                      setDailyDates(selection.dates);
+                      break;
+                    case "weekly":
+                      console.log("Setting weekly dates:", selection.dates);
+                      setWeeklyDates(selection.dates);
+                      break;
+                    case "monthly":
+                      console.log("Setting monthly dates:", selection.dates);
+                      setMonthlyDates(selection.dates);
+                      break;
+                  }
+                }}
+                dailyDates={dailyDates}
+                weeklyDates={weeklyDates}
+                monthlyDates={monthlyDates}
+                periodType={pendingPeriodType}
+                allowMultiSelection={allowMultiSelection}
+                className="bg-transparent shadow-none"
+              />
+            </div>
 
-          <div className="relative max-h-[430px] w-3/12 overflow-y-auto">
-            {/* Selected Items Panel */}
-            <SelectedItemsPanel
-              periodType={pendingPeriodType}
-              pendingDates={dailyDates}
-              pendingWeeks={weeklyDates}
-              pendingMonths={monthlyDates}
-              onRemoveDate={handleRemoveDate}
-            />
+            <div className="relative max-h-[430px] w-3/12 overflow-y-auto">
+              {/* Selected Items Panel */}
+              <SelectedItemsPanel
+                periodType={pendingPeriodType}
+                pendingDates={dailyDates}
+                pendingWeeks={weeklyDates}
+                pendingMonths={monthlyDates}
+                onRemoveDate={handleRemoveDate}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-center p-8">
+            <LoaderAnim />
+          </div>
+        )}
 
         {/* Save Button */}
-        <div className="flex justify-center p-4">
-          <Button
-            onClick={handleSave}
-            disabled={!hasSelectedDates() || disabled}
-            className={cn(
-              "w-full",
-              hasSelectedDates()
-                ? "bg-accent text-primary hover:bg-accent/90"
-                : "cursor-not-allowed bg-muted text-muted-foreground",
-            )}
-          >
-            ثبت
-          </Button>
-        </div>
+        {isModalReady && (
+          <div className="flex justify-center p-4">
+            <Button
+              onClick={handleSave}
+              disabled={!hasSelectedDates() || disabled}
+              className={cn(
+                "w-full",
+                hasSelectedDates()
+                  ? "bg-accent text-primary hover:bg-accent/90"
+                  : "cursor-not-allowed bg-muted text-muted-foreground",
+              )}
+            >
+              ثبت
+            </Button>
+          </div>
+        )}
       </Modal>
     </div>
   );

@@ -45,7 +45,7 @@ export function SimplifiedPersianCalendarPicker({
   onActiveTabChange,
   className,
 }: SimplifiedPersianCalendarPickerProps) {
-  // Internal state for active tab
+  // Internal state for active tab - initialize with the prop value to prevent flicker
   const [activeTab, setActiveTab] = React.useState<
     "daily" | "weekly" | "monthly"
   >(periodType);
