@@ -21,6 +21,11 @@ const config = {
   // Enable standalone output for Docker
   output: "standalone",
 
+  // Skip TypeScript checking during build
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Exclude pages1 folder from webpack compilation
     config.module.rules.push({

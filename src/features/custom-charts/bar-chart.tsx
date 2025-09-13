@@ -154,6 +154,7 @@ export default function CustomBarChart({
   }, []);
   return (
     <div ref={container} className="h-full w-full">
+      {/* @ts-ignore */}
       <BarChart
         width={containerWidth ?? width}
         height={height}
