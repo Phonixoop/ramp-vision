@@ -6,7 +6,7 @@ services:
       args:
         - DATABASE_URL=sqlserver://5.202.179.158:5090;database=RAMP_Vision;user=admin;password=Mohammad@2525;trustServerCertificate=true;encrypt=true
         - NEXTAUTH_SECRET=your_actual_secret_here
-        - NEXTAUTH_URL=http://localhost:3000
+        - NEXTAUTH_URL=https://ramp.atie-sazan.ir
         - SQL_USER=admin
         - SQL_PASSWORD=Mohammad@2525
         - SQL_SERVERIP=5.202.179.158
@@ -17,7 +17,7 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=sqlserver://5.202.179.158:5090;database=RAMP_Vision;user=admin;password=Mohammad@2525;trustServerCertificate=true;encrypt=true
       - NEXTAUTH_SECRET=your_actual_secret_here
-      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_URL=https://ramp.atie-sazan.ir
       - SQL_USER=admin
       - SQL_PASSWORD=Mohammad@2525
       - SQL_SERVERIP=5.202.179.158
