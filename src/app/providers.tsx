@@ -9,7 +9,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SessionProvider>
-        <ThemeProvider defaultTheme="system" enableSystem>
+        <ThemeProvider
+          defaultTheme="system"
+          enableSystem
+          enableColorScheme
+          themes={["light", "dark"]}
+        >
           <ModalProvider>{children}</ModalProvider>
         </ThemeProvider>
       </SessionProvider>

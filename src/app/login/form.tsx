@@ -112,16 +112,19 @@ export function CreateAccountForm() {
               key={0}
               className="relative flex w-full flex-col items-center justify-center gap-5 "
             >
-              <div className="max-w-sm">
-                <TextFieldWithLabel
-                  label={"نام کاربری"}
-                  name="username"
-                  id="username"
-                  {...formik.getFieldProps("username")}
-                  onKeyDown={(e) => Enter(e)}
-                />
-
-                <InputError message={formik.errors.username} />
+              <div className="flex flex-col items-center justify-center">
+                <div className=" flex flex-col  items-center justify-center  ">
+                  <TextFieldWithLabel
+                    label={"نام کاربری"}
+                    name="username"
+                    id="username"
+                    {...formik.getFieldProps("username")}
+                    onKeyDown={(e) => Enter(e)}
+                  />
+                </div>
+                <div className="w-full">
+                  <InputError message={formik.errors.username} />
+                </div>
               </div>
               <Button
                 className="rounded-full border border-primary px-5"

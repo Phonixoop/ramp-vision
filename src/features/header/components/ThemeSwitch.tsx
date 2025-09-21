@@ -17,7 +17,7 @@ export function ThemeSwitch({ className = "" }: ThemeSwitchProps) {
 
   if (!mounted) {
     return (
-      <div className="size-10 bg-third flex animate-pulse items-center justify-center rounded-full">
+      <div className="bg-third flex size-10 animate-pulse items-center justify-center rounded-full">
         <MinusIcon className="size-5 stroke-primary" />
       </div>
     );
@@ -26,21 +26,21 @@ export function ThemeSwitch({ className = "" }: ThemeSwitchProps) {
   return (
     <Button
       className={cn(
-        "size-10 border-third rounded-full shadow-[0px_0px_20px_0px_rgba(var(--dikado-yellow-800),0.1)]",
+        "border-third size-10 rounded-full shadow-[0px_0px_20px_0px_rgba(var(--dikado-yellow-800),0.1)]",
         className,
       )}
       onClick={() => {
-        if (resolvedTheme === "theme-light-4") {
-          setTheme("theme-dark-1");
+        if (resolvedTheme === "light") {
+          setTheme("dark");
         } else {
-          setTheme("theme-light-4");
+          setTheme("light");
         }
       }}
     >
       {resolvedTheme === "theme-dark-1" ? (
-        <MoonIcon className="size-5 fill-dikado-blue-default" />
+        <MoonIcon className="fill-dikado-blue-default size-5" />
       ) : (
-        <SunIcon className="size-5 stroke-dikado-yellow-default" />
+        <SunIcon className="stroke-dikado-yellow-default size-5" />
       )}
     </Button>
   );

@@ -80,26 +80,26 @@ export default function MultiStep({
           <Button
             disabled={isLoading}
             className={twMerge(
-              "group absolute left-1 z-20 rounded-full p-1.5 ring-1 ring-accent transition duration-500 hover:bg-accent/20 hover:ring-secondary",
+              "group absolute left-1 z-20 rounded-full p-1.5 ring-1 ring-accent transition duration-500 hover:bg-accent/20 hover:ring-transparent",
               currentStep === 0 ? "opacity-0" : "opacity-100",
             )}
             onClick={() => {
               if (currentStep - 1 >= 0) onPrevious();
             }}
           >
-            <ChevronLeft className="h-5 w-5 stroke-primbuttn group-hover:stroke-accent " />
+            <ChevronLeft className="h-5 w-5 stroke-accent " />
           </Button>
           <Button
             disabled={isLoading}
             className={twMerge(
-              "group absolute right-1 z-20  rounded-full p-1.5 ring-1 ring-accent transition duration-500 hover:bg-accent/20 hover:ring-secondary",
+              "group absolute right-1 z-20  rounded-full p-1.5 ring-1 ring-accent transition duration-500 hover:bg-accent/20 hover:ring-transparent",
               currentStep === icons.length - 1 ? "opacity-0" : "opacity-100",
             )}
             onClick={() => {
               if (currentStep + 1 <= icons.length - 1) onNext();
             }}
           >
-            <ChevronRight className="h-5 w-5 stroke-primbuttn group-hover:stroke-accent " />
+            <ChevronRight className="h-5 w-5 stroke-accent " />
           </Button>
         </div>
         <div className="relative flex h-full w-full items-center justify-center gap-10  ">

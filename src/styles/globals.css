@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html[data-theme="theme-light-4"] {
+html[data-theme="light"] {
   --primary: 8, 12, 10;
   --primary-muted: 92, 91, 84;
   --secondary: 206, 204, 188;
@@ -13,16 +13,15 @@ html[data-theme="theme-light-4"] {
   --accent: 237, 33, 124;
 }
 
-html[data-theme="theme-dark-1"] {
+html[data-theme="dark"] {
   --primary: 244, 246, 245;
   --primary-muted: 157, 153, 154;
   --secondary: 10, 10, 10;
-
-  --primbuttn: 76, 170, 136;
-
+  /* --primbuttn: 237, 33, 124; */
+  --primbuttn: 34, 102, 102;
   --secbuttn: 23, 23, 23;
-
-  --accent: 237, 33, 124;
+  /* --accent: 76, 170, 136; */
+  --accent: 51, 113, 90;
 }
 
 /* backup */
@@ -37,13 +36,13 @@ html[data-theme="theme-dark-1"] {
 /* --secbuttn: 10, 10, 10; */
 /* --accent: 190, 255, 255; */
 
-.theme-light-1 {
+/* .theme-light-1 {
   --primary: 29, 13, 7;
   --secondary: 250, 239, 235;
   --primbuttn: 104, 187, 217;
   --secbuttn: 244, 219, 210;
   --accent: 44, 140, 175;
-}
+} */
 
 /* .theme-light-2 {
   --primary: 36, 34, 27;
@@ -52,21 +51,21 @@ html[data-theme="theme-dark-1"] {
   --secbuttn: 228, 230, 201;
   --accent: 36, 34, 27;
 } */
-.theme-light-2 {
+/* .theme-light-2 {
   --primary: 247, 244, 242;
   --secondary: 222, 207, 206;
   --primbuttn: 236, 228, 223;
   --secbuttn: 10, 7, 6;
   --accent: 161, 120, 94;
-}
+} */
 
-.theme-light-3 {
+/* .theme-light-3 {
   --primary: 0, 0, 0;
   --secondary: 237, 248, 243;
   --primbuttn: 29, 70, 73;
   --secbuttn: 215, 225, 239;
   --accent: 29, 47, 73;
-}
+} */
 
 /* .theme-light-4 {
   --primary: 8, 12, 10;
@@ -76,21 +75,21 @@ html[data-theme="theme-dark-1"] {
   --accent: 85, 119, 97;
 } */
 
-.theme-light-4 {
+/* .theme-light-4 {
   --primary: 8, 12, 10;
   --secondary: 206, 204, 188;
   --primbuttn: 61, 87, 71;
   --secbuttn: 197, 188, 171;
   --accent: 85, 119, 97;
-}
+} */
 
-.theme {
+/* .theme {
   --primary: rgb(36, 34, 27);
   --secondary: rgb(228, 220, 201);
   --primbuttn: rgb(36, 34, 27);
   --secbuttn: rgb(228, 220, 201);
   --accent: rgb(36, 34, 27);
-}
+} */
 /* .theme-light-4 {
   --primary: rgb(36, 34, 27);
   --secondary: rgb(228, 220, 201);
@@ -99,18 +98,21 @@ html[data-theme="theme-dark-1"] {
   --accent: rgb(36, 34, 27);
 } */
 
-.theme-dark-1 {
+/* .theme-dark-1 {
   --primary: 244, 246, 245;
   --secondary: 7, 12, 19;
   --primbuttn: 75, 113, 100;
-  /* --primbuttn: 141, 165, 163; */
-  --secbuttn: 13, 20, 33;
-  /* --secbuttn: 10, 10, 10; */
-  /* --accent: 190, 255, 255; */
-  --accent: 230, 146, 35;
-}
 
-.theme-dark-2 {
+  --secbuttn: 13, 20, 33;
+
+  --accent: 230, 146, 35;
+} */
+
+/* --primbuttn: 141, 165, 163; */
+/* --secbuttn: 10, 10, 10; */
+/* --accent: 190, 255, 255; */
+
+/* .theme-dark-2 {
   --primary: 217, 242, 240;
   --secondary: 0, 0, 0;
   --primbuttn: 198, 88, 97;
@@ -131,7 +133,7 @@ html[data-theme="theme-dark-1"] {
   --primbuttn: 75, 113, 100;
   --secbuttn: 63, 59, 56;
   --accent: 230, 185, 35;
-}
+} */
 
 @tailwind utilities;
 
