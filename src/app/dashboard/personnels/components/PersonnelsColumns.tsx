@@ -66,11 +66,7 @@ export function PersonnelsColumns({
         accessorKey: "CityName",
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => (
-          <CityNameFilterPersonnel
-            cityNames={cityNames}
-            column={column}
-            setFilters={setFilters}
-          />
+          <CityNameFilterPersonnel cityNames={cityNames} column={column} />
         ),
       },
       {
@@ -79,7 +75,7 @@ export function PersonnelsColumns({
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           return (
-            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">پرسنل</span>
               <SelectColumnFilterOptimized
                 column={column}
@@ -100,7 +96,7 @@ export function PersonnelsColumns({
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           return (
-            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">نوع پروژه</span>
               <SelectColumnFilterOptimized
                 column={column}
@@ -117,7 +113,7 @@ export function PersonnelsColumns({
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           return (
-            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">سمت</span>
               <SelectColumnFilterOptimized
                 column={column}
@@ -134,7 +130,7 @@ export function PersonnelsColumns({
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           return (
-            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">نوع قرارداد</span>
               <SelectColumnFilterOptimized
                 column={column}
@@ -151,7 +147,7 @@ export function PersonnelsColumns({
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           return (
-            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">نوع سمت</span>
               <SelectColumnFilterOptimized
                 column={column}
@@ -175,7 +171,7 @@ export function PersonnelsColumns({
 
           if (DateInfos.length <= 0) return null;
           return (
-            <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">تاریخ گزارش پرسنل</span>
               <SelectColumnFilterOptimized
                 column={column}

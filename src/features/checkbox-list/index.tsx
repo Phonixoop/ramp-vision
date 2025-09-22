@@ -173,7 +173,8 @@ export function SelectControlled({
 
   if (!list || list.length === 0) return <></>;
 
-  const isAllSelected = filteredValues.length === list.length;
+  const isAllSelected =
+    optimisticValues.length === uniqueValues.length && uniqueValues.length > 0;
 
   // Filter and paginate items
   const filteredItems = uniqueValues.filter((item) =>
@@ -195,11 +196,11 @@ export function SelectControlled({
   return (
     <div
       className={cn(
-        "flex w-full items-center justify-between gap-2 px-2 text-center text-primary sm:px-0",
+        "flex w-full max-w-full items-center justify-between gap-2 overflow-hidden px-2 text-center text-primary sm:px-0",
         className,
       )}
     >
-      <div className="relative flex w-full max-w-[350px] items-center gap-2">
+      <div className="relative flex w-full min-w-0 max-w-[300px] items-center gap-2">
         <MultiSelect
           singleSelect={singleSelect}
           values={optimisticValues}
@@ -207,7 +208,7 @@ export function SelectControlled({
             handleFilterChange(values as string[]);
           }}
         >
-          <MultiSelectTrigger className="min-w-0">
+          <MultiSelectTrigger className="min-w-0 max-w-full overflow-hidden">
             <MultiSelectValue
               overflowBehavior="cutoff"
               placeholder={title || "جستجو..."}
@@ -283,7 +284,7 @@ export function SelectControlled({
             if (isAllSelected) {
               handleFilterChange([]);
             } else {
-              handleFilterChange(list);
+              handleFilterChange(uniqueValues);
             }
           }}
         >
@@ -415,13 +416,13 @@ export function SelectColumnFilter({
   const selectAllState = selectedCount < uniqueValues.length;
 
   return (
-    <div className=" flex w-full items-center justify-center gap-2 px-2 text-center sm:px-0 ">
+    <div className="flex w-full max-w-full items-center justify-center gap-2 overflow-hidden px-2 text-center sm:px-0">
       <MultiSelect
         values={localFilterValue}
         onValuesChange={handleFilterChange}
         defaultValues={initialFilters}
       >
-        <MultiSelectTrigger className="min-w-0">
+        <MultiSelectTrigger className="min-w-0 max-w-full overflow-hidden">
           <MultiSelectValue placeholder="جستجو..." />
         </MultiSelectTrigger>
         <MultiSelectContent
@@ -693,7 +694,8 @@ export function SelectColumnFilterOptimized<T>({
 
   if (!values || values.length === 0) return <></>;
 
-  const isAllSelected = filteredValues.length === uniqueValues.length;
+  const isAllSelected =
+    optimisticValues.length === uniqueValues.length && uniqueValues.length > 0;
 
   const handleFilterChange = (values: string[]) => {
     // Immediately update optimistic state for instant feedback
@@ -743,8 +745,8 @@ export function SelectColumnFilterOptimized<T>({
   // };
 
   return (
-    <div className="flex w-full  items-center justify-between gap-2 px-2 text-center text-primary sm:px-0 ">
-      <div className="relative flex w-full max-w-[350px] items-center gap-2">
+    <div className="flex w-full max-w-full items-center justify-between gap-2 overflow-hidden px-2 text-center text-primary sm:px-0">
+      <div className="relative flex w-full min-w-0 max-w-[300px] items-center gap-2">
         <MultiSelect
           singleSelect={singleSelect}
           defaultValues={stableInitialFilters}
@@ -753,7 +755,7 @@ export function SelectColumnFilterOptimized<T>({
             handleFilterChange(values as string[]);
           }}
         >
-          <MultiSelectTrigger className="min-w-0">
+          <MultiSelectTrigger className="min-w-0 max-w-full overflow-hidden">
             <MultiSelectValue
               overflowBehavior="cutoff"
               placeholder="جستجو..."

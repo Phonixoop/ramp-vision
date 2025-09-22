@@ -45,8 +45,16 @@ export type NavBarProps = {
 export function NavBar({ menuItems, className }: NavBarProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [dir, setDir] = useState<null | "l" | "r">(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleSetSelected = (val: string | null) => {
+    // Clear any existing timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
     if (val !== null && selected !== null && val !== selected) {
       const currentIndex = menuItems.findIndex((item) => item.id === selected);
       const nextIndex = menuItems.findIndex((item) => item.id === val);
@@ -60,6 +68,32 @@ export function NavBar({ menuItems, className }: NavBarProps) {
 
     setSelected(val);
   };
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+    // Clear any existing timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    // Add a delay before closing the menu
+    hoverTimeoutRef.current = setTimeout(() => {
+      handleSetSelected(null);
+    }, 150); // 150ms delay
+  };
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const itemsWithSubMenu = menuItems.filter(
     (item) => item.subMenu && item.subMenu.length > 0,
@@ -86,7 +120,8 @@ export function NavBar({ menuItems, className }: NavBarProps) {
 
       {/* Items with submenu - dropdown */}
       <div
-        onMouseLeave={() => handleSetSelected(null)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="relative flex h-fit gap-2"
       >
         {itemsWithSubMenu.map((item) => (
@@ -101,7 +136,13 @@ export function NavBar({ menuItems, className }: NavBarProps) {
         ))}
 
         {selected && (
-          <Content dir={dir} selected={selected} menuItems={itemsWithSubMenu} />
+          <Content
+            dir={dir}
+            selected={selected}
+            menuItems={itemsWithSubMenu}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          />
         )}
       </div>
     </div>
@@ -146,10 +187,14 @@ function Content({
   selected,
   dir,
   menuItems,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   selected: string | null;
   dir: null | "l" | "r";
   menuItems: MenuItem[];
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }) {
   const selectedItem = menuItems.find((item) => item.id === selected);
   const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
@@ -168,6 +213,8 @@ function Content({
     <motion.div
       layout
       id="overlay-content"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       initial={{
         opacity: 0,
         y: 8,

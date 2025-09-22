@@ -53,7 +53,6 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
   const getPersonnls = api.personnel.getAll.useQuery(
     {
       filter: {
-        CityName: filters?.filter?.CityName,
         ProjectType: filters?.filter?.ProjectType,
         Role: filters?.filter?.Role,
         ContractType: filters?.filter?.ContractType,

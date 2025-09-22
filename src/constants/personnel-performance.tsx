@@ -36,10 +36,11 @@ export const PersonnelPerformanceTranslate = {
   BranchName: "نام شعبه",
 };
 
-export const PersonnelPerformanceIcons = {
+export const PersonnelPerformanceIcons: { [key: string]: React.ReactNode } = {
   SabtAvalieAsnad: <FileInputIcon className="stroke-primary" />,
   PazireshVaSabtAvalieAsnad: <FileCheckIcon className="stroke-emerald-500" />,
   ArzyabiAsanadBimarsetaniDirect: <BrainCogIcon className="stroke-amber-500" />,
+
   ArzyabiAsnadBimarestaniIndirect: (
     <BrainCogIcon className="stroke-amber-700" />
   ),

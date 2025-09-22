@@ -48,6 +48,54 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
       [],
     );
 
+    // Helper function to get personnel data for a specific date
+    const getPersonnelDataForDate = React.useCallback(
+      (date: string, nationalCode: string) => {
+        if (!getAll?.data?.result) return null;
+
+        return distinctPersonnelPerformanceData(
+          getAll.data,
+          ["NationalCode", "NameFamily", "CityName"],
+          [
+            "NationalCode",
+            "NameFamily",
+            "TownName",
+            "BranchCode",
+            "BranchName",
+            "BranchType",
+            "SabtAvalieAsnad",
+            "PazireshVaSabtAvalieAsnad",
+            "ArzyabiAsanadBimarsetaniDirect",
+            "ArzyabiAsnadBimarestaniIndirect",
+            "ArzyabiAsnadDandanVaParaDirect",
+            "ArzyabiAsnadDandanVaParaIndirect",
+            "ArzyabiAsnadDaroDirect",
+            "ArzyabiAsnadDaroIndirect",
+            "WithScanCount",
+            "WithoutScanCount",
+            "WithoutScanInDirectCount",
+            "ArchiveDirectCount",
+            "ArchiveInDirectCount",
+            "ArzyabiVisitDirectCount",
+            "Role",
+            "RoleType",
+            "ContractType",
+            "ProjectType",
+            "TotalPerformance",
+            "DirectPerFormance",
+            "InDirectPerFormance",
+            "Start_Date",
+            "HasTheDayOff",
+          ],
+          {
+            HasTheDayOff: false,
+            Start_Date: date,
+          },
+        ).find((a: any) => a.key.NationalCode === nationalCode);
+      },
+      [getAll?.data],
+    );
+
     const numericItems = React.useMemo(() => {
       if (!selectedPerson) return [] as [string, number][];
       const pairs = Object.entries(selectedPerson).filter(
@@ -204,6 +252,21 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                           (selectedPerson as any).key.NationalCode,
                     )?.HasTheDayOff;
 
+                    const handleDateClick = () => {
+                      const dateString = date.format("jYYYY/jMM/jDD");
+                      const personnelDataForDate = getPersonnelDataForDate(
+                        dateString,
+                        (selectedPerson as any).key.NationalCode,
+                      );
+
+                      if (personnelDataForDate) {
+                        setSelectedPerson({
+                          ...(selectedPerson as any),
+                          ...personnelDataForDate,
+                        });
+                      }
+                    };
+
                     return Number.parseInt(date.format("M")) !==
                       monthNumber + 1 ? (
                       <div className="flex h-full w-full items-center justify-center">
@@ -221,7 +284,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                     ) : (
                       <ToolTipSimple
                         className={cn(
-                          "cursor-default bg-secondary",
+                          "cursor-pointer bg-secondary",
                           !hasTheDayOff &&
                             !userCalData?.TotalPerformance &&
                             "hidden",
@@ -239,9 +302,9 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                           </span>
                         }
                       >
-                        <div
+                        <Button
                           className={cn(
-                            "flex w-max cursor-default items-center justify-center rounded-lg p-2",
+                            "flex w-max cursor-pointer items-center justify-center rounded-xl p-2 transition-opacity hover:opacity-80",
                             hasTheDayOff === true
                               ? "bg-primary text-secondary"
                               : "bg-primary-muted/10 text-primary-muted",
@@ -251,11 +314,12 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                               ? userMetric.color
                               : undefined,
                           }}
+                          onClick={handleDateClick}
                         >
                           <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-black">
                             {date.format("D")}
                           </span>
-                        </div>
+                        </Button>
                       </ToolTipSimple>
                     );
                   }}

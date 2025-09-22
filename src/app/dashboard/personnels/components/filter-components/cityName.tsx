@@ -17,11 +17,9 @@ const same = (a?: string[], b?: string[]) =>
 export const CityNameFilterPersonnel = memo(function CityNameFilter({
   column,
   cityNames,
-  setFilters,
 }: {
   column: Column<any, unknown>;
   cityNames: string[];
-  setFilters: (f: any) => void;
 }) {
   const isCityNamesLoading = !cityNames;
 
@@ -40,7 +38,7 @@ export const CityNameFilterPersonnel = memo(function CityNameFilter({
   );
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
+    <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
       <span className="font-bold text-primary">استان</span>
 
       {isCityNamesLoading ? (
