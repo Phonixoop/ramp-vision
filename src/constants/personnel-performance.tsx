@@ -16,8 +16,10 @@ export const PersonnelPerformanceTranslate = {
   PazireshVaSabtAvalieAsnad: "پذیرش و ثبت اولیه اسناد",
   ArzyabiAsanadBimarsetaniDirect: "ارزیابی اسناد بیمارستانی مستقیم",
   ArzyabiAsnadBimarestaniIndirect: "ارزیابی اسناد بیمارستانی غیر مستقیم",
-  ArzyabiAsnadDandanVaParaDirect: "ارزیابی اسناد دندان و پارا مستقیم",
-  ArzyabiAsnadDandanVaParaIndirect: "ارزیابی اسناد دندان و پارا غیر مستقیم",
+  ArzyabiAsnadDandanVaParaDirect: "ارزیابی اسناد پاراکلینیکی مستقیم",
+  ArzyabiAsnadDandanVaParaIndirect: "ارزیابی اسناد پاراکلینیکی غیر مستقیم",
+  ArzyabiAsnadDandanDirect: "ارزیابی اسناد دندان مستقیم",
+  ArzyabiAsnadDandanIndirect: "ارزیابی اسناد دندان غیر مستقیم",
   ArzyabiAsnadDaroDirect: "ارزیابی اسناد دارو مستقیم",
   ArzyabiAsnadDaroIndirect: "ارزیابی اسناد دارو غیر مستقیم",
   ArchiveDirectCount: "بایگانی مستقیم",
@@ -48,6 +50,10 @@ export const PersonnelPerformanceIcons: { [key: string]: React.ReactNode } = {
   ArzyabiAsnadDandanVaParaIndirect: (
     <BiohazardIcon className="stroke-rose-700" />
   ),
+
+  ArzyabiAsnadDandanDirect: <BiohazardIcon className="stroke-rose-500" />,
+  ArzyabiAsnadDandanIndirect: <BiohazardIcon className="stroke-rose-700" />,
+
   ArzyabiAsnadDaroDirect: <SyringeIcon className="stroke-purple-500" />,
   ArzyabiAsnadDaroIndirect: <SyringeIcon className="stroke-purple-700" />,
 
@@ -70,7 +76,7 @@ export const defualtRoles = [
   "کارشناس ارزیاب اسناد بیمارستانی",
   "کارشناس ارزیاب اسناد پاراکلینیکی",
   "کارشناس ارزیاب اسناد دارویی",
-  "کارشناس ارزیاب اسناد دندانپزشکی",
+  "کارشناس ارزیاب اسناد دندان",
   "کارشناس پذیرش اسناد",
   "کارشناس ثبت اسناد خسارت",
 ];
@@ -139,7 +145,8 @@ export const defualtContractTypes = ["تمام وقت"];
 export const Indicators = {
   ArzyabiAsanadBimarsetaniDirect: 35, // ارزیابی اسناد بیمارستانی مستقیم
   ArzyabiAsnadDaroDirect: 250, // ارزیابی اسناد دارو مستقیم
-  ArzyabiAsnadDandanVaParaDirect: 200, // ارزیابی اسناد دندانپزشکی + پاراکلینیکی مستقیم
+  ArzyabiAsnadDandanVaParaDirect: 200, // ارزیابی اسناد  پاراکلینیکی مستقیم
+  ArzyabiAsnadDandanDirect: 200, // ارزیابی اسناد دندان  مستقیم
 
   PazireshVaSabtAvalieAsnad: 100, // پذیرش و ثبت اولیه اسناد مستقیم
   // SabtAvalieAsnad : 350, // ثبت اولیه اسناد مستقیم
@@ -153,7 +160,8 @@ export const Indicators = {
 
   ArzyabiAsnadBimarestaniIndirect: 35, // ارزیابی اسناد بیمارستانی غیر مستقیم
   ArzyabiAsnadDaroIndirect: 375, // ارزیابی اسناد دارو  غیر مستقیم
-  ArzyabiAsnadDandanVaParaIndirect: 300, // ارزیابی اسناد دندانپزشکی + پاراکلینیکی مستقیم
+  ArzyabiAsnadDandanVaParaIndirect: 300, // ارزیابی اسناد  پاراکلینیکی مستقیم
+  ArzyabiAsnadDandanIndirect: 300, // ارزیابی اسناد دندان مستقیم
 };
 
 export const performanceLevels = [

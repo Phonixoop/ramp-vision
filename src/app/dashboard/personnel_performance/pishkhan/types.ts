@@ -56,6 +56,8 @@ export type PishkhanData = {
   ArzyabiAsnadBimarestaniIndirect: number;
   ArzyabiAsnadDandanVaParaDirect: number;
   ArzyabiAsnadDandanVaParaIndirect: number;
+  ArzyabiAsnadDandanDirect: number;
+  ArzyabiAsnadDandanIndirect: number;
   ArzyabiAsnadDaroDirect: number;
   ArzyabiAsnadDaroIndirect: number;
   WithScanCount: number;

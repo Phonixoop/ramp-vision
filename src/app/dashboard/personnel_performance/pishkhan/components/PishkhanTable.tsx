@@ -134,6 +134,8 @@ export function PishkhanTable({ sessionData }: PishkhanTableProps) {
           "ArzyabiAsnadBimarestaniIndirect",
           "ArzyabiAsnadDandanVaParaDirect",
           "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDandanDirect",
+          "ArzyabiAsnadDandanIndirect",
           "ArzyabiAsnadDaroDirect",
           "ArzyabiAsnadDaroIndirect",
           "WithScanCount",

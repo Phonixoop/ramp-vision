@@ -132,6 +132,8 @@ export const useCityPage = () => {
         "ArzyabiAsnadBimarestaniIndirect",
         "ArzyabiAsnadDandanVaParaDirect",
         "ArzyabiAsnadDandanVaParaIndirect",
+        "ArzyabiAsnadDandanDirect",
+        "ArzyabiAsnadDandanIndirect",
         "ArzyabiAsnadDaroDirect",
         "ArzyabiAsnadDaroIndirect",
         "WithScanCount",

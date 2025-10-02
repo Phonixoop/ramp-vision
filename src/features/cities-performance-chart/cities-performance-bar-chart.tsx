@@ -72,6 +72,8 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
         "ArzyabiAsnadBimarestaniIndirect",
         "ArzyabiAsnadDandanVaParaDirect",
         "ArzyabiAsnadDandanVaParaIndirect",
+        "ArzyabiAsnadDandanDirect",
+        "ArzyabiAsnadDandanIndirect",
         "ArzyabiAsnadDaroDirect",
         "ArzyabiAsnadDaroIndirect",
         "WithScanCount",

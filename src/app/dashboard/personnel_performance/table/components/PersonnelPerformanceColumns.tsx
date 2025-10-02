@@ -271,7 +271,7 @@ export function PersonnelPerformanceColumns({
         ),
     },
     {
-      header: "ارزیابی اسناد دندان و پارا مستقیم",
+      header: "ارزیابی اسناد پاراکلینیکی مستقیم",
       accessorKey: "ArzyabiAsnadDandanVaParaDirect",
       footer: ({ table }) =>
         commify(
@@ -287,7 +287,7 @@ export function PersonnelPerformanceColumns({
         ),
     },
     {
-      header: "ارزیابی اسناد دندان و پارا غیر مستقیم",
+      header: "ارزیابی اسناد پاراکلینیکی غیر مستقیم",
       accessorKey: "ArzyabiAsnadDandanVaParaIndirect",
       footer: ({ table }) =>
         commify(
@@ -299,6 +299,36 @@ export function PersonnelPerformanceColumns({
                   (row.getValue(
                     "ArzyabiAsnadDandanVaParaIndirect",
                   ) as number) || 0,
+              0,
+            ),
+        ),
+    },
+    {
+      header: "ارزیابی اسناد دندان مستقیم",
+      accessorKey: "ArzyabiAsnadDandanDirect",
+      footer: ({ table }) =>
+        commify(
+          table
+            .getFilteredRowModel()
+            .rows.reduce(
+              (total, row) =>
+                total + (row.getValue("ArzyabiAsnadDandanDirect") as number) ||
+                0,
+              0,
+            ),
+        ),
+    },
+    {
+      header: "ارزیابی اسناد دندان غیر مستقیم",
+      accessorKey: "ArzyabiAsnadDandanIndirect",
+      footer: ({ table }) =>
+        commify(
+          table
+            .getFilteredRowModel()
+            .rows.reduce(
+              (total, row) =>
+                total +
+                  (row.getValue("ArzyabiAsnadDandanIndirect") as number) || 0,
               0,
             ),
         ),

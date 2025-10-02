@@ -230,6 +230,8 @@ export function PersonnelPerformanceTable({
           "ArzyabiAsnadBimarestaniIndirect",
           "ArzyabiAsnadDandanVaParaDirect",
           "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDandanDirect",
+          "ArzyabiAsnadDandanIndirect",
           "ArzyabiAsnadDaroDirect",
           "ArzyabiAsnadDaroIndirect",
           "WithScanCount",

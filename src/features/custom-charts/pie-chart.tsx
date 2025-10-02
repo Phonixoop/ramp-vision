@@ -122,26 +122,41 @@ export default function CustomPieChart<
         className,
       )}
     >
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          .pie-chart-container svg:focus,
+          .pie-chart-container svg:focus-visible,
+          .pie-chart-container svg *:focus,
+          .pie-chart-container svg *:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+          }
+        `,
+        }}
+      />
       {isEmpty ? (
         <div className="flex h-full w-full items-center justify-center p-2 text-center text-primary">
           <span>دیتا ای وجود ندارد</span>
         </div>
       ) : (
-        <PieChart width={300} height={300}>
-          <Pie
-            activeShape={activeIndex >= 0 ? renderActiveShape : undefined}
-            data={data}
-            cx="50%"
-            cy="50%"
-            stroke="#00000000"
-            innerRadius={60}
-            outerRadius={80}
-            dataKey={"value"}
-            onMouseEnter={onPieEnter}
-            onMouseLeave={onPieLeave}
-            label={(entry) => `${commify(entry.value)}`}
-          />
-        </PieChart>
+        <div className="pie-chart-container">
+          <PieChart width={300} height={300}>
+            <Pie
+              activeShape={activeIndex >= 0 ? renderActiveShape : undefined}
+              data={data}
+              cx="50%"
+              cy="50%"
+              stroke="#00000000"
+              innerRadius={60}
+              outerRadius={80}
+              dataKey={"value"}
+              onMouseEnter={onPieEnter}
+              onMouseLeave={onPieLeave}
+              label={(entry) => `${commify(entry.value)}`}
+            />
+          </PieChart>
+        </div>
       )}
     </div>
   );

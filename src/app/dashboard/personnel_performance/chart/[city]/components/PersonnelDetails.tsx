@@ -69,6 +69,8 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             "ArzyabiAsnadBimarestaniIndirect",
             "ArzyabiAsnadDandanVaParaDirect",
             "ArzyabiAsnadDandanVaParaIndirect",
+            "ArzyabiAsnadDandanDirect",
+            "ArzyabiAsnadDandanIndirect",
             "ArzyabiAsnadDaroDirect",
             "ArzyabiAsnadDaroIndirect",
             "WithScanCount",

@@ -29,6 +29,10 @@ export function calculatePerformance(
       ((dateLenght * Indicators.ArzyabiAsnadBimarestaniIndirect) / devideBy) +
     item.ArzyabiAsnadDandanVaParaDirect /
       ((dateLenght * Indicators.ArzyabiAsnadDandanVaParaDirect) / devideBy) +
+    item.ArzyabiAsnadDandanDirect /
+      ((dateLenght * Indicators.ArzyabiAsnadDandanDirect) / devideBy) +
+    item.ArzyabiAsnadDandanIndirect /
+      ((dateLenght * Indicators.ArzyabiAsnadDandanIndirect) / devideBy) +
     item.ArzyabiAsnadDandanVaParaIndirect /
       ((dateLenght * Indicators.ArzyabiAsnadDandanVaParaIndirect) / devideBy) +
     item.ArzyabiAsnadDaroDirect /
@@ -54,6 +58,8 @@ export function distinctDataAndCalculatePerformance(
     "ArzyabiAsnadBimarestaniIndirect",
     "ArzyabiAsnadDandanVaParaDirect",
     "ArzyabiAsnadDandanVaParaIndirect",
+    "ArzyabiAsnadDandanDirect",
+    "ArzyabiAsnadDandanIndirect",
     "ArzyabiAsnadDaroDirect",
     "ArzyabiAsnadDaroIndirect",
     "WithScanCount",
@@ -110,6 +116,8 @@ export function distinctPersonnelPerformanceData(
     "ArzyabiAsnadBimarestaniIndirect",
     "ArzyabiAsnadDandanVaParaDirect",
     "ArzyabiAsnadDandanVaParaIndirect",
+    "ArzyabiAsnadDandanDirect",
+    "ArzyabiAsnadDandanIndirect",
     "ArzyabiAsnadDaroDirect",
     "ArzyabiAsnadDaroIndirect",
     "WithScanCount",

@@ -73,7 +73,7 @@ export const direct_Table_WithoutScan: TableJson = {
 };
 
 export const direct_Table_Para_Dandan: TableJson = {
-  title: "ارزیابی اسناد دندانپزشکی + پاراکلینیکی",
+  title: "ارزیابی اسناد دندان + پاراکلینیکی",
   table: {
     "عملکرد کارشناس": {
       data: ["0 تا 150", "150 تا 200", "200 تا 250", "بیشتر از 250"],
@@ -123,7 +123,7 @@ export const inDirect_Table_WithoutScan: TableJson = {
 };
 
 export const inDirect_Table_Para_Dandan: TableJson = {
-  title: "ارزیابی اسناد دندانپزشکی + پاراکلینیکی",
+  title: "ارزیابی اسناد دندان + پاراکلینیکی",
   table: {
     "عملکرد کارشناس": {
       data: ["0 تا 225", "225 تا 300", "300 تا 375", "بیشتر از 375"],

@@ -215,6 +215,8 @@ export class PersonnelQueryBuilder extends AggregationQueryBuilder {
       .sum("ArzyabiAsanadBimarsetaniDirect", "ArzyabiAsanadBimarsetaniDirect")
       .sum("ArzyabiAsnadBimarestaniIndirect", "ArzyabiAsnadBimarestaniIndirect")
       .sum("ArzyabiAsnadDandanVaParaDirect", "ArzyabiAsnadDandanVaParaDirect")
+      .sum("ArzyabiAsnadDandanDirect", "ArzyabiAsnadDandanDirect")
+      .sum("ArzyabiAsnadDandanIndirect", "ArzyabiAsnadDandanIndirect")
       .sum(
         "ArzyabiAsnadDandanVaParaIndirect",
         "ArzyabiAsnadDandanVaParaIndirect",
