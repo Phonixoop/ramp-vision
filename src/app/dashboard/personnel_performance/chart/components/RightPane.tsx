@@ -5,10 +5,11 @@ import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 interface RightPaneProps {
   children?: React.ReactNode;
   navigatingToCity: string | null;
+  useWorkDays?: boolean;
 }
 
 export const RightPane = React.memo<RightPaneProps>(
-  ({ children, navigatingToCity }) => {
+  ({ children, navigatingToCity, useWorkDays }) => {
     return (
       <>
         {navigatingToCity ? (

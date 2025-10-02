@@ -39,10 +39,20 @@ interface PersonnelDetailsProps {
   filters: any;
   getAll: any;
   setSelectedPerson: (person: PersonRecord | null) => void;
+  useWorkDays?: boolean;
+  totalWorkDays?: number | null;
 }
 
 export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
-  ({ selectedPerson, currentCity, filters, getAll, setSelectedPerson }) => {
+  ({
+    selectedPerson,
+    currentCity,
+    filters,
+    getAll,
+    setSelectedPerson,
+    useWorkDays,
+    totalWorkDays,
+  }) => {
     const translateKeys = React.useMemo(
       () => Object.keys(PersonnelPerformanceTranslate),
       [],
@@ -93,9 +103,10 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             HasTheDayOff: false,
             Start_Date: date,
           },
+          useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
         ).find((a: any) => a.key.NationalCode === nationalCode);
       },
-      [getAll?.data],
+      [getAll?.data, useWorkDays, totalWorkDays],
     );
 
     const numericItems = React.useMemo(() => {

@@ -74,6 +74,7 @@ export function distinctDataAndCalculatePerformance(
     "InDirectPerFormance",
   ],
   where = {},
+  workDays?: number | null,
 ) {
   // const dataWithThurdsdayEdit = data?.result?.map((item) => {
   //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
@@ -98,6 +99,7 @@ export function distinctDataAndCalculatePerformance(
   const r = mapToCitiesWithPerformance({
     dateLengthPerCity: data?.dateLength,
     result: citiesWithPerformanceData,
+    workDays,
   });
   return r;
 }
@@ -129,6 +131,7 @@ export function distinctPersonnelPerformanceData(
     "TotalPerformance",
   ],
   where = {},
+  workDays?: number | null,
 ) {
   // const dataWithThurdsdayEdit = data?.result?.map((item) => {
   //   const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
@@ -149,12 +152,15 @@ export function distinctPersonnelPerformanceData(
     // const city =
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
+    // Use work days if provided, otherwise use rowCount
+    const divisor = workDays || item.key.rowCount;
+
     return {
       ...item.key, // Spread the key properties to make them top-level
       ...item, // Spread the aggregated values
-      TotalPerformance: item.TotalPerformance / item.key.rowCount,
-      DirectPerFormance: item.DirectPerFormance / item.key.rowCount,
-      InDirectPerFormance: item.InDirectPerFormance / item.key.rowCount,
+      TotalPerformance: item.TotalPerformance / divisor,
+      DirectPerFormance: item.DirectPerFormance / divisor,
+      InDirectPerFormance: item.InDirectPerFormance / divisor,
       // (groupBy.includes("Start_Date")
       //   ? item.key.COUNT
       //   : data.dateLength[city]),
@@ -165,6 +171,11 @@ export function distinctPersonnelPerformanceData(
 function mapToCitiesWithPerformance({
   dateLengthPerCity,
   result,
+  workDays,
+}: {
+  dateLengthPerCity: any;
+  result: any[];
+  workDays?: number | null;
 }): CityWithPerformanceData[] {
   return result.map((item) => {
     // const personnelCount = result.find(
@@ -174,12 +185,15 @@ function mapToCitiesWithPerformance({
     // const maxCount = Math.max(
     //   result.filter((a) => a.CityName === item.key).map((a) => a.COUNT),
     // );
+    // Use work days if provided, otherwise use COUNT
+    const divisor = workDays || item.COUNT;
+
     return {
       CityName_En: item.key.CityName,
       CityName_Fa: getEnglishToPersianCity(item.key.CityName),
-      TotalPerformance: item.TotalPerformance / item.COUNT,
-      DirectPerFormance: item.DirectPerFormance / item.COUNT,
-      InDirectPerFormance: item.InDirectPerFormance / item.COUNT,
+      TotalPerformance: item.TotalPerformance / divisor,
+      DirectPerFormance: item.DirectPerFormance / divisor,
+      InDirectPerFormance: item.InDirectPerFormance / divisor,
       // calculatePerformance(item, data?.dateLength) /
       // Math.max(
       //   ...data?.result

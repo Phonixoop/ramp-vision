@@ -3,6 +3,7 @@
 import React from "react";
 import { useCityPage } from "../hooks/useCityPage";
 import { PersonnelList, PersonnelDetails, CityOverview } from "./components";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
 
 export default function CityPage() {
   const {
@@ -15,7 +16,11 @@ export default function CityPage() {
     onFilterByLevel,
     onSelectPerson,
     setSelectedPerson,
+    getTotalWorkDays,
   } = useCityPage();
+
+  const { useWorkDays } = useWorkDaysToggle();
+  const totalWorkDays = getTotalWorkDays();
 
   if (!currentCity) {
     return (
@@ -53,6 +58,8 @@ export default function CityPage() {
                 filters={filters}
                 getAll={getAll}
                 setSelectedPerson={setSelectedPerson}
+                useWorkDays={useWorkDays}
+                totalWorkDays={totalWorkDays}
               />
             </div>
           )}

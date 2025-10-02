@@ -27,6 +27,8 @@ import { PersonnelPerformanceData } from "../types";
 import { usePersonnelPerformance } from "../context";
 import { TableFiltersContainerSkeleton } from "./TableFilterSkeleton";
 import { CustomColumnDef } from "~/types/table";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+import WorkDaysToggle from "~/features/work-days-toggle";
 
 export function PersonnelPerformanceTable({
   sessionData,
@@ -40,6 +42,8 @@ export function PersonnelPerformanceTable({
     setFiltersWithNoNetworkRequest,
     isFiltering,
   } = usePersonnelPerformance();
+
+  const { useWorkDays, setUseWorkDays } = useWorkDaysToggle();
 
   // API Queries
   const getInitialCities =
@@ -210,6 +214,46 @@ export function PersonnelPerformanceTable({
   );
   // console.log(personnelPerformance.data);
 
+  // Prepare months array for work days calculation
+  const monthsArray = useMemo(() => {
+    if (
+      !filters?.periodType ||
+      filters.periodType !== "ماهانه" ||
+      !filters?.filter?.Start_Date ||
+      !Array.isArray(filters.filter.Start_Date)
+    ) {
+      return [];
+    }
+
+    const months: { year: number; month: number }[] = [];
+
+    filters.filter.Start_Date.forEach((dateStr) => {
+      if (typeof dateStr === "string") {
+        try {
+          const momentDate = moment(dateStr, "jYYYY/jMM/jDD");
+          const year = momentDate.jYear();
+          const month = momentDate.jMonth() + 1; // jMonth() returns 0-11, we need 1-12
+          months.push({ year, month });
+        } catch (error) {
+          console.warn("Error parsing date:", dateStr, error);
+        }
+      }
+    });
+
+    return months;
+  }, [filters?.periodType, filters?.filter?.Start_Date]);
+
+  // Fetch total work days from tRPC
+  const { data: workDaysData } = api.monthWorkDays.getTotalWorkDays.useQuery(
+    { months: monthsArray },
+    {
+      enabled: monthsArray.length > 0,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const totalWorkDays = workDaysData?.totalWorkDays || null;
+
   // Derived data
   const distincedData = useMemo(
     () =>
@@ -252,8 +296,9 @@ export function PersonnelPerformanceTable({
           "HasTheDayOff",
         ],
         { HasTheDayOff: false },
+        useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
       ),
-    [personnelPerformance.data],
+    [personnelPerformance.data, useWorkDays, totalWorkDays],
   );
 
   useEffect(() => {
@@ -355,6 +400,16 @@ export function PersonnelPerformanceTable({
       <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
         جزئیات عملکرد پرسنل شعب (جدول)
       </h1>
+
+      {/* Work Days Toggle */}
+      <div className="flex justify-center py-2">
+        <WorkDaysToggle
+          isEnabled={useWorkDays}
+          onToggle={setUseWorkDays}
+          totalWorkDays={totalWorkDays}
+          className="rounded-lg bg-primary/5 px-4 py-2"
+        />
+      </div>
 
       <div className="relative flex w-full items-center justify-center rounded-lg py-5 text-center">
         <Table<PersonnelPerformanceData>

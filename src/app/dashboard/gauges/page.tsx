@@ -5,6 +5,7 @@ import BlurBackground from "~/ui/blur-backgrounds";
 import { GaugesTable } from "./components/GaugesTable";
 import { GaugesProvider } from "./context";
 import { TableDataProvider } from "~/context/table-data.context";
+import { WorkDaysToggleProvider } from "~/context/work-days-toggle.context";
 
 export default function GaugesPage() {
   const { data: sessionData } = useSession();
@@ -14,9 +15,11 @@ export default function GaugesPage() {
       <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000">
         <div className="w-full sm:p-0 xl:w-11/12">
           <TableDataProvider>
-            <GaugesProvider>
-              <GaugesTable sessionData={sessionData} />
-            </GaugesProvider>
+            <WorkDaysToggleProvider>
+              <GaugesProvider>
+                <GaugesTable sessionData={sessionData} />
+              </GaugesProvider>
+            </WorkDaysToggleProvider>
           </TableDataProvider>
         </div>
       </div>

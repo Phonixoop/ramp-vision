@@ -12,27 +12,26 @@ export const monthWorkDaysRouter = createTRPCRouter({
   // Get all month work days
   getAll: publicProcedure.query(async () => {
     return await db.monthWorkDay.findMany({
-      orderBy: [
-        { year: "desc" },
-        { month: "asc" }
-      ]
+      orderBy: [{ year: "desc" }, { month: "asc" }],
     });
   }),
 
   // Get work days for a specific month and year
   getByMonthYear: publicProcedure
-    .input(z.object({
-      year: z.number(),
-      month: z.number(),
-    }))
+    .input(
+      z.object({
+        year: z.number(),
+        month: z.number(),
+      }),
+    )
     .query(async ({ input }) => {
       return await db.monthWorkDay.findUnique({
         where: {
           year_month: {
             year: input.year,
             month: input.month,
-          }
-        }
+          },
+        },
       });
     }),
 
@@ -45,7 +44,7 @@ export const monthWorkDaysRouter = createTRPCRouter({
           year_month: {
             year: input.year,
             month: input.month,
-          }
+          },
         },
         update: {
           work_days: input.work_days,
@@ -55,24 +54,60 @@ export const monthWorkDaysRouter = createTRPCRouter({
           year: input.year,
           month: input.month,
           work_days: input.work_days,
-        }
+        },
       });
     }),
 
   // Delete month work days
   delete: publicProcedure
-    .input(z.object({
-      year: z.number(),
-      month: z.number(),
-    }))
+    .input(
+      z.object({
+        year: z.number(),
+        month: z.number(),
+      }),
+    )
     .mutation(async ({ input }) => {
       return await db.monthWorkDay.delete({
         where: {
           year_month: {
             year: input.year,
             month: input.month,
-          }
-        }
+          },
+        },
       });
+    }),
+
+  // Calculate total work days for given months
+  getTotalWorkDays: publicProcedure
+    .input(
+      z.object({
+        months: z.array(
+          z.object({
+            year: z.number(),
+            month: z.number(),
+          }),
+        ),
+      }),
+    )
+    .query(async ({ input }) => {
+      if (input.months.length === 0) {
+        return { totalWorkDays: 0 };
+      }
+
+      const totalWorkDays = await db.monthWorkDay.aggregate({
+        where: {
+          OR: input.months.map(({ year, month }) => ({
+            year,
+            month,
+          })),
+        },
+        _sum: {
+          work_days: true,
+        },
+      });
+
+      return {
+        totalWorkDays: totalWorkDays._sum.work_days || 0,
+      };
     }),
 });

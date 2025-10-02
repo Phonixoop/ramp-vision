@@ -11,6 +11,8 @@ import {
   defualtRoles,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+import moment from "jalali-moment";
 
 export const usePersonnelChart = () => {
   const {
@@ -19,6 +21,8 @@ export const usePersonnelChart = () => {
     reportPeriod,
     setReportPeriod,
   } = usePersonnelPerformanceChart();
+
+  const { useWorkDays } = useWorkDaysToggle();
 
   const router = useRouter();
   const params = useParams<{ city?: string }>();
@@ -54,10 +58,96 @@ export const usePersonnelChart = () => {
       { refetchOnWindowFocus: false },
     );
 
+  // Prepare months array for work days calculation
+  const monthsArray = React.useMemo(() => {
+    if (
+      !filters?.periodType ||
+      filters.periodType !== "ماهانه" ||
+      !filters?.filter?.Start_Date ||
+      !Array.isArray(filters.filter.Start_Date)
+    ) {
+      return [];
+    }
+
+    const months: { year: number; month: number }[] = [];
+
+    filters.filter.Start_Date.forEach((dateStr, index) => {
+      if (typeof dateStr === "string") {
+        try {
+          const momentDate = moment(dateStr, "jYYYY/jMM/jDD");
+          const year = momentDate.jYear();
+          const month = momentDate.jMonth() + 1; // jMonth() returns 0-11, we need 1-12
+
+          console.log(`✅ Parsed date ${index}:`, { year, month });
+          months.push({ year, month });
+        } catch (error) {
+          console.warn("Error parsing date:", dateStr, error);
+        }
+      } else {
+        console.log(`⚠️ Date ${index} is not a string:`, dateStr);
+      }
+    });
+
+    console.log("🎯 Final months array:", months);
+    return months;
+  }, [filters?.periodType, filters?.filter?.Start_Date]);
+
+  // Fetch total work days from tRPC
+  const {
+    data: workDaysData,
+    isLoading: workDaysLoading,
+    error: workDaysError,
+  } = api.monthWorkDays.getTotalWorkDays.useQuery(
+    { months: monthsArray },
+    {
+      enabled: monthsArray.length > 0, // Always fetch when months are selected, regardless of toggle state
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const totalWorkDays = workDaysData?.totalWorkDays || null;
+
+  // Debug logging
+  console.log("🔍 usePersonnelChart work days query:");
+  console.log("filters?.filter?.Start_Date:", filters?.filter?.Start_Date);
+  console.log("monthsArray:", monthsArray);
+  console.log("monthsArray.length:", monthsArray.length);
+  console.log("workDaysLoading:", workDaysLoading);
+  console.log("workDaysError:", workDaysError);
+  console.log("workDaysData:", workDaysData);
+  console.log("totalWorkDays:", totalWorkDays);
+
   const distincedData: CityWithPerformanceData[] = useMemo(
     () =>
-      distinctDataAndCalculatePerformance(getCitiesWithPerformance?.data) ?? [],
-    [getCitiesWithPerformance?.data],
+      distinctDataAndCalculatePerformance(
+        getCitiesWithPerformance?.data,
+        ["CityName"],
+        [
+          "SabtAvalieAsnad",
+          "PazireshVaSabtAvalieAsnad",
+          "ArzyabiAsanadBimarsetaniDirect",
+          "ArzyabiAsnadBimarestaniIndirect",
+          "ArzyabiAsnadDandanVaParaDirect",
+          "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDandanDirect",
+          "ArzyabiAsnadDandanIndirect",
+          "ArzyabiAsnadDaroDirect",
+          "ArzyabiAsnadDaroIndirect",
+          "WithScanCount",
+          "WithoutScanCount",
+          "WithoutScanInDirectCount",
+          "ArchiveDirectCount",
+          "ArchiveInDirectCount",
+          "ArzyabiVisitDirectCount",
+          "COUNT",
+          "TotalPerformance",
+          "DirectPerFormance",
+          "InDirectPerFormance",
+        ],
+        {},
+        useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
+      ) ?? [],
+    [getCitiesWithPerformance?.data, useWorkDays, totalWorkDays],
   );
 
   const [listView, setListView] = useState<CityWithPerformanceData[]>(
@@ -181,6 +271,7 @@ export const usePersonnelChart = () => {
     navigatingToCity,
     getInitialFilters,
     getCitiesWithPerformance,
+    totalWorkDays,
 
     // Loading states
     isLoading: getCitiesWithPerformance.isLoading,

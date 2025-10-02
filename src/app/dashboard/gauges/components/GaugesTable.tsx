@@ -25,6 +25,8 @@ import {
   defualtRoles,
 } from "~/constants/personnel-performance";
 import { distinctDataAndCalculatePerformance } from "~/utils/personnel-performance";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+import WorkDaysToggle from "~/features/work-days-toggle";
 import {
   DistinctData,
   calculateAggregateByFields,
@@ -36,6 +38,7 @@ import {
 export function GaugesTable({ sessionData }: GaugesTableProps) {
   const { filters, setDataFilters, reportPeriod, setReportPeriod } =
     useGauges();
+  const { useWorkDays, setUseWorkDays } = useWorkDaysToggle();
   const [showFilters, setShowFilters] = useState(false);
   const [cityLevel, setCityLevel] = useState({
     index: -1,
@@ -102,14 +105,106 @@ export function GaugesTable({ sessionData }: GaugesTableProps) {
     ),
   ] as string[];
 
+  // Prepare months array for work days calculation
+  const monthsArray = useMemo(() => {
+    if (
+      !filters?.periodType ||
+      filters.periodType !== "ماهانه" ||
+      !filters?.filter?.Start_Date ||
+      !Array.isArray(filters.filter.Start_Date)
+    ) {
+      return [];
+    }
+
+    const months: { year: number; month: number }[] = [];
+
+    filters.filter.Start_Date.forEach((dateStr) => {
+      if (typeof dateStr === "string") {
+        try {
+          const momentDate = moment(dateStr, "jYYYY/jMM/jDD");
+          const year = momentDate.jYear();
+          const month = momentDate.jMonth() + 1; // jMonth() returns 0-11, we need 1-12
+          months.push({ year, month });
+        } catch (error) {
+          console.warn("Error parsing date:", dateStr, error);
+        }
+      }
+    });
+
+    return months;
+  }, [filters?.periodType, filters?.filter?.Start_Date]);
+
+  // Fetch total work days from tRPC
+  const { data: workDaysData } = api.monthWorkDays.getTotalWorkDays.useQuery(
+    { months: monthsArray },
+    {
+      enabled: monthsArray.length > 0,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const totalWorkDays = workDaysData?.totalWorkDays || null;
+
   const result = useMemo(() => {
     if (cityLevel.cities.length > 0)
       return distinctDataAndCalculatePerformance(
         getCitiesWithPerformance.data,
+        ["CityName"],
+        [
+          "SabtAvalieAsnad",
+          "PazireshVaSabtAvalieAsnad",
+          "ArzyabiAsanadBimarsetaniDirect",
+          "ArzyabiAsnadBimarestaniIndirect",
+          "ArzyabiAsnadDandanVaParaDirect",
+          "ArzyabiAsnadDandanVaParaIndirect",
+          "ArzyabiAsnadDandanDirect",
+          "ArzyabiAsnadDandanIndirect",
+          "ArzyabiAsnadDaroDirect",
+          "ArzyabiAsnadDaroIndirect",
+          "WithScanCount",
+          "WithoutScanCount",
+          "WithoutScanInDirectCount",
+          "ArchiveDirectCount",
+          "ArchiveInDirectCount",
+          "ArzyabiVisitDirectCount",
+          "COUNT",
+          "TotalPerformance",
+          "DirectPerFormance",
+          "InDirectPerFormance",
+        ],
+        {},
+        useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
       ).filter((city) => cityLevel.cities.includes(city.CityName_Fa));
 
-    return distinctDataAndCalculatePerformance(getCitiesWithPerformance.data);
-  }, [getCitiesWithPerformance.data, cityLevel]);
+    return distinctDataAndCalculatePerformance(
+      getCitiesWithPerformance.data,
+      ["CityName"],
+      [
+        "SabtAvalieAsnad",
+        "PazireshVaSabtAvalieAsnad",
+        "ArzyabiAsanadBimarsetaniDirect",
+        "ArzyabiAsnadBimarestaniIndirect",
+        "ArzyabiAsnadDandanVaParaDirect",
+        "ArzyabiAsnadDandanVaParaIndirect",
+        "ArzyabiAsnadDandanDirect",
+        "ArzyabiAsnadDandanIndirect",
+        "ArzyabiAsnadDaroDirect",
+        "ArzyabiAsnadDaroIndirect",
+        "WithScanCount",
+        "WithoutScanCount",
+        "WithoutScanInDirectCount",
+        "ArchiveDirectCount",
+        "ArchiveInDirectCount",
+        "ArzyabiVisitDirectCount",
+        "COUNT",
+        "TotalPerformance",
+        "DirectPerFormance",
+        "InDirectPerFormance",
+      ],
+      {},
+      useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
+    );
+  }, [getCitiesWithPerformance.data, cityLevel, useWorkDays, totalWorkDays]);
 
   const handleFilterChange = (filterType: string, value: string[]) => {
     setDataFilters((prev) => ({
@@ -128,6 +223,16 @@ export function GaugesTable({ sessionData }: GaugesTableProps) {
           <div className="flex w-full flex-col items-center justify-center gap-5">
             <div className="sticky top-20 rounded-full bg-secondary/50 p-5 backdrop-blur-md">
               <PerformanceBadges />
+            </div>
+
+            {/* Work Days Toggle */}
+            <div className="flex justify-center py-2">
+              <WorkDaysToggle
+                isEnabled={useWorkDays}
+                onToggle={setUseWorkDays}
+                totalWorkDays={totalWorkDays}
+                className="rounded-lg bg-primary/5 px-4 py-2"
+              />
             </div>
             {getCitiesWithPerformance.isLoading ? (
               <>

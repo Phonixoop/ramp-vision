@@ -18,6 +18,7 @@ interface CitiesListProps {
   isLoading: boolean;
   onNavigate: (cityName: string) => void;
   onListViewChange: (list: CityWithPerformanceData[]) => void;
+  useWorkDays?: boolean;
 }
 
 export const CitiesList = React.memo<CitiesListProps>(
@@ -32,6 +33,7 @@ export const CitiesList = React.memo<CitiesListProps>(
     isLoading,
     onNavigate,
     onListViewChange,
+    useWorkDays,
   }) => {
     return (
       <AdvancedList

@@ -4,10 +4,11 @@ import { CityPerformanceWithUsersChart } from "~/features/cities-performance-cha
 interface BottomChartProps {
   filters: any;
   activeCity: string;
+  useWorkDays?: boolean;
 }
 
 export const BottomChart = React.memo<BottomChartProps>(
-  ({ filters, activeCity }) => {
+  ({ filters, activeCity, useWorkDays }) => {
     return (
       <div
         dir="rtl"

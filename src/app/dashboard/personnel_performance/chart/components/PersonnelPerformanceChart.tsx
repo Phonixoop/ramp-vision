@@ -7,6 +7,8 @@ import { ChartHeader } from "./ChartHeader";
 import { CitiesList } from "./CitiesList";
 import { RightPane } from "./RightPane";
 import { BottomChart } from "./BottomChart";
+import WorkDaysToggle from "~/features/work-days-toggle";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
 
 export const PersonnelPerformanceChart = React.memo<{
   sessionData: any;
@@ -21,6 +23,7 @@ export const PersonnelPerformanceChart = React.memo<{
     navigatingToCity,
     getInitialFilters,
     getCitiesWithPerformance,
+    totalWorkDays,
     isLoading,
     handleCalendarSubmit,
     updateFilters,
@@ -28,6 +31,9 @@ export const PersonnelPerformanceChart = React.memo<{
     setListView,
     getCalendarPeriodType,
   } = usePersonnelChart();
+
+  // Get work days toggle state from context
+  const { useWorkDays, setUseWorkDays } = useWorkDaysToggle();
 
   // // Show loading state if context is not initialized
   // if (isLoading && !filters) {
@@ -57,9 +63,17 @@ export const PersonnelPerformanceChart = React.memo<{
           getCalendarPeriodType={getCalendarPeriodType}
         />
 
+        {/* Work Days Toggle */}
+        <div className="flex justify-center py-2">
+          <WorkDaysToggle
+            isEnabled={useWorkDays}
+            onToggle={setUseWorkDays}
+            totalWorkDays={totalWorkDays}
+            className="rounded-lg bg-primary/5 px-4 py-2"
+          />
+        </div>
         {/* Header showing city/person */}
         <ChartHeader activeCity={activeCity} />
-
         {/* Main content */}
         <div className="m-auto flex w-full flex-row-reverse items-start justify-start gap-5 p-5 pb-10 xl:w-11/12 ">
           <div className="min-w-[380px]">
@@ -74,16 +88,25 @@ export const PersonnelPerformanceChart = React.memo<{
               isLoading={isLoading}
               onNavigate={handleCityNavigation}
               onListViewChange={setListView}
+              useWorkDays={useWorkDays}
             />
           </div>
 
           {/* Right pane - This will be the children from the layout */}
-          <RightPane navigatingToCity={navigatingToCity}>{children}</RightPane>
+          <RightPane
+            navigatingToCity={navigatingToCity}
+            useWorkDays={useWorkDays}
+          >
+            {children}
+          </RightPane>
         </div>
-
         {/* Bottom chart */}
         {activeCity && (
-          <BottomChart filters={filters} activeCity={activeCity} />
+          <BottomChart
+            filters={filters}
+            activeCity={activeCity}
+            useWorkDays={useWorkDays}
+          />
         )}
       </div>
     </>
