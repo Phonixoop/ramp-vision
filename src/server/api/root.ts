@@ -4,6 +4,7 @@ import { exampleRouter } from "~/server/api/routers/example";
 import { havaleKhesaratRouter } from "~/server/api/routers/havale_khesarat";
 import { homeRouter } from "~/server/api/routers/home";
 import { insuranceMetricsRouter } from "~/server/api/routers/insurance_metric";
+import { monthWorkDaysRouter } from "~/server/api/routers/month-work-days";
 import { otpUserRouter } from "~/server/api/routers/otpuser";
 import { personnelRouter } from "~/server/api/routers/personnel";
 import { personnelPerformanceRouter } from "~/server/api/routers/personnel_performance";
@@ -28,6 +29,7 @@ export const appRouter = createTRPCRouter({
   home: homeRouter,
   otpUser: otpUserRouter,
   bi: biRouter,
+  monthWorkDays: monthWorkDaysRouter,
 });
 
 // export type definition of API

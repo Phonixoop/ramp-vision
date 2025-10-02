@@ -38,6 +38,11 @@ const menuList = [
     description: "",
     link: "/admin/otps",
   },
+  {
+    value: "تنظیمات روز کاری ماهیانه",
+    description: "",
+    link: "/admin/month-work-day-settings",
+  },
 
   // {
   //   value: "پرسنل",

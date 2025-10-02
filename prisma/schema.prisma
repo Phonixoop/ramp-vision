@@ -55,3 +55,15 @@ model Verification_token {
     @@unique([identifier, token])
     @@map("verification_tokens")
 }
+
+model MonthWorkDay {
+    id         String   @id @default(cuid())
+    year       Int
+    month      Int // 1-12 for Persian months
+    work_days  Int // Number of work days in the month
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@unique([year, month])
+    @@map("month_work_days")
+}

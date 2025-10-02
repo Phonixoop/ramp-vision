@@ -7,10 +7,11 @@ import PhoneField from "~/ui/forms/phone-field";
 import withConfirmation from "~/ui/with-confirmation";
 import Button from "~/ui/buttons";
 import TextAreaField from "~/ui/forms/textarea-field";
+import IntegerField from "~/ui/forms/integer-field";
 
 const TextFieldWithLabel = withLabel(TextField);
 const TextAreaWithLabel = withLabel(TextAreaField);
-
+const NumberFieldWithLabel = withLabel(IntegerField);
 const PhoneFieldWithLabel = withLabel(PhoneField);
 const EnglishAndNumberFieldWithLabel = withLabel(EnglishAndNumberField);
 
@@ -20,5 +21,6 @@ export {
   TextAreaWithLabel,
   PhoneFieldWithLabel,
   EnglishAndNumberFieldWithLabel,
+  NumberFieldWithLabel,
   ButtonWithConfirmation,
 };
