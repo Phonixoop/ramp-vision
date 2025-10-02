@@ -347,6 +347,7 @@ const ServiceName_Color = {
   دارو: "violet",
   پاراکلینیک: "slate",
   "ثبت ارزیابی بدون اسکن مدارک": "cyan",
+  "ثبت ارزیابی دندانپزشکی": "orange",
 };
 
 export function commify(num) {

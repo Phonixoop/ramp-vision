@@ -28,13 +28,6 @@ export function ServiceNameFilter({
           value={(column.getFilterValue() as string[]) ?? []}
           onChange={(selectedValues) => {
             column.setFilterValue(selectedValues);
-            setDataFilters((prev: any) => ({
-              ...prev,
-              filter: {
-                ...prev.filter,
-                ServiceName: selectedValues,
-              },
-            }));
           }}
         />
       ) : (

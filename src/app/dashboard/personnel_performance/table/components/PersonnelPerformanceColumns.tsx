@@ -304,7 +304,7 @@ export function PersonnelPerformanceColumns({
         ),
     },
     {
-      header: "ارزیابی اسناد دندان مستقیم",
+      header: "ارزیابی اسناد دندانپزشکی مستقیم",
       accessorKey: "ArzyabiAsnadDandanDirect",
       footer: ({ table }) =>
         commify(
@@ -319,7 +319,7 @@ export function PersonnelPerformanceColumns({
         ),
     },
     {
-      header: "ارزیابی اسناد دندان غیر مستقیم",
+      header: "ارزیابی اسناد دندانپزشکی غیر مستقیم",
       accessorKey: "ArzyabiAsnadDandanIndirect",
       footer: ({ table }) =>
         commify(
