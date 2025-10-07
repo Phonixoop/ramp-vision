@@ -64,8 +64,8 @@ const sizes = [
       "md:min-w-[550px] md:w-fit w-full min-h-[10%] md:h-auto md:max-h-[90%] ",
   },
   {
-    label: "md blur",
-    class: "md:min-w-[50%] md:w-fit w-full md:h-5/6 backdrop-blur ",
+    label: "md blur", // backdrop-blur
+    class: "md:min-w-[50%] md:w-fit w-full md:h-5/6  ",
   },
   { label: "md", class: "md:min-w-[50%] md:w-fit w-full md:h-5/6 " },
   { label: "lg", class: "md:w-11/12 md:h-5/6 " },
@@ -175,10 +175,27 @@ export default function Modal({
             onClick={handleClose}
             className={cn(
               center ? "laptopMin:items-center" : "items-end",
-              `modal-overlay fixed inset-0 flex items-end justify-center overflow-clip bg-secondary/30 backdrop-blur-md ${zIndex}`,
+              `modal-overlay fixed inset-0 flex items-end justify-center overflow-clip bg-secondary/70 bg-gradient-to-b   ${zIndex}`,
+              // "backdrop-blur-md"
             )}
             style={{ zIndex: 1000 }}
           >
+            <div
+              className="absolute inset-0 -z-10"
+              data-framer-name="Mask Pattern"
+              style={{
+                backgroundColor: "transparent",
+                backgroundImage:
+                  "radial-gradient(transparent 1px, rgba(var(--secondary),0.8) 1px)",
+                backgroundSize: "4px 4px",
+                // backdropFilter: "blur(3px)",
+                maskImage:
+                  "linear-gradient(rgb(0, 0, 0) 100%, rgba(0, 0, 0, 0) 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(rgb(0, 0, 0) 100%, rgba(0, 0, 0, 0) 100%)", // For Safari compatibility
+                opacity: 1,
+              }}
+            />
             <motion.div
               ref={boxRef}
               initial="hidden"

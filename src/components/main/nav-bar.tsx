@@ -227,8 +227,23 @@ function Content({
         opacity: 0,
         y: 8,
       }}
-      className=" absolute left-0 top-[calc(100%_+_24px)] min-w-96 rounded-lg border  border-primary/5 bg-secbuttn supports-[backdrop-filter]:bg-secondary/80 supports-[backdrop-filter]:backdrop-blur-lg"
+      className=" absolute left-0 top-[calc(100%_+_24px)] min-w-96 rounded-lg border  border-primary/5  bg-secondary/80 "
     >
+      <div
+        className="absolute inset-0 -z-10"
+        data-framer-name="Mask Pattern"
+        style={{
+          backgroundColor: "transparent",
+          backgroundImage:
+            "radial-gradient(transparent 1px, rgba(var(--secondary),0.4) 1px)",
+          backgroundSize: "4px 4px",
+          backdropFilter: "blur(3px)",
+          maskImage: "linear-gradient(rgb(0, 0, 0) 60%, rgba(0, 0, 0, 0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(rgb(0, 0, 0) 60%, rgba(0, 0, 0, 0) 100%)", // For Safari compatibility
+          opacity: 1,
+        }}
+      />
       <Bridge />
       <Nub selected={selected} />
 
