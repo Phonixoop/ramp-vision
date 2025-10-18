@@ -60,8 +60,8 @@ export interface PersonnelPerformanceChartContextType {
       | "Pure"
       | ((prev: "Distincted" | "Pure") => "Distincted" | "Pure"),
   ) => void;
-  filtersWithNoNetworkRequest: any;
-  setFiltersWithNoNetworkRequest: (filters: any) => void;
+  // filtersWithNoNetworkRequest: any;
+  // setFiltersWithNoNetworkRequest: (filters: any) => void;
   // Optimistic filtering state
   isFiltering: boolean;
   setIsFiltering: (isFiltering: boolean) => void;

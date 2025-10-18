@@ -10,15 +10,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/shadcn/accordion";
-import { PeriodType } from "../types";
+import { FilterType, PeriodType } from "../types";
 import { cn, sortDates } from "~/lib/utils";
 import {
   FilterSectionSkeleton,
   FilterSkeleton,
 } from "~/components/skeletons/FilterSkeleton";
+import { defualtRoles } from "~/constants/personnel-performance";
 
 interface FiltersSectionProps {
-  filters: any;
+  filters: FilterType;
   reportPeriod: PeriodType;
   getInitialFilters: any;
   onCalendarSubmit: (params: {
@@ -50,6 +51,14 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
       [getInitialFilters.data?.DateInfos],
     );
     const DateInfos = sortDates({ dates: _DateInfos });
+
+    const ProjectTypes = React.useMemo(
+      () =>
+        getInitialFilters?.data?.ProjectTypes?.filter(
+          (type: string) => type && type.trim() !== "",
+        ) ?? [],
+      [getInitialFilters.data?.ProjectTypes],
+    );
 
     const Roles = React.useMemo(
       () => [
@@ -143,11 +152,7 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
                 <SelectControlled
                   withSelectAll
                   title="نوع پروژه"
-                  list={
-                    getInitialFilters?.data?.ProjectTypes?.filter(
-                      (type: string) => type && type.trim() !== "",
-                    ) ?? []
-                  }
+                  list={ProjectTypes as string[]}
                   value={filters?.filter?.ProjectType}
                   onChange={(values) =>
                     onUpdateFilters({ ProjectType: values })
@@ -166,7 +171,7 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
                   withSelectAll
                   title="سمت"
                   list={Roles as string[]}
-                  value={filters?.filter?.Role}
+                  value={filters?.filter?.Role ?? defualtRoles}
                   onChange={(values) => onUpdateFilters({ Role: values })}
                 />
               )}

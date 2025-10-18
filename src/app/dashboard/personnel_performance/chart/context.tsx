@@ -8,6 +8,7 @@ import {
   PeriodType,
 } from "./types";
 import {
+  defaultProjectTypes,
   defualtContractTypes,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
@@ -45,6 +46,9 @@ export function PersonnelPerformanceChartProvider({
   const [filters, setDataFilters] = useState<FilterType>({
     periodType: reportPeriod,
     filter: {
+      ProjectType: defaultProjectTypes,
+      ContractType: defualtContractTypes,
+      RoleType: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
       Start_Date: [
         moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
       ],
@@ -52,14 +56,14 @@ export function PersonnelPerformanceChartProvider({
   });
 
   // Filters without network request
-  const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
-    useState({
-      periodType: reportPeriod,
-      filter: {
-        ContractType: defualtContractTypes,
-        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
-      },
-    });
+  // const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
+  //   useState({
+  //     periodType: reportPeriod,
+  //     filter: {
+  //       ContractType: defualtContractTypes,
+  //       RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+  //     },
+  //   });
 
   // Optimistic filtering state
   const [isFiltering, setIsFiltering] = useState(false);
@@ -78,10 +82,10 @@ export function PersonnelPerformanceChartProvider({
       ...prev,
       periodType: reportPeriod,
     }));
-    setFiltersWithNoNetworkRequest((prev) => ({
-      ...prev,
-      periodType: reportPeriod,
-    }));
+    // setFiltersWithNoNetworkRequest((prev) => ({
+    //   ...prev,
+    //   periodType: reportPeriod,
+    // }));
   }, [reportPeriod]);
 
   const value: PersonnelPerformanceChartContextType = {
@@ -103,14 +107,14 @@ export function PersonnelPerformanceChartProvider({
         setToggleDistinctData(newToggle);
       }
     },
-    filtersWithNoNetworkRequest,
-    setFiltersWithNoNetworkRequest: (newFilters) => {
-      if (typeof newFilters === "function") {
-        setFiltersWithNoNetworkRequest(newFilters);
-      } else {
-        setFiltersWithNoNetworkRequest(newFilters);
-      }
-    },
+    // filtersWithNoNetworkRequest,
+    // setFiltersWithNoNetworkRequest: (newFilters) => {
+    //   if (typeof newFilters === "function") {
+    //     setFiltersWithNoNetworkRequest(newFilters);
+    //   } else {
+    //     setFiltersWithNoNetworkRequest(newFilters);
+    //   }
+    // },
     // Optimistic filtering state
     isFiltering,
     setIsFiltering,

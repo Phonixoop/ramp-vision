@@ -14,6 +14,7 @@ import {
   PeriodType,
 } from "./types";
 import {
+  defaultProjectTypes,
   defualtContractTypes,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
@@ -51,6 +52,7 @@ export function PersonnelPerformanceProvider({
   const [filters, setDataFilters] = useState<FilterType>({
     periodType: reportPeriod,
     filter: {
+      ProjectType: defaultProjectTypes,
       Start_Date: [
         moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
       ],
