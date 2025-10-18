@@ -39,7 +39,9 @@ export const DateInfoFilter = memo(function DateInfoFilter({
         singleSelect
         column={column}
         initialFilters={initialDateInfo}
-        values={personnelPerformance?.result ?? []}
+        values={(DateInfos ?? []).map((a: string) => ({
+          DateInfo: a,
+        }))}
         onChange={(filter) => {
           setDataFilters((prev: any) => ({
             ...prev,

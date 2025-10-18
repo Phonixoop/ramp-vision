@@ -170,8 +170,8 @@ export function PersonnelPerformanceTable({
   const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
     {
       filter: {
-        DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data ?? ""],
         ProjectType: filters.filter.ProjectType,
+        DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data ?? ""],
       },
     },
     {
