@@ -21,6 +21,7 @@ export default function withConfirmation(Component) {
               <Modal
                 size="xs"
                 center
+                className="bg-secondary"
                 zIndex="z-[10001]"
                 title={title}
                 isOpen={isOpen}

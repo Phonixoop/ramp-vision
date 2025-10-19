@@ -19,7 +19,7 @@ import ToolTipSimple from "~/features/tooltip-simple-use";
 import withConfirmation from "~/ui/with-confirmation";
 import Modal from "~/ui/modals";
 import { Loader2Icon } from "lucide-react";
-import { sortDates } from "~/lib/utils";
+import { cn, sortDates } from "~/lib/utils";
 import XlsxViewer from "~/features/xlsx-view";
 import { getPersianToEnglishCity } from "~/utils/util";
 import { usePersonnels } from "../context";
@@ -132,6 +132,7 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
             onClose={() => {
               setPersonnel(undefined);
             }}
+            className="bg-secondary"
           >
             <SetPersonnelDayOffWizard personnel={personnel} />
           </Modal>
@@ -343,7 +344,7 @@ export function TogglePersonelDayOffButton({
         title={hasTheDayOff ? textForDayOn : textForDayOff}
         confirmText="بله"
         cancelText="خیر"
-        className={twMerge(
+        className={cn(
           " w-full p-2",
           hasTheDayOff === true ? "bg-white text-secondary" : "bg-secondary",
         )}
