@@ -27,24 +27,31 @@ export const ContractTypeFilter = memo(function ContractTypeFilter({
       {isPersonnelDataLoading ? (
         <TableFilterSkeleton />
       ) : (
+        // <SelectColumnFilterOptimized<
+        //   Pick<PersonnelPerformanceData, "ContractType">
+        // >
+        //   initialFilters={
+        //     filtersWithNoNetworkRequest?.filter?.ContractType ??
+        //     defualtContractTypes
+        //   }
+        //   column={column}
+        //   values={personnelPerformance?.result ?? []}
+        //   onChange={(filter) => {
+        //     setFiltersWithNoNetworkRequest((prev: any) => ({
+        //       ...prev,
+        //       filter: {
+        //         ...prev.filter,
+        //         [filter.id]: filter.values,
+        //       },
+        //     }));
+        //   }}
+        // />
         <SelectColumnFilterOptimized<
           Pick<PersonnelPerformanceData, "ContractType">
         >
-          initialFilters={
-            filtersWithNoNetworkRequest?.filter?.ContractType ??
-            defualtContractTypes
-          }
+          initialFilters={defualtContractTypes}
           column={column}
-          values={personnelPerformance?.result ?? []}
-          onChange={(filter) => {
-            setFiltersWithNoNetworkRequest((prev: any) => ({
-              ...prev,
-              filter: {
-                ...prev.filter,
-                [filter.id]: filter.values,
-              },
-            }));
-          }}
+          values={personnelPerformance?.result}
         />
       )}
     </div>
