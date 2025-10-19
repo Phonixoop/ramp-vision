@@ -16,6 +16,7 @@ import {
 import { PersianCalendarExample } from "~/features/persian-calendar-picker/example";
 import Navbar from "~/components/Navbar";
 import { ShiftingDropDown } from "~/components/main/nav-tst";
+import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 
 export default function TestPage() {
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -69,6 +70,37 @@ export default function TestPage() {
 
   return (
     <div className="space-y-8 p-8">
+      <div className="flex h-[80px] w-full items-center justify-center gap-1 rounded-lg bg-accent bg-secondary/50 group-hover:bg-primary/10">
+        <div className="flex h-full w-4/12 flex-col items-center justify-center gap-2 rounded-xl bg-secbuttn px-2 ">
+          {/* 10 items with */}
+          {Array.from({ length: 8 }).map((_, index) => (
+            <span
+              key={index}
+              className="h-[100x] w-[10px]  rounded-xl bg-primary/10"
+            ></span>
+          ))}
+        </div>
+        <div className="flex h-full w-4/12 flex-col items-center justify-center gap-2 rounded-xl bg-secbuttn px-2 group-hover:bg-primary/10 ">
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+          <span className="h-[10x] w-full  rounded-xl bg-primary/10"></span>
+        </div>
+        <div className=" grid h-full w-8/12 grid-cols-2 grid-rows-2 items-center justify-center gap-1 rounded-xl bg-secbuttn p-2 group-hover:bg-primary/10  ">
+          <span className="h-full w-full  rounded-xl bg-primary/5" />
+          <span className="h-full w-full  rounded-xl bg-primary/5" />
+          <div className="h-full w-full  rounded-xl bg-primary/5">
+            <BarChartSkeletonLoading />
+          </div>
+          <span className="h-full w-full  rounded-xl bg-primary/5" />
+        </div>
+      </div>
       <div>
         <h1 className="mb-4 text-2xl font-bold text-primary">
           Persian Calendar Picker Demo

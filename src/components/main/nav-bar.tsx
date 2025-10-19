@@ -20,6 +20,8 @@ import {
   ActivityIcon,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
+import Image from "next/image";
+import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 
 // Type definitions
 export type MenuItem = {
@@ -29,6 +31,7 @@ export type MenuItem = {
   icon?: React.ComponentType<{ className?: string }>;
   subMenu?: MenuItem[];
   category?: string;
+  skeletonPreview?: React.ComponentType<{ className?: string }>;
 };
 
 export type MenuCategory = {
@@ -227,7 +230,7 @@ function Content({
         opacity: 0,
         y: 8,
       }}
-      className=" absolute left-0 top-[calc(100%_+_24px)] min-w-96 rounded-lg border  border-primary/5  bg-secondary/80 "
+      className=" absolute left-0 top-[calc(100%_+_24px)] w-full min-w-[500px] max-w-[650px] rounded-lg border border-primary/5  bg-secondary/80  pb-2"
     >
       <div
         className="absolute inset-0 -z-10"
@@ -341,7 +344,7 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
   if (categories.length === 1 && categories[0] === "default") {
     // Single column layout for uncategorized items
     return (
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-2 sm:gap-4">
         {subMenu.map((item) => (
           <SubMenuItem key={item.id} item={item} />
         ))}
@@ -351,16 +354,16 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
 
   // Multi-column layout for categorized items
   return (
-    <div className="grid w-full grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
       {categories.map((category) => (
         <div
           key={category}
           className="flex flex-col items-center justify-stretch"
         >
-          <h3 className="mb-2 text-sm font-medium text-primary-muted">
+          <h3 className="mb-1 text-xs font-medium text-primary-muted sm:mb-10 sm:text-sm">
             {category === "default" ? "سایر" : category}
           </h3>
-          <div className="space-y-1">
+          <div className="w-full space-y-1">
             {categorizedItems[category].map((item) => (
               <SubMenuItem key={item.id} item={item} />
             ))}
@@ -373,18 +376,27 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
 
 function SubMenuItem({ item }: { item: MenuItem }) {
   const IconComponent = item.icon;
-
+  const SkeletonPreview = item?.skeletonPreview;
   return (
     <Link
       href={{
         pathname: item.link,
       }}
-      className="group flex w-full  flex-col items-center justify-center py-2 text-primary-muted transition-colors hover:text-primary"
+      className="group flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-primary/10 bg-secondary p-2 text-primary-muted hover:bg-primary hover:text-secondary"
     >
-      {IconComponent && (
-        <IconComponent className="mb-2 size-10 rounded-md border border-primary/10 p-2 text-xl group-hover:bg-primary group-hover:stroke-secondary " />
+      <div className="flex w-full flex-row items-center justify-center gap-2">
+        {IconComponent && (
+          <IconComponent className="size-8 flex-shrink-0 rounded-md p-1.5 text-lg group-hover:bg-primary group-hover:stroke-secondary sm:size-10 sm:p-2 sm:text-xl" />
+        )}
+        <span className="truncate text-xs sm:text-sm">{item.value}</span>
+      </div>
+
+      {/* Skeleton preview with responsive sizing */}
+      {SkeletonPreview && (
+        <div className="w-full max-w-full overflow-hidden">
+          <SkeletonPreview className="h-auto max-h-16 w-full" />
+        </div>
       )}
-      <span className="text-sm">{item.value}</span>
     </Link>
   );
 }
