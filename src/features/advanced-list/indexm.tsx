@@ -3,6 +3,7 @@ import {
   ArrowUpAZIcon,
   DownloadCloudIcon,
   Tally5Icon,
+  ArrowUpDownIcon,
 } from "lucide-react";
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
@@ -39,13 +40,15 @@ export default function AdvancedList({
     [list],
   );
 
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "original">(
+    "original",
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   const debouncedQuery = useDebounce(searchQuery, 250);
 
   // Filtered list computed based on search
-  const computedList = useMemo(() => {
+  const filteredItems = useMemo(() => {
     if (!debouncedQuery) return correctList;
     return correctList.filter((item) => {
       const selectItem = selectProperty ? item[selectProperty] : item;
@@ -56,6 +59,26 @@ export default function AdvancedList({
     });
   }, [debouncedQuery, correctList, selectProperty]);
 
+  // Sorted list computed based on sort order
+  const computedList = useMemo(() => {
+    if (sortOrder === "original") {
+      return filteredItems; // Return in original order without sorting
+    }
+
+    const arr = [...filteredItems];
+    arr.sort((a, b) => {
+      const aa = selectProperty ? a[selectProperty] : a;
+      const bb = selectProperty ? b[selectProperty] : b;
+      const aaStr = aa?.toString() ?? "";
+      const bbStr = bb?.toString() ?? "";
+      const comparison = aaStr.localeCompare(bbStr, undefined, {
+        numeric: true,
+      });
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+    return arr;
+  }, [filteredItems, sortOrder, selectProperty]);
+
   // Send changes up
   React.useEffect(() => {
     onChange(computedList);
@@ -63,19 +86,14 @@ export default function AdvancedList({
 
   const toggleSortOrder = useCallback(() => {
     if (correctList.length <= 0) return;
-    const newOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newOrder);
-
-    const sorted = [...computedList].sort((a, b) => {
-      const aa = selectProperty ? a[selectProperty] : a;
-      const bb = selectProperty ? b[selectProperty] : b;
-      const comparison = aa.localeCompare(bb);
-      return newOrder === "asc" ? comparison : -comparison;
+    setSortOrder((prev) => {
+      if (prev === "original") return "asc";
+      if (prev === "asc") return "desc";
+      return "original";
     });
-    onChange(sorted);
-  }, [sortOrder, correctList, computedList, selectProperty, onChange]);
+  }, [correctList.length]);
 
-  const myDisabled = computedList.length <= 0 || disabled;
+  const myDisabled = correctList.length <= 0 || disabled;
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -131,7 +149,13 @@ export default function AdvancedList({
               className="flex w-full items-center justify-around gap-2 bg-secondary text-accent disabled:bg-primary/70 disabled:text-secondary"
             >
               <span>مرتب سازی</span>
-              {sortOrder === "asc" ? <ArrowDownAZIcon /> : <ArrowUpAZIcon />}
+              {sortOrder === "original" ? (
+                <ArrowUpDownIcon />
+              ) : sortOrder === "asc" ? (
+                <ArrowDownAZIcon />
+              ) : (
+                <ArrowUpAZIcon />
+              )}
             </Button>
           </div>
 

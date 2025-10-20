@@ -224,21 +224,22 @@ export const useCityPage = (
     if (!getPersonnels.data || !updatedList) return updatedList ?? [];
 
     // Create a more unique identifier to avoid duplicates
+    // const presentIdentifiers = new Set(
+    //   updatedList.map(
+    //     (b: any) =>
+    //       `${b.NationalCode || "unknown"}-${b.NameFamily || "unknown"}-${
+    //         b.Role || "unknown"
+    //       }-${b.BranchName || "unknown"}`,
+    //   ),
+    // );
+
     const presentIdentifiers = new Set(
-      updatedList.map(
-        (b: any) =>
-          `${b.NationalCode || "unknown"}-${b.NameFamily || "unknown"}-${
-            b.Role || "unknown"
-          }-${b.BranchName || "unknown"}`,
-      ),
+      updatedList.map((b: any) => b.NationalCode),
     );
 
     const missing = getPersonnels.data
       .filter((a: any) => {
-        const identifier = `${a.NationalCode || "unknown"}-${
-          a.NameFamily || "unknown"
-        }-${a.Role || "unknown"}-${a.BranchName || "unknown"}`;
-        return !presentIdentifiers.has(identifier);
+        return !presentIdentifiers.has(a.NationalCode);
       })
       .map((a: any) => ({
         ...a,
@@ -249,8 +250,11 @@ export const useCityPage = (
           NationalCode: a.NationalCode,
         },
       }));
+
     return [...updatedList, ...missing];
   }, [getPersonnels.data, updatedList]);
+
+  console.log({ mergedList });
 
   const displayedList: PersonRecord[] = useMemo(() => {
     if (levelFilter === "ALL") return mergedList;

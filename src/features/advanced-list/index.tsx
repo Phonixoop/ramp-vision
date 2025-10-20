@@ -122,9 +122,8 @@ export default function AdvancedListFast<T>({
   }, [sorted]);
 
   const toggleSortOrder = useCallback(() => {
-    if (!sorted.length) return;
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-  }, [sorted.length]);
+  }, []);
 
   const myDisabled = disabled || isLoading || sorted.length === 0;
 
