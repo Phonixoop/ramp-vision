@@ -182,8 +182,9 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                       </span>
                     </div>
                   </div>
-                  {numericItems.length % 2 !== 0 && isLastItem && (
-                    <div className="cross_hatch_pattern hidden w-full max-w-sm rounded-xl sm:block" />
+                  {/* numericItems.length % 2 !== 0 && */}
+                  {isLastItem && (
+                    <div className="cross_hatch_pattern hidden w-full max-w-sm  sm:block" />
                   )}
                 </React.Fragment>
               );
@@ -191,42 +192,48 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
           </div>
 
           {/* Details & Roles */}
-          <div className="grid gap-4" dir="rtl">
-            {nonNumericItems.map(([key, value], index) => {
-              if (!value || key === "Id") return null;
-              const isLastItem = index === nonNumericItems.length - 1;
-              let displayValue: string = value as string;
-              if (key === "Start_Date") {
-                displayValue = getMonthNamesFromJOINED_date_strings(
-                  value as string,
-                  getAll?.data?.periodType,
-                );
-              }
-              return (
-                <ToolTipSimple
-                  key={key}
-                  className="cursor-auto bg-secondary"
-                  tooltip={
-                    <span className="text-base text-primary">
-                      {PersonnelPerformanceTranslate[key] ?? key}
-                    </span>
-                  }
-                >
-                  <div
-                    className={cn(
-                      "flex min-w-[150px] cursor-auto items-center justify-center gap-2 rounded-2xl bg-secondary p-2",
-                      isLastItem || index === 0
-                        ? "md:col-span-2"
-                        : "col-span-1",
-                    )}
+          <div
+            className="flex flex-col items-center justify-center gap-4"
+            dir="rtl"
+          >
+            <div className="grid grid-cols-1 items-stretch justify-center divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn rounded-xl bg-secondary p-2 lg:grid-cols-2">
+              {nonNumericItems.map(([key, value], index) => {
+                if (!value || key === "Id") return null;
+                const isLastItem = index === nonNumericItems.length - 1;
+                let displayValue: string = value as string;
+                if (key === "Start_Date") {
+                  displayValue = getMonthNamesFromJOINED_date_strings(
+                    value as string,
+                    getAll?.data?.periodType,
+                  );
+                }
+                return (
+                  <ToolTipSimple
+                    key={key}
+                    childClassName="h-full flex justify-center items-center"
+                    className="flex cursor-auto bg-secondary"
+                    tooltip={
+                      <span className="text-base text-primary">
+                        {PersonnelPerformanceTranslate[key] ?? key}
+                      </span>
+                    }
                   >
-                    <span className="max-w-[250px] select-text break-words text-center font-bold text-accent">
-                      {displayValue}
-                    </span>
-                  </div>
-                </ToolTipSimple>
-              );
-            })}
+                    <div
+                      className={cn(
+                        "flex min-w-[150px] cursor-auto items-center justify-center gap-2  rounded-lg  bg-secondary p-2",
+                        isLastItem || index === 0
+                          ? "md:col-span-2"
+                          : "col-span-1",
+                      )}
+                    >
+                      <span className="max-w-[250px] select-text break-words text-center font-bold text-accent">
+                        {displayValue}
+                      </span>
+                    </div>
+                  </ToolTipSimple>
+                );
+              })}
+            </div>
 
             <RolesByBranchModal selectedPerson={selectedPerson} />
 
@@ -297,7 +304,6 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                     ) : (
                       <ToolTipSimple
                         className={cn(
-                          "cursor-pointer bg-secondary",
                           !hasTheDayOff &&
                             !userCalData?.TotalPerformance &&
                             "hidden",

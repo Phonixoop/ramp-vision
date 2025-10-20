@@ -7,6 +7,7 @@ export default function ToolTipSimple({
   children,
   tooltip = <></>,
   className = "",
+  childClassName = "",
 }) {
   const [isVisible, setIsVisible] = React.useState(false);
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
@@ -26,7 +27,11 @@ export default function ToolTipSimple({
 
   return (
     <div className="relative inline-block">
-      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div
+        className={childClassName}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {children}
       </div>
 
