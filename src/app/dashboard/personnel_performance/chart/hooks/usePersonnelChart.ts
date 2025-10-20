@@ -108,14 +108,14 @@ export const usePersonnelChart = () => {
   const totalWorkDays = workDaysData?.totalWorkDays || null;
 
   // Debug logging
-  console.log("🔍 usePersonnelChart work days query:");
-  console.log("filters?.filter?.Start_Date:", filters?.filter?.Start_Date);
-  console.log("monthsArray:", monthsArray);
-  console.log("monthsArray.length:", monthsArray.length);
-  console.log("workDaysLoading:", workDaysLoading);
-  console.log("workDaysError:", workDaysError);
-  console.log("workDaysData:", workDaysData);
-  console.log("totalWorkDays:", totalWorkDays);
+  // console.log("🔍 usePersonnelChart work days query:");
+  // console.log("filters?.filter?.Start_Date:", filters?.filter?.Start_Date);
+  // console.log("monthsArray:", monthsArray);
+  // console.log("monthsArray.length:", monthsArray.length);
+  // console.log("workDaysLoading:", workDaysLoading);
+  // console.log("workDaysError:", workDaysError);
+  // console.log("workDaysData:", workDaysData);
+  // console.log("totalWorkDays:", totalWorkDays);
 
   const distincedData: CityWithPerformanceData[] = useMemo(
     () =>
@@ -258,7 +258,9 @@ export const usePersonnelChart = () => {
 
   const handleCityNavigation = (cityName: string) => {
     setNavigatingToCity(cityName);
-    router.push(`/dashboard/personnel_performance/chart/${cityName}`);
+    router.push(`/dashboard/personnel_performance/chart/${cityName}`, {
+      scroll: false,
+    });
   };
 
   return {
