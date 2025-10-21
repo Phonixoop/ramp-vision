@@ -80,10 +80,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
         let filter = input.filter;
 
         if (filter.CityName?.length > 0)
-          filter.CityName = cities.filter((value) =>
-            input.filter.CityName.includes(value),
+          filter.CityName = input.filter.CityName.filter((value) =>
+            cities.includes(value),
           );
-
         if (filter.CityName.length <= 0) filter.CityName = cities;
 
         // const defualtDateInfo = await getDefualtDateInfo();
@@ -92,6 +91,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         //   throw new Error(
         //     "more than 3 cities in monthly filter is not allowed",
         //   );
+        console.log({ inputCityName: input.filter.CityName });
         console.log({ filter: filter.CityName });
         let queryStart = `
         SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,

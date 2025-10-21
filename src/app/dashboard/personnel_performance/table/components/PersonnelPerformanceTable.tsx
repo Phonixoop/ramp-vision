@@ -92,9 +92,12 @@ export function PersonnelPerformanceTable({
     }
   }, [getLastDate.data]);
 
-  // Update filters when initial cities are available
+  // Update filters when initial cities are available (only if no cities are already selected)
   useEffect(() => {
-    if (getInitialCities.data?.CityNames) {
+    if (
+      getInitialCities.data?.CityNames &&
+      !filters?.filter?.CityName?.length
+    ) {
       setDataFilters((prev) => ({
         ...prev,
         filter: {
@@ -103,7 +106,7 @@ export function PersonnelPerformanceTable({
         },
       }));
     }
-  }, [getInitialCities.data?.CityNames]);
+  }, [getInitialCities.data?.CityNames, filters?.filter?.CityName]);
 
   // Update filters when default date info is available
   useEffect(() => {
@@ -194,15 +197,7 @@ export function PersonnelPerformanceTable({
   }, [initialFilters.data]);
 
   // Deferred filter for performance
-  const deferredFilter = useDeferredValue({
-    ...filters,
-    periodType: filters?.periodType,
-    filter: {
-      ...filters?.filter,
-      // DateInfo: filters.filter.DateInfo ?? [defualtDateInfo.data],
-      // ProjectType: filters.filter.ProjectType,
-    },
-  });
+  const deferredFilter = useDeferredValue(filters);
 
   // Main data query
   const personnelPerformance = api.personnelPerformance.getAll.useQuery(
@@ -210,9 +205,23 @@ export function PersonnelPerformanceTable({
     {
       enabled: sessionData?.user !== undefined && !initialFilters.isLoading,
       refetchOnWindowFocus: false,
+      staleTime: 0, // Force refetch on every change
     },
   );
-  // console.log(personnelPerformance.data);
+  // Debug logging
+  console.log("🔍 Current filters:", filters);
+  console.log("🔍 Deferred filter:", deferredFilter);
+  console.log(
+    "🔍 Query enabled:",
+    sessionData?.user !== undefined && !initialFilters.isLoading,
+  );
+  console.log("🔍 Query status:", {
+    isLoading: personnelPerformance.isLoading,
+    isFetching: personnelPerformance.isFetching,
+    isError: personnelPerformance.isError,
+    error: personnelPerformance.error,
+    dataLength: personnelPerformance.data?.result?.length || 0,
+  });
 
   // Prepare months array for work days calculation
   const monthsArray = useMemo(() => {
@@ -254,57 +263,71 @@ export function PersonnelPerformanceTable({
 
   const totalWorkDays = workDaysData?.totalWorkDays || null;
 
+  // Debug the data before processing
+  console.log("🔍 Raw personnel data:", personnelPerformance.data);
+
   // Derived data
-  const distincedData = useMemo(
-    () =>
-      distinctPersonnelPerformanceData(
-        personnelPerformance.data,
-        ["NationalCode", "NameFamily", "CityName"],
-        [
-          "CityName",
-          "NationalCode",
-          "NameFamily",
-          "TownName",
-          "BranchCode",
-          "BranchName",
-          "BranchType",
-          "SabtAvalieAsnad",
-          "PazireshVaSabtAvalieAsnad",
-          "ArzyabiAsanadBimarsetaniDirect",
-          "ArzyabiAsnadBimarestaniIndirect",
-          "ArzyabiAsnadDandanVaParaDirect",
-          "ArzyabiAsnadDandanVaParaIndirect",
-          "ArzyabiAsnadDandanDirect",
-          "ArzyabiAsnadDandanIndirect",
-          "ArzyabiAsnadDaroDirect",
-          "ArzyabiAsnadDaroIndirect",
-          "WithScanCount",
-          "WithoutScanCount",
-          "WithoutScanInDirectCount",
-          "ArchiveDirectCount",
-          "ArchiveInDirectCount",
-          "ArzyabiVisitDirectCount",
-          "Role",
-          "RoleType",
-          "ContractType",
-          "ProjectType",
-          "TotalPerformance",
-          "DirectPerFormance",
-          "InDirectPerFormance",
-          "Start_Date",
-          "DateInfo",
-          "HasTheDayOff",
-        ],
-        { HasTheDayOff: false },
-        useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
-      ),
-    [personnelPerformance.data, useWorkDays, totalWorkDays],
-  );
+  const distincedData = useMemo(() => {
+    console.log("🔍 Processing data with:", {
+      data: personnelPerformance.data,
+      hasData: !!personnelPerformance.data,
+      dataResult: personnelPerformance.data?.result,
+      dataResultLength: personnelPerformance.data?.result?.length,
+    });
+
+    return distinctPersonnelPerformanceData(
+      personnelPerformance.data,
+      ["NationalCode", "NameFamily", "CityName"],
+      [
+        "CityName",
+        "NationalCode",
+        "NameFamily",
+        "TownName",
+        "BranchCode",
+        "BranchName",
+        "BranchType",
+        "SabtAvalieAsnad",
+        "PazireshVaSabtAvalieAsnad",
+        "ArzyabiAsanadBimarsetaniDirect",
+        "ArzyabiAsnadBimarestaniIndirect",
+        "ArzyabiAsnadDandanVaParaDirect",
+        "ArzyabiAsnadDandanVaParaIndirect",
+        "ArzyabiAsnadDandanDirect",
+        "ArzyabiAsnadDandanIndirect",
+        "ArzyabiAsnadDaroDirect",
+        "ArzyabiAsnadDaroIndirect",
+        "WithScanCount",
+        "WithoutScanCount",
+        "WithoutScanInDirectCount",
+        "ArchiveDirectCount",
+        "ArchiveInDirectCount",
+        "ArzyabiVisitDirectCount",
+        "Role",
+        "RoleType",
+        "ContractType",
+        "ProjectType",
+        "TotalPerformance",
+        "DirectPerFormance",
+        "InDirectPerFormance",
+        "Start_Date",
+        "DateInfo",
+        "HasTheDayOff",
+      ],
+      { HasTheDayOff: false },
+      useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
+    );
+  }, [personnelPerformance.data, useWorkDays, totalWorkDays]);
+
+  // Debug the processed data
+  console.log("🔍 Processed distinct data:", distincedData);
 
   useEffect(() => {
     // if reportPeriod is monthly, set only one cityname to the SelectColumnFilterOptimized CityName filter if there is more than 1 already
-    if (filters?.periodType === "ماهانه") {
-      const cityNames = getInitialCities.data?.CityNames?.slice(0, 1);
+    if (
+      filters?.periodType === "ماهانه" &&
+      filters?.filter?.CityName?.length > 1
+    ) {
+      const cityNames = filters.filter.CityName.slice(0, 1);
       setDataFilters?.((prev: any) => ({
         ...prev,
         filter: {
@@ -313,7 +336,7 @@ export function PersonnelPerformanceTable({
         },
       }));
     }
-  }, [filters?.periodType, getInitialCities.data?.CityNames, setDataFilters]);
+  }, [filters?.periodType, filters?.filter?.CityName, setDataFilters]);
 
   // Table columns configuration - use a more stable approach
   const columns = useMemo<CustomColumnDef<PersonnelPerformanceData, any>[]>(
@@ -368,6 +391,15 @@ export function PersonnelPerformanceTable({
     toggleDistinctData === "Distincted"
       ? distincedData
       : personnelPerformance?.data?.result;
+
+  // Debug table data
+  console.log("🔍 Table data:", {
+    toggleDistinctData,
+    distincedDataLength: distincedData?.length || 0,
+    rawDataLength: personnelPerformance?.data?.result?.length || 0,
+    tableDataLength: tableData?.length || 0,
+    tableData: tableData,
+  });
 
   const toSelectionSet = (data, { lowerCaseKeys = true } = {}) => {
     const norm = (k) =>

@@ -103,7 +103,6 @@ export function PersonnelPerformanceFilters({
     // Update filters with the selected dates array and period type
     if (selectedDates.length > 0) {
       setDataFilters({
-        ...filters,
         periodType: newPeriodType,
         filter: {
           ...filters.filter,
