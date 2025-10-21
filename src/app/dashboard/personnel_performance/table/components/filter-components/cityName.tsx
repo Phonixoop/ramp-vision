@@ -81,8 +81,8 @@ export const CityNameFilter = memo(function CityNameFilter({
                   return;
                 }
                 const single = values.slice(0, 1);
-                // 👉 server-driven path: do NOT also keep a large client filter running
-                //  applyColumn(single); // you can also skip this line if you prefer purely server-filter in monthly
+                // Update both server-side filters and column filter for monthly period
+                applyColumn(single);
                 setDataFilters((prev: any) => ({
                   ...prev,
                   filter: {
