@@ -258,6 +258,15 @@ export const usePersonnelChart = () => {
 
   const handleCityNavigation = (cityName: string) => {
     setNavigatingToCity(cityName);
+
+    // If clicking on the same city, reset navigation state after a short delay
+    if (activeCity === cityName) {
+      setTimeout(() => {
+        setNavigatingToCity(null);
+      }, 100);
+      return;
+    }
+
     router.push(`/dashboard/personnel_performance/chart/${cityName}`, {
       scroll: false,
     });
