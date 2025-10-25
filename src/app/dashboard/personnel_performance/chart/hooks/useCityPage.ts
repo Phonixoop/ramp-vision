@@ -23,6 +23,7 @@ type Rating = "Weak" | "Average" | "Good" | "Excellent" | "NeedsReview" | "ALL";
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
   NameFamily?: string;
+  Role?: string;
   TotalPerformance?: number;
   Start_Date?: string;
   key?: { CityName: string; NameFamily: string; NationalCode: string };
@@ -253,8 +254,6 @@ export const useCityPage = (
 
     return [...updatedList, ...missing];
   }, [getPersonnels.data, updatedList]);
-
-  console.log({ mergedList });
 
   const displayedList: PersonRecord[] = useMemo(() => {
     if (levelFilter === "ALL") return mergedList;

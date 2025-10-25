@@ -13,6 +13,7 @@ type Rating = "Weak" | "Average" | "Good" | "Excellent" | "NeedsReview" | "ALL";
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
   NameFamily?: string;
+  Role?: string;
   TotalPerformance?: number;
   Start_Date?: string;
   key?: { CityName: string; NameFamily: string; NationalCode: string };
@@ -112,10 +113,17 @@ export const PersonnelList = React.memo<PersonnelListProps>(
             }-${user?.Role || "unknown"}-${user?.BranchName || "unknown"}-${
               user?.Start_Date || "unknown"
             }-${index}`}
+            isActive={
+              selectedPerson?.NationalCode +
+                selectedPerson?.NameFamily +
+                selectedPerson?.Role ===
+              user.NationalCode + user.NameFamily + user.Role
+            }
             user={user}
             activeKey={{
               nc: selectedPerson?.NationalCode,
-              id: (selectedPerson as any)?.Id,
+              name: selectedPerson?.NameFamily,
+              role: selectedPerson?.Role,
             }}
             getAllData={getAll?.data?.result ?? []}
             onSelect={(sparkData) => onSelectPerson(user, sparkData)}

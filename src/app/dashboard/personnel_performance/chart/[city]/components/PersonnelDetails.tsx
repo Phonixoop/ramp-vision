@@ -57,10 +57,15 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
       () => Object.keys(PersonnelPerformanceTranslate),
       [],
     );
-
+    console.log({ selectedPerson });
     // Helper function to get personnel data for a specific date
     const getPersonnelDataForDate = React.useCallback(
-      (date: string, nationalCode: string) => {
+      (
+        date: string,
+        nationalCode: string,
+        nameFamily: string,
+        role: string,
+      ) => {
         if (!getAll?.data?.result) return null;
 
         return distinctPersonnelPerformanceData(
@@ -104,7 +109,11 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             Start_Date: date,
           },
           useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
-        ).find((a: any) => a.key.NationalCode === nationalCode);
+        ).find(
+          (a: any) =>
+            a.key.NationalCode + a.key.NameFamily + a.Role ===
+            nationalCode + nameFamily + role,
+        );
       },
       [getAll?.data, useWorkDays, totalWorkDays],
     );
@@ -277,6 +286,8 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                       const personnelDataForDate = getPersonnelDataForDate(
                         dateString,
                         (selectedPerson as any).key.NationalCode,
+                        (selectedPerson as any).key.NameFamily,
+                        (selectedPerson as any).Role,
                       );
 
                       if (personnelDataForDate) {

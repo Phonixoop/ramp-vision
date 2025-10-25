@@ -10,6 +10,7 @@ import { sparkChartForPersonnel } from "~/utils/personnel-performance";
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
   NameFamily?: string;
+  Role?: string;
   TotalPerformance?: number;
   Start_Date?: string;
   key?: { CityName: string; NameFamily: string; NationalCode: string };
@@ -17,13 +18,19 @@ type PersonRecord = Record<string, any> & {
 
 interface PersonnelRowOptimizedProps {
   user: PersonRecord;
-  activeKey: { nc?: string; id?: string | number };
+  activeKey: {
+    nc?: string;
+    name?: string;
+    role?: string;
+    id?: string | number;
+  };
   getAllData: any[];
   onSelect: (sparkData: any[]) => void;
+  isActive: boolean;
 }
 
 export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
-  ({ user, activeKey, getAllData, onSelect }) => {
+  ({ user, activeKey, getAllData, onSelect, isActive }) => {
     const userPerformances = React.useMemo(() => {
       return (getAllData || [])
         .filter((x: any) => x.NameFamily === user.NameFamily)
@@ -37,12 +44,19 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       ]);
     }, [getAllData, user.NameFamily]);
 
-    const isActive = React.useMemo(() => {
-      return (
-        user.NationalCode === activeKey?.nc &&
-        (user as any)?.Id === activeKey?.id
-      );
-    }, [user.NationalCode, user.Id, activeKey?.nc, activeKey?.id]);
+    // const isActive = React.useMemo(() => {
+    //   const userKey = user.NationalCode + user.NameFamily + user.Role;
+    //   const activeKeyCombined =
+    //     activeKey?.nc + activeKey?.name + activeKey?.role;
+    //   return userKey === activeKeyCombined;
+    // }, [
+    //   user.NationalCode,
+    //   user.NameFamily,
+    //   user.Role,
+    //   activeKey?.nc,
+    //   activeKey?.name,
+    //   activeKey?.role,
+    // ]);
 
     const handleClick = React.useCallback(() => {
       onSelect(sparkData);
@@ -145,7 +159,10 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       prev.user.NationalCode === next.user.NationalCode &&
       prev.user.TotalPerformance === next.user.TotalPerformance &&
       prev.user.NameFamily === next.user.NameFamily &&
+      prev.user.Role === next.user.Role &&
       prev.activeKey.nc === next.activeKey.nc &&
+      prev.activeKey.name === next.activeKey.name &&
+      prev.activeKey.role === next.activeKey.role &&
       prev.activeKey.id === next.activeKey.id &&
       prev.getAllData === next.getAllData
     );
