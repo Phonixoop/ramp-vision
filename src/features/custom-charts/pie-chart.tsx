@@ -1,11 +1,12 @@
-// @ts-nocheck - Disable TypeScript checking for recharts type conflicts
+"use client";
+
 import React, { useState, useCallback } from "react";
 import { Pie, Sector, ResponsiveContainer, PieChart } from "recharts";
-import dynamic from "next/dynamic";
+
 import { commify } from "~/utils/util";
 
 import { cn } from "~/lib/utils";
-
+// @ts-nocheck - Disable TypeScript checking for recharts type conflicts
 // const PieChart = dynamic(
 //   () => import("recharts").then((recharts) => recharts.PieChart),
 //   { ssr: false },
@@ -150,6 +151,7 @@ export default function CustomPieChart<
               stroke="#00000000"
               innerRadius={60}
               outerRadius={80}
+              nameKey="name"
               dataKey={"value"}
               onMouseEnter={onPieEnter}
               onMouseLeave={onPieLeave}

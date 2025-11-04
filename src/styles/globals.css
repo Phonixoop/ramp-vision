@@ -972,3 +972,24 @@ input[type="number"] {
     }
   }
 }
+
+@layer base {
+  :root {
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+  }
+}
+
+/* Recharts: prevent white focus outline on selected SVG elements (modern Chrome/Edge) */
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus,
+.recharts-surface:focus,
+svg:focus {
+  outline: none !important;
+}
+.recharts-wrapper:focus-visible,
+.recharts-wrapper *:focus-visible,
+.recharts-surface:focus-visible,
+svg:focus-visible {
+  outline: none !important;
+}

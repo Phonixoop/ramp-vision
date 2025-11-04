@@ -30,7 +30,13 @@ import DepoSkeletonLoading from "~/features/loadings/depo/depo-box";
 import DepoTimeSkeletonLoading from "~/features/loadings/depo/depo-time-box";
 import CustomPieChart from "~/features/custom-charts/pie-chart";
 import SimpleTable from "~/features/guide-table";
-
+import { ChartPieLabel } from "~/components/shadcn/charts/pie/pie-chart-label";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "~/components/shadcn/chart";
+import { Pie, PieChart } from "recharts";
 // Reusable DataDisplay Component
 interface DataDisplayProps {
   data: Array<{
@@ -276,23 +282,47 @@ export const DepoSummary = memo(function DepoSummary({
         </div>
 
         <div className="flex w-full flex-col items-center justify-center gap-5">
-          <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-4">
+          <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {/* Direct Entry and Processing */}
             <div className="flex flex-col gap-3 rounded-2xl bg-secbuttn p-4">
               <Loading
                 isLoading={depo.isLoading}
                 LoadingComponent={EntryHandlingSkeletonLoading}
               >
-                <div className="flex flex-col gap-3">
-                  <H2 className="text-center text-lg font-bold">
-                    تعداد ورودی و رسیدگی شده مستقیم
-                  </H2>
-                  <DataDisplay data={entry_capacity_Direct} />
-                  <div className="flex h-64 w-full items-center justify-center">
-                    <CustomPieChart
+                <div className="flex h-full flex-col justify-between gap-3">
+                  <div className="flex flex-col gap-2">
+                    <H2 className="text-center text-lg font-bold">
+                      تعداد ورودی و رسیدگی شده مستقیم
+                    </H2>
+                    <DataDisplay data={entry_capacity_Direct} />
+                  </div>
+                  <div className="flex  w-full items-center justify-center">
+                    {/* <CustomPieChart
                       data={entry_capacity_Direct}
                       index="value"
-                    />
+                    /> */}
+
+                    {/* <ChartContainer
+                      config={{
+                        value: {
+                          label: "value",
+                        },
+                      }}
+                      className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[250px] pb-0"
+                    >
+                      <PieChart>
+                        <ChartTooltip
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Pie
+                          data={entry_capacity_Direct}
+                          dataKey="value"
+                          label
+                          nameKey="name"
+                        />
+                      </PieChart>
+                    </ChartContainer> */}
+                    <ChartPieLabel data={entry_capacity_Direct} />
                   </div>
                 </div>
               </Loading>
@@ -304,16 +334,19 @@ export const DepoSummary = memo(function DepoSummary({
                 isLoading={depo.isLoading}
                 LoadingComponent={EntryHandlingSkeletonLoading}
               >
-                <div className="flex flex-col gap-3">
-                  <H2 className="text-md pb-1 text-center font-bold">
-                    تعداد ورودی و رسیدگی شده غیر مستقیم
-                  </H2>
-                  <DataDisplay data={entry_capacity_InDirect} />
-                  <div className="flex h-64 w-full items-center justify-center">
-                    <CustomPieChart
+                <div className="flex h-full flex-col justify-between gap-3">
+                  <div className="flex flex-col gap-2">
+                    <H2 className="text-md pb-1 text-center font-bold">
+                      تعداد ورودی و رسیدگی شده غیر مستقیم
+                    </H2>
+                    <DataDisplay data={entry_capacity_InDirect} />
+                  </div>
+                  <div className="flex w-full items-center justify-center">
+                    {/* <CustomPieChart
                       data={entry_capacity_InDirect}
                       index="value"
-                    />
+                    /> */}
+                    <ChartPieLabel data={entry_capacity_InDirect} />
                   </div>
                 </div>
               </Loading>
@@ -325,11 +358,14 @@ export const DepoSummary = memo(function DepoSummary({
                 isLoading={depo.isLoading}
                 LoadingComponent={DepoSkeletonLoading}
               >
-                <div className="flex flex-col gap-3">
-                  <H2 className="text-center text-lg font-bold">تعداد دپو</H2>
-                  <DataDisplay data={depo_BaseOnSabt} />
-                  <div className="flex h-64 w-full items-center justify-center">
-                    <CustomPieChart data={depo_BaseOnSabt} index="value" />
+                <div className="flex h-full flex-col justify-between gap-3">
+                  <div className="flex flex-col gap-2">
+                    <H2 className="text-center text-lg font-bold">تعداد دپو</H2>
+                    <DataDisplay data={depo_BaseOnSabt} />
+                  </div>
+                  <div className="flex w-full items-center justify-center">
+                    {/* <CustomPieChart data={depo_BaseOnSabt} index="value" /> */}
+                    <ChartPieLabel data={depo_BaseOnSabt} />
                   </div>
                 </div>
               </Loading>
@@ -341,18 +377,17 @@ export const DepoSummary = memo(function DepoSummary({
                 isLoading={depoEstimate.isLoading}
                 LoadingComponent={DepoTimeSkeletonLoading}
               >
-                <div className="flex flex-col gap-3">
-                  <H2 className="text-center text-lg font-bold">
-                    زمان کلی اتمام دپو
-                    {depo.data?.periodType && (
-                      <span className="block text-sm text-primbuttn">
-                        {depo.data?.periodType}
-                      </span>
-                    )}
-                  </H2>
-                  <DataDisplay data={depoEstimateData} />
-                  <div className="flex h-64 w-full items-center justify-center">
-                    <CustomPieChart data={depoEstimateData} index="value" />
+                <div className="flex h-full flex-col justify-between gap-3">
+                  <div className="flex flex-col gap-2">
+                    <H2 className="text-center text-lg font-bold">
+                      زمان کلی اتمام دپو
+                      {depo.data?.periodType && (
+                        <span className="block text-sm text-primbuttn">
+                          {depo.data?.periodType}
+                        </span>
+                      )}
+                    </H2>
+                    <DataDisplay data={depoEstimateData} />
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-primary">
@@ -380,6 +415,10 @@ export const DepoSummary = memo(function DepoSummary({
                         </div>
                       </div>
                     )}
+                  </div>
+                  <div className="flex w-full items-center justify-center">
+                    {/* <CustomPieChart data={depoEstimateData} index="value" /> */}
+                    <ChartPieLabel data={depoEstimateData} />
                   </div>
                 </div>
               </Loading>
