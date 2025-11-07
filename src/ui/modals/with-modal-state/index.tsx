@@ -36,6 +36,7 @@ export default function withModalState(Component: React.ComponentType<any>) {
           {content}
         </Component>
         <Modal
+          className="bg-secondary"
           {...{
             isOpen: modal.isOpen,
             center,

@@ -20,18 +20,28 @@ export const userRouter = createTRPCRouter({
   createUser: protectedProcedure
     .input(createUserSchema)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.user.create({
+      const created = await ctx.db.user.create({
         data: {
           username: input.username,
           password: hashPassword(input.password),
           roleId: input.roleId,
         },
+        select: {
+          id: true,
+          username: true,
+          display_name: true,
+          roleId: true,
+          created_at: true,
+          updated_at: true,
+          role: true,
+        },
       });
+      return created;
     }),
   updateUser: protectedProcedure
     .input(updateUserSchema)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.user.update({
+      const updated = await ctx.db.user.update({
         where: {
           id: input.id,
         },
@@ -40,19 +50,39 @@ export const userRouter = createTRPCRouter({
           roleId: input.roleId,
           display_name: input.display_name,
         },
+        select: {
+          id: true,
+          username: true,
+          display_name: true,
+          roleId: true,
+          created_at: true,
+          updated_at: true,
+          role: true,
+        },
       });
+      return updated;
     }),
   updateUserPassword: protectedProcedure
     .input(updateUserPassword)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.user.update({
+      const updated = await ctx.db.user.update({
         where: {
           id: input.id,
         },
         data: {
           password: hashPassword(input.password),
         },
+        select: {
+          id: true,
+          username: true,
+          display_name: true,
+          roleId: true,
+          created_at: true,
+          updated_at: true,
+          role: true,
+        },
       });
+      return updated;
     }),
   getUsers: publicProcedure
     .input(
@@ -68,7 +98,13 @@ export const userRouter = createTRPCRouter({
         (await ctx.db.user.findMany({
           take: limit + 1, // get an extra item at the end which we'll use as next cursor
           cursor: cursor ? { id: cursor } : undefined,
-          include: {
+          select: {
+            id: true,
+            username: true,
+            display_name: true,
+            roleId: true,
+            created_at: true,
+            updated_at: true,
             role: true,
           },
           orderBy: {
@@ -92,6 +128,15 @@ export const userRouter = createTRPCRouter({
       return await ctx.db.user.findUnique({
         where: {
           id: input.id,
+        },
+        select: {
+          id: true,
+          username: true,
+          display_name: true,
+          roleId: true,
+          created_at: true,
+          updated_at: true,
+          role: true,
         },
       });
     }),

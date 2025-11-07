@@ -103,8 +103,7 @@ export function UserForm({
   const formik = useFormik({
     initialValues: {
       username: selectedRowUser?.username || "",
-      // i know its bad to return password from server even hashed password
-      password: selectedRowUser?.password || "",
+      password: "",
       display_name: selectedRowUser?.display_name || "",
       roleId: selectedRowUser?.roleId || "",
     },
@@ -133,7 +132,7 @@ export function UserForm({
     formik.setValues((a) => {
       return {
         username: selectedRowUser?.username || "",
-        password: selectedRowUser?.password || "",
+        password: "",
         display_name: selectedRowUser?.display_name || "",
         roleId: selectedRowUser?.roleId || "",
       };

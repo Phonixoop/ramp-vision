@@ -107,7 +107,7 @@ export default function AdminLayout({
           </div>
         </Container>
       </Container>
-      <ContainerBottomBorder className=" sticky top-0 z-50 flex pt-2 backdrop-blur-lg">
+      <ContainerBottomBorder className=" sticky top-0 z-40 flex pt-2 backdrop-blur-lg">
         <Container className=" max2xl:w-full">
           <LayoutGroup id="main-menu">
             <Menu rootPath={"/admin"} list={menuList} />

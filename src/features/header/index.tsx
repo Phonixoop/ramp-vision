@@ -15,7 +15,7 @@ export default function Header() {
   return (
     <header
       dir="rtl"
-      className="sticky top-0 z-50 flex w-full flex-col items-center justify-between border-b border-primary/10 bg-gradient-to-b from-secondary/80 via-secondary/50 to-transparent sm:p-0 "
+      className="sticky top-0 z-50 flex w-full flex-col items-center justify-between  bg-gradient-to-b from-secondary/80 via-secondary/50 to-transparent sm:p-0 "
     >
       <div
         className="absolute inset-0 -z-10"

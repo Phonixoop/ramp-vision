@@ -116,21 +116,7 @@ export default function UsersList() {
                   e.stopPropagation();
                 }}
               >
-                <Button
-                  onClick={async () => {
-                    await signIn("credentials", {
-                      username: user.username,
-                      password: user.password,
-                      session: JSON.stringify(session.data?.user),
-                      callbackUrl: `${window.location.origin}/admin`,
-                      redirect: false,
-                    });
-                    router.refresh();
-                  }}
-                  className="w-full cursor-pointer rounded-full bg-secbuttn px-2 py-2 text-primbuttn  "
-                >
-                  ورود
-                </Button>
+                {/* Removed password-based login from list to avoid exposing/storing passwords */}
                 <ButtonWithConfirmation
                   isLoading={deleteUser.isPending || !user.id}
                   onConfirm={async () => {
@@ -166,9 +152,8 @@ export default function UsersList() {
         }
         data={flatUsers}
         clickedRowIndex={selectedRowUser?.id}
-        onClick={(row) => {
-          const user = row.original;
-          setSelectedRowUser(user);
+        onClick={(user) => {
+          setSelectedRowUser(user as User);
         }}
       />
       <div className="flex items-center justify-center gap-5 py-5">
