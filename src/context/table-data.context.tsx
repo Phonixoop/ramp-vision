@@ -7,7 +7,9 @@ interface TableDataContextType {
   setFlatRows: (rows: any[]) => void;
 }
 
-const TableDataContext = createContext<TableDataContextType | undefined>(undefined);
+const TableDataContext = createContext<TableDataContextType | undefined>(
+  undefined,
+);
 
 export function TableDataProvider({ children }: { children: ReactNode }) {
   const [flatRows, setFlatRows] = useState<any[]>([]);
@@ -17,7 +19,11 @@ export function TableDataProvider({ children }: { children: ReactNode }) {
     setFlatRows,
   };
 
-  return <TableDataContext.Provider value={value}>{children}</TableDataContext.Provider>;
+  return (
+    <TableDataContext.Provider value={value}>
+      {children}
+    </TableDataContext.Provider>
+  );
 }
 
 export function useTableData() {
