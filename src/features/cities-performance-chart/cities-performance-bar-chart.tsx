@@ -1,5 +1,6 @@
 // @ts-nocheck - Disable TypeScript checking for recharts type conflicts
 import React, { Suspense } from "react";
+import { Cell } from "recharts";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";
@@ -15,8 +16,6 @@ import {
   getEnglishToPersianCity,
   processDataForChart,
 } from "~/utils/util";
-
-import { Cell, ResponsiveContainer } from "recharts";
 
 import CustomBarChart from "~/features/custom-charts/bar-chart";
 import {
@@ -162,15 +161,11 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   return (
     <>
       {!getCitysUsersPerformance.isLoading ? (
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-          className={"min-h-[70vh] "}
-        >
-          <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
-            <H2 className="font-bold">
-              نمودار عملکرد پرسنل شهر {getEnglishToPersianCity(cityName_En)}
-            </H2>
+        <div className="flex min-h-[70vh] w-full flex-col gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
+          <H2 className="text-center font-bold">
+            نمودار عملکرد پرسنل شهر {getEnglishToPersianCity(cityName_En)}
+          </H2>
+          <div className="h-[600px] w-full">
             <CustomBarChart
               onBarClick={(data, index) => {
                 // window.open(
@@ -217,7 +212,7 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
               }}
             />
           </div>
-        </ResponsiveContainer>
+        </div>
       ) : (
         <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
           <BarChartSkeletonLoading />
@@ -226,15 +221,11 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
 
       <>
         {searchParams.get("NameFamily") && (
-          <ResponsiveContainer
-            width="100%"
-            height="100%"
-            className={"min-h-[70vh]"}
-          >
-            <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
-              <H2 className="font-bold">
-                نمودار زمانی عملکرد {searchParams.get("NameFamily")}
-              </H2>
+          <div className="flex min-h-[70vh] w-full flex-col gap-5  rounded-2xl  bg-secbuttn/50 py-5 xl:p-5">
+            <H2 className="text-center font-bold">
+              نمودار زمانی عملکرد {searchParams.get("NameFamily")}
+            </H2>
+            <div className="h-[600px] w-full">
               <CustomBarChart
                 width={500}
                 height={500}
@@ -271,7 +262,7 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
                 }}
               />
             </div>
-          </ResponsiveContainer>
+          </div>
         )}
       </>
     </>

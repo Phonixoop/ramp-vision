@@ -152,6 +152,7 @@ export function distinctPersonnelPerformanceData(
     // const city =
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
+    console.log({ workDays, rowCount: item.key.rowCount });
     // Use work days if provided, otherwise use rowCount
     const divisor = workDays || item.key.rowCount;
 

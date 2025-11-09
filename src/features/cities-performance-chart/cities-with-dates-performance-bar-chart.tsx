@@ -1,6 +1,6 @@
 // @ts-nocheck - Disable TypeScript checking for recharts type conflicts
 import React, { useState, useEffect } from "react";
-import { ResponsiveContainer, Cell } from "recharts";
+import { Cell } from "recharts";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";
@@ -22,7 +22,6 @@ import {
 import moment from "jalali-moment";
 import { groupBy, uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
 import PerformanceBadges from "~/components/main/performance-badges";
-import { BarChart } from "recharts";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
@@ -155,13 +154,12 @@ export function CitiesWithDatesPerformanceBarChart({
         </p>
       )}
       {!getCitiesWithPerformance.isLoading ? (
-        <ResponsiveContainer width="100%" height="100%">
-          <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
-            <H2 className="font-bold">
-              نمودار زمانی عملکرد شهر{" "}
-              {getEnglishToPersianCity(filters.filter.CityName[0])}
-            </H2>
-
+        <div className="flex h-full w-full flex-col gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
+          <H2 className="text-center font-bold">
+            نمودار زمانی عملکرد شهر{" "}
+            {getEnglishToPersianCity(filters.filter.CityName[0])}
+          </H2>
+          <div className="h-[500px] w-full flex-1">
             <CustomBarChart
               width={500}
               height={500}
@@ -206,13 +204,13 @@ export function CitiesWithDatesPerformanceBarChart({
                 });
               }}
             />
-            {!hasData && (
-              <p className="rounded-xl bg-yellow-100 p-3 text-yellow-800">
-                هیچ داده‌ای برای نمایش وجود ندارد
-              </p>
-            )}
           </div>
-        </ResponsiveContainer>
+          {!hasData && (
+            <p className="rounded-xl bg-yellow-100 p-3 text-yellow-800">
+              هیچ داده‌ای برای نمایش وجود ندارد
+            </p>
+          )}
+        </div>
       ) : (
         <div className="flex w-full flex-col items-center justify-center gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
           <BarChartSkeletonLoading />

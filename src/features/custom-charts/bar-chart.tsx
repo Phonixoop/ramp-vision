@@ -1,5 +1,5 @@
-//  i
-import React, { useState, useEffect, useRef } from "react";
+"use client";
+import React from "react";
 import { SquircleIcon } from "lucide-react";
 import {
   Bar,
@@ -12,13 +12,14 @@ import {
   Legend,
   Line,
   ReferenceLine,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import { cn } from "~/lib/utils";
 
-const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
+// const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
 
 const getPath = (x, y, width, height) => {
   return `M${x},${y + height}C${x + width / 3},${y + height} ${x + width / 2},${
@@ -121,7 +122,7 @@ type CustomBarChartOptions = {
 };
 export default function CustomBarChart({
   nameClassName = "",
-  width,
+  width = 500,
   height = 500,
   data = [],
   bars = [],
@@ -134,30 +135,9 @@ export default function CustomBarChart({
   customBars = undefined,
   onBarClick = (data, index) => {},
 }: CustomBarChartOptions) {
-  const container = useRef<HTMLDivElement>(undefined);
-
-  const [containerWidth, setContainerWidth] = useState(width);
-
-  useEffect(() => {
-    if (!container.current) return;
-
-    const observer = new ResizeObserver((entries) => {
-      setContainerWidth(entries[0].contentRect.width);
-    });
-
-    observer.observe(container.current);
-
-    // Clean up the observer on component unmount
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
   return (
-    <div ref={container} className="h-full w-full">
-      {/* @ts-ignore */}
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart
-        width={containerWidth ?? width}
-        height={height}
         data={data.map((item) => {
           return {
             ...item,
@@ -243,7 +223,7 @@ export default function CustomBarChart({
         />
         {brushKey && <Brush dataKey={brushKey} height={30} />}
       </BarChart>
-    </div>
+    </ResponsiveContainer>
   );
 }
 
