@@ -32,18 +32,23 @@ import { useMemo } from "react";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import { groupBy, uniqueArrayWithCounts } from "~/lib/utils";
 import moment from "jalali-moment";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
 
 function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
+  const { useWorkDays } = useWorkDaysToggle();
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000,
+  });
   const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
         CityName: [cityName_En],
         Start_Date: filters?.filter?.Start_Date,
-        ProjectType: defaultProjectTypes,
-        Role: defualtRoles,
-        ContractType: defualtContractTypes,
-        RoleType: undefined,
-        DateInfo: filters?.filter?.DateInfo,
+        ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
+        Role: filters?.filter?.Role ?? defualtRoles,
+        ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
+        RoleType: filters?.filter?.RoleType,
+        DateInfo: filters?.filter?.DateInfo ?? [defualtDateInfo.data],
       },
       periodType: filters.periodType,
     },
@@ -57,6 +62,47 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  // Prepare months array for work days calculation
+  const monthsArray = useMemo(() => {
+    if (
+      !filters?.periodType ||
+      filters.periodType !== "ماهانه" ||
+      !filters?.filter?.Start_Date ||
+      !Array.isArray(filters.filter.Start_Date)
+    ) {
+      return [];
+    }
+
+    const months: { year: number; month: number }[] = [];
+
+    filters.filter.Start_Date.forEach((dateStr) => {
+      if (typeof dateStr === "string") {
+        try {
+          const momentDate = moment(dateStr, "jYYYY/jMM/jDD");
+          const year = momentDate.jYear();
+          const month = momentDate.jMonth() + 1; // jMonth() returns 0-11, we need 1-12
+
+          months.push({ year, month });
+        } catch (error) {
+          console.warn("Error parsing date:", dateStr, error);
+        }
+      }
+    });
+
+    return months;
+  }, [filters?.periodType, filters?.filter?.Start_Date]);
+
+  // Get total work days for monthly filters
+  const { data: workDaysData } = api.monthWorkDays.getTotalWorkDays.useQuery(
+    { months: monthsArray },
+    {
+      enabled: monthsArray.length > 0,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const totalWorkDays = workDaysData?.totalWorkDays || null;
 
   const distinctData = useMemo(() => {
     return distinctPersonnelPerformanceData(
@@ -89,8 +135,9 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
         "HasTheDayOff",
       ],
       { HasTheDayOff: false },
+      useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
     );
-  }, [getCitysUsersPerformance?.data]);
+  }, [getCitysUsersPerformance?.data, useWorkDays, totalWorkDays]);
 
   // const selectedUserData = useMemo(() => {
   //   return sparkChartForPersonnel(
@@ -118,6 +165,8 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
         (item: any) => item.Start_Date,
       );
       return Object.entries(singleMonthData)?.map(([key, value]) => {
+        // For single date view, TotalPerformance is already daily performance
+        // No need to divide further when showing individual days
         return {
           Start_Date: key,
           COUNT: 1,
@@ -140,6 +189,9 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
       (item: any) => item.Start_Date,
     );
 
+    // Calculate number of unique months for work days approximation
+    const numberOfMonths = dates.result.length;
+
     const rrr = Object.entries(resultGroupByStartDate)?.map(([key, value]) => {
       const vv: any = processDataForChart({
         rawData: value,
@@ -147,16 +199,29 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
         values: ["TotalPerformance", "COUNT"],
       });
 
+      // For multi-month view: if workdays enabled, approximate work days per month
+      // by dividing total work days by number of months. Otherwise use rowCount (actual days in that month)
+      const divisor =
+        useWorkDays && totalWorkDays && numberOfMonths > 0
+          ? totalWorkDays / numberOfMonths
+          : vv[0].key.rowCount;
+
       return {
         key: { Start_Date: key },
         Start_Date: key,
         COUNT: 1,
-        TotalPerformance: vv[0].TotalPerformance / vv[0].key.rowCount,
+        TotalPerformance: divisor,
       };
     });
 
     return rrr;
-  }, [searchParams, filters, getCitysUsersPerformance?.data]);
+  }, [
+    searchParams,
+    filters,
+    getCitysUsersPerformance?.data,
+    useWorkDays,
+    totalWorkDays,
+  ]);
 
   return (
     <>
