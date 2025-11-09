@@ -215,6 +215,12 @@ export function SetPersonnelDayOffWizard({
     (getAll?.data as any)?.result ?? [],
     "NameFamily",
     nameFamily,
+    [],
+    {
+      // Match aggregation grouping: filter by NationalCode and CityName to ensure consistency
+      NationalCode: nationalCode,
+      CityName: cityName,
+    },
   );
 
   // Render function for calendar dates; casted to match older Calender types if needed.

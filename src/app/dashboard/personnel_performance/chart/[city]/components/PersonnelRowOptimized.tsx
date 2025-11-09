@@ -38,11 +38,24 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
     }, [getAllData, user.NameFamily]);
 
     const sparkData = React.useMemo(() => {
-      return sparkChartForPersonnel(getAllData, "NameFamily", user.NameFamily, [
-        "BranchName",
-        "Role",
-      ]);
-    }, [getAllData, user.NameFamily]);
+      return sparkChartForPersonnel(
+        getAllData,
+        "NameFamily",
+        user.NameFamily,
+        ["BranchName", "Role"],
+        {
+          // Match aggregation grouping: filter by NationalCode and CityName to ensure consistency
+          NationalCode: user.NationalCode,
+          CityName: user.CityName || user.key?.CityName,
+        },
+      );
+    }, [
+      getAllData,
+      user.NameFamily,
+      user.NationalCode,
+      user.CityName,
+      user.key?.CityName,
+    ]);
 
     // const isActive = React.useMemo(() => {
     //   const userKey = user.NationalCode + user.NameFamily + user.Role;

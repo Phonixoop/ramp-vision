@@ -173,11 +173,17 @@ type ProcessDataForChartOptions = {
   groupBy: string | string[];
   values: string[];
   where?: Record<string, string | string[]>;
-  options?: { max: string[] };
+  options?: { max?: string[]; uniqueCountFields?: string[] };
 };
 export function processDataForChart(input: ProcessDataForChartOptions) {
   const { rawData, groupBy, values, where, options } = input;
-  return rawData?.reduce((acc, current) => {
+  const uniqueCountFields = options?.uniqueCountFields;
+
+  // Debug mode - set to true to enable detailed logging
+  const DEBUG = false;
+  const debugLog: any[] = [];
+
+  const result = rawData?.reduce((acc, current, index) => {
     const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
 
     // Check if the current item meets the 'where' conditions
@@ -191,6 +197,19 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
     );
 
     if (!meetsConditions) {
+      if (DEBUG) {
+        debugLog.push({
+          index,
+          action: "skipped",
+          reason: "does not meet where conditions",
+          current: {
+            ...Object.fromEntries(groupByKeys.map((k) => [k, current[k]])),
+            TotalPerformance: current.TotalPerformance,
+            HasTheDayOff: current.HasTheDayOff,
+            Start_Date: current.Start_Date,
+          },
+        });
+      }
       return acc; // Skip current item if it doesn't meet conditions
     }
 
@@ -201,6 +220,26 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
     );
 
     if (existingGroupIndex !== -1) {
+      const oldTotalPerformance = acc[existingGroupIndex].TotalPerformance || 0;
+      const currentTotalPerformance = current.TotalPerformance || 0;
+
+      // Track unique values for the specified fields
+      if (uniqueCountFields && Array.isArray(uniqueCountFields)) {
+        if (!acc[existingGroupIndex]._uniqueValuesSets) {
+          acc[existingGroupIndex]._uniqueValuesSets = {};
+        }
+        uniqueCountFields.forEach((field) => {
+          if (current[field] != null) {
+            if (!acc[existingGroupIndex]._uniqueValuesSets[field]) {
+              acc[existingGroupIndex]._uniqueValuesSets[field] = new Set();
+            }
+            acc[existingGroupIndex]._uniqueValuesSets[field].add(
+              current[field],
+            );
+          }
+        });
+      }
+
       for (const value of values) {
         if (options?.max && options.max.includes(value)) {
           // If it's in the max array, keep the maximum value
@@ -208,6 +247,11 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
             acc[existingGroupIndex][value] || 0,
             current[value] || 0,
           );
+          // Also track the sum/total of this field
+          const totalKey = `${value}Total`;
+          const currentValue = current[value] || 0;
+          acc[existingGroupIndex][totalKey] =
+            (acc[existingGroupIndex][totalKey] || 0) + currentValue;
         } else {
           // Otherwise, sum the values
           if (acc[existingGroupIndex][value] === null)
@@ -222,25 +266,115 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
           } else if (
             typeof acc[existingGroupIndex][value] === "number" &&
             typeof current[value] === "number"
-          )
-            acc[existingGroupIndex][value] =
-              (acc[existingGroupIndex][value] || 0) + (current[value] || 0);
+          ) {
+            const oldValue = acc[existingGroupIndex][value] || 0;
+            const newValue = (oldValue || 0) + (current[value] || 0);
+            acc[existingGroupIndex][value] = newValue;
+
+            if (DEBUG && value === "TotalPerformance") {
+              debugLog.push({
+                index,
+                action: "added to existing group",
+                groupKey: groupByKey,
+                oldValue: oldTotalPerformance,
+                currentValue: currentTotalPerformance,
+                newTotal: newValue,
+                rowCount: acc[existingGroupIndex].key.rowCount + 1,
+                Start_Date: current.Start_Date,
+                HasTheDayOff: current.HasTheDayOff,
+              });
+            }
+          }
         }
       }
       acc[existingGroupIndex].key.rowCount++;
     } else {
-      const group = { key: { rowCount: 1 } };
+      const group: any = { key: { rowCount: 1 } };
       groupByKeys.forEach((key, index) => {
         group.key[key] = groupByKey[index];
       });
+
+      // Initialize unique values Sets if uniqueCountFields are specified
+      if (uniqueCountFields && Array.isArray(uniqueCountFields)) {
+        group._uniqueValuesSets = {};
+        uniqueCountFields.forEach((field) => {
+          if (current[field] != null) {
+            group._uniqueValuesSets[field] = new Set([current[field]]);
+          }
+        });
+      }
+
       for (const value of values) {
         group[value] = current[value];
+        // If this field is in the max array, also initialize the total field
+        if (options?.max && options.max.includes(value)) {
+          const totalKey = `${value}Total`;
+          group[totalKey] = current[value] || 0;
+        }
       }
       acc.push(group);
+
+      if (DEBUG && values.includes("TotalPerformance")) {
+        debugLog.push({
+          index,
+          action: "created new group",
+          groupKey: groupByKey,
+          TotalPerformance: current.TotalPerformance,
+          Start_Date: current.Start_Date,
+          HasTheDayOff: current.HasTheDayOff,
+        });
+      }
     }
 
     return acc;
   }, []);
+
+  // Convert unique values Sets to counts in the keys object
+  if (uniqueCountFields && Array.isArray(uniqueCountFields)) {
+    result.forEach((item: any) => {
+      uniqueCountFields.forEach((field) => {
+        const countKey = `unique${field}Count`;
+        if (item._uniqueValuesSets && item._uniqueValuesSets[field]) {
+          item.key[countKey] = item._uniqueValuesSets[field].size;
+        } else {
+          // If no Set was created (all values were null), set count to 0
+          item.key[countKey] = 0;
+        }
+      });
+      // Remove the temporary Sets object from the result
+      if (item._uniqueValuesSets) {
+        delete item._uniqueValuesSets;
+      }
+    });
+  }
+
+  if (DEBUG && debugLog.length > 0) {
+    console.group("processDataForChart Debug");
+    console.log("Input:", {
+      groupBy,
+      values,
+      where,
+      recordCount: rawData?.length,
+    });
+    console.log("Debug Log:", debugLog);
+    console.log("Result:", result);
+    if (result && result.length > 0 && values.includes("TotalPerformance")) {
+      const totals = result.map((r: any) => ({
+        key: r.key,
+        TotalPerformance: r.TotalPerformance,
+        rowCount: r.key.rowCount,
+      }));
+      console.log("Aggregated Totals:", totals);
+      const sum = result.reduce(
+        (sum: number, r: any) => sum + (r.TotalPerformance || 0),
+        0,
+      );
+      console.log("Sum of all TotalPerformance:", sum);
+    }
+    console.groupEnd();
+  }
+
+  return result;
 }
 
 export function countColumnValues(

@@ -161,7 +161,7 @@ export const useCityPage = (
   const getTotalWorkDays = useCallback(() => {
     return workDaysData?.totalWorkDays || null;
   }, [workDaysData]);
-
+  // console.log({ data: getAll.data });
   // Derived data
   const baseList: PersonRecord[] = useMemo(() => {
     const data = getAll.data as any;

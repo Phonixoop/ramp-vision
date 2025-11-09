@@ -86,16 +86,17 @@ export function distinctDataAndCalculatePerformance(
   //       : item.TotalPerformance,
   //   };
   // });
-
+  console.log({ data });
   const citiesWithPerformanceData = processDataForChart({
     rawData: data?.result ?? [],
     groupBy,
     values,
     where,
-    // {
-    //   max: ["COUNT"],
-    // },
+    options: {
+      max: ["COUNT"],
+    },
   });
+  console.log({ citiesWithPerformanceData });
   const r = mapToCitiesWithPerformance({
     dateLengthPerCity: data?.dateLength,
     result: citiesWithPerformanceData,
@@ -152,8 +153,8 @@ export function distinctPersonnelPerformanceData(
     // const city =
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
-    console.log({ workDays, rowCount: item.key.rowCount });
     // Use work days if provided, otherwise use rowCount
+
     const divisor = workDays || item.key.rowCount;
 
     return {
@@ -162,6 +163,7 @@ export function distinctPersonnelPerformanceData(
       TotalPerformance: item.TotalPerformance / divisor,
       DirectPerFormance: item.DirectPerFormance / divisor,
       InDirectPerFormance: item.InDirectPerFormance / divisor,
+
       // (groupBy.includes("Start_Date")
       //   ? item.key.COUNT
       //   : data.dateLength[city]),
@@ -187,7 +189,10 @@ function mapToCitiesWithPerformance({
     //   result.filter((a) => a.CityName === item.key).map((a) => a.COUNT),
     // );
     // Use work days if provided, otherwise use COUNT
-    const divisor = workDays || item.COUNT;
+    // this count is max count of people who has shown up to work for that city
+    let workDaysCountForCities = workDays ? workDays * item.COUNT : null;
+
+    const divisor = workDaysCountForCities || item.COUNTTotal;
 
     return {
       CityName_En: item.key.CityName,
@@ -210,12 +215,24 @@ export function sparkChartForPersonnel(
   propertyToCheck,
   valueToCheck,
   selectExtraProperty = [],
+  additionalFilters?: Record<string, any>, // Add optional additional filters to match aggregation grouping
 ) {
   return data
-    ?.filter(
-      (a: any) =>
-        a[propertyToCheck] === valueToCheck && a.HasTheDayOff === false,
-    )
+    ?.filter((a: any) => {
+      // Base filter: property match and no day off
+      if (a[propertyToCheck] !== valueToCheck || a.HasTheDayOff !== false) {
+        return false;
+      }
+
+      // Apply additional filters if provided (e.g., to match aggregation grouping by NationalCode, CityName, etc.)
+      if (additionalFilters) {
+        return Object.entries(additionalFilters).every(([key, value]) => {
+          return a[key] === value;
+        });
+      }
+
+      return true;
+    })
     .map((item: any) => {
       // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
@@ -245,6 +262,81 @@ export function sparkChartForCity(data = [], propertyToCheck, valueToCheck) {
         Benchmark2: 120,
       };
     });
+}
+
+/**
+ * Debug function to compare sparkData TotalPerformance sum with aggregated total
+ * Call this in the browser console with the selectedPerson object
+ */
+export function debugTotalPerformanceMismatch(selectedPerson: any) {
+  if (!selectedPerson) {
+    console.warn("selectedPerson is not provided");
+    return;
+  }
+
+  const sparkDataSum =
+    selectedPerson.sparkData?.reduce(
+      (sum: number, item: any) => sum + (item.TotalPerformance || 0),
+      0,
+    ) || 0;
+
+  const aggregatedTotal = selectedPerson.total || 0;
+  const aggregatedAverage = selectedPerson.TotalPerformance || 0;
+  const rowCount = selectedPerson.key?.rowCount || selectedPerson.rowCount || 0;
+
+  console.group("🔍 TotalPerformance Debug");
+  console.log("Person:", {
+    NameFamily: selectedPerson.NameFamily,
+    NationalCode: selectedPerson.NationalCode,
+    CityName: selectedPerson.CityName,
+  });
+  console.log("📊 SparkData:", {
+    itemCount: selectedPerson.sparkData?.length || 0,
+    sum: sparkDataSum,
+    items: selectedPerson.sparkData?.map((item: any) => ({
+      Start_Date: item.Start_Date,
+      TotalPerformance: item.TotalPerformance,
+    })),
+  });
+  console.log("📈 Aggregated Data:", {
+    total: aggregatedTotal,
+    average: aggregatedAverage,
+    rowCount: rowCount,
+    expectedAverage: rowCount > 0 ? aggregatedTotal / rowCount : 0,
+  });
+  console.log("🔢 Difference:", {
+    absolute: Math.abs(aggregatedTotal - sparkDataSum),
+    percentage:
+      aggregatedTotal > 0
+        ? (
+            (Math.abs(aggregatedTotal - sparkDataSum) / aggregatedTotal) *
+            100
+          ).toFixed(2) + "%"
+        : "N/A",
+  });
+
+  if (Math.abs(aggregatedTotal - sparkDataSum) > 0.01) {
+    console.warn("⚠️ MISMATCH DETECTED!");
+    console.log("Possible causes:");
+    console.log("1. Different data sources (getAll.data vs aggregated data)");
+    console.log(
+      "2. Records with HasTheDayOff=true included in aggregation but not in sparkData",
+    );
+    console.log("3. Multiple records per day being summed in aggregation");
+    console.log(
+      "4. Data filtering differences between processDataForChart and sparkChartForPersonnel",
+    );
+  } else {
+    console.log("✅ Values match!");
+  }
+  console.groupEnd();
+
+  return {
+    sparkDataSum,
+    aggregatedTotal,
+    difference: Math.abs(aggregatedTotal - sparkDataSum),
+    rowCount,
+  };
 }
 
 export const getPerformanceMetric = (limit) => {
