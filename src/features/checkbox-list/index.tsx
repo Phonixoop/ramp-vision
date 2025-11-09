@@ -196,7 +196,7 @@ export function SelectControlled({
   return (
     <div
       className={cn(
-        "flex w-full max-w-full items-center justify-between gap-2 overflow-hidden px-2 text-center text-primary sm:px-0",
+        "flex w-full max-w-full items-center justify-center gap-2 overflow-hidden px-2 text-center text-primary sm:px-0",
         className,
       )}
     >
@@ -745,7 +745,7 @@ export function SelectColumnFilterOptimized<T>({
   // };
 
   return (
-    <div className="flex w-full max-w-full items-center justify-between gap-2 overflow-hidden px-2 text-center text-primary sm:px-0">
+    <div className="flex w-full max-w-full items-center justify-center gap-2 overflow-hidden px-2 text-center text-primary sm:px-0">
       <div className="relative flex w-full min-w-0 max-w-[300px] items-center gap-2">
         <MultiSelect
           singleSelect={singleSelect}
