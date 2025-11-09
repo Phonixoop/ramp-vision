@@ -88,7 +88,7 @@ export const MENU: MenuItem[] = [
   // Insurance & Claims
   {
     id: "insurance",
-    value: "بیمه و خسارت",
+    value: "خسارت",
     link: "/dashboard/havale_khesarat",
     icon: FileTextIcon,
     subMenu: [

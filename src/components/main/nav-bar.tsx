@@ -1,6 +1,7 @@
 "use client";
 import React, { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChartIcon,
@@ -46,10 +47,26 @@ export type NavBarProps = {
 };
 
 export function NavBar({ menuItems, className }: NavBarProps) {
+  const pathname = usePathname();
   const [selected, setSelected] = useState<string | null>(null);
   const [dir, setDir] = useState<null | "l" | "r">(null);
   const [isHovering, setIsHovering] = useState(false);
   const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Check if a parent menu item is active (current route matches parent link or any child link)
+  function isParentActive(item: MenuItem): boolean {
+    if (!item.subMenu || item.subMenu.length === 0) {
+      // For items without submenu, check if pathname matches the link
+      return pathname === item.link || pathname.startsWith(item.link + "/");
+    }
+    // For items with submenu, check if any child is active
+    return item.subMenu.some((child) => isChildActive(child));
+  }
+
+  // Check if a child menu item is active
+  function isChildActive(item: MenuItem): boolean {
+    return pathname === item.link || pathname.startsWith(item.link + "/");
+  }
 
   const handleSetSelected = (val: string | null) => {
     // Clear any existing timeout
@@ -108,18 +125,26 @@ export function NavBar({ menuItems, className }: NavBarProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
       {/* Items without submenu - direct links */}
-      {itemsWithoutSubMenu.map((item) => (
-        <Link
-          key={item.id}
-          href={{
-            pathname: item.link,
-          }}
-          className="flex items-start justify-center gap-1 rounded-full px-3 py-1.5 text-sm text-primary-muted transition-colors hover:text-primary"
-        >
-          {item.icon && <item.icon className="size-4" />}
-          <span>{item.value}</span>
-        </Link>
-      ))}
+      {itemsWithoutSubMenu.map((item) => {
+        const isActive = isParentActive(item);
+        return (
+          <Link
+            key={item.id}
+            href={{
+              pathname: item.link,
+            }}
+            className={cn(
+              "flex items-start justify-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors",
+              isActive
+                ? "bg-secbuttn text-primary"
+                : "text-primary-muted hover:text-primary",
+            )}
+          >
+            {item.icon && <item.icon className="size-4" />}
+            <span>{item.value}</span>
+          </Link>
+        );
+      })}
 
       {/* Items with submenu - dropdown */}
       <div
@@ -127,16 +152,20 @@ export function NavBar({ menuItems, className }: NavBarProps) {
         onMouseLeave={handleMouseLeave}
         className="relative flex h-fit gap-2"
       >
-        {itemsWithSubMenu.map((item) => (
-          <Tab
-            key={item.id}
-            selected={selected}
-            handleSetSelected={handleSetSelected}
-            item={item}
-          >
-            {item.value}
-          </Tab>
-        ))}
+        {itemsWithSubMenu.map((item) => {
+          const isActive = isParentActive(item);
+          return (
+            <Tab
+              key={item.id}
+              selected={selected}
+              handleSetSelected={handleSetSelected}
+              item={item}
+              isActive={isActive}
+            >
+              {item.value}
+            </Tab>
+          );
+        })}
 
         {selected && (
           <Content
@@ -145,6 +174,7 @@ export function NavBar({ menuItems, className }: NavBarProps) {
             menuItems={itemsWithSubMenu}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            isChildActive={isChildActive}
           />
         )}
       </div>
@@ -157,12 +187,15 @@ function Tab({
   item,
   handleSetSelected,
   selected,
+  isActive,
 }: {
   children: ReactNode;
   item: MenuItem;
   handleSetSelected: (val: string | null) => void;
   selected: string | null;
+  isActive: boolean;
 }) {
+  const isSelected = selected === item.id;
   return (
     <button
       id={`shift-tab-${item.id}`}
@@ -170,16 +203,16 @@ function Tab({
       onClick={() => handleSetSelected(item.id)}
       className={cn(
         "flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition-colors",
-        selected === item.id
+        isSelected || isActive
           ? "bg-secbuttn text-primary"
-          : "text-primary-muted",
+          : "text-primary-muted hover:text-primary",
       )}
     >
       <span>{children}</span>
       <ChevronDownIcon
         className={cn(
           "size-3.5 stroke-[3px] transition-transform",
-          selected === item.id ? "rotate-180" : "",
+          isSelected ? "rotate-180" : "",
         )}
       />
     </button>
@@ -192,12 +225,14 @@ function Content({
   menuItems,
   onMouseEnter,
   onMouseLeave,
+  isChildActive,
 }: {
   selected: string | null;
   dir: null | "l" | "r";
   menuItems: MenuItem[];
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  isChildActive: (item: MenuItem) => boolean;
 }) {
   const selectedItem = menuItems.find((item) => item.id === selected);
   const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
@@ -258,7 +293,12 @@ function Content({
         {/* A normal-flow measuring node for the selected content */}
         <div className="pointer-events-none invisible">
           <div ref={measureRef}>
-            {selectedItem && <SubMenuContent subMenu={selectedItem.subMenu} />}
+            {selectedItem && (
+              <SubMenuContent
+                subMenu={selectedItem.subMenu}
+                isChildActive={isChildActive}
+              />
+            )}
           </div>
         </div>
         {menuItems.map((item, i) => {
@@ -316,7 +356,10 @@ function Content({
               }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
             >
-              <SubMenuContent subMenu={item.subMenu} />
+              <SubMenuContent
+                subMenu={item.subMenu}
+                isChildActive={isChildActive}
+              />
             </motion.div>
           );
         })}
@@ -325,7 +368,13 @@ function Content({
   );
 }
 
-function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
+function SubMenuContent({
+  subMenu,
+  isChildActive,
+}: {
+  subMenu: MenuItem[];
+  isChildActive: (item: MenuItem) => boolean;
+}) {
   // Group items by category if they have categories
   const categorizedItems = subMenu.reduce(
     (acc, item) => {
@@ -346,7 +395,11 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
     return (
       <div className="grid grid-cols-1 gap-2 sm:gap-4">
         {subMenu.map((item) => (
-          <SubMenuItem key={item.id} item={item} />
+          <SubMenuItem
+            key={item.id}
+            item={item}
+            isActive={isChildActive(item)}
+          />
         ))}
       </div>
     );
@@ -365,7 +418,11 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
           </h3>
           <div className="w-full space-y-1">
             {categorizedItems[category].map((item) => (
-              <SubMenuItem key={item.id} item={item} />
+              <SubMenuItem
+                key={item.id}
+                item={item}
+                isActive={isChildActive(item)}
+              />
             ))}
           </div>
         </div>
@@ -374,7 +431,13 @@ function SubMenuContent({ subMenu }: { subMenu: MenuItem[] }) {
   );
 }
 
-function SubMenuItem({ item }: { item: MenuItem }) {
+function SubMenuItem({
+  item,
+  isActive,
+}: {
+  item: MenuItem;
+  isActive: boolean;
+}) {
   const IconComponent = item.icon;
   const SkeletonPreview = item?.skeletonPreview;
   return (
@@ -382,11 +445,23 @@ function SubMenuItem({ item }: { item: MenuItem }) {
       href={{
         pathname: item.link,
       }}
-      className="group flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-primary/10 bg-secondary p-2 text-primary-muted hover:bg-primary hover:text-secondary"
+      className={cn(
+        "group flex w-full flex-col items-center justify-center gap-2 rounded-xl border p-2 transition-colors",
+        isActive
+          ? "border-accent bg-accent/20 text-accent hover:bg-accent/30"
+          : "border-primary/10 bg-secondary text-primary-muted hover:bg-primary hover:text-secondary",
+      )}
     >
       <div className="flex w-full flex-row items-center justify-center gap-2">
         {IconComponent && (
-          <IconComponent className="size-8 flex-shrink-0 rounded-md p-1.5 text-lg group-hover:bg-primary group-hover:stroke-secondary sm:size-10 sm:p-2 sm:text-xl" />
+          <IconComponent
+            className={cn(
+              "size-8 flex-shrink-0 rounded-md p-1.5 text-lg sm:size-10 sm:p-2 sm:text-xl",
+              isActive
+                ? "bg-accent/30 stroke-accent group-hover:bg-accent/40"
+                : "group-hover:bg-primary group-hover:stroke-secondary",
+            )}
+          />
         )}
         <span className="truncate text-xs sm:text-sm">{item.value}</span>
       </div>

@@ -77,7 +77,7 @@ export function DepoTable({ sessionData }: DepoTableProps) {
         dir="rtl"
       >
         <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
-          جزئیات دپو (جدول)
+          عملکرد شعبه ارزیابی
         </h1>
 
         <div className="relative flex w-full items-center justify-center rounded-lg py-5 text-center">
