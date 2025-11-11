@@ -14,6 +14,8 @@ import { DepoExport } from "./DepoExport";
 import { CitiesPerformanceBarChart } from "~/features/cities-performance-chart/cities-performance-barchart";
 import { FilterType as PersonnelFilterType } from "~/context/personnel-filter.context";
 import { TableDataProvider } from "~/context/table-data.context";
+import WorkDaysToggle from "~/features/work-days-toggle";
+import WorkDaysToggleView from "~/features/work-days-toggle/view";
 
 export function DepoTable({ sessionData }: DepoTableProps) {
   const { filters, setDataFilters, reportPeriod } = useDepo();
@@ -110,6 +112,25 @@ export function DepoTable({ sessionData }: DepoTableProps) {
           />
         </div>
         <div className="flex w-full flex-col items-center justify-center gap-5 py-5">
+          <div className="sticky top-20 z-30 flex items-center justify-center overflow-hidden rounded-full bg-secondary/80 p-3 ">
+            <WorkDaysToggleView filters={filters} />
+            <div
+              className="absolute inset-0 -z-10"
+              data-framer-name="Mask Pattern"
+              style={{
+                backgroundColor: "transparent",
+                backgroundImage:
+                  "radial-gradient(transparent 0.1px, rgba(var(--secondary),0.9) 1px)",
+                backgroundSize: "3px 3px",
+                // backdropFilter: "blur(3px)",
+                maskImage:
+                  "linear-gradient(rgb(0, 0, 0) 60%, rgba(0, 0, 0, 0) 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(rgb(0, 0, 0) 60%, rgba(0, 0, 0, 0) 100%)", // For Safari compatibility
+                opacity: 1,
+              }}
+            />
+          </div>
           <CitiesPerformanceBarChart filters={filters} />
         </div>
       </div>

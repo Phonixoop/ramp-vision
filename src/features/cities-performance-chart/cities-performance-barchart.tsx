@@ -79,6 +79,7 @@ function CitiesPerformanceBarChartContent({
 
                 const params = new URLSearchParams(searchParams);
                 params.set("performance_CityName", data.CityName_En);
+                params.delete("NameFamily");
                 router.push(`?${params.toString()}`, { scroll: false });
               }}
               data={(getCitiesWithPerformance?.data.result ?? []).map((row) => {
