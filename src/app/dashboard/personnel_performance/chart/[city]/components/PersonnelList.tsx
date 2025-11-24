@@ -28,7 +28,12 @@ interface PersonnelListProps {
   getAll: any;
   selectedPerson: PersonRecord | null;
   onFilterByLevel: (rating: Rating) => void;
-  onSelectPerson: (person: PersonRecord, sparkData?: any[]) => void;
+  onSelectPerson: (
+    person: PersonRecord,
+    sparkData?: any[],
+    StartDate?: string,
+    periodType?: string,
+  ) => void;
 }
 
 export const PersonnelList = React.memo<PersonnelListProps>(
@@ -126,7 +131,9 @@ export const PersonnelList = React.memo<PersonnelListProps>(
               role: selectedPerson?.Role,
             }}
             getAllData={getAll?.data?.result ?? []}
-            onSelect={(sparkData) => onSelectPerson(user, sparkData)}
+            onSelect={(sparkData) =>
+              onSelectPerson(user, sparkData, "", selectedPerson?.periodType)
+            }
           />
         )}
       />

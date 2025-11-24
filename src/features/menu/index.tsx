@@ -237,6 +237,7 @@ export function InPageMenu({
                 )}
               />
             </Button>
+            <span className="text-accent">{items[activeIndex]?.name}</span>
             <Button
               disabled={activeIndex - 1 < 0 || list.length <= 0}
               className={twMerge(
@@ -262,7 +263,6 @@ export function InPageMenu({
               />
             </Button>
           </div>
-          <span className="text-accent">{items[activeIndex]?.name}</span>
         </div>
       )}
     </>

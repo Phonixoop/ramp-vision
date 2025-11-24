@@ -250,7 +250,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             <RolesByBranchModal selectedPerson={selectedPerson} />
 
             {/* Calendar */}
-            <div className="relative col-span-2 w-full overflow-hidden rounded-xl bg-accent/10 p-1">
+            <div className="relative col-span-2 flex w-full max-w-[310px] justify-start overflow-hidden rounded-xl bg-accent/10 p-1">
               {(selectedPerson as any)?.sparkData?.length > 0 ? (
                 <Calendar
                   withMonthMenu
@@ -297,6 +297,8 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                         setSelectedPerson({
                           ...(selectedPerson as any),
                           ...personnelDataForDate,
+                          Start_Date: dateString,
+                          periodType: getAll?.data?.periodType,
                         });
                       }
                     };
@@ -341,6 +343,12 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                             hasTheDayOff === true
                               ? "bg-primary text-secondary"
                               : "bg-primary-muted/10 text-primary-muted",
+                            date.format("YYYY/MM/DD") ===
+                              (selectedPerson as any).Start_Date &&
+                              (selectedPerson as any).periodType ===
+                                getAll?.data?.periodType
+                              ? " rounded-full ring-2 ring-primary"
+                              : "",
                           )}
                           style={{
                             backgroundColor: userCalData

@@ -109,45 +109,19 @@ export default function Calendar({
     _listOfMonths = orderBasedOnFirstList(MONTHS, listOfMonthsOutOfGivenDates);
   return (
     <div className="grid w-full  gap-5 p-2 ">
-      <LayoutGroup id="months-InPageMenu">
-        <InPageMenu
-          collapsedUi={collapsedUi}
-          className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
-          startIndex={0}
-          list={listOfYears}
-          onChange={(value: { item: any; index: number }) => {
-            const newCalendar = getMonthDays(
-              moment()
-                .locale("fa")
-                .jYear(parseInt(value.item.name))
-                .jMonth(calendar[16].jMonth()),
-            );
-
-            setCalendar(newCalendar);
-            // onMonthChange(
-            //   newCalendar.at(0),
-            //   newCalendar.at(newCalendar.length - 1),
-            // );
-          }}
-        />
-      </LayoutGroup>
-      {withMonthMenu && (
+      <div className="flex items-center justify-between gap-2">
         <LayoutGroup id="months-InPageMenu">
           <InPageMenu
             collapsedUi={collapsedUi}
             className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
-            startIndex={
-              listOfMonthsOutOfGivenDates &&
-              listOfMonthsOutOfGivenDates.length > 0
-                ? 0
-                : defaultMonth
-            }
-            list={_listOfMonths}
+            startIndex={0}
+            list={listOfYears}
             onChange={(value: { item: any; index: number }) => {
-              const monthIndex = MONTHS.find((x) => x === value.item.name);
-
               const newCalendar = getMonthDays(
-                moment().locale("fa").jYear(year).jMonth(monthIndex),
+                moment()
+                  .locale("fa")
+                  .jYear(parseInt(value.item.name))
+                  .jMonth(calendar[16].jMonth()),
               );
 
               setCalendar(newCalendar);
@@ -158,7 +132,35 @@ export default function Calendar({
             }}
           />
         </LayoutGroup>
-      )}
+        {withMonthMenu && (
+          <LayoutGroup id="months-InPageMenu">
+            <InPageMenu
+              collapsedUi={collapsedUi}
+              className="mx-auto rounded-xl bg-secbuttn px-5 pb-1 pt-2"
+              startIndex={
+                listOfMonthsOutOfGivenDates &&
+                listOfMonthsOutOfGivenDates.length > 0
+                  ? 0
+                  : defaultMonth
+              }
+              list={_listOfMonths}
+              onChange={(value: { item: any; index: number }) => {
+                const monthIndex = MONTHS.find((x) => x === value.item.name);
+
+                const newCalendar = getMonthDays(
+                  moment().locale("fa").jYear(year).jMonth(monthIndex),
+                );
+
+                setCalendar(newCalendar);
+                // onMonthChange(
+                //   newCalendar.at(0),
+                //   newCalendar.at(newCalendar.length - 1),
+                // );
+              }}
+            />
+          </LayoutGroup>
+        )}
+      </div>
 
       <div className="grid grid-cols-7 gap-3 text-center text-xs text-accent md:text-base">
         {defaultWeekdays.map((week, i) => {

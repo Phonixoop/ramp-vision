@@ -36,6 +36,7 @@ export default function CityPage() {
     <div className="flex h-full w-full  flex-col items-center justify-between gap-5  transition-colors duration-1000">
       <div className="flex h-full w-full flex-row-reverse justify-start gap-4  divide-secbuttn ">
         {/* Personnel List */}
+
         <div className=" min-w-[380px]">
           <PersonnelList
             displayedList={displayedList}

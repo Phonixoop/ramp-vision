@@ -26,6 +26,7 @@ type PersonRecord = Record<string, any> & {
   Role?: string;
   TotalPerformance?: number;
   Start_Date?: string;
+  periodType?: string;
   key?: { CityName: string; NameFamily: string; NationalCode: string };
 };
 
@@ -268,8 +269,18 @@ export const useCityPage = (
   }, []);
 
   const onSelectPerson = useCallback(
-    (person: PersonRecord, sparkData?: any[]) => {
-      setSelectedPerson({ ...person, sparkData });
+    (
+      person: PersonRecord,
+      sparkData?: any[],
+      StartDate?: string,
+      periodType?: string,
+    ) => {
+      setSelectedPerson({
+        ...person,
+        sparkData,
+        Start_Date: StartDate ? StartDate : person.Start_Date,
+        periodType: periodType ? periodType : filters?.periodType,
+      });
     },
     [],
   );
