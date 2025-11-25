@@ -132,7 +132,7 @@ export const PersonnelList = React.memo<PersonnelListProps>(
             }}
             getAllData={getAll?.data?.result ?? []}
             onSelect={(sparkData) =>
-              onSelectPerson(user, sparkData, "", selectedPerson?.periodType)
+              onSelectPerson(user, sparkData, "", getAll?.data?.periodType)
             }
           />
         )}

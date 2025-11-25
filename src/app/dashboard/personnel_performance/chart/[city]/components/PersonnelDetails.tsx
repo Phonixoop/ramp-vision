@@ -298,7 +298,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                           ...(selectedPerson as any),
                           ...personnelDataForDate,
                           Start_Date: dateString,
-                          periodType: getAll?.data?.periodType,
+                          periodType: "روزانه",
                         });
                       }
                     };
@@ -339,14 +339,13 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                       >
                         <Button
                           className={cn(
-                            "flex w-max cursor-pointer items-center justify-center rounded-xl p-2 transition-opacity hover:opacity-80",
+                            "flex w-max cursor-pointer items-center justify-center rounded-xl  p-2   hover:opacity-80",
                             hasTheDayOff === true
                               ? "bg-primary text-secondary"
                               : "bg-primary-muted/10 text-primary-muted",
                             date.format("YYYY/MM/DD") ===
                               (selectedPerson as any).Start_Date &&
-                              (selectedPerson as any).periodType ===
-                                getAll?.data?.periodType
+                              (selectedPerson as any).periodType === "روزانه"
                               ? " rounded-full ring-2 ring-primary"
                               : "",
                           )}
