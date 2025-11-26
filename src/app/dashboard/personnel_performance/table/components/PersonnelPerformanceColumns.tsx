@@ -434,7 +434,7 @@ export function PersonnelPerformanceColumns({
         ),
     },
     {
-      header: "ارزیابی ویزیت",
+      header: "ارزیابی ویزیت مستقیم",
       accessorKey: "ArzyabiVisitDirectCount",
       footer: ({ table }) =>
         commify(
@@ -443,6 +443,21 @@ export function PersonnelPerformanceColumns({
             .rows.reduce(
               (total, row) =>
                 total + (row.getValue("ArzyabiVisitDirectCount") as number) ||
+                0,
+              0,
+            ),
+        ),
+    },
+    {
+      header: "ارزیابی ویزیت غیر مستقیم",
+      accessorKey: "ArzyabiVisitInDirectCount",
+      footer: ({ table }) =>
+        commify(
+          table
+            .getFilteredRowModel()
+            .rows.reduce(
+              (total, row) =>
+                total + (row.getValue("ArzyabiVisitInDirectCount") as number) ||
                 0,
               0,
             ),

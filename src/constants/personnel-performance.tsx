@@ -10,8 +10,10 @@ import {
   SyringeIcon,
   ViewIcon,
 } from "lucide-react";
+import EmptyBasketIcon from "~/ui/icons/empty-basket";
 
 export const PersonnelPerformanceTranslate = {
+  Empty: "",
   SabtAvalieAsnad: "ثبت اولیه اسناد",
   PazireshVaSabtAvalieAsnad: "پذیرش و ثبت اولیه اسناد",
   ArzyabiAsanadBimarsetaniDirect: "ارزیابی اسناد بیمارستانی مستقیم",
@@ -28,6 +30,7 @@ export const PersonnelPerformanceTranslate = {
   WithoutScanInDirectCount: "ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)",
   WithScanCount: "ثبت ارزیابی با اسکن مدارک",
   ArzyabiVisitDirectCount: "ارزیابی ویزیت مستقیم",
+  ArzyabiVisitInDirectCount: "ارزیابی ویزیت غیر مستقیم",
   DirectPerFormance: "عملکرد مستقیم",
   InDirectPerFormance: "عملکرد غیر مستقیم",
   TotalPerformance: "عملکرد کلی",
@@ -39,10 +42,10 @@ export const PersonnelPerformanceTranslate = {
 };
 
 export const PersonnelPerformanceIcons: { [key: string]: React.ReactNode } = {
+  Empty: <EmptyBasketIcon className="stroke-primary" />,
   SabtAvalieAsnad: <FileInputIcon className="stroke-primary" />,
   PazireshVaSabtAvalieAsnad: <FileCheckIcon className="stroke-emerald-500" />,
   ArzyabiAsanadBimarsetaniDirect: <BrainCogIcon className="stroke-amber-500" />,
-
   ArzyabiAsnadBimarestaniIndirect: (
     <BrainCogIcon className="stroke-amber-700" />
   ),
@@ -50,27 +53,73 @@ export const PersonnelPerformanceIcons: { [key: string]: React.ReactNode } = {
   ArzyabiAsnadDandanVaParaIndirect: (
     <BiohazardIcon className="stroke-rose-700" />
   ),
-
   ArzyabiAsnadDandanDirect: <BiohazardIcon className="stroke-rose-500" />,
   ArzyabiAsnadDandanIndirect: <BiohazardIcon className="stroke-rose-700" />,
-
   ArzyabiAsnadDaroDirect: <SyringeIcon className="stroke-purple-500" />,
   ArzyabiAsnadDaroIndirect: <SyringeIcon className="stroke-purple-700" />,
-
   ArchiveDirectCount: <ArchiveIcon className="stroke-violet-500" />,
   ArchiveInDirectCount: <ArchiveIcon className="stroke-violet-900" />,
-
   WithScanCount: <FileScanIcon className="stroke-cyan-500" />,
   WithoutScanCount: <FileScanIcon className="stroke-cyan-700" />,
-
   WithoutScanInDirectCount: <FileScanIcon className="stroke-cyan-900" />,
-
+  ArzyabiVisitInDirectCount: <EyeIcon className="stroke-orange-900" />,
   ArzyabiVisitDirectCount: <EyeIcon className="stroke-orange-900" />,
-
   DirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
   InDirectPerFormance: <FunctionSquareIcon className="stroke-cyan-600" />,
   TotalPerformance: <FunctionSquareIcon className="stroke-cyan-600" />,
 };
+
+export type PersonnelPerformanceGroup = {
+  keys: string[];
+  type?: "single" | "group" | "empty";
+};
+
+export const PersonnelPerformanceGroups: PersonnelPerformanceGroup[] = [
+  // Empty cells
+  { keys: ["Empty"], type: "empty" },
+
+  // Groups
+  {
+    keys: ["SabtAvalieAsnad", "PazireshVaSabtAvalieAsnad"],
+    type: "group",
+  },
+
+  // Groups
+  {
+    keys: ["ArzyabiAsanadBimarsetaniDirect", "ArzyabiAsnadBimarestaniIndirect"],
+    type: "group",
+  },
+  {
+    keys: [
+      "ArzyabiAsnadDandanVaParaDirect",
+      "ArzyabiAsnadDandanVaParaIndirect",
+    ],
+    type: "group",
+  },
+  {
+    keys: ["ArzyabiAsnadDandanDirect", "ArzyabiAsnadDandanIndirect"],
+    type: "group",
+  },
+  {
+    keys: ["ArzyabiAsnadDaroDirect", "ArzyabiAsnadDaroIndirect"],
+    type: "group",
+  },
+  {
+    keys: ["ArchiveDirectCount", "ArchiveInDirectCount"],
+    type: "group",
+  },
+  { keys: ["WithScanCount", "WithoutScanCount"], type: "group" },
+  { keys: ["WithoutScanInDirectCount"], type: "single" },
+  {
+    keys: ["ArzyabiVisitDirectCount", "ArzyabiVisitInDirectCount"],
+    type: "group",
+  },
+  {
+    keys: ["DirectPerFormance", "InDirectPerFormance"],
+    type: "group",
+  },
+  { keys: ["TotalPerformance"], type: "single" },
+];
 
 export const defualtRoles = [
   "کارشناس ارزیاب اسناد بیمارستانی",

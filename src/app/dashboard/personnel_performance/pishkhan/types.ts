@@ -66,4 +66,5 @@ export type PishkhanData = {
   ArchiveDirectCount: number;
   ArchiveInDirectCount: number;
   ArzyabiVisitDirectCount: number;
+  ArzyabiVisitInDirectCount: number;
 };

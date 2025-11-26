@@ -302,6 +302,7 @@ export function PersonnelPerformanceTable({
         "ArchiveDirectCount",
         "ArchiveInDirectCount",
         "ArzyabiVisitDirectCount",
+        "ArzyabiVisitInDirectCount",
         "Role",
         "RoleType",
         "ContractType",

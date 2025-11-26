@@ -68,6 +68,7 @@ export function distinctDataAndCalculatePerformance(
     "ArchiveDirectCount",
     "ArchiveInDirectCount",
     "ArzyabiVisitDirectCount",
+    "ArzyabiVisitInDirectCount",
     "COUNT",
     "TotalPerformance",
     "DirectPerFormance",
@@ -86,7 +87,7 @@ export function distinctDataAndCalculatePerformance(
   //       : item.TotalPerformance,
   //   };
   // });
-  console.log({ data });
+
   const citiesWithPerformanceData = processDataForChart({
     rawData: data?.result ?? [],
     groupBy,
@@ -94,6 +95,7 @@ export function distinctDataAndCalculatePerformance(
     where,
     options: {
       max: ["COUNT"],
+      dedupeBy: ["NationalCode", "NameFamily", "CityName"],
     },
   });
   console.log({ citiesWithPerformanceData });
@@ -129,6 +131,7 @@ export function distinctPersonnelPerformanceData(
     "ArchiveDirectCount",
     "ArchiveInDirectCount",
     "ArzyabiVisitDirectCount",
+    "ArzyabiVisitInDirectCount",
     "TotalPerformance",
   ],
   where = {},

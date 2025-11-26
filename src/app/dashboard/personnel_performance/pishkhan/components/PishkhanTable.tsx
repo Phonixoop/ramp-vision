@@ -144,6 +144,7 @@ export function PishkhanTable({ sessionData }: PishkhanTableProps) {
           "ArchiveDirectCount",
           "ArchiveInDirectCount",
           "ArzyabiVisitDirectCount",
+          "ArzyabiVisitInDirectCount",
           "Role",
           "RoleType",
           "ContractType",

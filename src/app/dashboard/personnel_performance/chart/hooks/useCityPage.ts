@@ -193,6 +193,7 @@ export const useCityPage = (
         "ArchiveDirectCount",
         "ArchiveInDirectCount",
         "ArzyabiVisitDirectCount",
+        "ArzyabiVisitInDirectCount",
         "Role",
         "RoleType",
         "ContractType",
@@ -215,6 +216,7 @@ export const useCityPage = (
     setUpdatedList(baseList);
   }, [baseList]);
 
+  console.log({ baseList });
   // Mimic previous onSuccess behavior
   useEffect(() => {
     if (ready && getAll.isSuccess) {

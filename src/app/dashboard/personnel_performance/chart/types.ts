@@ -20,6 +20,7 @@ export type CityWithPerformanceData = {
   ArchiveDirectCount: number;
   ArchiveInDirectCount: number;
   ArzyabiVisitDirectCount: number;
+  ArzyabiVisitInDirectCount: number;
   Start_Date: string;
   DateInfo: string;
   UserCount?: number;

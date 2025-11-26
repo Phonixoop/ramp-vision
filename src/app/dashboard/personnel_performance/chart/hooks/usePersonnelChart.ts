@@ -139,6 +139,7 @@ export const usePersonnelChart = () => {
           "ArchiveDirectCount",
           "ArchiveInDirectCount",
           "ArzyabiVisitDirectCount",
+          "ArzyabiVisitInDirectCount",
           "COUNT",
           "TotalPerformance",
           "DirectPerFormance",

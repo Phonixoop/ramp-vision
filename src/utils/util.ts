@@ -173,7 +173,7 @@ type ProcessDataForChartOptions = {
   groupBy: string | string[];
   values: string[];
   where?: Record<string, string | string[]>;
-  options?: { max?: string[]; uniqueCountFields?: string[] };
+  options?: { max?: string[]; uniqueCountFields?: string[]; dedupeBy };
 };
 export function processDataForChart(input: ProcessDataForChartOptions) {
   const { rawData, groupBy, values, where, options } = input;

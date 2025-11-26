@@ -229,6 +229,7 @@ export class PersonnelQueryBuilder extends AggregationQueryBuilder {
       .sum("ArchiveDirectCount", "ArchiveDirectCount")
       .sum("ArchiveInDirectCount", "ArchiveInDirectCount")
       .sum("ArzyabiVisitDirectCount", "ArzyabiVisitDirectCount")
+      .sum("ArzyabiVisitInDirectCount", "ArzyabiVisitInDirectCount")
       .sum("TotalPerformance", "TotalPerformance")
       .sum("DirectPerFormance", "DirectPerFormance")
       .sum("InDirectPerFormance", "InDirectPerFormance");

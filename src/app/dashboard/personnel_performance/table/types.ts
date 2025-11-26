@@ -25,6 +25,7 @@ export type PersonnelPerformanceData = {
   ArchiveDirectCount: number;
   ArchiveInDirectCount: number;
   ArzyabiVisitDirectCount: number;
+  ArzyabiVisitInDirectCount: number;
   Start_Date: string;
   DateInfo: string;
 };

@@ -7,6 +7,8 @@ import PerformanceBadgesLazy from "~/components/main/performance-badges";
 import {
   PersonnelPerformanceIcons,
   PersonnelPerformanceTranslate,
+  PersonnelPerformanceGroups,
+  type PersonnelPerformanceGroup,
 } from "~/constants/personnel-performance";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import ToolTipSimple from "~/features/tooltip-simple-use";
@@ -53,10 +55,6 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
     useWorkDays,
     totalWorkDays,
   }) => {
-    const translateKeys = React.useMemo(
-      () => Object.keys(PersonnelPerformanceTranslate),
-      [],
-    );
     console.log({ selectedPerson });
     // Helper function to get personnel data for a specific date
     const getPersonnelDataForDate = React.useCallback(
@@ -94,6 +92,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             "ArchiveDirectCount",
             "ArchiveInDirectCount",
             "ArzyabiVisitDirectCount",
+            "ArzyabiVisitInDirectCount",
             "Role",
             "RoleType",
             "ContractType",
@@ -118,15 +117,37 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
       [getAll?.data, useWorkDays, totalWorkDays],
     );
 
-    const numericItems = React.useMemo(() => {
-      if (!selectedPerson) return [] as [string, number][];
-      const pairs = Object.entries(selectedPerson).filter(
-        ([_, v]) => typeof v === "number",
-      ) as [string, number][];
-      return [...pairs].sort(
-        (a, b) => translateKeys.indexOf(a[0]) - translateKeys.indexOf(b[0]),
-      );
-    }, [selectedPerson, translateKeys]);
+    const numericItemsMap = React.useMemo(() => {
+      if (!selectedPerson) return new Map<string, number | null>();
+      const map = new Map<string, number | null>();
+      Object.entries(selectedPerson).forEach(([k, v]) => {
+        if (typeof v === "number" || k === "Empty") {
+          map.set(k, v);
+        }
+      });
+      return map;
+    }, [selectedPerson]);
+
+    const groupedItems = React.useMemo(() => {
+      const items: Array<{
+        group: PersonnelPerformanceGroup;
+        items: Array<[string, number | null]>;
+      }> = [];
+
+      PersonnelPerformanceGroups.forEach((group) => {
+        const groupItems: Array<[string, number | null]> = [];
+        group.keys.forEach((key) => {
+          if (numericItemsMap.has(key)) {
+            groupItems.push([key, numericItemsMap.get(key)!]);
+          }
+        });
+        if (groupItems.length > 0) {
+          items.push({ group, items: groupItems });
+        }
+      });
+
+      return items;
+    }, [numericItemsMap]);
 
     const nonNumericItems = React.useMemo(() => {
       if (!selectedPerson) return [] as [string, string][];
@@ -142,58 +163,89 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
     return (
       <div className="flex flex-col items-center justify-center gap-5">
         <div className="flex w-full flex-col items-start justify-center gap-5 xl:flex-row">
-          {/* Metrics grid */}
+          {/* Metrics grouped */}
           <div
-            className="grid grid-cols-1 divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn rounded-xl bg-secondary p-2 lg:grid-cols-2"
+            className="flex w-4/6 flex-col gap-1  divide-dashed divide-primbuttn rounded-xl bg-secondary p-2"
             dir="rtl"
           >
-            {numericItems.map(([key, value], index) => {
-              if (!PersonnelPerformanceIcons[key]) return null;
-              const isLastItem = index === numericItems.length - 1;
-              const isZero = (value as number) <= 0;
+            {groupedItems.map((groupData, groupIndex) => {
+              const isLastGroup = groupIndex === groupedItems.length - 1;
+              const isGroup = groupData.group.type === "group";
+              const isSingle = groupData.group.type === "single";
+              const isEmptyGroup = groupData.group.type === "empty";
+
               return (
-                <React.Fragment key={key}>
+                <React.Fragment key={`group-${groupIndex}`}>
                   <div
                     className={cn(
-                      "group flex flex-col justify-center gap-2 p-2 last:bg-primary/80 hover:opacity-100 md:col-span-1",
-                      isZero ? "opacity-50" : "bg-secbuttn",
+                      "flex overflow-hidden  rounded-xl bg-secbuttn",
+                      isGroup ? "flex-row   " : "flex-col",
                     )}
                   >
-                    <div className="flex h-full w-full items-center justify-between gap-4 rounded-xl p-2">
-                      <span
-                        className={cn(
-                          !isZero
-                            ? "animate-path animate-[move_200s_linear_infinite]"
-                            : "",
-                        )}
-                      >
-                        {PersonnelPerformanceIcons[key]}
-                      </span>
-                      <span
-                        className={cn(
-                          "text-primary group-last:text-secondary",
-                          !isZero ? "font-bold" : "text-sm",
-                        )}
-                      >
-                        {PersonnelPerformanceTranslate[key]}
-                      </span>
-                      <span
-                        className={cn(
-                          "text-primary group-last:text-secondary",
-                          !isZero ? "font-bold" : "text-sm",
-                        )}
-                      >
-                        {commify(
-                          Number.isInteger(value)
-                            ? value
-                            : ((value as number).toFixed(2) as any),
-                        )}
-                      </span>
-                    </div>
+                    {groupData.items.map(([key, value], index) => {
+                      if (!PersonnelPerformanceIcons[key]) return null;
+                      const isEmpty = key === "Empty";
+                      const isZero = !isEmpty && (value as number) <= 0;
+
+                      return (
+                        <div
+                          key={key}
+                          className={cn(
+                            "flex flex-col justify-center  p-2",
+                            index === 0 &&
+                              groupData.items.length > 1 &&
+                              " border-dashed",
+                            isZero
+                              ? "bg-secondary opacity-50"
+                              : "border-solid border-t-accent bg-accent/20",
+                            isSingle && !isEmptyGroup && "w-full",
+                            isGroup && "flex-1",
+                            isEmptyGroup && "w-full",
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "flex h-full w-full  items-center justify-between gap-4 p-2 ",
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                !isEmpty && !isZero
+                                  ? "animate-path animate-[move_200s_linear_infinite]"
+                                  : "",
+                              )}
+                            >
+                              {PersonnelPerformanceIcons[key]}
+                            </span>
+                            <span
+                              className={cn(
+                                "text-primary",
+                                !isEmpty && !isZero ? "font-bold" : "text-sm",
+                              )}
+                            >
+                              {PersonnelPerformanceTranslate[key]}
+                            </span>
+                            {!isEmpty && (
+                              <span
+                                className={cn(
+                                  "text-primary",
+                                  !isZero ? "font-bold" : "text-sm",
+                                )}
+                              >
+                                {commify(
+                                  Number.isInteger(value)
+                                    ? value
+                                    : ((value as number).toFixed(2) as any),
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  {/* numericItems.length % 2 !== 0 && */}
-                  {isLastItem && (
-                    <div className="cross_hatch_pattern hidden w-full max-w-sm  sm:block" />
+                  {isLastGroup && (
+                    <div className="cross_hatch_pattern hidden w-full max-w-sm sm:block" />
                   )}
                 </React.Fragment>
               );
@@ -202,7 +254,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
 
           {/* Details & Roles */}
           <div
-            className="flex flex-col items-center justify-center gap-4"
+            className="flex w-2/6 flex-col items-center justify-center gap-4"
             dir="rtl"
           >
             <div className="overflow-hidden rounded-xl border-[1px] border-dashed border-primbuttn bg-secondary">
@@ -293,6 +345,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                         (selectedPerson as any).Role,
                       );
 
+                      console.log({ personnelDataForDate });
                       if (personnelDataForDate) {
                         setSelectedPerson({
                           ...(selectedPerson as any),
