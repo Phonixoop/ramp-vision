@@ -83,34 +83,32 @@ export default function OtpPage() {
         </Button>
         {(isFetching || isRefetching || isLoading) && <ThreeDotsWave />}
         <div className="p-6">
-          <h2 className="mb-4 text-xl font-bold text-primary">کاربران OTP</h2>
+          <h2 className="mb-4 text-xl font-bold text-primary">درخواست‌های OTP (Rasa)</h2>
           <Table dir="rtl">
             <TableHeader>
               <TableRow className="border-primary text-center text-accent hover:bg-transparent">
-                <TableHead className="text-center ">
-                  نام و نام خانوادگی
-                </TableHead>
-                <TableHead className="text-center ">نام کامپیوتر</TableHead>
-                <TableHead className="text-center ">شماره تلفن</TableHead>
                 <TableHead className="text-center ">کد OTP</TableHead>
-                <TableHead className="text-center ">تاریخ ایجاد</TableHead>
+                <TableHead className="text-center ">تاریخ بروزرسانی</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {otpUsers?.map((user) => (
+              {otpUsers?.map((row, index) => (
                 <TableRow
-                  key={user.Id}
-                  className=" cursor-pointer border-primary text-center text-primary hover:bg-primary/50"
+                  key={row.Otp ? `${row.Otp}-${row.UpdatedAt ?? index}` : index}
+                  className="cursor-pointer border-primary text-center text-primary hover:bg-primary/50"
                   onClick={() => {
-                    copyToClipboard(user.OtpCode);
+                    copyToClipboard(row.Otp);
                     toast.info("کد کپی شد");
                   }}
                 >
-                  <TableCell>{user.NameFamily}</TableCell>
-                  <TableCell>{user.PcName}</TableCell>
-                  <TableCell>{user.PhoneNumber}</TableCell>
-                  <TableCell>{user.OtpCode}</TableCell>
-                  <TableCell>{user.CreatedAt ?? "نامشخص"}</TableCell>
+                  <TableCell>{row.Otp}</TableCell>
+                  <TableCell>
+                    {row.UpdatedAt == null
+                      ? "—"
+                      : typeof row.UpdatedAt === "string"
+                        ? row.UpdatedAt
+                        : new Date(row.UpdatedAt).toLocaleString("fa-IR")}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
