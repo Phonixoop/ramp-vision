@@ -607,6 +607,33 @@ export function PersianCalendarPicker({
     setCurrentDate(currentDate.clone().add(1, "jMonth"));
   };
 
+  const goToPreviousYear = () => {
+    setCurrentDate(currentDate.clone().subtract(1, "jYear"));
+  };
+
+  const goToNextYear = () => {
+    setCurrentDate(currentDate.clone().add(1, "jYear"));
+  };
+
+  const navigateByYear =
+    activeTabState === "monthly" && showMonthListView;
+
+  const goToPrevious = () => {
+    if (navigateByYear) {
+      goToPreviousYear();
+    } else {
+      goToPreviousMonth();
+    }
+  };
+
+  const goToNext = () => {
+    if (navigateByYear) {
+      goToNextYear();
+    } else {
+      goToNextMonth();
+    }
+  };
+
   const goToToday = () => {
     setCurrentDate(moment().locale("fa"));
   };
@@ -856,8 +883,8 @@ export function PersianCalendarPicker({
           <div className="space-y-4">
             <CalendarHeader
               currentDate={currentDate}
-              onPreviousMonth={goToPreviousMonth}
-              onNextMonth={goToNextMonth}
+              onPreviousMonth={goToPrevious}
+              onNextMonth={goToNext}
               onGoToToday={goToToday}
               onYearSelect={handleYearSelect}
               onMonthSelect={handleMonthSelect}
@@ -883,8 +910,8 @@ export function PersianCalendarPicker({
           <div className="space-y-4">
             <CalendarHeader
               currentDate={currentDate}
-              onPreviousMonth={goToPreviousMonth}
-              onNextMonth={goToNextMonth}
+              onPreviousMonth={goToPrevious}
+              onNextMonth={goToNext}
               onGoToToday={goToToday}
               onYearSelect={handleYearSelect}
               onMonthSelect={handleMonthSelect}
@@ -911,8 +938,8 @@ export function PersianCalendarPicker({
           <div className="min-h-[372px] max-w-[374px] space-y-4">
             <CalendarHeader
               currentDate={currentDate}
-              onPreviousMonth={goToPreviousMonth}
-              onNextMonth={goToNextMonth}
+              onPreviousMonth={goToPrevious}
+              onNextMonth={goToNext}
               onGoToToday={goToToday}
               onYearSelect={handleYearSelect}
               onMonthSelect={handleMonthSelect}
