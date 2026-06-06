@@ -21,6 +21,7 @@ import {
   getMonthNamesFromJOINED_date_strings,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
+  isPersonnelWorkingDay,
 } from "~/utils/personnel-performance";
 import { getMonthNumber } from "~/utils/date-utils";
 
@@ -70,8 +71,6 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
           getAll.data,
           ["NationalCode", "NameFamily", "CityName"],
           [
-            "NationalCode",
-            "NameFamily",
             "TownName",
             "BranchCode",
             "BranchName",
@@ -149,11 +148,32 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
       return items;
     }, [numericItemsMap]);
 
-    const nonNumericItems = React.useMemo(() => {
+    const personDetailItems = React.useMemo(() => {
       if (!selectedPerson) return [] as [string, string][];
-      return Object.entries(selectedPerson).filter(
-        ([_, v]) => typeof v === "string",
-      ) as [string, string][];
+      const person = selectedPerson as Record<string, unknown>;
+      const detailKeys = [
+        "NationalCode",
+        "NameFamily",
+        "CityName",
+        "Role",
+        "RoleType",
+        "ContractType",
+        "ProjectType",
+        "TownName",
+        "BranchName",
+        "BranchCode",
+        "BranchType",
+        "DateInfo",
+        "Start_Date",
+      ] as const;
+
+      return detailKeys
+        .map((key) => {
+          const raw = person[key] ?? (person.key as Record<string, unknown>)?.[key];
+          if (raw == null || raw === "") return null;
+          return [key, String(raw)] as [string, string];
+        })
+        .filter((entry): entry is [string, string] => entry != null);
     }, [selectedPerson]);
 
     if (!selectedPerson) {
@@ -259,9 +279,9 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
           >
             <div className="overflow-hidden rounded-xl border-[1px] border-dashed border-primbuttn bg-secondary">
               <div className="grid grid-cols-1 items-stretch justify-center divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn lg:grid-cols-2">
-                {nonNumericItems.map(([key, value], index) => {
+                {personDetailItems.map(([key, value], index) => {
                   if (!value || key === "Id") return null;
-                  const isLastItem = index === nonNumericItems.length - 1;
+                  const isLastItem = index === personDetailItems.length - 1;
                   let displayValue: string = value as string;
                   if (key === "Start_Date") {
                     displayValue = getMonthNamesFromJOINED_date_strings(
@@ -323,21 +343,24 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                     (selectedPerson as any).sparkData[0].Start_Date,
                   )}
                   onDate={(date, monthNumber) => {
+                    const dateString = date.format("jYYYY/jMM/jDD");
                     const userCalData = (selectedPerson as any).sparkData.find(
-                      (d: any) => d.Start_Date === date.format("YYYY/MM/DD"),
+                      (d: any) => d.Start_Date === dateString,
                     );
                     const userMetric = getPerformanceMetric(
                       userCalData?.TotalPerformance,
                     );
-                    const hasTheDayOff = getAll.data?.result?.find(
+                    const dayOffRow = getAll.data?.result?.find(
                       (a: any) =>
-                        a.Start_Date === date.format("YYYY/MM/DD") &&
-                        a.NationalCode ===
-                          (selectedPerson as any).key.NationalCode,
-                    )?.HasTheDayOff;
+                        a.Start_Date === dateString &&
+                        String(a.NationalCode) ===
+                          String((selectedPerson as any).key.NationalCode),
+                    );
+                    const hasTheDayOff =
+                      dayOffRow != null &&
+                      !isPersonnelWorkingDay(dayOffRow.HasTheDayOff);
 
                     const handleDateClick = () => {
-                      const dateString = date.format("jYYYY/jMM/jDD");
                       const personnelDataForDate = getPersonnelDataForDate(
                         dateString,
                         (selectedPerson as any).key.NationalCode,
@@ -396,8 +419,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                             hasTheDayOff === true
                               ? "bg-primary text-secondary"
                               : "bg-primary-muted/10 text-primary-muted",
-                            date.format("YYYY/MM/DD") ===
-                              (selectedPerson as any).Start_Date &&
+                            dateString === (selectedPerson as any).Start_Date &&
                               (selectedPerson as any).periodType === "روزانه"
                               ? " rounded-full ring-2 ring-primary"
                               : "",

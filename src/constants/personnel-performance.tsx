@@ -38,6 +38,15 @@ export const PersonnelPerformanceTranslate = {
   BranchType: "نوع شعبه",
   BranchCode: "کد شعبه",
   BranchName: "نام شعبه",
+  NationalCode: "کد ملی",
+  NameFamily: "نام و نام خانوادگی",
+  CityName: "استان",
+  Role: "سمت",
+  RoleType: "نوع سمت",
+  ContractType: "نوع قرارداد",
+  ProjectType: "نوع پروژه",
+  DateInfo: "تاریخ اطلاعات",
+  Start_Date: "تاریخ",
 };
 
 export const PersonnelPerformanceIcons: { [key: string]: React.ReactNode } = {

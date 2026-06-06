@@ -121,9 +121,6 @@ export function PishkhanTable({ sessionData }: PishkhanTableProps) {
         personnelPerformance.data?.result,
         ["NationalCode", "NameFamily", "CityName"],
         [
-          "CityName",
-          "NationalCode",
-          "NameFamily",
           "TownName",
           "BranchCode",
           "BranchName",

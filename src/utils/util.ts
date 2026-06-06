@@ -236,6 +236,11 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
         if (Array.isArray(conditionValues)) {
           return conditionValues.includes(current[conditionKey]);
         }
+        // SQL bit: 0 = working day, 1 = day off (not always boolean false)
+        if (conditionKey === "HasTheDayOff" && conditionValues === false) {
+          const v = current[conditionKey];
+          return v !== true && v !== 1;
+        }
         return current[conditionKey] === conditionValues;
       },
     );

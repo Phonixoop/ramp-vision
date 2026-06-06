@@ -41,6 +41,36 @@ export function dedupePersonnelPerformanceRows<T extends Record<string, unknown>
   return dedupeRowsByFields(rows, [...PERSONNEL_PERFORMANCE_DEDUPE_BY]);
 }
 
+/** SQL bit / boolean — 0 and false mean working day; 1 and true mean day off. */
+export function isPersonnelWorkingDay(hasTheDayOff: unknown): boolean {
+  return hasTheDayOff !== true && hasTheDayOff !== 1;
+}
+
+function matchesPersonnelSparkFilter(
+  row: Record<string, unknown>,
+  key: string,
+  value: unknown,
+): boolean {
+  if (value == null || value === "") return true;
+  const rowValue = row[key];
+  if (rowValue == null || rowValue === "") return false;
+
+  if (key === "NationalCode") {
+    return String(rowValue) === String(value);
+  }
+
+  if (key === "CityName") {
+    const a = String(rowValue);
+    const b = String(value);
+    if (a === b) return true;
+    const aFa = getEnglishToPersianCity(a) ?? a;
+    const bFa = getEnglishToPersianCity(b) ?? b;
+    return aFa === bFa;
+  }
+
+  return rowValue === value;
+}
+
 export function calculatePerformance(
   item: any,
   dateLenght: number,
@@ -193,8 +223,8 @@ export function distinctPersonnelPerformanceData(
     const divisor = workDays || item.key.rowCount;
 
     return {
-      ...item.key, // Spread the key properties to make them top-level
-      ...item, // Spread the aggregated values
+      ...item,
+      ...item.key, // groupBy identity (NationalCode, NameFamily, …) must win over aggregated values
       TotalPerformance: item.TotalPerformance / divisor,
       DirectPerFormance: item.DirectPerFormance / divisor,
       InDirectPerFormance: item.InDirectPerFormance / divisor,
@@ -252,25 +282,28 @@ export function sparkChartForPersonnel(
   selectExtraProperty = [],
   additionalFilters?: Record<string, any>, // Add optional additional filters to match aggregation grouping
 ) {
-  const dedupedData = dedupePersonnelPerformanceRows(data ?? []);
+  const filtered = (data ?? []).filter((a: any) => {
+    if (!matchesPersonnelSparkFilter(a, propertyToCheck, valueToCheck)) {
+      return false;
+    }
 
-  return dedupedData
-    ?.filter((a: any) => {
-      // Base filter: property match and no day off
-      if (a[propertyToCheck] !== valueToCheck || a.HasTheDayOff !== false) {
-        return false;
-      }
+    if (!isPersonnelWorkingDay(a.HasTheDayOff)) {
+      return false;
+    }
 
-      // Apply additional filters if provided (e.g., to match aggregation grouping by NationalCode, CityName, etc.)
-      if (additionalFilters) {
-        return Object.entries(additionalFilters).every(([key, value]) => {
-          return a[key] === value;
-        });
-      }
+    if (additionalFilters) {
+      return Object.entries(additionalFilters).every(([key, value]) =>
+        matchesPersonnelSparkFilter(a, key, value),
+      );
+    }
 
-      return true;
-    })
-    .map((item: any) => {
+    return true;
+  });
+
+  // Dedupe only this person's rows (removes users_info role duplicates per day/branch)
+  const dedupedData = dedupePersonnelPerformanceRows(filtered);
+
+  return dedupedData.map((item: any) => {
       // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
       return {

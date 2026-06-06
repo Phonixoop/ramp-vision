@@ -171,8 +171,6 @@ export const useCityPage = (
       data,
       ["NationalCode", "NameFamily", "CityName"],
       [
-        "NationalCode",
-        "NameFamily",
         "TownName",
         "BranchCode",
         "BranchName",

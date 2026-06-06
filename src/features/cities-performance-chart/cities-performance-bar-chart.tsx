@@ -109,8 +109,6 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
       getCitysUsersPerformance?.data,
       ["NationalCode", "NameFamily", "CityName"],
       [
-        "NationalCode",
-        "NameFamily",
         "SabtAvalieAsnad",
         "PazireshVaSabtAvalieAsnad",
         "ArzyabiAsanadBimarsetaniDirect",

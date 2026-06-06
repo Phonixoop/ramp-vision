@@ -279,9 +279,6 @@ export function PersonnelPerformanceTable({
       personnelPerformance.data,
       ["NationalCode", "NameFamily", "CityName"],
       [
-        "CityName",
-        "NationalCode",
-        "NameFamily",
         "TownName",
         "BranchCode",
         "BranchName",
