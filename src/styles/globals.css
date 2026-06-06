@@ -520,6 +520,11 @@ input[type="number"] {
 
 /* recharts */
 
+[data-slot="chart"] .recharts-wrapper,
+[data-slot="chart"] .recharts-surface {
+  direction: ltr;
+}
+
 .recharts-rectangle.recharts-tooltip-cursor {
   fill: #00000049;
 }

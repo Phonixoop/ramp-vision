@@ -204,13 +204,15 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
       const divisor =
         useWorkDays && totalWorkDays && numberOfMonths > 0
           ? totalWorkDays / numberOfMonths
-          : vv[0].key.rowCount;
+          : vv[0]?.key?.rowCount || 1;
+
+      const totalPerformance = vv[0]?.TotalPerformance ?? 0;
 
       return {
         key: { Start_Date: key },
         Start_Date: key,
         COUNT: 1,
-        TotalPerformance: divisor,
+        TotalPerformance: totalPerformance / divisor,
       };
     });
 

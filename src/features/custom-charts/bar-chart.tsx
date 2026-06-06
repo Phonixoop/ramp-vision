@@ -18,6 +18,7 @@ import {
   YAxis,
 } from "recharts";
 import { cn } from "~/lib/utils";
+import { coerceAggregateValue } from "~/utils/util";
 
 // const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
 
@@ -136,16 +137,20 @@ export default function CustomBarChart({
   onBarClick = (data, index) => {},
 }: CustomBarChartOptions) {
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={data.map((item) => {
-          return {
-            ...item,
-            first: 75,
-            second: 120,
-          };
-        })}
-      >
+    <div dir="ltr" className="h-full w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data.map((item) => {
+            const numericItem = { ...item, first: 75, second: 120 };
+            bars.forEach((bar) => {
+              const coerced = coerceAggregateValue(item[bar.name]);
+              if (typeof coerced === "number") {
+                numericItem[bar.name] = coerced;
+              }
+            });
+            return numericItem;
+          })}
+        >
         {refrenceLines &&
           refrenceLines.map((line) => {
             return (
@@ -167,7 +172,7 @@ export default function CustomBarChart({
               dataKey={bar.name}
               className={bar.className}
               onClick={(data, index) => onBarClick(data, index)}
-              shape={<RectangleBar />}
+              shape={(props) => <RectangleBar {...props} />}
             >
               {customBars && customBars(data)}
 
@@ -224,6 +229,7 @@ export default function CustomBarChart({
         {brushKey && <Brush dataKey={brushKey} height={30} />}
       </BarChart>
     </ResponsiveContainer>
+    </div>
   );
 }
 

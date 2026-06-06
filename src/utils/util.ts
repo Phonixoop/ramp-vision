@@ -180,6 +180,24 @@ type ProcessDataForChartOptions = {
   };
 };
 
+/** Parse SQL/API values for chart aggregation; keeps non-numeric strings (e.g. Role) as-is. */
+export function coerceAggregateValue(raw: unknown): number | string | null {
+  if (raw == null) return null;
+  if (typeof raw === "number") return Number.isFinite(raw) ? raw : 0;
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (trimmed === "") return null;
+    const n = Number(trimmed);
+    if (Number.isFinite(n)) return n;
+    return raw;
+  }
+  return null;
+}
+
+function isNumericAggregateValue(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
 /** Keep the first row for each unique combination of `dedupeBy` field values. */
 export function dedupeRowsByFields<T extends Record<string, unknown>>(
   rows: T[],
@@ -267,35 +285,35 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
       }
 
       for (const value of values) {
+        const currentCoerced = coerceAggregateValue(current[value]);
+        const storedCoerced = coerceAggregateValue(
+          acc[existingGroupIndex][value],
+        );
+
         if (options?.max && options.max.includes(value)) {
           // If it's in the max array, keep the maximum value
-          acc[existingGroupIndex][value] = Math.max(
-            acc[existingGroupIndex][value] || 0,
-            current[value] || 0,
-          );
+          const currentNum = isNumericAggregateValue(currentCoerced)
+            ? currentCoerced
+            : 0;
+          const storedNum = isNumericAggregateValue(storedCoerced)
+            ? storedCoerced
+            : 0;
+          acc[existingGroupIndex][value] = Math.max(storedNum, currentNum);
           // Also track the sum/total of this field
           const totalKey = `${value}Total`;
-          const currentValue = current[value] || 0;
           acc[existingGroupIndex][totalKey] =
-            (acc[existingGroupIndex][totalKey] || 0) + currentValue;
-        } else {
-          // Otherwise, sum the values
-          if (acc[existingGroupIndex][value] === null)
-            acc[existingGroupIndex][value] = "";
-          // my code
-          if (
-            typeof acc[existingGroupIndex][value] === "string" &&
-            typeof current[value] === "string"
-          ) {
-            if (acc[existingGroupIndex][value] === current[value]) continue;
-            //acc[existingGroupIndex][value] += ","; // my code
-          } else if (
-            typeof acc[existingGroupIndex][value] === "number" &&
-            typeof current[value] === "number"
-          ) {
-            const oldValue = acc[existingGroupIndex][value] || 0;
-            const newValue = (oldValue || 0) + (current[value] || 0);
-            acc[existingGroupIndex][value] = newValue;
+            (acc[existingGroupIndex][totalKey] || 0) + currentNum;
+        } else if (
+          isNumericAggregateValue(currentCoerced) ||
+          isNumericAggregateValue(storedCoerced)
+        ) {
+          const oldValue = isNumericAggregateValue(storedCoerced)
+            ? storedCoerced
+            : 0;
+          const newValue =
+            oldValue +
+            (isNumericAggregateValue(currentCoerced) ? currentCoerced : 0);
+          acc[existingGroupIndex][value] = newValue;
 
             if (DEBUG && value === "TotalPerformance") {
               debugLog.push({
@@ -310,7 +328,11 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
                 HasTheDayOff: current.HasTheDayOff,
               });
             }
-          }
+        } else if (
+          typeof storedCoerced === "string" &&
+          typeof currentCoerced === "string"
+        ) {
+          if (storedCoerced === currentCoerced) continue;
         }
       }
       acc[existingGroupIndex].key.rowCount++;
@@ -331,11 +353,14 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
       }
 
       for (const value of values) {
-        group[value] = current[value];
+        const coerced = coerceAggregateValue(current[value]);
+        group[value] =
+          coerced ??
+          (typeof current[value] === "string" ? current[value] : "");
         // If this field is in the max array, also initialize the total field
         if (options?.max && options.max.includes(value)) {
           const totalKey = `${value}Total`;
-          group[totalKey] = current[value] || 0;
+          group[totalKey] = isNumericAggregateValue(coerced) ? coerced : 0;
         }
       }
       acc.push(group);

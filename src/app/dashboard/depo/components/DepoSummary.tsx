@@ -1,19 +1,19 @@
 // @ts-nocheck - Disable TypeScript checking for recharts type conflicts
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
 import {
   commify,
+  coerceAggregateValue,
   dataAsTable,
   humanizeDuration,
   processDataForChart,
@@ -31,12 +31,19 @@ import DepoTimeSkeletonLoading from "~/features/loadings/depo/depo-time-box";
 import CustomPieChart from "~/features/custom-charts/pie-chart";
 import SimpleTable from "~/features/guide-table";
 import { ChartPieLabel } from "~/components/shadcn/charts/pie/pie-chart-label";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "~/components/shadcn/chart";
 import { Pie, PieChart } from "recharts";
+
+const DEPO_BAR_COLORS = {
+  depoCount: "#e11d48",
+  entryCount: "#06B6D4",
+  capacityCount: "#059669",
+} as const;
+
+function toChartNumber(value: unknown): number {
+  const coerced = coerceAggregateValue(value);
+  return typeof coerced === "number" ? coerced : 0;
+}
+
 // Reusable DataDisplay Component
 interface DataDisplayProps {
   data: Array<{
@@ -79,6 +86,25 @@ export const DepoSummary = memo(function DepoSummary({
     groupBy: ["ServiceName"],
     values: ["DepoCount", "EntryCount", "Capicity"],
   });
+  const chartData = useMemo(
+    () =>
+      (serviceData ?? []).map((row) => ({
+        name:
+          ShortServiceNames[row.key.ServiceName] ?? row.key.ServiceName ?? "",
+        depoCount: toChartNumber(row.DepoCount),
+        entryCount: toChartNumber(row.EntryCount),
+        capacityCount: toChartNumber(row.Capicity),
+      })),
+    [serviceData],
+  );
+  const chartYMax = useMemo(() => {
+    const maxValue = chartData.reduce(
+      (max, row) =>
+        Math.max(max, row.depoCount, row.entryCount, row.capacityCount),
+      0,
+    );
+    return maxValue > 0 ? Math.ceil(maxValue * 1.1) : 1;
+  }, [chartData]);
   const depoCompletionTime = processDepoCompleteTimeData(flatRows);
 
   const entryDirectBaseOnSabt = sumColumnBasedOnRowValue(
@@ -241,17 +267,10 @@ export const DepoSummary = memo(function DepoSummary({
               isLoading={depo.isLoading}
               LoadingComponent={BarChartSkeletonLoading}
             >
-              <div className="h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%" key="bar-chart">
+              <div className="h-80 w-full" dir="ltr">
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={(serviceData ?? []).map((row) => {
-                      return {
-                        name: ShortServiceNames[row.key.ServiceName],
-                        "تعداد دپو": row.DepoCount,
-                        "تعداد ورودی": row.EntryCount,
-                        "تعداد رسیدگی": row.Capicity,
-                      };
-                    })}
+                    data={chartData}
                     margin={{
                       top: 20,
                       right: 30,
@@ -260,20 +279,40 @@ export const DepoSummary = memo(function DepoSummary({
                     }}
                   >
                     <XAxis dataKey="name" />
-                    <YAxis />
+                    <YAxis
+                      type="number"
+                      domain={[0, chartYMax]}
+                      allowDataOverflow={false}
+                      tickFormatter={(value) => commify(value)}
+                    />
                     <Tooltip
                       labelClassName="text-primary"
-                      formatter={(value) => commify(value)}
+                      formatter={(value) => commify(Number(value))}
                       contentStyle={{
                         backgroundColor: "rgb(var(--secondary))",
                         borderRadius: "8px",
-                        border: "0px ",
+                        border: "0px",
                       }}
                     />
                     <Legend />
-                    <Bar dataKey="تعداد دپو" fill="#e11d48" />
-                    <Bar dataKey="تعداد ورودی" fill="#06B6D4" />
-                    <Bar dataKey="تعداد رسیدگی" fill="#059669" />
+                    <Bar
+                      isAnimationActive={false}
+                      dataKey="depoCount"
+                      name="تعداد دپو"
+                      fill={DEPO_BAR_COLORS.depoCount}
+                    />
+                    <Bar
+                      isAnimationActive={false}
+                      dataKey="entryCount"
+                      name="تعداد ورودی"
+                      fill={DEPO_BAR_COLORS.entryCount}
+                    />
+                    <Bar
+                      isAnimationActive={false}
+                      dataKey="capacityCount"
+                      name="تعداد رسیدگی"
+                      fill={DEPO_BAR_COLORS.capacityCount}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

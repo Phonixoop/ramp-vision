@@ -8,10 +8,9 @@ import {
   FileScanIcon,
   FunctionSquareIcon,
   SyringeIcon,
-  ViewIcon,
 } from "lucide-react";
 import EmptyBasketIcon from "~/ui/icons/empty-basket";
-
+import { IconDentalBroken } from "@tabler/icons-react";
 export const PersonnelPerformanceTranslate = {
   Empty: "",
   SabtAvalieAsnad: "ثبت اولیه اسناد",
@@ -53,8 +52,8 @@ export const PersonnelPerformanceIcons: { [key: string]: React.ReactNode } = {
   ArzyabiAsnadDandanVaParaIndirect: (
     <BiohazardIcon className="stroke-rose-700" />
   ),
-  ArzyabiAsnadDandanDirect: <BiohazardIcon className="stroke-rose-500" />,
-  ArzyabiAsnadDandanIndirect: <BiohazardIcon className="stroke-rose-700" />,
+  ArzyabiAsnadDandanDirect: <IconDentalBroken className="stroke-rose-500" />,
+  ArzyabiAsnadDandanIndirect: <IconDentalBroken className="stroke-rose-700" />,
   ArzyabiAsnadDaroDirect: <SyringeIcon className="stroke-purple-500" />,
   ArzyabiAsnadDaroIndirect: <SyringeIcon className="stroke-purple-700" />,
   ArchiveDirectCount: <ArchiveIcon className="stroke-violet-500" />,
