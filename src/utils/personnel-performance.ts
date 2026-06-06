@@ -7,10 +7,39 @@ import { PeriodType } from "~/context/personnel-filter.context";
 import { CityWithPerformanceData } from "~/types";
 import { getMonthName, getWeekOfMonth } from "~/utils/date-utils";
 import {
+  dedupeRowsByFields,
   getEnglishToPersianCity,
   getPersianToEnglishCity,
   processDataForChart,
 } from "~/utils/util";
+
+/** Fields sourced from users_info that differ per role row after the SQL join. */
+export const USERS_INFO_FIELDS = [
+  "NameFamily",
+  "Role",
+  "RoleType",
+  "ContractType",
+  "ProjectType",
+  "DateInfo",
+] as const;
+
+/** Identity of a personnel_performance record (excludes users_info role fields). */
+export const PERSONNEL_PERFORMANCE_DEDUPE_BY = [
+  "NationalCode",
+  "CityName",
+  "Start_Date",
+  "TownName",
+  "BranchCode",
+  "BranchName",
+  "BranchType",
+  "HasTheDayOff",
+] as const;
+
+export function dedupePersonnelPerformanceRows<T extends Record<string, unknown>>(
+  rows: T[],
+): T[] {
+  return dedupeRowsByFields(rows, [...PERSONNEL_PERFORMANCE_DEDUPE_BY]);
+}
 
 export function calculatePerformance(
   item: any,
@@ -95,7 +124,7 @@ export function distinctDataAndCalculatePerformance(
     where,
     options: {
       max: ["COUNT"],
-      dedupeBy: ["NationalCode", "NameFamily", "CityName"],
+      dedupeBy: [...PERSONNEL_PERFORMANCE_DEDUPE_BY],
     },
   });
   console.log({ citiesWithPerformanceData });
@@ -152,6 +181,9 @@ export function distinctPersonnelPerformanceData(
     groupBy,
     values,
     where,
+    options: {
+      dedupeBy: [...PERSONNEL_PERFORMANCE_DEDUPE_BY],
+    },
   }).map((item) => {
     // const city =
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
@@ -220,7 +252,9 @@ export function sparkChartForPersonnel(
   selectExtraProperty = [],
   additionalFilters?: Record<string, any>, // Add optional additional filters to match aggregation grouping
 ) {
-  return data
+  const dedupedData = dedupePersonnelPerformanceRows(data ?? []);
+
+  return dedupedData
     ?.filter((a: any) => {
       // Base filter: property match and no day off
       if (a[propertyToCheck] !== valueToCheck || a.HasTheDayOff !== false) {

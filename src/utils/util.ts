@@ -173,17 +173,43 @@ type ProcessDataForChartOptions = {
   groupBy: string | string[];
   values: string[];
   where?: Record<string, string | string[]>;
-  options?: { max?: string[]; uniqueCountFields?: string[]; dedupeBy };
+  options?: {
+    max?: string[];
+    uniqueCountFields?: string[];
+    dedupeBy?: string[];
+  };
 };
+
+/** Keep the first row for each unique combination of `dedupeBy` field values. */
+export function dedupeRowsByFields<T extends Record<string, unknown>>(
+  rows: T[],
+  dedupeBy: string[],
+): T[] {
+  if (!dedupeBy.length) return rows;
+
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = dedupeBy.map((field) => String(row[field] ?? "")).join("\0");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function processDataForChart(input: ProcessDataForChartOptions) {
   const { rawData, groupBy, values, where, options } = input;
   const uniqueCountFields = options?.uniqueCountFields;
+  const dedupeBy = options?.dedupeBy;
+  const dataToProcess =
+    dedupeBy?.length && rawData
+      ? dedupeRowsByFields(rawData, dedupeBy)
+      : (rawData ?? []);
 
   // Debug mode - set to true to enable detailed logging
   const DEBUG = false;
   const debugLog: any[] = [];
 
-  const result = rawData?.reduce((acc, current, index) => {
+  const result = dataToProcess.reduce((acc, current, index) => {
     const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
 
     // Check if the current item meets the 'where' conditions

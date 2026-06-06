@@ -130,7 +130,7 @@ const CalendarHeader = ({
     <div className="flex flex-col gap-2">
       <div className="calendar-header flex items-center justify-between">
         <Button
-          onClick={onPreviousMonth}
+          onClick={onNextMonth}
           className="text-primary hover:bg-accent hover:text-secondary"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -237,7 +237,7 @@ const CalendarHeader = ({
         </div>
 
         <Button
-          onClick={onNextMonth}
+          onClick={onPreviousMonth}
           className="text-primary hover:bg-accent hover:text-secondary"
         >
           <ChevronRight className="h-4 w-4" />
@@ -615,8 +615,7 @@ export function PersianCalendarPicker({
     setCurrentDate(currentDate.clone().add(1, "jYear"));
   };
 
-  const navigateByYear =
-    activeTabState === "monthly" && showMonthListView;
+  const navigateByYear = activeTabState === "monthly" && showMonthListView;
 
   const goToPrevious = () => {
     if (navigateByYear) {
