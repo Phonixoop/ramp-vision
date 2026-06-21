@@ -35,6 +35,7 @@ export type PishkhanTableProps = {
 export type PishkhanData = {
   Id: number;
   CityName: string;
+  RealCityName?: string | null;
   NameFamily: string;
   TownName: string;
   BranchCode: string;

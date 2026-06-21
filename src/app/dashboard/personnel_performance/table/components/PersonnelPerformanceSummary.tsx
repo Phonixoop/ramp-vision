@@ -4,6 +4,7 @@ import Gauge from "~/features/gauge";
 import Button from "~/ui/buttons";
 import H2 from "~/ui/heading/h2";
 import { countColumnValues } from "~/utils/util";
+import { filterRowsForCityPerformanceAggregate } from "~/utils/personnel-performance";
 import {
   defualtRoles,
   getDefaultRoleTypesBaseOnContractType,
@@ -27,12 +28,15 @@ export function PersonnelPerformanceSummary({
     countNone: false,
   });
 
-  // Calculate average performance
-  const sumOfPerformances = flatRows.reduce((acc, row) => {
+  // Calculate average performance (exclude personnel whose real city differs)
+  const rowsForCityPerformance = filterRowsForCityPerformanceAggregate(flatRows);
+  const sumOfPerformances = rowsForCityPerformance.reduce((acc, row) => {
     return acc + row.TotalPerformance;
   }, 0);
   const totalPerformance =
-    flatRows.length > 0 ? sumOfPerformances / flatRows.length : 0;
+    rowsForCityPerformance.length > 0
+      ? sumOfPerformances / rowsForCityPerformance.length
+      : 0;
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">

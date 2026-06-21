@@ -8,6 +8,7 @@ import {
   distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
+  getPersonnelDisplayName,
   sparkChartForCity,
   sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
@@ -131,6 +132,7 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
         "ProjectType",
         "TotalPerformance",
         "HasTheDayOff",
+        "RealCityName",
       ],
       { HasTheDayOff: false },
       useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
@@ -246,7 +248,11 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
               height={500}
               data={(distinctData ?? []).map((row) => {
                 return {
-                  نام: row.NameFamily,
+                  نام: getPersonnelDisplayName(
+                    row.NameFamily,
+                    row.CityName,
+                    row.RealCityName,
+                  ),
                   عملکرد: Math.round(row.TotalPerformance),
                 };
               })}

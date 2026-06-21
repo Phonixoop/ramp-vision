@@ -35,6 +35,39 @@ export const PERSONNEL_PERFORMANCE_DEDUPE_BY = [
   "HasTheDayOff",
 ] as const;
 
+export function normalizeCityName(cityName: string | null | undefined): string {
+  if (!cityName) return "";
+  return getPersianToEnglishCity(cityName);
+}
+
+export function isPersonnelCityMismatch(
+  performanceCity: string | null | undefined,
+  realCity: string | null | undefined,
+): boolean {
+  if (!performanceCity || !realCity) return false;
+  return (
+    normalizeCityName(performanceCity) !== normalizeCityName(realCity)
+  );
+}
+
+export function getPersonnelDisplayName(
+  nameFamily: string,
+  performanceCity?: string | null,
+  realCity?: string | null,
+): string {
+  if (!isPersonnelCityMismatch(performanceCity, realCity)) return nameFamily;
+  const realCityFa = getEnglishToPersianCity(normalizeCityName(realCity!));
+  return `${nameFamily} (${realCityFa})`;
+}
+
+export function filterRowsForCityPerformanceAggregate<
+  T extends { CityName?: string; RealCityName?: string | null },
+>(rows: T[]): T[] {
+  return rows.filter(
+    (row) => !isPersonnelCityMismatch(row.CityName, row.RealCityName),
+  );
+}
+
 export function dedupePersonnelPerformanceRows<T extends Record<string, unknown>>(
   rows: T[],
 ): T[] {
@@ -192,6 +225,7 @@ export function distinctPersonnelPerformanceData(
     "ArzyabiVisitDirectCount",
     "ArzyabiVisitInDirectCount",
     "TotalPerformance",
+    "RealCityName",
   ],
   where = {},
   workDays?: number | null,

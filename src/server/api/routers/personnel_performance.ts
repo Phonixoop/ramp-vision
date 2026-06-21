@@ -40,6 +40,67 @@ const config = {
 
 await sql.connect(config);
 
+const USERS_REAL_CITY_JOIN =
+  "JOIN RAMP_Daily.dbo.users as usr ON p.NationalCode = usr.NationalCode";
+
+const PERFORMANCE_CITY_MATCHES_USER = "p.CityName = usr.CityName";
+
+const PERSONNEL_PERFORMANCE_WHERE_COLUMNS = [
+  "Start_Date",
+  "TownName",
+  "BranchName",
+  "BranchCode",
+  "BranchType",
+  "HasTheDayOff",
+  "NationalCode",
+] as const;
+
+const USERS_INFO_WHERE_COLUMNS = [
+  "ProjectType",
+  "ContractType",
+  "Role",
+  "RoleType",
+  "DateInfo",
+] as const;
+
+const USERS_WHERE_COLUMNS = ["NameFamily"] as const;
+
+function prefixColumnInClause(
+  clause: string,
+  column: string,
+  alias: string,
+): string {
+  return clause.replace(
+    new RegExp(`(?<!\\.)\\b${column}\\b`, "g"),
+    `${alias}.${column}`,
+  );
+}
+
+function prefixPersonnelPerformanceWhere(whereClause: string): string {
+  if (!whereClause) return whereClause;
+
+  let clause = prefixColumnInClause(whereClause, "CityName", "p");
+  for (const column of PERSONNEL_PERFORMANCE_WHERE_COLUMNS) {
+    clause = prefixColumnInClause(clause, column, "p");
+  }
+  for (const column of USERS_INFO_WHERE_COLUMNS) {
+    clause = prefixColumnInClause(clause, column, "u");
+  }
+  for (const column of USERS_WHERE_COLUMNS) {
+    clause = prefixColumnInClause(clause, column, "usr");
+  }
+  return clause;
+}
+function mapPersonnelPerformanceRow(cf: Record<string, unknown>) {
+  return {
+    ...cf,
+    CityName: getEnglishToPersianCity(cf.CityName as string),
+    RealCityName: cf.RealCityName
+      ? getEnglishToPersianCity(cf.RealCityName as string)
+      : null,
+  };
+}
+
 export const personnelPerformanceRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(
@@ -94,39 +155,40 @@ export const personnelPerformanceRouter = createTRPCRouter({
         console.log({ inputCityName: input.filter.CityName });
         console.log({ filter: filter.CityName });
         let queryStart = `
-        SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
+        SELECT p.CityName, usr.CityName as RealCityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, p.HasTheDayOff,
 
-        TownName,
-        BranchCode,
-        BranchName,
-        BranchType,
+        p.TownName,
+        p.BranchCode,
+        p.BranchName,
+        p.BranchType,
         
-        SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-        SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-	    	SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-	    	SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-        SUM(ArzyabiAsnadDandanDirect) as ArzyabiAsnadDandanDirect ,
-        SUM(ArzyabiAsnadDandanIndirect) as ArzyabiAsnadDandanIndirect ,
-        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-	      SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-        SUM(WithScanCount) as WithScanCount,
-        SUM(WithoutScanCount) as WithoutScanCount,
-        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
-        SUM(ArchiveDirectCount) as ArchiveDirectCount,
-        SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-        SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
-        SUM(ArzyabiVisitInDirectCount) as ArzyabiVisitInDirectCount,
+        SUM(p.SabtAvalieAsnad) as SabtAvalieAsnad,
+        SUM(p.PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+        SUM(p.ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+	    	SUM(p.ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+        SUM(p.ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+	    	SUM(p.ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+        SUM(p.ArzyabiAsnadDandanDirect) as ArzyabiAsnadDandanDirect ,
+        SUM(p.ArzyabiAsnadDandanIndirect) as ArzyabiAsnadDandanIndirect ,
+        SUM(p.ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+	      SUM(p.ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+        SUM(p.WithScanCount) as WithScanCount,
+        SUM(p.WithoutScanCount) as WithoutScanCount,
+        SUM(p.WithoutScanInDirectCount) as WithoutScanInDirectCount,
+        SUM(p.ArchiveDirectCount) as ArchiveDirectCount,
+        SUM(p.ArchiveInDirectCount) as ArchiveInDirectCount,
+        SUM(p.ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
+        SUM(p.ArzyabiVisitInDirectCount) as ArzyabiVisitInDirectCount,
       
 
-        SUM(TotalPerformance) as TotalPerformance, 
+        SUM(p.TotalPerformance) as TotalPerformance, 
         
-        SUM(DirectPerFormance) as DirectPerFormance, 
-        SUM(InDirectPerFormance) as InDirectPerFormance, 
+        SUM(p.DirectPerFormance) as DirectPerFormance, 
+        SUM(p.InDirectPerFormance) as InDirectPerFormance, 
 
-        DateInfo,Start_Date from dbName1 as p
-        JOIN dbName2 as u on p.NationalCode = u.NationalCode  
+        u.DateInfo, p.Start_Date from dbName1 as p
+        JOIN dbName2 as u on p.NationalCode = u.NationalCode
+        ${USERS_REAL_CITY_JOIN}
          `;
         let dbName1 = "";
         let dbName2 = "";
@@ -136,12 +198,13 @@ export const personnelPerformanceRouter = createTRPCRouter({
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
-          BranchCode,
-          BranchName,
-          BranchType
+          whereClause = prefixPersonnelPerformanceWhere(whereClause);
+          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
+          p.BranchCode,
+          p.BranchName,
+          p.BranchType
 
-          Order By CityName,NameFamily `;
+          Order By p.CityName, usr.NameFamily `;
         } else if (input.periodType === "هفتگی") {
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
           dbName2 = "RAMP_Daily.dbo.users_info";
@@ -151,43 +214,45 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By CityName,NameFamily,u.NationalCode,ProjectType,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
-          BranchCode,
-          BranchName,
-          BranchType
+          whereClause = prefixPersonnelPerformanceWhere(whereClause);
+          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
+          p.BranchCode,
+          p.BranchName,
+          p.BranchType
 
-          Order By CityName,NameFamily `;
+          Order By p.CityName, usr.NameFamily `;
         } else if (input.periodType === "ماهانه") {
-          queryStart = `SELECT Distinct CityName,NameFamily,u.NationalCode, ProjectType,ContractType,Role,RoleType,HasTheDayOff,
-          TownName,
-          BranchCode,
-          BranchName,
-          BranchType,
+          queryStart = `SELECT p.CityName, usr.CityName as RealCityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, p.HasTheDayOff,
+          p.TownName,
+          p.BranchCode,
+          p.BranchName,
+          p.BranchType,
 
-          SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-          SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-          SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-          SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-          SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-          SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-          SUM(ArzyabiAsnadDandanDirect) as ArzyabiAsnadDandanDirect ,
-          SUM(ArzyabiAsnadDandanIndirect) as ArzyabiAsnadDandanIndirect ,
-          SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-          SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-          SUM(WithScanCount) as WithScanCount,
-          SUM(WithoutScanCount) as WithoutScanCount,
-          SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
-          SUM(ArchiveDirectCount) as ArchiveDirectCount,
-          SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-          SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
-          SUM(ArzyabiVisitInDirectCount) as ArzyabiVisitInDirectCount,
-          SUM(TotalPerformance) as TotalPerformance,DateInfo,Start_Date,
+          SUM(p.SabtAvalieAsnad) as SabtAvalieAsnad,
+          SUM(p.PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
+          SUM(p.ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
+          SUM(p.ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
+          SUM(p.ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
+          SUM(p.ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
+          SUM(p.ArzyabiAsnadDandanDirect) as ArzyabiAsnadDandanDirect ,
+          SUM(p.ArzyabiAsnadDandanIndirect) as ArzyabiAsnadDandanIndirect ,
+          SUM(p.ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
+          SUM(p.ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
+          SUM(p.WithScanCount) as WithScanCount,
+          SUM(p.WithoutScanCount) as WithoutScanCount,
+          SUM(p.WithoutScanInDirectCount) as WithoutScanInDirectCount,
+          SUM(p.ArchiveDirectCount) as ArchiveDirectCount,
+          SUM(p.ArchiveInDirectCount) as ArchiveInDirectCount,
+          SUM(p.ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
+          SUM(p.ArzyabiVisitInDirectCount) as ArzyabiVisitInDirectCount,
+          SUM(p.TotalPerformance) as TotalPerformance, u.DateInfo, p.Start_Date,
           
-          SUM(DirectPerFormance) as DirectPerFormance, 
-          SUM(InDirectPerFormance) as InDirectPerFormance
+          SUM(p.DirectPerFormance) as DirectPerFormance, 
+          SUM(p.InDirectPerFormance) as InDirectPerFormance
 
           from dbName1 as p
-          JOIN dbName2 as u on p.NationalCode = u.NationalCode  
+          JOIN dbName2 as u on p.NationalCode = u.NationalCode
+          ${USERS_REAL_CITY_JOIN}
            `;
 
           dbName1 = "RAMP_Daily.dbo.personnel_performance";
@@ -208,7 +273,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
             return `LIKE '${_d[0]}/${_d[1]}/%'`;
           });
           const likeConditions = dates
-            .map((date) => `Start_Date  ${date} `)
+            .map((date) => `p.Start_Date  ${date} `)
             .join(" OR ");
           whereClause = generateWhereClause(
             filter,
@@ -217,13 +282,14 @@ export const personnelPerformanceRouter = createTRPCRouter({
             likeConditions + " AND ",
             //    `SUBSTRING(Start_Date, 1, 7) IN (${dates.join(",")}) AND `,
           );
+          whereClause = prefixPersonnelPerformanceWhere(whereClause);
 
-          whereClause += ` Group By CityName,NameFamily,ProjectType,u.NationalCode,ContractType,Role,RoleType,DateInfo,Start_Date,HasTheDayOff, TownName,
-          BranchCode,
-          BranchName,
-          BranchType
+          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
+          p.BranchCode,
+          p.BranchName,
+          p.BranchType
             
-          Order By CityName,NameFamily `;
+          Order By p.CityName, usr.NameFamily `;
           // const date = filter.Start_Date[0].split("/");
           // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
           //   parseInt(date[0]),
@@ -312,16 +378,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
           periodType: input.periodType,
           dateLength: dateLengthPerCityName,
           result:
-            finalResult.map((cf) => {
-              return {
-                ...cf,
-                CityName: getEnglishToPersianCity(cf.CityName),
-              };
-            }) ?? [],
+            finalResult.map((cf) => mapPersonnelPerformanceRow(cf)) ?? [],
         };
       } catch (error) {
         console.error("Error fetching data:", error.message);
-        return error;
+        throw error;
       }
     }),
   getCitiesWithPerformance: protectedProcedure
@@ -374,7 +435,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         
      
       SELECT
-      CityName,
+      p.CityName,
       p.Start_Date,
       COUNT(*) AS COUNT,
       SUM(TotalPerformance) AS TotalPerformance,
@@ -402,9 +463,10 @@ export const personnelPerformanceRouter = createTRPCRouter({
       FROM dbName.dbo.personnel_performance as p
       JOIN
       RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-      whereClause AND HasTheDayOff = 0
+      ${USERS_REAL_CITY_JOIN}
+      whereClause AND ${PERFORMANCE_CITY_MATCHES_USER} AND p.HasTheDayOff = 0
 
-      group by CityName,p.Start_Date ORDER BY CityName ASC
+      group by p.CityName,p.Start_Date ORDER BY p.CityName ASC
       `;
 
         if (input.periodType === "هفتگی") {
@@ -414,6 +476,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
 
           whereClause = generateWhereClause(filter);
+          whereClause = prefixPersonnelPerformanceWhere(whereClause);
         }
         if (input.periodType === "ماهانه") {
           filter.Start_Date = filter.Start_Date.map((d) => {
@@ -427,11 +490,12 @@ export const personnelPerformanceRouter = createTRPCRouter({
           });
           //   const date = filter.Start_Date[0].split("/");
           whereClause = generateWhereClause(filter, ["Start_Date"], undefined);
+          whereClause = prefixPersonnelPerformanceWhere(whereClause);
 
           queryCities = `
               
         SELECT
-        CityName,
+        p.CityName,
         p.Start_Date,
         COUNT(*) AS COUNT,
         SUM(TotalPerformance) AS TotalPerformance,
@@ -460,13 +524,15 @@ export const personnelPerformanceRouter = createTRPCRouter({
         FROM dbName.dbo.personnel_performance as p
         JOIN
         RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
-        whereClause AND (Start_Date ${dates.join(
-          " OR Start_Date ",
-        )}) AND HasTheDayOff = 0
+        ${USERS_REAL_CITY_JOIN}
+        whereClause AND (p.Start_Date ${dates.join(
+          " OR p.Start_Date ",
+        )}) AND ${PERFORMANCE_CITY_MATCHES_USER} AND p.HasTheDayOff = 0
 
-        group by CityName,p.Start_Date ORDER BY CityName ASC
+        group by p.CityName,p.Start_Date ORDER BY p.CityName ASC
         `;
         }
+        whereClause = prefixPersonnelPerformanceWhere(whereClause);
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
         console.log("queryCITIES ::::: \n ", queryCities);

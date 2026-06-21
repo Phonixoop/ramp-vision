@@ -1,6 +1,7 @@
 export type PersonnelPerformanceData = {
   Id: number;
   CityName: string;
+  RealCityName?: string | null;
   NameFamily: string;
   ProjectType: string;
   ContractType: string;

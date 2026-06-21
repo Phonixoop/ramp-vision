@@ -5,7 +5,7 @@ import { ChevronLeftIcon } from "lucide-react";
 import Button from "~/ui/buttons";
 import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
 import { TrendDecider } from "~/features/trend-decider";
-import { sparkChartForPersonnel } from "~/utils/personnel-performance";
+import { sparkChartForPersonnel, getPersonnelDisplayName } from "~/utils/personnel-performance";
 import { cn } from "~/lib/utils";
 
 type PersonRecord = Record<string, any> & {
@@ -116,7 +116,13 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
             />
           </div>
 
-          <span className="w-full text-sm">{user.NameFamily}</span>
+          <span className="w-full text-sm">
+            {getPersonnelDisplayName(
+              user.NameFamily ?? "",
+              user.CityName || user.key?.CityName,
+              user.RealCityName,
+            )}
+          </span>
         </div>
       </Button>
     );

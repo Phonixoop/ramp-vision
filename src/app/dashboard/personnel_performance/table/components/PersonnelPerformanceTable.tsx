@@ -310,6 +310,7 @@ export function PersonnelPerformanceTable({
         "Start_Date",
         "DateInfo",
         "HasTheDayOff",
+        "RealCityName",
       ],
       { HasTheDayOff: false },
       useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled

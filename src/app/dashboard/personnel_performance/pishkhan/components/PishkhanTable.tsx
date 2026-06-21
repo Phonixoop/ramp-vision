@@ -152,6 +152,7 @@ export function PishkhanTable({ sessionData }: PishkhanTableProps) {
           "Start_Date",
           "DateInfo",
           "HasTheDayOff",
+          "RealCityName",
         ],
         { HasTheDayOff: false },
       ),

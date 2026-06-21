@@ -7,6 +7,7 @@ import { InPageMenu } from "~/features/menu";
 import { LayoutGroup } from "framer-motion";
 import { City_Levels } from "~/constants";
 import { getPersianToEnglishCity, getEnglishToPersianCity } from "~/utils/util";
+import { getPersonnelDisplayName } from "~/utils/personnel-performance";
 import { arrIncludeExcat, commify } from "~/utils/util";
 import { PishkhanData } from "../types";
 
@@ -119,6 +120,15 @@ export function PishkhanColumns({
         hSticky: true,
         width: 200,
         accessorKey: "NameFamily",
+        cell: ({ row }) => (
+          <span>
+            {getPersonnelDisplayName(
+              row.original.NameFamily,
+              row.original.CityName,
+              row.original.RealCityName,
+            )}
+          </span>
+        ),
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           return (

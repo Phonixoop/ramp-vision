@@ -11,7 +11,7 @@ import {
   getEnglishToPersianCity,
   getPersianToEnglishCity,
 } from "~/utils/util";
-import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
+import { getMonthNamesFromJOINED_date_strings, getPersonnelDisplayName } from "~/utils/personnel-performance";
 import {
   defaultProjectTypes,
   defualtContractTypes,
@@ -85,6 +85,15 @@ export function PersonnelPerformanceColumns({
       hSticky: true,
       width: 200,
       accessorKey: "NameFamily",
+      cell: ({ row }) => (
+        <span>
+          {getPersonnelDisplayName(
+            row.original.NameFamily,
+            row.original.CityName,
+            row.original.RealCityName,
+          )}
+        </span>
+      ),
       filterFn: "arrIncludesSome",
       Filter: ({ column }) => (
         <PersonnelFilter

@@ -21,6 +21,7 @@ import {
   getMonthNamesFromJOINED_date_strings,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
+  getPersonnelDisplayName,
   isPersonnelWorkingDay,
 } from "~/utils/personnel-performance";
 import { getMonthNumber } from "~/utils/date-utils";
@@ -171,6 +172,17 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
         .map((key) => {
           const raw = person[key] ?? (person.key as Record<string, unknown>)?.[key];
           if (raw == null || raw === "") return null;
+          if (key === "NameFamily") {
+            const personKey = person.key as Record<string, unknown> | undefined;
+            return [
+              key,
+              getPersonnelDisplayName(
+                String(raw),
+                String(person.CityName ?? personKey?.CityName ?? ""),
+                person.RealCityName as string | null | undefined,
+              ),
+            ] as [string, string];
+          }
           return [key, String(raw)] as [string, string];
         })
         .filter((entry): entry is [string, string] => entry != null);
@@ -512,7 +524,11 @@ function RolesByBranchModal({
       buttonProps={{ className: "w-full rounded-xl bg-primary text-secondary" }}
       buttonChildren={<span className="text-contrast">واحد پذیرش</span>}
       modalProps={{
-        title: `نقش های ${selectedPerson?.NameFamily ?? ""}`,
+        title: `نقش های ${getPersonnelDisplayName(
+          selectedPerson?.NameFamily ?? "",
+          selectedPerson?.CityName ?? selectedPerson?.key?.CityName,
+          selectedPerson?.RealCityName,
+        )}`,
         size: "sm",
         center: true,
         className: "bg-secondary",

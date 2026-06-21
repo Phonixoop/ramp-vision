@@ -166,7 +166,7 @@ export const useCityPage = (
   // Derived data
   const baseList: PersonRecord[] = useMemo(() => {
     const data = getAll.data as any;
-    if (!data || !data.result) return [];
+    if (!data?.result || !Array.isArray(data.result)) return [];
     return distinctPersonnelPerformanceData(
       data,
       ["NationalCode", "NameFamily", "CityName"],
@@ -202,6 +202,7 @@ export const useCityPage = (
         "Start_Date",
         "DateInfo",
         "HasTheDayOff",
+        "RealCityName",
         "COUNT",
       ],
       { HasTheDayOff: false },
