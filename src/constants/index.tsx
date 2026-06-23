@@ -17,6 +17,8 @@ export const City_Levels: {
     cities: [
       "Tehran InDirect",
       "Tehran Direct",
+      "Tehran Jobran",
+      "Tehran Not Jobran",
       "Tehran",
       "Isfahan",
       "Fars",
@@ -65,9 +67,9 @@ export const City_Levels: {
 export const CITIES: City[] = [
   { EnglishName: "Tehran InDirect", PersianName: "تهران غیر مستقیم" },
   { EnglishName: "Tehran Direct", PersianName: "تهران مستقیم" },
-  // { EnglishName: "Tehran Jobran", PersianName: "تهران جبران" },
-  // { EnglishName: "Tehran Not Jobran", PersianName: "تهران غیر جبران" },
-  // { EnglishName: "Tehran", PersianName: "تهران" },
+  { EnglishName: "Tehran Jobran", PersianName: "تهران جبران" },
+  { EnglishName: "Tehran Not Jobran", PersianName: "تهران غیر جبران" },
+  { EnglishName: "Tehran", PersianName: "تهران" },
   { EnglishName: "Ardabil", PersianName: "اردبیل" },
   { EnglishName: "Isfahan", PersianName: "اصفهان" },
   { EnglishName: "Alborz", PersianName: "البرز" },
@@ -104,7 +106,6 @@ export const CITIES: City[] = [
   { EnglishName: "Hormozgan", PersianName: "هرمزگان" },
   { EnglishName: "Yazd", PersianName: "یزد" },
   { EnglishName: "Hamedan", PersianName: "همدان" },
-  { EnglishName: "Tehran", PersianName: "تهران" },
 ];
 
 export const PERMISSIONS: Permission[] = [

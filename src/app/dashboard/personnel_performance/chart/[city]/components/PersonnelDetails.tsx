@@ -43,8 +43,6 @@ interface PersonnelDetailsProps {
   filters: any;
   getAll: any;
   setSelectedPerson: (person: PersonRecord | null) => void;
-  useWorkDays?: boolean;
-  totalWorkDays?: number | null;
 }
 
 export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
@@ -54,8 +52,6 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
     filters,
     getAll,
     setSelectedPerson,
-    useWorkDays,
-    totalWorkDays,
   }) => {
     console.log({ selectedPerson });
     // Helper function to get personnel data for a specific date
@@ -107,14 +103,13 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             HasTheDayOff: false,
             Start_Date: date,
           },
-          useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
         ).find(
           (a: any) =>
             a.key.NationalCode + a.key.NameFamily + a.Role ===
             nationalCode + nameFamily + role,
         );
       },
-      [getAll?.data, useWorkDays, totalWorkDays],
+      [getAll?.data],
     );
 
     const numericItemsMap = React.useMemo(() => {
@@ -170,7 +165,8 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
 
       return detailKeys
         .map((key) => {
-          const raw = person[key] ?? (person.key as Record<string, unknown>)?.[key];
+          const raw =
+            person[key] ?? (person.key as Record<string, unknown>)?.[key];
           if (raw == null || raw === "") return null;
           if (key === "NameFamily") {
             const personKey = person.key as Record<string, unknown> | undefined;

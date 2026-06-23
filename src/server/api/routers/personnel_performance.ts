@@ -45,6 +45,64 @@ const USERS_REAL_CITY_JOIN =
 
 const PERFORMANCE_CITY_MATCHES_USER = "p.CityName = usr.CityName";
 
+const TEHRAN_RELATED_CITIES = [
+  "Tehran",
+  "Tehran Direct",
+  "Tehran InDirect",
+  "Tehran Jobran",
+  "Tehran Not Jobran",
+] as const;
+
+/** Any Tehran permission also grants access to all split Tehran cities in DB. */
+function expandPermittedCities(cities: string[]): string[] {
+  const expanded = new Set(cities);
+  const hasAnyTehran = cities.some((city) =>
+    TEHRAN_RELATED_CITIES.includes(city as (typeof TEHRAN_RELATED_CITIES)[number]),
+  );
+  if (hasAnyTehran) {
+    for (const city of TEHRAN_RELATED_CITIES) {
+      expanded.add(city);
+    }
+  }
+  return [...expanded];
+}
+
+function getActiveViewCityNames(permissions: {
+  id: string;
+  subPermissions?: { isActive: boolean; enLabel: string }[];
+}[]): string[] {
+  const cities =
+    permissions
+      .find((permission) => permission.id === "ViewCities")
+      ?.subPermissions?.filter((permission) => permission.isActive)
+      .map((permission) => permission.enLabel) ?? [];
+  return expandPermittedCities(cities);
+}
+
+/** City chart aggregates: include all performance cities, exclude mismatched personnel from sums. */
+const CITY_PERFORMANCE_AGGREGATES = `
+      COUNT(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN 1 END) AS COUNT,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.TotalPerformance ELSE 0 END) AS TotalPerformance,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.DirectPerFormance ELSE 0 END) AS DirectPerFormance,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.InDirectPerFormance ELSE 0 END) AS InDirectPerFormance,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.SabtAvalieAsnad ELSE 0 END) as SabtAvalieAsnad,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.PazireshVaSabtAvalieAsnad ELSE 0 END) as PazireshVaSabtAvalieAsnad,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsanadBimarsetaniDirect ELSE 0 END) as ArzyabiAsanadBimarsetaniDirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadBimarestaniIndirect ELSE 0 END) as ArzyabiAsnadBimarestaniIndirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadDandanVaParaDirect ELSE 0 END) as ArzyabiAsnadDandanVaParaDirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadDandanVaParaIndirect ELSE 0 END) as ArzyabiAsnadDandanVaParaIndirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadDandanDirect ELSE 0 END) as ArzyabiAsnadDandanDirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadDandanIndirect ELSE 0 END) as ArzyabiAsnadDandanIndirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadDaroDirect ELSE 0 END) as ArzyabiAsnadDaroDirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiAsnadDaroIndirect ELSE 0 END) as ArzyabiAsnadDaroIndirect,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.WithScanCount ELSE 0 END) as WithScanCount,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.WithoutScanCount ELSE 0 END) as WithoutScanCount,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.WithoutScanInDirectCount ELSE 0 END) as WithoutScanInDirectCount,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArchiveDirectCount ELSE 0 END) as ArchiveDirectCount,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArchiveInDirectCount ELSE 0 END) as ArchiveInDirectCount,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiVisitDirectCount ELSE 0 END) as ArzyabiVisitDirectCount,
+      SUM(CASE WHEN ${PERFORMANCE_CITY_MATCHES_USER} THEN p.ArzyabiVisitInDirectCount ELSE 0 END) as ArzyabiVisitInDirectCount`;
+
 const PERSONNEL_PERFORMANCE_WHERE_COLUMNS = [
   "Start_Date",
   "TownName",
@@ -133,10 +191,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         let finalResult = [];
         const permissions = await getPermission({ ctx });
-        const cities = permissions
-          .find((permission) => permission.id === "ViewCities")
-          .subPermissions.filter((permission) => permission.isActive)
-          .map((permission) => permission.enLabel);
+        const cities = getActiveViewCityNames(permissions);
 
         let filter = input.filter;
 
@@ -409,10 +464,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         // Connect to SQL Server
         let filter = input.filter;
         const permissions = await getPermission({ ctx });
-        const cities = permissions
-          .find((permission) => permission.id === "ViewCities")
-          .subPermissions.filter((permission) => permission.isActive)
-          .map((permission) => permission.enLabel);
+        const cities = getActiveViewCityNames(permissions);
 
         // const defualtDateInfo = await getDefualtDateInfo();
         // filter.DateInfo = [defualtDateInfo];
@@ -437,34 +489,13 @@ export const personnelPerformanceRouter = createTRPCRouter({
       SELECT
       p.CityName,
       p.Start_Date,
-      COUNT(*) AS COUNT,
-      SUM(TotalPerformance) AS TotalPerformance,
-      SUM(DirectPerFormance) AS DirectPerFormance,
-      SUM(InDirectPerFormance) AS InDirectPerFormance,
-      
-      SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-      SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-      SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-      SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-      SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-      SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-      SUM(ArzyabiAsnadDandanDirect) as ArzyabiAsnadDandanDirect ,
-      SUM(ArzyabiAsnadDandanIndirect) as ArzyabiAsnadDandanIndirect ,
-      SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-      SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-      SUM(WithScanCount) as WithScanCount,
-      SUM(WithoutScanCount) as WithoutScanCount,
-      SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
-      SUM(ArchiveDirectCount) as ArchiveDirectCount,
-      SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-      SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
-      SUM(ArzyabiVisitInDirectCount) as ArzyabiVisitInDirectCount
+      ${CITY_PERFORMANCE_AGGREGATES}
 
       FROM dbName.dbo.personnel_performance as p
       JOIN
       RAMP_Daily.dbo.users_info as u ON p.NationalCode = u.NationalCode
       ${USERS_REAL_CITY_JOIN}
-      whereClause AND ${PERFORMANCE_CITY_MATCHES_USER} AND p.HasTheDayOff = 0
+      whereClause AND p.HasTheDayOff = 0
 
       group by p.CityName,p.Start_Date ORDER BY p.CityName ASC
       `;
@@ -497,29 +528,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         SELECT
         p.CityName,
         p.Start_Date,
-        COUNT(*) AS COUNT,
-        SUM(TotalPerformance) AS TotalPerformance,
-        SUM(DirectPerFormance) AS DirectPerFormance,
-        SUM(InDirectPerFormance) AS InDirectPerFormance,
-        
-        SUM(SabtAvalieAsnad) as SabtAvalieAsnad,
-        SUM(PazireshVaSabtAvalieAsnad) as PazireshVaSabtAvalieAsnad,
-        SUM(ArzyabiAsanadBimarsetaniDirect) as ArzyabiAsanadBimarsetaniDirect ,
-        SUM(ArzyabiAsnadBimarestaniIndirect) as ArzyabiAsnadBimarestaniIndirect ,
-        SUM(ArzyabiAsnadDandanVaParaDirect) as ArzyabiAsnadDandanVaParaDirect ,
-        SUM(ArzyabiAsnadDandanVaParaIndirect) as ArzyabiAsnadDandanVaParaIndirect ,
-        SUM(ArzyabiAsnadDandanDirect) as ArzyabiAsnadDandanDirect ,
-        SUM(ArzyabiAsnadDandanIndirect) as ArzyabiAsnadDandanIndirect ,
-        SUM(ArzyabiAsnadDaroDirect) as ArzyabiAsnadDaroDirect ,
-        SUM(ArzyabiAsnadDaroIndirect) as ArzyabiAsnadDaroIndirect ,
-        SUM(WithScanCount) as WithScanCount,
-        SUM(WithoutScanCount) as WithoutScanCount,
-        SUM(WithoutScanInDirectCount) as WithoutScanInDirectCount,
-        SUM(ArchiveDirectCount) as ArchiveDirectCount,
-        SUM(ArchiveInDirectCount) as ArchiveInDirectCount,
-          SUM(ArzyabiVisitDirectCount) as ArzyabiVisitDirectCount,
-          SUM(ArzyabiVisitInDirectCount) as ArzyabiVisitInDirectCount
-        
+        ${CITY_PERFORMANCE_AGGREGATES}
       
         FROM dbName.dbo.personnel_performance as p
         JOIN
@@ -527,7 +536,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         ${USERS_REAL_CITY_JOIN}
         whereClause AND (p.Start_Date ${dates.join(
           " OR p.Start_Date ",
-        )}) AND ${PERFORMANCE_CITY_MATCHES_USER} AND p.HasTheDayOff = 0
+        )}) AND p.HasTheDayOff = 0
 
         group by p.CityName,p.Start_Date ORDER BY p.CityName ASC
         `;
@@ -584,10 +593,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         // Connect to SQL Server
 
         const permissions = await getPermission({ ctx });
-        const cities = permissions
-          .find((permission) => permission.id === "ViewCities")
-          .subPermissions.filter((permission) => permission.isActive)
-          .map((permission) => permission.enLabel);
+        const cities = getActiveViewCityNames(permissions);
 
         const whereClauseForRest = generateWhereClause({
           DateInfo: input.filter.DateInfo,
@@ -661,10 +667,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         // Connect to SQL Server
 
         const permissions = await getPermission({ ctx });
-        const cities = permissions
-          .find((permission) => permission.id === "ViewCities")
-          .subPermissions.filter((permission) => permission.isActive)
-          .map((permission) => permission.enLabel);
+        const cities = getActiveViewCityNames(permissions);
 
         const commonCities = cities.filter(
           (item) => input.filter.CityName?.includes(item),
@@ -745,10 +748,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
     }),
   getInitialCityNames: protectedProcedure.query(async ({ ctx }) => {
     const permissions = await getPermission({ ctx });
-    const cities = permissions
-      .find((permission) => permission.id === "ViewCities")
-      .subPermissions.filter((permission) => permission.isActive)
-      .map((permission) => permission.enLabel);
+    const cities = getActiveViewCityNames(permissions);
 
     const whereClauseForCity = generateWhereClause({
       CityName: cities,
@@ -818,10 +818,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const permissions = await getPermission({ ctx });
-      const cities = permissions
-        .find((permission) => permission.id === "ViewCities")
-        .subPermissions.filter((permission) => permission.isActive)
-        .map((permission) => permission.enLabel);
+      const cities = getActiveViewCityNames(permissions);
 
       if (!cities.includes(input.cityName)) return;
       let queryStart = `SELECT Distinct CityName,NameFamily, ProjectType,ContractType,Role,RoleType,
@@ -860,10 +857,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         // Connect to SQL Server
 
         const permissions = await getPermission({ ctx });
-        const cities = permissions
-          .find((permission) => permission.id === "ViewCities")
-          .subPermissions.filter((permission) => permission.isActive)
-          .map((permission) => permission.enLabel);
+        const cities = getActiveViewCityNames(permissions);
 
         const whereClause = generateWhereClause({ CityName: cities });
         const queryCities = `SELECT * FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC

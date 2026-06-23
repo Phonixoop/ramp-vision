@@ -45,9 +45,7 @@ export function isPersonnelCityMismatch(
   realCity: string | null | undefined,
 ): boolean {
   if (!performanceCity || !realCity) return false;
-  return (
-    normalizeCityName(performanceCity) !== normalizeCityName(realCity)
-  );
+  return normalizeCityName(performanceCity) !== normalizeCityName(realCity);
 }
 
 export function getPersonnelDisplayName(
@@ -68,9 +66,9 @@ export function filterRowsForCityPerformanceAggregate<
   );
 }
 
-export function dedupePersonnelPerformanceRows<T extends Record<string, unknown>>(
-  rows: T[],
-): T[] {
+export function dedupePersonnelPerformanceRows<
+  T extends Record<string, unknown>,
+>(rows: T[]): T[] {
   return dedupeRowsByFields(rows, [...PERSONNEL_PERFORMANCE_DEDUPE_BY]);
 }
 
@@ -199,6 +197,22 @@ export function distinctDataAndCalculatePerformance(
   return r;
 }
 
+/** True when aggregating a single calendar day — work-days divisor must not apply. */
+export function isDayLevelPerformanceQuery(
+  groupBy: string | string[],
+  where: Record<string, unknown> = {},
+): boolean {
+  const groupByKeys = Array.isArray(groupBy) ? groupBy : [groupBy];
+  if (groupByKeys.includes("Start_Date")) return true;
+
+  const startDateFilter = where.Start_Date;
+  if (startDateFilter == null || startDateFilter === "") return false;
+  if (typeof startDateFilter === "string") return true;
+  if (Array.isArray(startDateFilter) && startDateFilter.length === 1) return true;
+
+  return false;
+}
+
 export function distinctPersonnelPerformanceData(
   data = {
     periodType: "",
@@ -252,9 +266,11 @@ export function distinctPersonnelPerformanceData(
     // const city =
     //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
 
-    // Use work days if provided, otherwise use rowCount
-
-    const divisor = workDays || item.key.rowCount;
+    // Work-days divisor applies only to period-level aggregation, not single-day views
+    const divisor =
+      workDays && !isDayLevelPerformanceQuery(groupBy, where)
+        ? workDays
+        : item.key.rowCount;
 
     return {
       ...item,
@@ -338,19 +354,19 @@ export function sparkChartForPersonnel(
   const dedupedData = dedupePersonnelPerformanceRows(filtered);
 
   return dedupedData.map((item: any) => {
-      // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+    // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
 
-      return {
-        TotalPerformance: item.TotalPerformance,
-        Start_Date: item.Start_Date,
-        Benchmark: 75,
-        Benchmark2: 120,
-        ...selectExtraProperty.reduce((acc: any, curr) => {
-          acc[curr] = item[curr];
-          return acc;
-        }, {}),
-      };
-    });
+    return {
+      TotalPerformance: item.TotalPerformance,
+      Start_Date: item.Start_Date,
+      Benchmark: 75,
+      Benchmark2: 120,
+      ...selectExtraProperty.reduce((acc: any, curr) => {
+        acc[curr] = item[curr];
+        return acc;
+      }, {}),
+    };
+  });
 }
 
 export function sparkChartForCity(data = [], propertyToCheck, valueToCheck) {

@@ -5,7 +5,10 @@ import { cn } from "~/lib/utils";
 import Button from "~/ui/buttons";
 import BarChart3Loading from "~/ui/loadings/chart/bar-chart-3";
 import { TrendDecider } from "~/features/trend-decider";
-import { sparkChartForPersonnel, getPersonnelDisplayName } from "~/utils/personnel-performance";
+import {
+  sparkChartForPersonnel,
+  getPersonnelDisplayName,
+} from "~/utils/personnel-performance";
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
