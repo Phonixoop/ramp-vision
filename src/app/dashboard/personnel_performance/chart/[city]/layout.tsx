@@ -12,7 +12,11 @@ export default function CityPage() {
     getAll,
     filters,
     pageLoading,
+    isTehran,
+    levelFilter,
+    tehranSubCities,
     onFilterByLevel,
+    onTehranSubCityChange,
     onSelectPerson,
     setSelectedPerson,
   } = useCityPage();
@@ -41,7 +45,11 @@ export default function CityPage() {
             pageLoading={pageLoading}
             getAll={getAll}
             selectedPerson={selectedPerson}
+            isTehran={isTehran}
+            levelFilter={levelFilter}
+            tehranSubCities={tehranSubCities}
             onFilterByLevel={onFilterByLevel}
+            onTehranSubCityChange={onTehranSubCityChange}
             onSelectPerson={onSelectPerson}
           />
         </div>
@@ -61,6 +69,7 @@ export default function CityPage() {
             currentCity={currentCity}
             filters={filters}
             selectedPerson={selectedPerson}
+            tehranSubCities={tehranSubCities}
           />
         </div>
       </div>

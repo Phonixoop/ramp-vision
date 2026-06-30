@@ -14,11 +14,17 @@ import {
   defualtContractTypes,
   defualtRoles,
 } from "~/constants/personnel-performance";
-import { distinctPersonnelPerformanceData } from "~/utils/personnel-performance";
+import { TEHRAN_SUB_CITIES } from "~/constants";
+import {
+  distinctPersonnelPerformanceData,
+  expandTehranPerformanceCities,
+  normalizeCityName,
+} from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
 import moment from "jalali-moment";
 
 type Rating = "Weak" | "Average" | "Good" | "Excellent" | "NeedsReview" | "ALL";
+type TehranSubCity = (typeof TEHRAN_SUB_CITIES)[number];
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
@@ -45,6 +51,11 @@ export const useCityPage = (
 
   const { filters } = usePersonnelPerformanceChart();
   const { useWorkDays } = useWorkDaysToggle();
+  const isTehran = normalizeCityName(currentCity) === "Tehran";
+  const performanceCityFilter = useMemo(
+    () => expandTehranPerformanceCities([currentCity]),
+    [currentCity],
+  );
 
   const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
@@ -110,7 +121,7 @@ export const useCityPage = (
   const queryInput = useMemo(
     () => ({
       filter: {
-        CityName: [currentCity],
+        CityName: performanceCityFilter,
         Start_Date: filters?.filter?.Start_Date,
         ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
         Role: filters?.filter?.Role ?? defualtRoles,
@@ -125,7 +136,7 @@ export const useCityPage = (
       periodType: filters?.periodType,
     }),
     [
-      currentCity,
+      performanceCityFilter,
       filters?.filter?.Start_Date,
       filters?.filter?.ProjectType,
       filters?.filter?.Role,
@@ -153,6 +164,7 @@ export const useCityPage = (
   // State management
   const defaultListRef = useRef<PersonRecord[]>([]);
   const [levelFilter, setLevelFilter] = useState<Rating>("ALL");
+  const [tehranSubCities, setTehranSubCities] = useState<TehranSubCity[]>([]);
   const [updatedList, setUpdatedList] = useState<PersonRecord[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<PersonRecord | null>(
     null,
@@ -215,6 +227,12 @@ export const useCityPage = (
     setUpdatedList(baseList);
   }, [baseList]);
 
+  useEffect(() => {
+    if (!isTehran) {
+      setTehranSubCities([]);
+    }
+  }, [isTehran, currentCity]);
+
   console.log({ baseList });
   // Mimic previous onSuccess behavior
   useEffect(() => {
@@ -258,15 +276,30 @@ export const useCityPage = (
   }, [getPersonnels.data, updatedList]);
 
   const displayedList: PersonRecord[] = useMemo(() => {
-    if (levelFilter === "ALL") return mergedList;
-    return mergedList.filter(
+    let nextList = mergedList;
+
+    if (isTehran && tehranSubCities.length > 0) {
+      nextList = nextList.filter(
+        (u: any) =>
+          tehranSubCities.includes(normalizeCityName(u.CityName) as TehranSubCity),
+      );
+    }
+
+    if (levelFilter === "ALL") return nextList;
+    return nextList.filter(
       (u: any) => getPerformanceTextEn(u.TotalPerformance) === levelFilter,
     );
-  }, [mergedList, levelFilter]);
+  }, [mergedList, levelFilter, isTehran, tehranSubCities]);
 
   // Handlers
   const onFilterByLevel = useCallback((rating: Rating) => {
     setLevelFilter((prev) => (prev === rating ? "ALL" : rating));
+  }, []);
+
+  const onTehranSubCityChange = useCallback((city: TehranSubCity) => {
+    setTehranSubCities((prev) =>
+      prev.includes(city) ? prev.filter((item) => item !== city) : [...prev, city],
+    );
   }, []);
 
   const onSelectPerson = useCallback(
@@ -302,6 +335,9 @@ export const useCityPage = (
     getPersonnels,
     filters,
     getTotalWorkDays,
+    isTehran,
+    levelFilter,
+    tehranSubCities,
 
     // Loading states
     pageLoading,
@@ -309,6 +345,7 @@ export const useCityPage = (
 
     // Actions
     onFilterByLevel,
+    onTehranSubCityChange,
     onSelectPerson,
     setSelectedPerson,
   };

@@ -23,6 +23,7 @@ import {
   getPersianToEnglishCity,
 } from "~/utils/util";
 import { defaultProjectTypes } from "~/constants/personnel-performance";
+import { TEHRAN_RELATED_CITIES } from "~/constants";
 import { getUserPermissions } from "~/lib/user.util";
 import { sortDates } from "~/lib/utils";
 import sql from "mssql";
@@ -43,15 +44,24 @@ await sql.connect(config);
 const USERS_REAL_CITY_JOIN =
   "JOIN RAMP_Daily.dbo.users as usr ON p.NationalCode = usr.NationalCode";
 
-const PERFORMANCE_CITY_MATCHES_USER = "p.CityName = usr.CityName";
+const TEHRAN_RELATED_CITIES_SQL = TEHRAN_RELATED_CITIES.map(
+  (city) => `'${city}'`,
+).join(",");
 
-const TEHRAN_RELATED_CITIES = [
-  "Tehran",
-  "Tehran Direct",
-  "Tehran InDirect",
-  "Tehran Jobran",
-  "Tehran Not Jobran",
-] as const;
+const NORMALIZED_PERFORMANCE_CITY_SQL = `
+  CASE
+    WHEN p.CityName IN (${TEHRAN_RELATED_CITIES_SQL}) THEN 'Tehran'
+    ELSE p.CityName
+  END
+`;
+
+const PERFORMANCE_CITY_MATCHES_USER = `
+  p.CityName = usr.CityName
+  OR (
+    usr.CityName = 'Tehran'
+    AND p.CityName IN (${TEHRAN_RELATED_CITIES_SQL})
+  )
+`;
 
 /** Any Tehran permission also grants access to all split Tehran cities in DB. */
 function expandPermittedCities(cities: string[]): string[] {
@@ -487,7 +497,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         
      
       SELECT
-      p.CityName,
+      ${NORMALIZED_PERFORMANCE_CITY_SQL} as CityName,
       p.Start_Date,
       ${CITY_PERFORMANCE_AGGREGATES}
 
@@ -497,7 +507,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       ${USERS_REAL_CITY_JOIN}
       whereClause AND p.HasTheDayOff = 0
 
-      group by p.CityName,p.Start_Date ORDER BY p.CityName ASC
+      group by ${NORMALIZED_PERFORMANCE_CITY_SQL},p.Start_Date ORDER BY CityName ASC
       `;
 
         if (input.periodType === "هفتگی") {
@@ -526,7 +536,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           queryCities = `
               
         SELECT
-        p.CityName,
+        ${NORMALIZED_PERFORMANCE_CITY_SQL} as CityName,
         p.Start_Date,
         ${CITY_PERFORMANCE_AGGREGATES}
       
@@ -538,7 +548,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           " OR p.Start_Date ",
         )}) AND p.HasTheDayOff = 0
 
-        group by p.CityName,p.Start_Date ORDER BY p.CityName ASC
+        group by ${NORMALIZED_PERFORMANCE_CITY_SQL},p.Start_Date ORDER BY CityName ASC
         `;
         }
         whereClause = prefixPersonnelPerformanceWhere(whereClause);

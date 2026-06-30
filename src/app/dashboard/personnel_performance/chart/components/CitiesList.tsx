@@ -5,6 +5,7 @@ import AdvancedList from "~/features/advanced-list/indexm";
 import { CityButton } from "./CityButton";
 import { CityWithPerformanceData } from "~/types";
 import { sparkChartForCity } from "~/utils/personnel-performance";
+import { TEHRAN_RELATED_CITIES } from "~/constants";
 import { getPersianToEnglishCity } from "~/utils/util";
 
 interface CitiesListProps {
@@ -64,12 +65,18 @@ export const CitiesList = React.memo<CitiesListProps>(
         onChange={onListViewChange}
         renderItem={(item, i) => {
           const isActive = item.CityName_En === activeCity;
+          const relatedCities =
+            item.CityName_En === "Tehran"
+              ? [...TEHRAN_RELATED_CITIES]
+              : undefined;
 
           const cityPerformances =
             getCitiesWithPerformance?.data?.result
               ?.filter(
                 (x: any) =>
-                  getPersianToEnglishCity(x?.CityName) === item.CityName_En,
+                  relatedCities
+                    ? relatedCities.includes(getPersianToEnglishCity(x?.CityName))
+                    : getPersianToEnglishCity(x?.CityName) === item.CityName_En,
               )
               ?.map((m: any) => m?.TotalPerformance) ?? [];
 
@@ -84,6 +91,7 @@ export const CitiesList = React.memo<CitiesListProps>(
                 getCitiesWithPerformance?.data?.result ?? [],
                 "CityName",
                 item.CityName_En,
+                relatedCities,
               )}
               cityPerformances={cityPerformances}
               onNavigate={onNavigate}

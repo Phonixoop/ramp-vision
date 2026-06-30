@@ -6,9 +6,11 @@ import AdvancedList from "~/features/advanced-list/indexm";
 import Button from "~/ui/buttons";
 import { PersonnelRowOptimized } from "./PersonnelRowOptimized";
 import { performanceLevels } from "~/constants/personnel-performance";
+import { TEHRAN_SUB_CITIES } from "~/constants";
 import { getEnglishToPersianCity } from "~/utils/util";
 
 type Rating = "Weak" | "Average" | "Good" | "Excellent" | "NeedsReview" | "ALL";
+type TehranSubCity = (typeof TEHRAN_SUB_CITIES)[number];
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
@@ -27,7 +29,11 @@ interface PersonnelListProps {
   pageLoading: boolean;
   getAll: any;
   selectedPerson: PersonRecord | null;
+  isTehran: boolean;
+  levelFilter: Rating;
+  tehranSubCities: TehranSubCity[];
   onFilterByLevel: (rating: Rating) => void;
+  onTehranSubCityChange: (city: TehranSubCity) => void;
   onSelectPerson: (
     person: PersonRecord,
     sparkData?: any[],
@@ -45,9 +51,19 @@ export const PersonnelList = React.memo<PersonnelListProps>(
     pageLoading,
     getAll,
     selectedPerson,
+    isTehran,
+    levelFilter,
+    tehranSubCities,
     onFilterByLevel,
+    onTehranSubCityChange,
     onSelectPerson,
   }) => {
+    const tehranSubCityLabels: Record<Exclude<TehranSubCity, null>, string> = {
+      "Tehran Jobran": "جبران",
+      "Tehran Not Jobran": "غیر جبران",
+      "Tehran InDirect": "غیر مستقیم",
+    };
+
     return (
       <AdvancedList
         title={
@@ -85,30 +101,50 @@ export const PersonnelList = React.memo<PersonnelListProps>(
         ]}
         dataToDownload={displayedList}
         renderUnderButtons={() => (
-          <div
-            dir="rtl"
-            className="flex w-full items-center justify-center gap-2 py-2"
-          >
-            {performanceLevels.map((level) => {
-              const isSelected = false; // This will be handled by the parent component
-              return (
-                <Button
-                  key={level.enText}
-                  onClick={() => onFilterByLevel(level.enText as Rating)}
-                  className={cn(
-                    "rounded-full px-2 py-1 text-sm",
-                    isSelected ? "text-white" : "text-primary",
-                  )}
-                  style={{
-                    backgroundColor: isSelected ? level.color : "transparent",
-                    borderColor: level.color,
-                    borderWidth: "1px",
-                  }}
-                >
-                  {level.text}
-                </Button>
-              );
-            })}
+          <div dir="rtl" className="flex w-full flex-col items-center gap-2 py-2">
+            {isTehran && (
+              <div className="flex w-full flex-wrap items-center justify-center gap-2">
+                {TEHRAN_SUB_CITIES.map((city) => {
+                  const isSelected = tehranSubCities.includes(city);
+                  return (
+                    <Button
+                      key={city}
+                      onClick={() => onTehranSubCityChange(city)}
+                      className={cn(
+                        "rounded-full border border-primary px-3 py-1 text-sm",
+                        isSelected
+                          ? "bg-primary text-secondary"
+                          : "bg-transparent text-primary",
+                      )}
+                    >
+                      {tehranSubCityLabels[city]}
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
+            <div className="flex w-full flex-wrap items-center justify-center gap-2">
+              {performanceLevels.map((level) => {
+                const isSelected = levelFilter === level.enText;
+                return (
+                  <Button
+                    key={level.enText}
+                    onClick={() => onFilterByLevel(level.enText as Rating)}
+                    className={cn(
+                      "rounded-full px-2 py-1 text-sm",
+                      isSelected ? "text-white" : "text-primary",
+                    )}
+                    style={{
+                      backgroundColor: isSelected ? level.color : "transparent",
+                      borderColor: level.color,
+                      borderWidth: "1px",
+                    }}
+                  >
+                    {level.text}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
         )}
         renderItem={(user: PersonRecord, index: number) => (

@@ -3,6 +3,10 @@ import {
   Indicators,
   Performance_Levels_Gauge,
 } from "~/constants/personnel-performance";
+import {
+  TEHRAN_RELATED_CITIES,
+  TEHRAN_SUB_CITIES,
+} from "~/constants";
 import { PeriodType } from "~/context/personnel-filter.context";
 import { CityWithPerformanceData } from "~/types";
 import { getMonthName, getWeekOfMonth } from "~/utils/date-utils";
@@ -40,12 +44,69 @@ export function normalizeCityName(cityName: string | null | undefined): string {
   return getPersianToEnglishCity(cityName);
 }
 
+export function isTehranRelatedCity(
+  cityName: string | null | undefined,
+): cityName is (typeof TEHRAN_RELATED_CITIES)[number] {
+  const normalizedCity = normalizeCityName(cityName);
+  return TEHRAN_RELATED_CITIES.includes(
+    normalizedCity as (typeof TEHRAN_RELATED_CITIES)[number],
+  );
+}
+
+export function isTehranSubCity(
+  cityName: string | null | undefined,
+): cityName is (typeof TEHRAN_SUB_CITIES)[number] {
+  const normalizedCity = normalizeCityName(cityName);
+  return TEHRAN_SUB_CITIES.includes(
+    normalizedCity as (typeof TEHRAN_SUB_CITIES)[number],
+  );
+}
+
+export function isTehranCityMatch(
+  performanceCity: string | null | undefined,
+  realCity: string | null | undefined,
+): boolean {
+  const normalizedPerformanceCity = normalizeCityName(performanceCity);
+  const normalizedRealCity = normalizeCityName(realCity);
+
+  if (!normalizedPerformanceCity || !normalizedRealCity) return false;
+  if (normalizedPerformanceCity === normalizedRealCity) return true;
+
+  return normalizedRealCity === "Tehran" && isTehranRelatedCity(performanceCity);
+}
+
+export function expandTehranPerformanceCities(cityNames: string[]): string[] {
+  if (!cityNames.length) return cityNames;
+
+  const expandedCities = new Set<string>();
+  for (const cityName of cityNames) {
+    const normalizedCity = normalizeCityName(cityName);
+    if (normalizedCity === "Tehran") {
+      for (const tehranCity of TEHRAN_RELATED_CITIES) {
+        expandedCities.add(tehranCity);
+      }
+      continue;
+    }
+
+    expandedCities.add(normalizedCity || cityName);
+  }
+
+  return [...expandedCities];
+}
+
+export function normalizeCityForCityList(
+  cityName: string | null | undefined,
+): string {
+  if (isTehranRelatedCity(cityName)) return "Tehran";
+  return normalizeCityName(cityName);
+}
+
 export function isPersonnelCityMismatch(
   performanceCity: string | null | undefined,
   realCity: string | null | undefined,
 ): boolean {
   if (!performanceCity || !realCity) return false;
-  return normalizeCityName(performanceCity) !== normalizeCityName(realCity);
+  return !isTehranCityMatch(performanceCity, realCity);
 }
 
 export function getPersonnelDisplayName(
@@ -369,19 +430,46 @@ export function sparkChartForPersonnel(
   });
 }
 
-export function sparkChartForCity(data = [], propertyToCheck, valueToCheck) {
-  return data
-    ?.filter((a) => a[propertyToCheck] === valueToCheck)
-    .map((item: any) => {
-      // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+export function sparkChartForCity(
+  data = [],
+  propertyToCheck,
+  valueToCheck,
+  relatedCities?: string[],
+) {
+  const normalizedTarget = normalizeCityName(valueToCheck);
+  const relatedCitySet =
+    relatedCities && relatedCities.length > 0
+      ? new Set(relatedCities.map((city) => normalizeCityName(city)))
+      : null;
 
-      return {
-        TotalPerformance: item.TotalPerformance,
-        Start_Date: item.Start_Date,
-        Benchmark: 75,
-        Benchmark2: 120,
-      };
-    });
+  const filteredData = data?.filter((item: any) => {
+    const rowValue = normalizeCityName(item?.[propertyToCheck]);
+    if (relatedCitySet) return relatedCitySet.has(rowValue);
+    return rowValue === normalizedTarget;
+  });
+
+  if (!relatedCitySet) {
+    return filteredData?.map((item: any) => ({
+      TotalPerformance: item.TotalPerformance,
+      Start_Date: item.Start_Date,
+      Benchmark: 75,
+      Benchmark2: 120,
+    }));
+  }
+
+  const totalsByDate = filteredData.reduce((acc: Record<string, number>, item: any) => {
+    const startDate = item?.Start_Date;
+    if (!startDate) return acc;
+    acc[startDate] = (acc[startDate] || 0) + (item?.TotalPerformance || 0);
+    return acc;
+  }, {});
+
+  return Object.entries(totalsByDate).map(([Start_Date, TotalPerformance]) => ({
+    TotalPerformance,
+    Start_Date,
+    Benchmark: 75,
+    Benchmark2: 120,
+  }));
 }
 
 /**

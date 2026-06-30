@@ -8,6 +8,19 @@ export const Reports_Period = {
   هفتگی: "هفته",
   ماهانه: "ماه",
 };
+
+export const TEHRAN_SUB_CITIES = [
+  "Tehran Jobran",
+  "Tehran Not Jobran",
+  "Tehran InDirect",
+] as const;
+
+export const TEHRAN_RELATED_CITIES = [
+  "Tehran",
+  "Tehran Direct",
+  ...TEHRAN_SUB_CITIES,
+] as const;
+
 export const City_Levels: {
   name: string;
   cities: string[];

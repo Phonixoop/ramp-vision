@@ -8,6 +8,7 @@ import {
   distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
+  isTehranRelatedCity,
 } from "~/utils/personnel-performance";
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 
@@ -28,6 +29,16 @@ export function CitiesWithDatesPerformanceBarChart({
 }: {
   filters: FilterType;
 }) {
+  const selectedCities = filters.filter.CityName ?? [];
+  const hasSelectedCity = selectedCities.length > 0;
+  const isTehranSelection =
+    hasSelectedCity && selectedCities.every((city) => isTehranRelatedCity(city));
+  const shouldBlockChart =
+    !hasSelectedCity || (selectedCities.length >= 2 && !isTehranSelection);
+  const chartCityLabel = isTehranSelection
+    ? "تهران"
+    : getEnglishToPersianCity(selectedCities[0]);
+
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -95,10 +106,7 @@ export function CitiesWithDatesPerformanceBarChart({
       },
     );
 
-  if (
-    filters.filter.CityName.length <= 0 ||
-    filters.filter.CityName.length >= 2
-  )
+  if (shouldBlockChart)
     return (
       <>
         <p className="rounded-xl bg-primary p-3 text-secondary">
@@ -156,8 +164,7 @@ export function CitiesWithDatesPerformanceBarChart({
       {!getCitiesWithPerformance.isLoading ? (
         <div className="flex h-full w-full flex-col gap-5  rounded-2xl  bg-secbuttn py-5 xl:p-5">
           <H2 className="text-center font-bold">
-            نمودار زمانی عملکرد شهر{" "}
-            {getEnglishToPersianCity(filters.filter.CityName[0])}
+            نمودار زمانی عملکرد شهر {chartCityLabel}
           </H2>
           <div className="h-[500px] w-full flex-1">
             <CustomBarChart
