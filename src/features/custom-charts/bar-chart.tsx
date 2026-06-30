@@ -292,6 +292,7 @@ function CustomizedXAxisTick({
   ...rest
 }) {
   const { x, y, payload } = rest;
+  const labelOffsetY = customXTick ? 12 : 40;
 
   return (
     <g
@@ -300,11 +301,11 @@ function CustomizedXAxisTick({
     >
       <text
         x={customXTick ? 0 : -50}
-        y={customXTick ? 0 : 40}
+        y={labelOffsetY}
         dy={0}
         className={className}
-        textAnchor="end"
-        transform={customXTick ? "rotate(90)" : ""}
+        textAnchor={customXTick ? "start" : "end"}
+        transform={customXTick ? "rotate(90 0 12)" : ""}
       >
         {payload.value}
       </text>
