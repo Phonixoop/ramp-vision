@@ -7,6 +7,7 @@ import { api } from "~/trpc/react";
 import {
   distinctDataAndCalculatePerformance,
   distinctPersonnelPerformanceData,
+  expandTehranPerformanceCities,
   getPerformanceMetric,
   getPersonnelDisplayName,
   sparkChartForCity,
@@ -37,13 +38,17 @@ import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
 
 function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   const { useWorkDays } = useWorkDaysToggle();
+  const cityFilter = useMemo(
+    () => expandTehranPerformanceCities([cityName_En]),
+    [cityName_En],
+  );
   const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
   const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
-        CityName: [cityName_En],
+        CityName: cityFilter,
         Start_Date: filters?.filter?.Start_Date,
         ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
         Role: filters?.filter?.Role ?? defualtRoles,
