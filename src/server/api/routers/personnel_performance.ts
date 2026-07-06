@@ -26,20 +26,7 @@ import { defaultProjectTypes } from "~/constants/personnel-performance";
 import { TEHRAN_RELATED_CITIES } from "~/constants";
 import { getUserPermissions } from "~/lib/user.util";
 import { sortDates } from "~/lib/utils";
-import sql from "mssql";
-const config = {
-  user: process.env.SQL_USER,
-  password: process.env.SQL_PASSWORD,
-  server: process.env.SQL_SERVERIP,
-  port: parseInt(process.env.SQL_PORT),
-  database: "", // Set your database name, e.g., "RAMP_Daily" or "RAMP_Weekly"
-  options: {
-    encrypt: true, // For securing the connection (optional, based on your setup)
-    trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
-  },
-};
-
-await sql.connect(config);
+import { mssqlQuery } from "~/server/db/mssql-pool";
 
 const USERS_REAL_CITY_JOIN =
   "JOIN RAMP_Daily.dbo.users as usr ON p.NationalCode = usr.NationalCode";
@@ -383,7 +370,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         `;
 
         console.log(query);
-        const result = await sql.query(query);
+        const result = await mssqlQuery(query);
         if (input.periodType === "روزانه") {
           finalResult = result.recordsets[0];
         }
@@ -555,7 +542,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         queryCities = queryCities.replace("whereClause", whereClause);
         queryCities = queryCities.replaceAll("dbName", "RAMP_Daily");
         console.log("queryCITIES ::::: \n ", queryCities);
-        const resultOfCities = await sql.query(queryCities);
+        const resultOfCities = await mssqlQuery(queryCities);
 
         const uniqueData = resultOfCities.recordsets[0].filter(
           (obj, index, self) =>
@@ -640,7 +627,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
      
       `;
         // console.log(query);
-        const result = await sql.query(query);
+        const result = await mssqlQuery(query);
         // console.log(result.recordsets);
         return {
           usersInfo: result.recordsets[0],
@@ -698,11 +685,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
         GROUP BY Start_Date ORDER BY Start_Date
         `;
         // console.log(queryDaysOfMonth);
-        const resultDays = await sql.query(queryDaysOfMonth);
+        const resultDays = await mssqlQuery(queryDaysOfMonth);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
         // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+        // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
 
         const result: {
           date: string;
@@ -774,7 +761,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
   `;
     // console.log(query);
-    const result = await sql.query(query);
+    const result = await mssqlQuery(query);
 
     const r = {
       CityNames: result.recordsets[0]
@@ -797,7 +784,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
   `;
     // console.log(query);
-    const result = await sql.query(query);
+    const result = await mssqlQuery(query);
 
     const r = {
       Cities: result.recordsets[0]
@@ -814,7 +801,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
     SELECT TOP 1 Start_Date FROM RAMP_Daily.dbo.personnel_performance ORDER BY Start_Date DESC 
     `;
 
-    const result = await sql.query(query);
+    const result = await mssqlQuery(query);
     const value = result.recordsets[0][0]["Start_Date"];
     // console.log(result.recordsets);
     return value;
@@ -873,11 +860,11 @@ export const personnelPerformanceRouter = createTRPCRouter({
         const queryCities = `SELECT * FROM RAMP_Daily.dbo.personnel_performance ${whereClause} ORDER BY CityName ASC
           `;
 
-        const resultOfCities = await sql.query(queryCities);
+        const resultOfCities = await mssqlQuery(queryCities);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
         // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+        // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
 
         const result = {
           Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),
@@ -999,7 +986,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
       
       `;
 
-      const reuslt = await sql.query(updateHasTheDayOffQuery);
+      const reuslt = await mssqlQuery(updateHasTheDayOffQuery);
 
       return reuslt;
     }),
@@ -1045,7 +1032,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         ORDER BY AVG(TotalPerformance) DESC;
       `;
 
-      const result = await sql.query(query);
+      const result = await mssqlQuery(query);
       const performanceOrder = [
         "عالی",
         "خوب",
@@ -1129,7 +1116,7 @@ export async function getDefualtDateInfo() {
 
   `;
   // console.log(query);
-  const result = await sql.query(query);
+  const result = await mssqlQuery(query);
   // console.log(result.recordsets);
 
   const usersInfos = result.recordsets[0].map((a) => a.DateInfo);

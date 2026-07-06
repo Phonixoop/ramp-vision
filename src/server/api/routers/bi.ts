@@ -1,23 +1,12 @@
 import { generateWhereClause, getPermission } from "~/server/server-utils";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
-import sql from "mssql";
+import { mssqlQuery } from "~/server/db/mssql-pool";
 import {
   extractYearAndMonth,
   getDatesBetweenTwoDates,
 } from "~/utils/date-utils";
-const config = {
-  user: process.env.SQL_USER,
-  password: process.env.SQL_PASSWORD,
-  server: process.env.SQL_SERVERIP,
-  port: parseInt(process.env.SQL_PORT),
-  database: "RAMP_OTP", // Set your database name, e.g., "RAMP_Daily" or "RAMP_Weekly"
-  options: {
-    encrypt: true, // For securing the connection (optional, based on your setup)
-    trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
-  },
-};
-await sql.connect(config);
+
 export const biRouter = createTRPCRouter({
   getReports: protectedProcedure
     .input(
@@ -83,7 +72,7 @@ export const biRouter = createTRPCRouter({
 
         let query = `${queryStart} Where ${whereClause} ORDER BY CityName, DateFa`;
         // console.log(query);
-        const result = await sql.query(query);
+        const result = await mssqlQuery(query);
         finalResult = result.recordsets[0] ?? [];
 
         return { periodType: input.periodType, result: finalResult };

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import sql from "mssql";
+import { mssqlQuery } from "~/server/db/mssql-pool";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import moment from "jalali-moment";
 import { getEnglishToPersianCity } from "~/utils/util";
@@ -16,18 +16,7 @@ import {
   getSecondOrLaterDayOfNextMonth,
   getWeekOfMonth,
 } from "~/utils/date-utils";
-const config = {
-  user: process.env.SQL_USER,
-  password: process.env.SQL_PASSWORD,
-  server: process.env.SQL_SERVERIP,
-  port: parseInt(process.env.SQL_PORT),
-  database: "", // RAMP_Daily | RAMP_Weekly
-  options: {
-    encrypt: true, // For securing the connection (optional, based on your setup)
-    trustServerCertificate: true, // For self-signed certificates (optional, based on your setup)
-  },
-};
-await sql.connect(config);
+
 export const depoRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(
@@ -182,7 +171,7 @@ export const depoRouter = createTRPCRouter({
             parseInt(date[1]),
           );
 
-          const dateResult = await sql.query(`
+          const dateResult = await mssqlQuery(`
 
                  use RAMP_Daily
                   SELECT TOP 1 
@@ -260,7 +249,7 @@ export const depoRouter = createTRPCRouter({
         ${whereClause}
         `;
         console.log(query);
-        const result = await sql.query(query);
+        const result = await mssqlQuery(query);
 
         if (input.periodType === "روزانه") {
           finalResult = result.recordsets[0];
@@ -333,11 +322,11 @@ export const depoRouter = createTRPCRouter({
       const queryCities = `use RAMP_Daily  SELECT DISTINCT CityName FROM depos ${whereClause} ORDER BY CityName ASC
       `;
 
-      const resultOfCities = await sql.query(queryCities);
+      const resultOfCities = await mssqlQuery(queryCities);
 
       // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
 
-      // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+      // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
 
       const result = {
         Cities: resultOfCities.recordsets[0]
@@ -397,11 +386,11 @@ export const depoRouter = createTRPCRouter({
         GROUP BY Start_Date ORDER BY Start_Date
         `;
 
-        const resultDays = await sql.query(queryDaysOfMonth);
+        const resultDays = await mssqlQuery(queryDaysOfMonth);
 
         // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
         // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await sql.query(queryDocumentTypes);
+        // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
 
         const result: {
           date: string;
@@ -496,7 +485,7 @@ export const depoRouter = createTRPCRouter({
         let prevCapicity = 1;
 
         if (input.periodType === "ماهانه") {
-          const dateResult = await sql.query(`
+          const dateResult = await mssqlQuery(`
           USE RAMP_Daily;
           SELECT TOP 1 
             COALESCE(
@@ -518,7 +507,7 @@ export const depoRouter = createTRPCRouter({
             FROM depos
             WHERE Start_Date LIKE N'${prevMonthLike}'
           `;
-          const result = await sql.query(prevMonthCapicityQuery);
+          const result = await mssqlQuery(prevMonthCapicityQuery);
           prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
         } else if (input.periodType === "هفتگی") {
           const dates = getDatesBetweenTwoDates(
@@ -541,7 +530,7 @@ export const depoRouter = createTRPCRouter({
             FROM depos
             WHERE Start_Date IN (${jalaliRange.join(", ")})
           `;
-          const result = await sql.query(weekCapicityQuery);
+          const result = await mssqlQuery(weekCapicityQuery);
           prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
         } else if (input.periodType === "روزانه") {
           depoDate = dates.at(-1);
@@ -564,7 +553,7 @@ export const depoRouter = createTRPCRouter({
             FROM depos
             WHERE Start_Date IN (${jalaliRange.join(", ")})
           `;
-          const result = await sql.query(dailyCapicityQuery);
+          const result = await mssqlQuery(dailyCapicityQuery);
           prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
         }
 
@@ -575,7 +564,7 @@ export const depoRouter = createTRPCRouter({
           FROM depos
           WHERE Start_Date = N'${depoDate}'
         `;
-        const depoResult = await sql.query(depoQuery);
+        const depoResult = await mssqlQuery(depoQuery);
         const latestDepo = depoResult.recordset[0]?.DepoTotal ?? 0;
 
         // 👇 query EntryCount in selected range
@@ -587,7 +576,7 @@ export const depoRouter = createTRPCRouter({
           WHERE Start_Date IN (${dateList})
         `;
 
-        const entryResult = await sql.query(entryQuery);
+        const entryResult = await mssqlQuery(entryQuery);
         const entryTotal = entryResult.recordset[0]?.EntryTotal ?? 0;
 
         // ✅ Calculate estimate
