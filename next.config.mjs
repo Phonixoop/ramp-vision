@@ -18,9 +18,6 @@ const config = {
   // i18n configuration is not supported with App Router
   // Use middleware.ts for internationalization instead
 
-  // Enable standalone output for Docker
-  output: "standalone",
-
   // Skip TypeScript checking during build
   typescript: {
     ignoreBuildErrors: true,
