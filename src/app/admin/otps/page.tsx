@@ -30,6 +30,30 @@ function formatTimestamp(iso: string | null): string {
   return date.toISOString();
 }
 
+async function copyTextWithFallback(text: string) {
+  if (navigator.clipboard?.writeText && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.top = "-9999px";
+  textArea.style.left = "-9999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textArea);
+
+  if (!copied) {
+    throw new Error("copy failed");
+  }
+}
+
 export default function OtpPage() {
   const { data, isLoading, isFetching, error, refetch } =
     api.otpUser.getAll.useQuery(undefined, {
@@ -41,7 +65,7 @@ export default function OtpPage() {
   async function handleCopyOtp() {
     if (!latest?.Otp) return;
     try {
-      await navigator.clipboard.writeText(latest.Otp);
+      await copyTextWithFallback(latest.Otp);
       toast.success("کد OTP کپی شد");
     } catch {
       toast.error("خطا در کپی کردن کد");
