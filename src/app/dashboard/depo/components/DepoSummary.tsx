@@ -248,13 +248,18 @@ export const DepoSummary = memo(function DepoSummary({
       rowClassName: "text-lg  text-emerald-600 bg-secondary",
     },
     {
-      name: `دپو ${depoEstimate?.data?.depoDate}`,
+      name: `دپو ${depoEstimate?.data?.depoDate ?? "—"}`,
       value: depoEstimate?.data?.latestDepo ?? 0,
       fill: "#65a30d",
       headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
       rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
     },
   ];
+  const estimateValue =
+    typeof depoEstimate?.data?.estimate === "number" &&
+    Number.isFinite(depoEstimate.data.estimate)
+      ? depoEstimate.data.estimate
+      : 0;
   return (
     <>
       <div className="flex w-full flex-col items-center justify-center gap-5">
@@ -432,20 +437,18 @@ export const DepoSummary = memo(function DepoSummary({
                     <p className="text-sm text-primary">
                       نتیجه عددی فرمول:{" "}
                       <span dir="ltr" className="font-bold">
-                        {depoEstimate?.data?.estimate
-                          ? parseFloat(depoEstimate.data.estimate.toFixed(2))
-                          : "0.00"}
+                        {parseFloat(estimateValue.toFixed(2))}
                       </span>
                     </p>
                     {depo.data?.periodType && (
                       <div className="mt-2">
                         <div className="text-sm text-accent">
-                          {depoEstimate?.data?.estimate <= 0 ? (
+                          {estimateValue <= 0 ? (
                             "دپو ای وجود ندارد"
                           ) : (
                             <p>
                               {humanizeDuration(
-                                depoEstimate?.data?.estimate,
+                                estimateValue,
                                 Reports_Period[depo.data?.periodType],
                               )}{" "}
                               <span className="text-primary">تا اتمام دپو</span>

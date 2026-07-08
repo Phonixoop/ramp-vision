@@ -460,7 +460,6 @@ export const depoRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       try {
-        console.log("START ESTIMATE");
         const permissions = await getPermission({ ctx });
         const cities = permissions
           .find((p) => p.id === "ViewCities")
@@ -468,10 +467,72 @@ export const depoRouter = createTRPCRouter({
           .map((p) => p.enLabel);
 
         const filter = input.filter;
-        filter.CityName = cities;
+        const commonCities =
+          filter.CityName?.length > 0
+            ? cities.filter((city) => filter.CityName.includes(city))
+            : cities;
+        filter.CityName = commonCities;
 
         const dates = filter.Start_Date;
         const date = dates.at(-1).split("/");
+
+        const buildEstimateWhereClause = (
+          startDateCondition: string,
+          customDatesAlreadyApplied = false,
+        ) => {
+          const conditions = startDateCondition ? [startDateCondition] : [];
+
+          if (filter.CityName?.length) {
+            const cityValues = filter.CityName.map((city) => `N'${city}'`).join(", ");
+            conditions.push(`CityName IN (${cityValues})`);
+          }
+
+          if (filter.ServiceName?.length) {
+            const serviceValues = filter.ServiceName
+              .map((service) => `N'${service}'`)
+              .join(", ");
+            conditions.push(`ServiceName IN (${serviceValues})`);
+          }
+
+          if (filter.DocumentType?.length) {
+            const documentValues = filter.DocumentType
+              .map((documentType) => `N'${documentType}'`)
+              .join(", ");
+            conditions.push(`DocumentType IN (${documentValues})`);
+          }
+
+          if (!customDatesAlreadyApplied && !startDateCondition) {
+            const dateValues = dates.map((d) => `N'${d}'`).join(", ");
+            conditions.push(`Start_Date IN (${dateValues})`);
+          }
+
+          return `WHERE CityName is not NULL AND ${conditions.join(" AND ")}`;
+        };
+
+        const buildFilterOnlyWhereClause = () => {
+          const conditions = ["CityName is not NULL"];
+
+          if (filter.CityName?.length) {
+            const cityValues = filter.CityName.map((city) => `N'${city}'`).join(", ");
+            conditions.push(`CityName IN (${cityValues})`);
+          }
+
+          if (filter.ServiceName?.length) {
+            const serviceValues = filter.ServiceName
+              .map((service) => `N'${service}'`)
+              .join(", ");
+            conditions.push(`ServiceName IN (${serviceValues})`);
+          }
+
+          if (filter.DocumentType?.length) {
+            const documentValues = filter.DocumentType
+              .map((documentType) => `N'${documentType}'`)
+              .join(", ");
+            conditions.push(`DocumentType IN (${documentValues})`);
+          }
+
+          return `WHERE ${conditions.join(" AND ")}`;
+        };
 
         const secondDayOfNextMonth = getSecondOrLaterDayOfNextMonth(
           parseInt(date[0]),
@@ -480,17 +541,20 @@ export const depoRouter = createTRPCRouter({
 
         let depoDate = null;
 
-        console.log({ dates, m2: dates.at(-2) });
-        // ✅ Get prevCapicity based on periodType
         let prevCapicity = 1;
 
         if (input.periodType === "ماهانه") {
+          const dateWhere = buildEstimateWhereClause(
+            `Start_Date = N'${secondDayOfNextMonth}'`,
+            true,
+          );
+          const fallbackDateWhere = buildFilterOnlyWhereClause();
           const dateResult = await mssqlQuery(`
           USE RAMP_Daily;
           SELECT TOP 1 
             COALESCE(
-              (SELECT MAX(Start_Date) FROM depos WHERE Start_Date = '${secondDayOfNextMonth}'),
-              (SELECT MAX(Start_Date) FROM depos)
+              (SELECT MAX(Start_Date) FROM depos ${dateWhere}),
+              (SELECT MAX(Start_Date) FROM depos ${fallbackDateWhere})
             ) AS LastDate
         `);
           const lastDate = dateResult.recordset[0].LastDate;
@@ -505,7 +569,7 @@ export const depoRouter = createTRPCRouter({
             USE RAMP_Daily;
             SELECT SUM(Capicity) as TotalCapicity
             FROM depos
-            WHERE Start_Date LIKE N'${prevMonthLike}'
+            ${buildEstimateWhereClause(`Start_Date LIKE N'${prevMonthLike}'`, true)}
           `;
           const result = await mssqlQuery(prevMonthCapicityQuery);
           prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
@@ -528,7 +592,10 @@ export const depoRouter = createTRPCRouter({
             USE RAMP_Daily;
             SELECT SUM(Capicity) as TotalCapicity
             FROM depos
-            WHERE Start_Date IN (${jalaliRange.join(", ")})
+            ${buildEstimateWhereClause(
+              `Start_Date IN (${jalaliRange.join(", ")})`,
+              true,
+            )}
           `;
           const result = await mssqlQuery(weekCapicityQuery);
           prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
@@ -551,7 +618,10 @@ export const depoRouter = createTRPCRouter({
             USE RAMP_Daily;
             SELECT SUM(Capicity) as TotalCapicity
             FROM depos
-            WHERE Start_Date IN (${jalaliRange.join(", ")})
+            ${buildEstimateWhereClause(
+              `Start_Date IN (${jalaliRange.join(", ")})`,
+              true,
+            )}
           `;
           const result = await mssqlQuery(dailyCapicityQuery);
           prevCapicity = result.recordset[0]?.TotalCapicity ?? 1;
@@ -562,27 +632,27 @@ export const depoRouter = createTRPCRouter({
           USE RAMP_Daily;
           SELECT SUM(DepoCount) as DepoTotal
           FROM depos
-          WHERE Start_Date = N'${depoDate}'
+          ${buildEstimateWhereClause(`Start_Date = N'${depoDate}'`, true)}
         `;
         const depoResult = await mssqlQuery(depoQuery);
         const latestDepo = depoResult.recordset[0]?.DepoTotal ?? 0;
 
-        // 👇 query EntryCount in selected range
-        const dateList = dates.map((d) => `N'${d}'`).join(", ");
         const entryQuery = `
           USE RAMP_Daily;
           SELECT SUM(EntryCount) as EntryTotal
           FROM depos
-          WHERE Start_Date IN (${dateList})
+          ${buildEstimateWhereClause("", false)}
         `;
 
         const entryResult = await mssqlQuery(entryQuery);
         const entryTotal = entryResult.recordset[0]?.EntryTotal ?? 0;
 
-        // ✅ Calculate estimate
-        const estimate = latestDepo / (prevCapicity - entryTotal || 1);
+        const denominator = prevCapicity - entryTotal;
+        const estimate =
+          !depoDate || !Number.isFinite(denominator) || denominator <= 0
+            ? 0
+            : latestDepo / denominator;
 
-        console.log("END ESTIMATE");
         return {
           latestDepo,
           depoDate,
