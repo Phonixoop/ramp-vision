@@ -31,33 +31,31 @@ function formatTimestamp(iso: string | null): string {
   return date.toISOString();
 }
 
-async function copyText(text: string): Promise<boolean> {
-  if (navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      // Fall through to manual selection when clipboard API is blocked (e.g. HTTP).
-    }
+async function copyTextWithFallback(text: string) {
+  if (navigator.clipboard?.writeText && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
   }
 
-  return false;
-}
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.top = "-9999px";
+  textArea.style.left = "-9999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
 
-function selectTextContent(element: HTMLElement | null) {
-  if (!element) return;
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textArea);
 
-  const selection = window.getSelection();
-  if (!selection) return;
-
-  const range = document.createRange();
-  range.selectNodeContents(element);
-  selection.removeAllRanges();
-  selection.addRange(range);
+  if (!copied) {
+    throw new Error("copy failed");
+  }
 }
 
 export default function OtpPage() {
-  const otpCodeRef = useRef<HTMLDivElement>(null);
   const { data, isLoading, isFetching, error, refetch } =
     api.otpUser.getAll.useQuery(undefined, {
       refetchOnWindowFocus: false,
@@ -67,15 +65,12 @@ export default function OtpPage() {
 
   async function handleCopyOtp() {
     if (!latest?.Otp) return;
-
-    const copied = await copyText(latest.Otp);
-    if (copied) {
+    try {
+      await copyTextWithFallback(latest.Otp);
       toast.success("کد OTP کپی شد");
-      return;
+    } catch {
+      toast.error("خطا در کپی کردن کد");
     }
-
-    selectTextContent(otpCodeRef.current);
-    toast.info("کد انتخاب شد. برای کپی Ctrl+C را بزنید");
   }
 
   return (
@@ -133,10 +128,7 @@ export default function OtpPage() {
                 برای کپی کلیک کنید
               </span>
             </div>
-            <div
-              ref={otpCodeRef}
-              className="w-full select-all font-mono text-4xl tracking-widest text-primary"
-            >
+            <div className="w-full font-mono text-4xl tracking-widest text-primary">
               {latest.Otp}
             </div>
             <div className="flex w-full flex-col gap-1 text-sm text-primary/80">
