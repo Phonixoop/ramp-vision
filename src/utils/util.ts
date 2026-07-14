@@ -168,11 +168,12 @@ export function en(inputString: string): string {
 //   }, []);
 // }
 
+type WhereConditionValue = string | number | boolean | null;
 type ProcessDataForChartOptions = {
   rawData: any[];
   groupBy: string | string[];
   values: string[];
-  where?: Record<string, string | string[]>;
+  where?: Record<string, WhereConditionValue | WhereConditionValue[]>;
   options?: {
     max?: string[];
     uniqueCountFields?: string[];

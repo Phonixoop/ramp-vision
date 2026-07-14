@@ -1,4 +1,5 @@
 import { Column, ColumnDef } from "@tanstack/react-table";
+import type { JSX } from "react";
 
 // Extend ColumnDef to include custom properties used by the table component
 export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {

@@ -78,10 +78,10 @@ type Props<TData> = {
   clickedRowIndex?: string;
   hasClickAction?: boolean;
   onClick?: (cell: TData) => void;
-  renderChild?: (rows: TData[]) => JSX.Element;
-  renderAfterTable?: (rows: TData[]) => JSX.Element;
-  renderInFilterView?: () => JSX.Element;
-  renderAfterFilterView?: (rows: TData[]) => JSX.Element;
+  renderChild?: (rows: TData[]) => React.JSX.Element;
+  renderAfterTable?: (rows: TData[]) => React.JSX.Element;
+  renderInFilterView?: () => React.JSX.Element;
+  renderAfterFilterView?: (rows: TData[]) => React.JSX.Element;
 };
 
 export default function Table<TData>({

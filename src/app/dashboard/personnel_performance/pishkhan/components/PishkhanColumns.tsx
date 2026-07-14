@@ -12,7 +12,7 @@ import { arrIncludeExcat, commify } from "~/utils/util";
 import { PishkhanData } from "../types";
 
 export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
-  Filter?: (props: { column: any }) => JSX.Element | null;
+  Filter?: (props: { column: any }) => React.JSX.Element | null;
   hSticky?: boolean;
   accessorKey?: string;
   width?: number;

@@ -1,10 +1,9 @@
-// /middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { Permission, User } from "~/types";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const fileUrl = "http://programchi.ir/licences/RAMP/web.txt";
   const exists = await fileExists(fileUrl);
 
@@ -12,7 +11,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(
       "http://roocket.ir/articles/what-to-do-when-your-client-wont-pay",
     );
-    //  return NextResponse.redirect(new URL("/404", req.url));
   }
   const token = await getToken({ req, secret: process.env.SECRET });
 
@@ -22,8 +20,6 @@ export async function middleware(req: NextRequest) {
   const user = token.user as User;
 
   if (req.nextUrl.pathname.startsWith("/admin")) {
-    // check role maybe
-
     if (!user.role.permissions)
       return NextResponse.redirect(new URL("/", req.url));
 
@@ -41,22 +37,10 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    // "/((?!api|_next/static|_next/image|favicon.ico).*)",
-    //'/:path*'
-    "/dashboard/:path*",
-    "/admin/:path*",
-  ],
+  matcher: ["/dashboard/:path*", "/admin/:path*"],
 };
 
-const fileExists = async (url) => {
+const fileExists = async (url: string) => {
   try {
     const response = await fetch(url, { method: "HEAD" });
 

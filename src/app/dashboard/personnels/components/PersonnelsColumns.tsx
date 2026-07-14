@@ -24,7 +24,7 @@ import { AppRouter } from "~/server/api/root";
 export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
   Filter?: (props: {
     column: Column<TData, string | number | null>;
-  }) => JSX.Element | null;
+  }) => React.JSX.Element | null;
   hSticky?: boolean;
   accessorKey?: string;
   width?: number;

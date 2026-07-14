@@ -8,6 +8,7 @@ import {
   Ref,
   ComponentProps,
   useState,
+  type JSX,
 } from "react";
 import { twMerge } from "tailwind-merge";
 import { cn } from "~/lib/utils";

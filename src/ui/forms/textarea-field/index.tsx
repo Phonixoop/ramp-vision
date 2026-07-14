@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, ChangeEvent, forwardRef } from "react";
+import React, {
+  useEffect,
+  useRef,
+  ChangeEvent,
+  forwardRef,
+  type JSX,
+} from "react";
 import { cn } from "~/lib/utils";
 
 interface TextAreaFieldProps {

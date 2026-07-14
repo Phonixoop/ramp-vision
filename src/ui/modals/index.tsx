@@ -27,7 +27,7 @@ import { useModal } from "~/context/modal.context";
 /** ---------------- Helpers ---------------- */
 
 function usePrevious<T>(value: T): T | undefined {
-  const previousValueRef = useRef<T>();
+  const previousValueRef = useRef<T | undefined>(undefined);
   useEffect(() => {
     previousValueRef.current = value;
   }, [value]);
@@ -51,7 +51,7 @@ const overlayVariants = {
 const boxVariants = {
   visible: {
     translateY: "0px",
-    transition: { type: "spring", damping: 30, stiffness: 1000 },
+    transition: { type: "spring" as const, damping: 30, stiffness: 1000 },
   },
   hidden: { translateY: "30px" },
 };

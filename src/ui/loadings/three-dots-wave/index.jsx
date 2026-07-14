@@ -40,7 +40,7 @@ const DotVariants = {
 const DotTransition = {
   duration: 0.5,
   repeat: Infinity,
-  ease: "easeInOut",
+  ease: /** @type {const} */ ("easeInOut"),
 };
 
 export default function ThreeDotsWave() {
