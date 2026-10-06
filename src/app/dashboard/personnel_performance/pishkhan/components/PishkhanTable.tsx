@@ -118,7 +118,7 @@ export function PishkhanTable({ sessionData }: PishkhanTableProps) {
   const distincedData = useMemo(
     () =>
       distinctPersonnelPerformanceData(
-        personnelPerformance.data?.result,
+        personnelPerformance.data,
         ["NationalCode", "NameFamily", "CityName"],
         [
           "TownName",
