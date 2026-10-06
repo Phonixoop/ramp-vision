@@ -864,8 +864,8 @@ export const isNumber = (value) => {
 export function arrIncludeExcat(
   row,
   ColumnName,
-  selectedDocumentTypeFilters: string[],
+  selectedFilters: string[],
 ) {
-  if (selectedDocumentTypeFilters.length <= 0) return true;
-  return selectedDocumentTypeFilters.includes(row.original[ColumnName]);
+  if (selectedFilters.length <= 0) return true;
+  return selectedFilters.includes(row.original[ColumnName]);
 }

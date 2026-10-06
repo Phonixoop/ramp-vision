@@ -12,7 +12,7 @@ export function DepoProvider({ children }: { children: ReactNode }) {
     periodType: "ماهانه" as PeriodType,
     filter: {
       CityName: [],
-      DocumentType: [],
+      BillType: [],
       ServiceName: [],
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),

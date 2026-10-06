@@ -29,7 +29,7 @@ export const depoRouter = createTRPCRouter({
         filter: z.object({
           ServiceName: z.array(z.string()).nullish(),
           CityName: z.array(z.string()).nullish(),
-          DocumentType: z.array(z.string()).nullish(),
+          BillType: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
         }),
       }),
@@ -86,7 +86,7 @@ export const depoRouter = createTRPCRouter({
              DISTINCT 
              depos.ServiceName,
              depos.CityName,
-             depos.DocumentType,
+             depos.BillType,
            
              SUM(CASE 
                WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
@@ -108,7 +108,7 @@ export const depoRouter = createTRPCRouter({
            `;
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By ServiceName,CityName,DocumentType,Start_Date ORDER BY CityName`;
+          whereClause += ` Group By ServiceName,CityName,BillType,Start_Date ORDER BY CityName`;
         } else if (input.periodType === "هفتگی") {
           const dates = getDatesBetweenTwoDates(
             filter.Start_Date[0],
@@ -128,7 +128,7 @@ export const depoRouter = createTRPCRouter({
             DISTINCT 
             depos.ServiceName,
             depos.CityName,
-            depos.DocumentType,
+            depos.BillType,
           
             SUM(CASE 
               WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
@@ -152,7 +152,7 @@ export const depoRouter = createTRPCRouter({
           filter.Start_Date = dates;
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` GROUP BY CityName, ServiceName, DocumentType ORDER BY CityName`;
+          whereClause += ` GROUP BY CityName, ServiceName, BillType ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
@@ -203,7 +203,7 @@ export const depoRouter = createTRPCRouter({
             undefined,
             `(${likeConditionsGeneral})` + " AND ",
           );
-          whereClause += ` group by ServiceName,DocumentType,CityName ORDER BY CityName`;
+          whereClause += ` group by ServiceName,BillType,CityName ORDER BY CityName`;
 
           // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
           //   parseInt(date[0]),
@@ -216,14 +216,14 @@ export const depoRouter = createTRPCRouter({
           //   .month(parseInt(date[1]) - 1)
           //   .format("MMMM");
           // queryStart = `
-          // SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
+          // SELECT distinct depos.ServiceName,depos.CityName,depos.BillType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
           // SUM(CASE WHEN Start_Date = '${lastWeek}' THEN DepoCount ELSE 0 END) AS DepoCount
 
           // FROM
           // `;
 
           queryStart = `
-          SELECT distinct ServiceName,CityName,DocumentType,
+          SELECT distinct ServiceName,CityName,BillType,
 
                SUM(CASE 
               WHEN ${likeConditionsForEachProperty} 
@@ -324,9 +324,9 @@ export const depoRouter = createTRPCRouter({
 
       const resultOfCities = await mssqlQuery(queryCities);
 
-      // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
+      // const queryBillTypes = `SELECT DISTINCT BillType FROM RAMP_Daily.dbo.depos`;
 
-      // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
+      // const resultOfBillTypes = await mssqlQuery(queryBillTypes);
 
       const result = {
         Cities: resultOfCities.recordsets[0]
@@ -388,9 +388,9 @@ export const depoRouter = createTRPCRouter({
 
         const resultDays = await mssqlQuery(queryDaysOfMonth);
 
-        // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-        // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
+        // const queryBillTypes = `SELECT DISTINCT BillType FROM RAMP_Daily.dbo.depos`;
+        // console.log(queryBillTypes);
+        // const resultOfBillTypes = await mssqlQuery(queryBillTypes);
 
         const result: {
           date: string;
@@ -453,7 +453,7 @@ export const depoRouter = createTRPCRouter({
         filter: z.object({
           ServiceName: z.array(z.string()).nullish(),
           CityName: z.array(z.string()).nullish(),
-          DocumentType: z.array(z.string()).nullish(),
+          BillType: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
         }),
       }),
@@ -494,11 +494,11 @@ export const depoRouter = createTRPCRouter({
             conditions.push(`ServiceName IN (${serviceValues})`);
           }
 
-          if (filter.DocumentType?.length) {
-            const documentValues = filter.DocumentType
-              .map((documentType) => `N'${documentType}'`)
+          if (filter.BillType?.length) {
+            const billTypeValues = filter.BillType
+              .map((billType) => `N'${billType}'`)
               .join(", ");
-            conditions.push(`DocumentType IN (${documentValues})`);
+            conditions.push(`BillType IN (${billTypeValues})`);
           }
 
           if (!customDatesAlreadyApplied && !startDateCondition) {
@@ -524,11 +524,11 @@ export const depoRouter = createTRPCRouter({
             conditions.push(`ServiceName IN (${serviceValues})`);
           }
 
-          if (filter.DocumentType?.length) {
-            const documentValues = filter.DocumentType
-              .map((documentType) => `N'${documentType}'`)
+          if (filter.BillType?.length) {
+            const billTypeValues = filter.BillType
+              .map((billType) => `N'${billType}'`)
               .join(", ");
-            conditions.push(`DocumentType IN (${documentValues})`);
+            conditions.push(`BillType IN (${billTypeValues})`);
           }
 
           return `WHERE ${conditions.join(" AND ")}`;

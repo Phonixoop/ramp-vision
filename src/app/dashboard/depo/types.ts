@@ -12,7 +12,7 @@ export type FilterType = {
   periodType: PeriodType;
   filter: {
     CityName?: string[];
-    DocumentType?: string[];
+    BillType?: string[];
     ServiceName?: string[];
     Start_Date: string[];
   };

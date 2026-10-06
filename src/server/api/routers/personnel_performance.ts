@@ -167,7 +167,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           .default("روزانه"),
         filter: z.object({
           CityName: z.array(z.string()).nullish().default([]),
-          DocumentType: z.array(z.string()).nullish(),
+          BillType: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
           NameFamily: z.array(z.string()).nullish(),
           ProjectType: z.array(z.string()).nullish(),
@@ -354,7 +354,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           //   .month(parseInt(date[1]) - 1)
           //   .format("MMMM");
           //   queryStart = `
-          //   SELECT distinct depos.ServiceName,depos.CityName,depos.DocumentType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
+          //   SELECT distinct depos.ServiceName,depos.CityName,depos.BillType,SUM(depos.EntryCount) AS EntryCount ,SUM(depos.Capicity) AS Capicity,
           //   SUM(CASE WHEN Start_Date = '${lastWeek}' THEN DepoCount ELSE 0 END) AS DepoCount
 
           //   FROM
@@ -687,9 +687,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
         // console.log(queryDaysOfMonth);
         const resultDays = await mssqlQuery(queryDaysOfMonth);
 
-        // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-        // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
+        // const queryBillTypes = `SELECT DISTINCT BillType FROM RAMP_Daily.dbo.depos`;
+        // console.log(queryBillTypes);
+        // const resultOfBillTypes = await mssqlQuery(queryBillTypes);
 
         const result: {
           date: string;
@@ -862,9 +862,9 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
         const resultOfCities = await mssqlQuery(queryCities);
 
-        // const queryDocumentTypes = `SELECT DISTINCT DocumentType FROM RAMP_Daily.dbo.depos`;
-        // console.log(queryDocumentTypes);
-        // const resultOfDocumentTypes = await mssqlQuery(queryDocumentTypes);
+        // const queryBillTypes = `SELECT DISTINCT BillType FROM RAMP_Daily.dbo.depos`;
+        // console.log(queryBillTypes);
+        // const resultOfBillTypes = await mssqlQuery(queryBillTypes);
 
         const result = {
           Cities: resultOfCities.recordsets[0].filter((c) => c.CityName !== ""),

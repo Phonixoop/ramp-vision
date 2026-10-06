@@ -108,7 +108,7 @@ export const DepoSummary = memo(function DepoSummary({
   const depoCompletionTime = processDepoCompleteTimeData(flatRows);
 
   const entryDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.DocumentType === "مستقیم"),
+    flatRows.filter((a) => a.BillType === "مستقیم"),
     "EntryCount",
     "ServiceName",
     [
@@ -119,7 +119,7 @@ export const DepoSummary = memo(function DepoSummary({
   );
 
   const entryInDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.DocumentType === "غیر مستقیم"),
+    flatRows.filter((a) => a.BillType === "غیر مستقیم"),
     "EntryCount",
     "ServiceName",
     [
@@ -130,7 +130,7 @@ export const DepoSummary = memo(function DepoSummary({
   );
 
   const capacityDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.DocumentType === "مستقیم"),
+    flatRows.filter((a) => a.BillType === "مستقیم"),
     "Capicity",
     "ServiceName",
     [
@@ -141,7 +141,7 @@ export const DepoSummary = memo(function DepoSummary({
   );
 
   const capacityInDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.DocumentType === "غیر مستقیم"),
+    flatRows.filter((a) => a.BillType === "غیر مستقیم"),
     "Capicity",
     "ServiceName",
     [

@@ -23,7 +23,7 @@ export const personnelRouter = createTRPCRouter({
       z.object({
         filter: z.object({
           CityName: z.array(z.string()).nullish().default([]),
-          DocumentType: z.array(z.string()).nullish(),
+          BillType: z.array(z.string()).nullish(),
           NameFamily: z.array(z.string()).nullish(),
           ProjectType: z.array(z.string()).nullish(),
           ContractType: z.array(z.string()).nullish(),
