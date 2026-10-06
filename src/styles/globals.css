@@ -150,6 +150,68 @@ html[data-theme="dark"] {
     font-display: swap;
     font-style: normal;
   } */
+  :root {
+    --legend: rgb(var(--secondary));
+    --legend-foreground: rgb(var(--primary));
+    --legend-muted: rgb(var(--secbuttn));
+    --legend-muted-foreground: rgb(var(--primary-muted));
+    --legend-track: rgb(var(--secbuttn));
+    --chart-background: rgb(var(--secondary));
+    --chart-foreground: rgb(var(--primary));
+    --chart-foreground-muted: rgb(var(--primary-muted));
+    --chart-label: rgb(var(--primary-muted));
+    /* Semantic depo metrics — used by pie + bar charts */
+    --depo-chart-depo: #be123c;
+    --depo-chart-entry: #0e7490;
+    --depo-chart-capacity: #047857;
+    --depo-chart-remaining: #b45309;
+    --depo-chart-direct: #a21caf;
+    --depo-chart-indirect: #0f766e;
+    /* Generic chart slots mapped to depo semantics */
+    --chart-1: var(--depo-chart-depo);
+    --chart-2: var(--depo-chart-entry);
+    --chart-3: var(--depo-chart-capacity);
+    --chart-4: var(--depo-chart-remaining);
+    --chart-5: var(--depo-chart-direct);
+    --chart-line-primary: var(--chart-1);
+    --chart-line-secondary: var(--chart-2);
+    --chart-crosshair: rgba(var(--primary), 0.35);
+    --chart-grid: rgba(var(--primary), 0.12);
+    --chart-brush-border: var(--chart-grid);
+    --chart-tooltip-background: rgba(var(--secondary), 0.92);
+    --chart-tooltip-foreground: rgb(var(--primary));
+    --chart-tooltip-muted: rgb(var(--primary-muted));
+    --chart-marker-background: rgb(var(--secbuttn));
+    --chart-marker-border: rgba(var(--primary), 0.2);
+    --chart-marker-foreground: rgb(var(--primary));
+    --chart-scale-01: oklch(0.98 0.003 106);
+    --chart-scale-02: oklch(0.92 0.008 106);
+    --chart-scale-03: oklch(0.82 0.015 106);
+    --chart-scale-04: oklch(0.68 0.02 106);
+    --chart-scale-05: oklch(0.55 0.025 106);
+    --chart-scale-pattern-color: oklch(0.96 0.005 106);
+  }
+  .dark {
+    --chart-background: rgb(var(--secondary));
+    --chart-foreground: rgb(var(--primary));
+    --chart-foreground-muted: rgb(var(--primary-muted));
+    --chart-label: rgb(var(--primary-muted));
+    --chart-crosshair: rgba(var(--primary), 0.35);
+    --chart-grid: rgba(var(--primary), 0.12);
+    --chart-brush-border: var(--chart-grid);
+    --chart-tooltip-background: rgba(var(--secondary), 0.92);
+    --chart-tooltip-foreground: rgb(var(--primary));
+    --chart-tooltip-muted: rgb(var(--primary-muted));
+    --chart-marker-background: rgb(var(--secbuttn));
+    --chart-marker-border: rgba(var(--primary), 0.2);
+    --chart-marker-foreground: rgb(var(--primary));
+    --chart-scale-01: oklch(0.28 0.03 270);
+    --chart-scale-02: oklch(0.38 0.04 270);
+    --chart-scale-03: oklch(0.48 0.05 270);
+    --chart-scale-04: oklch(0.58 0.06 270);
+    --chart-scale-05: oklch(0.68 0.07 270);
+    --chart-scale-pattern-color: rgb(var(--secondary));
+  }
 }
 
 h1,
@@ -978,12 +1040,6 @@ input[type="number"] {
   }
 }
 
-@layer base {
-  :root {
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-  }
-}
 
 /* Recharts: prevent white focus outline on selected SVG elements (modern Chrome/Edge) */
 .recharts-wrapper:focus,

@@ -10,16 +10,14 @@ export default function DeposPage() {
   const { data: sessionData } = useSession();
 
   return (
-    <>
-      <div className="flex min-h-screen w-full flex-col items-center justify-between gap-5 bg-secondary transition-colors duration-1000 ">
-        <div className="w-full sm:p-0  xl:w-11/12">
-          <WorkDaysToggleProvider>
-            <DepoProvider>
-              <DepoTable sessionData={sessionData} />
-            </DepoProvider>
-          </WorkDaysToggleProvider>
-        </div>
+    <div className="flex min-h-screen w-full flex-col items-center bg-secondary transition-colors duration-300">
+      <div className="w-full px-2 py-2 sm:px-0 xl:w-11/12">
+        <WorkDaysToggleProvider>
+          <DepoProvider>
+            <DepoTable sessionData={sessionData} />
+          </DepoProvider>
+        </WorkDaysToggleProvider>
       </div>
-    </>
+    </div>
   );
 }

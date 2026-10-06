@@ -1,71 +1,87 @@
-// @ts-nocheck - Disable TypeScript checking for recharts type conflicts
 "use client";
 
-import { memo, useMemo } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { memo, type ReactNode, useMemo } from "react";
 import {
   commify,
   coerceAggregateValue,
-  dataAsTable,
   humanizeDuration,
   processDataForChart,
-  processDepoCompleteTimeData,
   sumColumnBasedOnRowValue,
 } from "~/utils/util";
-import { Reports_Period, Text } from "~/constants";
+import { Reports_Period } from "~/constants";
 import { ServiceNames, ShortServiceNames } from "~/constants/depo";
 import H2 from "~/ui/heading/h2";
-import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 import EntryHandlingSkeletonLoading from "~/features/loadings/depo/entry-handling-box";
 import { Loading } from "~/features/loadings/loading";
 import DepoSkeletonLoading from "~/features/loadings/depo/depo-box";
 import DepoTimeSkeletonLoading from "~/features/loadings/depo/depo-time-box";
-import CustomPieChart from "~/features/custom-charts/pie-chart";
-import SimpleTable from "~/features/guide-table";
+import { ChartBarMultiple } from "~/components/shadcn/charts/bar/bar-chart-multiple";
 import { ChartPieLabel } from "~/components/shadcn/charts/pie/pie-chart-label";
-import { Pie, PieChart } from "recharts";
-
-const DEPO_BAR_COLORS = {
-  depoCount: "#e11d48",
-  entryCount: "#06B6D4",
-  capacityCount: "#059669",
-} as const;
+import {
+  DEPO_CHART_COLORS,
+  DEPO_CHART_HANDLED,
+} from "~/constants/depo-chart-colors";
+import { cn } from "~/lib/utils";
 
 function toChartNumber(value: unknown): number {
   const coerced = coerceAggregateValue(value);
   return typeof coerced === "number" ? coerced : 0;
 }
 
-// Reusable DataDisplay Component
-interface DataDisplayProps {
-  data: Array<{
-    name: string;
-    value: number;
-    fill: string;
-  }>;
+function SummaryCard({
+  title,
+  subtitle,
+  children,
+  className,
+  footer,
+}: {
+  title: string;
+  subtitle?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  footer?: ReactNode;
+}) {
+  return (
+    <article
+      className={cn(
+        "flex h-full min-w-0 max-w-full flex-col gap-3 overflow-hidden rounded-2xl border border-primary/10 bg-secbuttn/80 p-3 shadow-sm transition-colors duration-200 hover:border-primary/20 sm:p-4",
+        className,
+      )}
+    >
+      <header className="min-w-0 space-y-1 text-center">
+        <H2 className="text-balance text-base font-bold leading-snug text-primary sm:text-lg">
+          {title}
+        </H2>
+        {subtitle ? (
+          <div className="text-xs text-primary-muted sm:text-sm">{subtitle}</div>
+        ) : null}
+      </header>
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        {children}
+      </div>
+      {footer ? <footer className="min-w-0 pt-1">{footer}</footer> : null}
+    </article>
+  );
 }
 
-function DataDisplay({ data }: DataDisplayProps) {
+function KpiChip({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number;
+  accent: string;
+}) {
   return (
-    <div className="flex flex-col divide-y divide-primary/10 rounded-md bg-secondary p-1">
-      {data.map((item, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between p-1"
-          style={{ color: item.fill }}
-        >
-          <span className="text-sm">{item.name}:</span>
-          <span className="font-bold">{commify(item.value)}</span>
-        </div>
-      ))}
+    <div className="flex min-w-0 flex-1 flex-col gap-1 rounded-xl border border-primary/10 bg-secondary/60 px-3 py-2.5">
+      <span className="truncate text-xs text-primary-muted">{label}</span>
+      <span
+        className="text-lg font-bold tabular-nums leading-none"
+        style={{ color: accent }}
+      >
+        {commify(value)}
+      </span>
     </div>
   );
 }
@@ -97,15 +113,17 @@ export const DepoSummary = memo(function DepoSummary({
       })),
     [serviceData],
   );
-  const chartYMax = useMemo(() => {
-    const maxValue = chartData.reduce(
-      (max, row) =>
-        Math.max(max, row.depoCount, row.entryCount, row.capacityCount),
-      0,
+  const kpiTotals = useMemo(() => {
+    return chartData.reduce(
+      (acc, row) => {
+        acc.depo += row.depoCount;
+        acc.entry += row.entryCount;
+        acc.capacity += row.capacityCount;
+        return acc;
+      },
+      { depo: 0, entry: 0, capacity: 0 },
     );
-    return maxValue > 0 ? Math.ceil(maxValue * 1.1) : 1;
   }, [chartData]);
-  const depoCompletionTime = processDepoCompleteTimeData(flatRows);
 
   const entryDirectBaseOnSabt = sumColumnBasedOnRowValue(
     flatRows.filter((a) => a.BillType === "مستقیم"),
@@ -155,23 +173,17 @@ export const DepoSummary = memo(function DepoSummary({
     {
       name: "ورودی",
       value: entryDirectBaseOnSabt,
-      fill: "#06B6D4",
-      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
-      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
+      fill: DEPO_CHART_COLORS.entry,
     },
     {
       name: "رسیدگی",
       value: capacityDirectBaseOnSabt,
-      fill: "#059669",
-      headClassName: "text-lg text-emerald-600 bg-secondary",
-      rowClassName: "text-lg  text-emerald-600 bg-secondary",
+      fill: DEPO_CHART_HANDLED,
     },
     {
       name: "مانده",
-      value: entryDirectBaseOnSabt - capacityDirectBaseOnSabt,
-      fill: "#65a30d",
-      headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
-      rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
+      value: Math.max(0, entryDirectBaseOnSabt - capacityDirectBaseOnSabt),
+      fill: DEPO_CHART_COLORS.remaining,
     },
   ];
 
@@ -179,23 +191,17 @@ export const DepoSummary = memo(function DepoSummary({
     {
       name: "ورودی",
       value: entryInDirectBaseOnSabt,
-      fill: "#06B6D4",
-      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
-      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
+      fill: DEPO_CHART_COLORS.entry,
     },
     {
       name: "رسیدگی",
       value: capacityInDirectBaseOnSabt,
-      fill: "#059669",
-      headClassName: "text-lg text-emerald-600 bg-secondary",
-      rowClassName: "text-lg  text-emerald-600 bg-secondary",
+      fill: DEPO_CHART_HANDLED,
     },
     {
       name: "مانده",
-      value: entryInDirectBaseOnSabt - capacityInDirectBaseOnSabt,
-      fill: "#65a30d",
-      headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
-      rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
+      value: Math.max(0, entryInDirectBaseOnSabt - capacityInDirectBaseOnSabt),
+      fill: DEPO_CHART_COLORS.remaining,
     },
   ];
 
@@ -219,16 +225,12 @@ export const DepoSummary = memo(function DepoSummary({
     {
       name: "مستقیم",
       value: depoBaseOnSabtDirect,
-      fill: "#c026d3",
-      headClassName: "text-lg text-fuchsia-600 bg-secondary rounded-tr-xl ",
-      rowClassName: "text-lg  text-fuchsia-600 bg-secondary rounded-br-xl",
+      fill: DEPO_CHART_COLORS.direct,
     },
     {
       name: "غیر مستقیم",
       value: depoBaseOnSabtInDirect,
-      fill: "#0d9488",
-      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tl-xl ",
-      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-bl-xl",
+      fill: DEPO_CHART_COLORS.indirect,
     },
   ];
 
@@ -236,23 +238,17 @@ export const DepoSummary = memo(function DepoSummary({
     {
       name: "ورودی",
       value: depoEstimate?.data?.entryTotal ?? 0,
-      fill: "#06B6D4",
-      headClassName: "text-lg text-cyan-600 bg-secondary rounded-tr-xl",
-      rowClassName: "text-lg  text-cyan-600 bg-secondary rounded-br-xl",
+      fill: DEPO_CHART_COLORS.entry,
     },
     {
       name: "رسیدگی",
       value: depoEstimate?.data?.prevCapicity ?? 0,
-      fill: "#059669",
-      headClassName: "text-lg text-emerald-600 bg-secondary",
-      rowClassName: "text-lg  text-emerald-600 bg-secondary",
+      fill: DEPO_CHART_HANDLED,
     },
     {
       name: `دپو ${depoEstimate?.data?.depoDate ?? "—"}`,
       value: depoEstimate?.data?.latestDepo ?? 0,
-      fill: "#65a30d",
-      headClassName: "text-lg text-lime-600 bg-secondary rounded-tl-xl",
-      rowClassName: "text-lg  text-lime-600 bg-secondary rounded-bl-xl",
+      fill: DEPO_CHART_COLORS.depo,
     },
   ];
   const estimateValue =
@@ -260,214 +256,125 @@ export const DepoSummary = memo(function DepoSummary({
     Number.isFinite(depoEstimate.data.estimate)
       ? depoEstimate.data.estimate
       : 0;
+
+  const estimateInsight =
+    estimateValue <= 0 ? (
+      <p className="text-sm text-primary-muted">دپویی برای اتمام وجود ندارد</p>
+    ) : (
+      <p className="text-sm leading-relaxed text-primary">
+        <span className="font-bold text-accent" dir="ltr">
+          {parseFloat(estimateValue.toFixed(2))}
+        </span>
+        {depo.data?.periodType ? (
+          <>
+            {" · "}
+            <span className="font-semibold">
+              {humanizeDuration(
+                estimateValue,
+                Reports_Period[depo.data?.periodType],
+              )}
+            </span>
+            <span className="text-primary-muted"> تا اتمام دپو</span>
+          </>
+        ) : null}
+      </p>
+    );
+
   return (
-    <>
-      <div className="flex w-full flex-col items-center justify-center gap-5">
-        <div className="flex w-full flex-col items-center justify-center gap-5">
-          <div className="flex w-full flex-col justify-center gap-5 rounded-2xl bg-secbuttn p-5">
-            <H2 className="text-center text-lg font-bold">
-              نمودار به تفکیک فعالیت
-            </H2>
-            <Loading
-              isLoading={depo.isLoading}
-              LoadingComponent={BarChartSkeletonLoading}
-            >
-              <div className="h-80 w-full" dir="ltr">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    margin={{
-                      top: 20,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <XAxis dataKey="name" />
-                    <YAxis
-                      type="number"
-                      domain={[0, chartYMax]}
-                      allowDataOverflow={false}
-                      tickFormatter={(value) => commify(value)}
-                    />
-                    <Tooltip
-                      labelClassName="text-primary"
-                      formatter={(value) => commify(Number(value))}
-                      contentStyle={{
-                        backgroundColor: "rgb(var(--secondary))",
-                        borderRadius: "8px",
-                        border: "0px",
-                      }}
-                    />
-                    <Legend />
-                    <Bar
-                      isAnimationActive={false}
-                      dataKey="depoCount"
-                      name="تعداد دپو"
-                      fill={DEPO_BAR_COLORS.depoCount}
-                    />
-                    <Bar
-                      isAnimationActive={false}
-                      dataKey="entryCount"
-                      name="تعداد ورودی"
-                      fill={DEPO_BAR_COLORS.entryCount}
-                    />
-                    <Bar
-                      isAnimationActive={false}
-                      dataKey="capacityCount"
-                      name="تعداد رسیدگی"
-                      fill={DEPO_BAR_COLORS.capacityCount}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </Loading>
-          </div>
+    <section
+      className="flex w-full min-w-0 max-w-full flex-col gap-4"
+      aria-label="خلاصه دپو"
+    >
+      <SummaryCard
+        className="p-4 sm:p-5"
+        title="نمودار به تفکیک فعالیت"
+        subtitle="مقایسه دپو، ورودی و رسیدگی در هر فعالیت"
+      >
+        <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <KpiChip
+            accent={DEPO_CHART_COLORS.depo}
+            label="مجموع دپو"
+            value={kpiTotals.depo}
+          />
+          <KpiChip
+            accent={DEPO_CHART_COLORS.entry}
+            label="مجموع ورودی"
+            value={kpiTotals.entry}
+          />
+          <KpiChip
+            accent={DEPO_CHART_COLORS.capacity}
+            label="مجموع رسیدگی"
+            value={kpiTotals.capacity}
+          />
         </div>
+        <ChartBarMultiple data={chartData} isLoading={depo.isLoading} />
+      </SummaryCard>
 
-        <div className="flex w-full flex-col items-center justify-center gap-5">
-          <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {/* Direct Entry and Processing */}
-            <div className="flex flex-col gap-3 rounded-2xl bg-secbuttn p-4">
-              <Loading
-                isLoading={depo.isLoading}
-                LoadingComponent={EntryHandlingSkeletonLoading}
-              >
-                <div className="flex h-full flex-col justify-between gap-3">
-                  <div className="flex flex-col gap-2">
-                    <H2 className="text-center text-lg font-bold">
-                      تعداد ورودی و رسیدگی شده مستقیم
-                    </H2>
-                    <DataDisplay data={entry_capacity_Direct} />
-                  </div>
-                  <div className="flex  w-full items-center justify-center">
-                    {/* <CustomPieChart
-                      data={entry_capacity_Direct}
-                      index="value"
-                    /> */}
+      <div className="grid w-full min-w-0 grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-4">
+        <SummaryCard title="ورودی و رسیدگی مستقیم">
+          <Loading
+            isLoading={depo.isLoading}
+            LoadingComponent={EntryHandlingSkeletonLoading}
+          >
+            <ChartPieLabel
+              ariaLabel="نسبت ورودی و رسیدگی مستقیم"
+              centerLabel="مجموع"
+              data={entry_capacity_Direct}
+            />
+          </Loading>
+        </SummaryCard>
 
-                    {/* <ChartContainer
-                      config={{
-                        value: {
-                          label: "value",
-                        },
-                      }}
-                      className="[&_.recharts-pie-label-text]:fill-foreground mx-auto aspect-square max-h-[250px] pb-0"
-                    >
-                      <PieChart>
-                        <ChartTooltip
-                          content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Pie
-                          data={entry_capacity_Direct}
-                          dataKey="value"
-                          label
-                          nameKey="name"
-                        />
-                      </PieChart>
-                    </ChartContainer> */}
-                    <ChartPieLabel data={entry_capacity_Direct} />
-                  </div>
-                </div>
-              </Loading>
+        <SummaryCard title="ورودی و رسیدگی غیر مستقیم">
+          <Loading
+            isLoading={depo.isLoading}
+            LoadingComponent={EntryHandlingSkeletonLoading}
+          >
+            <ChartPieLabel
+              ariaLabel="نسبت ورودی و رسیدگی غیر مستقیم"
+              centerLabel="مجموع"
+              data={entry_capacity_InDirect}
+            />
+          </Loading>
+        </SummaryCard>
+
+        <SummaryCard title="تعداد دپو">
+          <Loading
+            isLoading={depo.isLoading}
+            LoadingComponent={DepoSkeletonLoading}
+          >
+            <ChartPieLabel
+              ariaLabel="نسبت دپو مستقیم و غیر مستقیم"
+              centerLabel="مجموع"
+              data={depo_BaseOnSabt}
+            />
+          </Loading>
+        </SummaryCard>
+
+        <SummaryCard
+          title="زمان اتمام دپو"
+          subtitle={
+            depo.data?.periodType ? (
+              <span className="text-primbuttn">{depo.data.periodType}</span>
+            ) : null
+          }
+          footer={
+            <div className="rounded-xl border border-accent/20 bg-accent/10 px-3 py-2 text-center">
+              {estimateInsight}
             </div>
-
-            {/* Indirect Entry and Processing */}
-            <div className="flex flex-col gap-3 rounded-2xl bg-secbuttn p-4">
-              <Loading
-                isLoading={depo.isLoading}
-                LoadingComponent={EntryHandlingSkeletonLoading}
-              >
-                <div className="flex h-full flex-col justify-between gap-3">
-                  <div className="flex flex-col gap-2">
-                    <H2 className="text-md pb-1 text-center font-bold">
-                      تعداد ورودی و رسیدگی شده غیر مستقیم
-                    </H2>
-                    <DataDisplay data={entry_capacity_InDirect} />
-                  </div>
-                  <div className="flex w-full items-center justify-center">
-                    {/* <CustomPieChart
-                      data={entry_capacity_InDirect}
-                      index="value"
-                    /> */}
-                    <ChartPieLabel data={entry_capacity_InDirect} />
-                  </div>
-                </div>
-              </Loading>
-            </div>
-
-            {/* Depo Count */}
-            <div className="flex flex-col gap-3 rounded-2xl bg-secbuttn p-4">
-              <Loading
-                isLoading={depo.isLoading}
-                LoadingComponent={DepoSkeletonLoading}
-              >
-                <div className="flex h-full flex-col justify-between gap-3">
-                  <div className="flex flex-col gap-2">
-                    <H2 className="text-center text-lg font-bold">تعداد دپو</H2>
-                    <DataDisplay data={depo_BaseOnSabt} />
-                  </div>
-                  <div className="flex w-full items-center justify-center">
-                    {/* <CustomPieChart data={depo_BaseOnSabt} index="value" /> */}
-                    <ChartPieLabel data={depo_BaseOnSabt} />
-                  </div>
-                </div>
-              </Loading>
-            </div>
-
-            {/* Depo Estimate */}
-            <div className="flex flex-col gap-3 rounded-2xl bg-secbuttn p-4">
-              <Loading
-                isLoading={depoEstimate.isLoading}
-                LoadingComponent={DepoTimeSkeletonLoading}
-              >
-                <div className="flex h-full flex-col justify-between gap-3">
-                  <div className="flex flex-col gap-2">
-                    <H2 className="text-center text-lg font-bold">
-                      زمان کلی اتمام دپو
-                      {depo.data?.periodType && (
-                        <span className="block text-sm text-primbuttn">
-                          {depo.data?.periodType}
-                        </span>
-                      )}
-                    </H2>
-                    <DataDisplay data={depoEstimateData} />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-primary">
-                      نتیجه عددی فرمول:{" "}
-                      <span dir="ltr" className="font-bold">
-                        {parseFloat(estimateValue.toFixed(2))}
-                      </span>
-                    </p>
-                    {depo.data?.periodType && (
-                      <div className="mt-2">
-                        <div className="text-sm text-accent">
-                          {estimateValue <= 0 ? (
-                            "دپو ای وجود ندارد"
-                          ) : (
-                            <p>
-                              {humanizeDuration(
-                                estimateValue,
-                                Reports_Period[depo.data?.periodType],
-                              )}{" "}
-                              <span className="text-primary">تا اتمام دپو</span>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex w-full items-center justify-center">
-                    {/* <CustomPieChart data={depoEstimateData} index="value" /> */}
-                    <ChartPieLabel data={depoEstimateData} />
-                  </div>
-                </div>
-              </Loading>
-            </div>
-          </div>
-        </div>
+          }
+        >
+          <Loading
+            isLoading={depoEstimate?.isLoading}
+            LoadingComponent={DepoTimeSkeletonLoading}
+          >
+            <ChartPieLabel
+              ariaLabel="ترکیب برآورد اتمام دپو"
+              centerLabel="مجموع"
+              data={depoEstimateData}
+            />
+          </Loading>
+        </SummaryCard>
       </div>
-    </>
+    </section>
   );
 });

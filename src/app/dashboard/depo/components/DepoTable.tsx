@@ -75,12 +75,17 @@ export function DepoTable({ sessionData }: DepoTableProps) {
   return (
     <TableDataProvider>
       <div
-        className="flex w-full flex-col items-center justify-center gap-5 text-primary"
+        className="flex w-full min-w-0 max-w-full flex-col items-center justify-center gap-5 text-primary"
         dir="rtl"
       >
-        <h1 className="py-5 text-right text-2xl text-primary underline underline-offset-[12px]">
-          عملکرد شعبه ارزیابی
-        </h1>
+        <header className="flex w-full flex-col items-center gap-1 py-4 text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-primary">
+            عملکرد شعبه ارزیابی
+          </h1>
+          <p className="text-sm text-primary-muted">
+            خلاصه دپو، ورودی و رسیدگی بر اساس فیلترهای فعال
+          </p>
+        </header>
 
         <div className="relative flex w-full items-center justify-center rounded-lg py-5 text-center">
           <Table
