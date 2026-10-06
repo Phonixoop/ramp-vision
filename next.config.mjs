@@ -12,6 +12,7 @@ await import("./src/env.mjs");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  allowedDevOrigins: ["192.168.0.211"],
 
   // Skip TypeScript checking during build
   typescript: {

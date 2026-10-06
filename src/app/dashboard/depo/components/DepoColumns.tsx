@@ -6,6 +6,7 @@ import { DepoData } from "../types";
 import { CityNameFilter } from "~/app/dashboard/depo/components/filter-components/cityName";
 import { ServiceNameFilter } from "~/app/dashboard/depo/components/filter-components/serviceName";
 import { BillTypeFilter } from "~/app/dashboard/depo/components/filter-components/billType";
+import { CaseFormFilter } from "~/app/dashboard/depo/components/filter-components/caseForm";
 import { CustomColumnDef } from "~/types/table";
 
 interface DepoColumnsProps {
@@ -67,6 +68,18 @@ export function DepoColumns({
       filterFn: arrIncludeExcat,
       Filter: ({ column }) => (
         <BillTypeFilter
+          column={column}
+          depo={depo}
+          setDataFilters={setDataFilters}
+        />
+      ),
+    },
+    {
+      header: "نوع پرونده",
+      accessorKey: "CaseForm",
+      filterFn: arrIncludeExcat,
+      Filter: ({ column }) => (
+        <CaseFormFilter
           column={column}
           depo={depo}
           setDataFilters={setDataFilters}

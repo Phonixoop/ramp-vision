@@ -13,6 +13,7 @@ export function DepoProvider({ children }: { children: ReactNode }) {
     filter: {
       CityName: [],
       BillType: [],
+      CaseForm: [],
       ServiceName: [],
       Start_Date: [
         moment().locale("fa").subtract(2, "days").format("YYYY/MM/DD"),

@@ -13,6 +13,7 @@ export type FilterType = {
   filter: {
     CityName?: string[];
     BillType?: string[];
+    CaseForm?: string[];
     ServiceName?: string[];
     Start_Date: string[];
   };

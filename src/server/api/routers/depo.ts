@@ -30,6 +30,7 @@ export const depoRouter = createTRPCRouter({
           ServiceName: z.array(z.string()).nullish(),
           CityName: z.array(z.string()).nullish(),
           BillType: z.array(z.string()).nullish(),
+          CaseForm: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
         }),
       }),
@@ -87,6 +88,7 @@ export const depoRouter = createTRPCRouter({
              depos.ServiceName,
              depos.CityName,
              depos.BillType,
+             depos.CaseForm,
            
              SUM(CASE 
                WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
@@ -108,7 +110,7 @@ export const depoRouter = createTRPCRouter({
            `;
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By ServiceName,CityName,BillType,Start_Date ORDER BY CityName`;
+          whereClause += ` Group By ServiceName,CityName,BillType,CaseForm,Start_Date ORDER BY CityName`;
         } else if (input.periodType === "هفتگی") {
           const dates = getDatesBetweenTwoDates(
             filter.Start_Date[0],
@@ -129,6 +131,7 @@ export const depoRouter = createTRPCRouter({
             depos.ServiceName,
             depos.CityName,
             depos.BillType,
+            depos.CaseForm,
           
             SUM(CASE 
               WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
@@ -152,7 +155,7 @@ export const depoRouter = createTRPCRouter({
           filter.Start_Date = dates;
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` GROUP BY CityName, ServiceName, BillType ORDER BY CityName`;
+          whereClause += ` GROUP BY CityName, ServiceName, BillType, CaseForm ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
@@ -203,7 +206,7 @@ export const depoRouter = createTRPCRouter({
             undefined,
             `(${likeConditionsGeneral})` + " AND ",
           );
-          whereClause += ` group by ServiceName,BillType,CityName ORDER BY CityName`;
+          whereClause += ` group by ServiceName,BillType,CaseForm,CityName ORDER BY CityName`;
 
           // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
           //   parseInt(date[0]),
@@ -223,7 +226,7 @@ export const depoRouter = createTRPCRouter({
           // `;
 
           queryStart = `
-          SELECT distinct ServiceName,CityName,BillType,
+          SELECT distinct ServiceName,CityName,BillType,CaseForm,
 
                SUM(CASE 
               WHEN ${likeConditionsForEachProperty} 
@@ -454,6 +457,7 @@ export const depoRouter = createTRPCRouter({
           ServiceName: z.array(z.string()).nullish(),
           CityName: z.array(z.string()).nullish(),
           BillType: z.array(z.string()).nullish(),
+          CaseForm: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
         }),
       }),
@@ -501,6 +505,13 @@ export const depoRouter = createTRPCRouter({
             conditions.push(`BillType IN (${billTypeValues})`);
           }
 
+          if (filter.CaseForm?.length) {
+            const caseFormValues = filter.CaseForm
+              .map((caseForm) => `N'${caseForm}'`)
+              .join(", ");
+            conditions.push(`CaseForm IN (${caseFormValues})`);
+          }
+
           if (!customDatesAlreadyApplied && !startDateCondition) {
             const dateValues = dates.map((d) => `N'${d}'`).join(", ");
             conditions.push(`Start_Date IN (${dateValues})`);
@@ -529,6 +540,13 @@ export const depoRouter = createTRPCRouter({
               .map((billType) => `N'${billType}'`)
               .join(", ");
             conditions.push(`BillType IN (${billTypeValues})`);
+          }
+
+          if (filter.CaseForm?.length) {
+            const caseFormValues = filter.CaseForm
+              .map((caseForm) => `N'${caseForm}'`)
+              .join(", ");
+            conditions.push(`CaseForm IN (${caseFormValues})`);
           }
 
           return `WHERE ${conditions.join(" AND ")}`;
