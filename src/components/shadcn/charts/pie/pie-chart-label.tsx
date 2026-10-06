@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Legend,
   LegendItem,
@@ -26,7 +26,8 @@ type DepoPieDatum = {
 
 const CHART_SIZE = 200;
 const INNER_RADIUS = 60;
-const MIN_CHART_SIZE = 140;
+/** Room for up to 3 legend rows so 2-item charts keep the same vertical band */
+const LEGEND_MIN_HEIGHT_CLASS = "min-h-[9.75rem]";
 
 function toPieData(data: DepoPieDatum[]): PieData[] {
   return data.map((item) => ({
@@ -47,8 +48,6 @@ export function ChartPieLabel({
   centerLabel?: string;
   ariaLabel?: string;
 }) {
-  const chartRef = useRef<HTMLDivElement>(null);
-  const [chartSize, setChartSize] = useState(CHART_SIZE);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -59,27 +58,6 @@ export function ChartPieLabel({
     media.addEventListener("change", sync);
     return () => media.removeEventListener("change", sync);
   }, []);
-
-  useEffect(() => {
-    const el = chartRef.current;
-    if (!el) return;
-
-    const updateSize = () => {
-      const width = el.clientWidth || CHART_SIZE;
-      setChartSize(
-        Math.max(MIN_CHART_SIZE, Math.min(CHART_SIZE, Math.floor(width))),
-      );
-    };
-
-    updateSize();
-    const observer = new ResizeObserver(updateSize);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const innerRadius = Math.round(
-    chartSize * (INNER_RADIUS / CHART_SIZE),
-  );
 
   const pieData = useMemo(() => toPieData(data ?? []), [data]);
   const totalValue = useMemo(
@@ -102,12 +80,18 @@ export function ChartPieLabel({
     return (
       <div
         className={cn(
-          "flex aspect-square w-full max-w-[200px] items-center justify-center rounded-xl border border-primary/10 bg-secondary/40 text-sm text-primary/60",
+          "flex h-full w-full min-w-0 flex-col gap-3",
           className,
         )}
-        role="status"
       >
-        داده‌ای برای نمودار وجود ندارد
+        <div
+          className="mx-auto flex shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-secondary/40 text-sm text-primary/60"
+          role="status"
+          style={{ width: CHART_SIZE, height: CHART_SIZE }}
+        >
+          داده‌ای برای نمودار وجود ندارد
+        </div>
+        <div className={cn("w-full", LEGEND_MIN_HEIGHT_CLASS)} aria-hidden />
       </div>
     );
   }
@@ -115,23 +99,24 @@ export function ChartPieLabel({
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 max-w-full flex-col items-stretch gap-3",
+        "flex h-full w-full min-w-0 max-w-full flex-col gap-3",
         className,
       )}
     >
+      {/* Fixed chart slot — same size/position in every card */}
       <div
         aria-label={ariaLabel}
-        className="mx-auto aspect-square w-full max-w-[200px]"
-        ref={chartRef}
+        className="mx-auto shrink-0"
         role="img"
+        style={{ width: CHART_SIZE, height: CHART_SIZE }}
       >
         <PieChart
           data={pieData}
           hoveredIndex={hoveredIndex}
-          innerRadius={innerRadius}
+          innerRadius={INNER_RADIUS}
           onHoverChange={setHoveredIndex}
           padAngle={0.02}
-          size={chartSize}
+          size={CHART_SIZE}
         >
           {pieData.map((item, index) => (
             <PieSlice
@@ -146,7 +131,8 @@ export function ChartPieLabel({
         </PieChart>
       </div>
 
-      <div className="min-w-0 w-full">
+      {/* Fixed legend band — 2-item charts don't pull the donut down */}
+      <div className={cn("min-w-0 w-full", LEGEND_MIN_HEIGHT_CLASS)}>
         <Legend
           className="w-full"
           hoveredIndex={hoveredIndex}

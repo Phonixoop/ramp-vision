@@ -44,22 +44,24 @@ function SummaryCard({
   return (
     <article
       className={cn(
-        "flex h-full min-w-0 max-w-full flex-col gap-3 overflow-hidden rounded-2xl border border-primary/10 bg-secbuttn/80 p-3 shadow-sm transition-colors duration-200 hover:border-primary/20 sm:p-4",
+        "grid h-full min-w-0 max-w-full grid-rows-[auto_1fr_auto] gap-3 overflow-hidden rounded-2xl border border-primary/10 bg-secbuttn/80 p-3 shadow-sm transition-colors duration-200 hover:border-primary/20 sm:p-4",
         className,
       )}
     >
-      <header className="min-w-0 space-y-1 text-center">
+      {/* Reserved 2-line header so titles/subtitles share one band across cards */}
+      <header className="flex min-h-[3.5rem] min-w-0 flex-col justify-start gap-0.5 text-center sm:min-h-[3.75rem]">
         <H2 className="text-balance text-base font-bold leading-snug text-primary sm:text-lg">
           {title}
         </H2>
-        {subtitle ? (
-          <div className="text-xs text-primary-muted sm:text-sm">{subtitle}</div>
-        ) : null}
+        <div className="min-h-[1.25rem] text-xs leading-tight text-primary-muted sm:text-sm">
+          {subtitle ?? <span className="invisible select-none">.</span>}
+        </div>
       </header>
-      <div className="flex min-w-0 flex-1 flex-col justify-center">
-        {children}
-      </div>
-      {footer ? <footer className="min-w-0 pt-1">{footer}</footer> : null}
+      <div className="flex min-h-0 min-w-0 flex-col">{children}</div>
+      {/* Reserved footer band so charts stay aligned when only some cards have footers */}
+      <footer className="flex min-h-[3rem] min-w-0 items-center">
+        {footer ?? <span className="invisible block w-full" aria-hidden />}
+      </footer>
     </article>
   );
 }
@@ -310,7 +312,7 @@ export const DepoSummary = memo(function DepoSummary({
         <ChartBarMultiple data={chartData} isLoading={depo.isLoading} />
       </SummaryCard>
 
-      <div className="grid w-full min-w-0 grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-4">
+      <div className="grid w-full min-w-0 grid-cols-1 items-stretch gap-3 md:grid-cols-2 2xl:grid-cols-4">
         <SummaryCard title="ورودی و رسیدگی مستقیم">
           <Loading
             isLoading={depo.isLoading}
@@ -357,8 +359,9 @@ export const DepoSummary = memo(function DepoSummary({
               <span className="text-primbuttn">{depo.data.periodType}</span>
             ) : null
           }
+          className="items-center"
           footer={
-            <div className="rounded-xl border border-accent/20 bg-accent/10 px-3 py-2 text-center">
+            <div className="w-full rounded-xl border border-accent/20 bg-accent/10 px-3 py-2 text-center">
               {estimateInsight}
             </div>
           }
