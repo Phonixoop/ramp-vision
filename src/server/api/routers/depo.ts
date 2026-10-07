@@ -30,7 +30,7 @@ export const depoRouter = createTRPCRouter({
           ServiceName: z.array(z.string()).nullish(),
           CityName: z.array(z.string()).nullish(),
           BillType: z.array(z.string()).nullish(),
-          CaseForm: z.array(z.string()).nullish(),
+          CaseType: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
         }),
       }),
@@ -88,7 +88,7 @@ export const depoRouter = createTRPCRouter({
              depos.ServiceName,
              depos.CityName,
              depos.BillType,
-             depos.CaseForm,
+             depos.CaseType,
            
              SUM(CASE 
                WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
@@ -110,7 +110,7 @@ export const depoRouter = createTRPCRouter({
            `;
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` Group By ServiceName,CityName,BillType,CaseForm,Start_Date ORDER BY CityName`;
+          whereClause += ` Group By ServiceName,CityName,BillType,CaseType,Start_Date ORDER BY CityName`;
         } else if (input.periodType === "هفتگی") {
           const dates = getDatesBetweenTwoDates(
             filter.Start_Date[0],
@@ -131,7 +131,7 @@ export const depoRouter = createTRPCRouter({
             depos.ServiceName,
             depos.CityName,
             depos.BillType,
-            depos.CaseForm,
+            depos.CaseType,
           
             SUM(CASE 
               WHEN Start_Date IN (${dateList}) THEN depos.EntryCount 
@@ -155,7 +155,7 @@ export const depoRouter = createTRPCRouter({
           filter.Start_Date = dates;
 
           whereClause = generateWhereClause(filter);
-          whereClause += ` GROUP BY CityName, ServiceName, BillType, CaseForm ORDER BY CityName`;
+          whereClause += ` GROUP BY CityName, ServiceName, BillType, CaseType ORDER BY CityName`;
         } else if (input.periodType === "ماهانه") {
           filter.Start_Date = filter.Start_Date.map((d) => {
             return extractYearAndMonth(d);
@@ -206,7 +206,7 @@ export const depoRouter = createTRPCRouter({
             undefined,
             `(${likeConditionsGeneral})` + " AND ",
           );
-          whereClause += ` group by ServiceName,BillType,CaseForm,CityName ORDER BY CityName`;
+          whereClause += ` group by ServiceName,BillType,CaseType,CityName ORDER BY CityName`;
 
           // const lastWeek = getFirstSaturdayOfLastWeekOfMonth(
           //   parseInt(date[0]),
@@ -226,7 +226,7 @@ export const depoRouter = createTRPCRouter({
           // `;
 
           queryStart = `
-          SELECT distinct ServiceName,CityName,BillType,CaseForm,
+          SELECT distinct ServiceName,CityName,BillType,CaseType,
 
                SUM(CASE 
               WHEN ${likeConditionsForEachProperty} 
@@ -457,7 +457,7 @@ export const depoRouter = createTRPCRouter({
           ServiceName: z.array(z.string()).nullish(),
           CityName: z.array(z.string()).nullish(),
           BillType: z.array(z.string()).nullish(),
-          CaseForm: z.array(z.string()).nullish(),
+          CaseType: z.array(z.string()).nullish(),
           Start_Date: z.array(z.string()).min(1).max(10),
         }),
       }),
@@ -505,11 +505,11 @@ export const depoRouter = createTRPCRouter({
             conditions.push(`BillType IN (${billTypeValues})`);
           }
 
-          if (filter.CaseForm?.length) {
-            const caseFormValues = filter.CaseForm
-              .map((caseForm) => `N'${caseForm}'`)
+          if (filter.CaseType?.length) {
+            const caseTypeValues = filter.CaseType
+              .map((caseType) => `N'${caseType}'`)
               .join(", ");
-            conditions.push(`CaseForm IN (${caseFormValues})`);
+            conditions.push(`CaseType IN (${caseTypeValues})`);
           }
 
           if (!customDatesAlreadyApplied && !startDateCondition) {
@@ -542,11 +542,11 @@ export const depoRouter = createTRPCRouter({
             conditions.push(`BillType IN (${billTypeValues})`);
           }
 
-          if (filter.CaseForm?.length) {
-            const caseFormValues = filter.CaseForm
-              .map((caseForm) => `N'${caseForm}'`)
+          if (filter.CaseType?.length) {
+            const caseTypeValues = filter.CaseType
+              .map((caseType) => `N'${caseType}'`)
               .join(", ");
-            conditions.push(`CaseForm IN (${caseFormValues})`);
+            conditions.push(`CaseType IN (${caseTypeValues})`);
           }
 
           return `WHERE ${conditions.join(" AND ")}`;

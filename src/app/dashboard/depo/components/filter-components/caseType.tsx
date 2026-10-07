@@ -3,19 +3,19 @@ import { Column } from "@tanstack/react-table";
 import { SelectControlled } from "~/features/checkbox-list";
 import { DepoData } from "../../types";
 
-interface CaseFormFilterProps {
+interface CaseTypeFilterProps {
   column: Column<DepoData, string | number | null>;
   depo: any;
   setDataFilters: (filters: any) => void;
 }
 
-export function CaseFormFilter({
+export function CaseTypeFilter({
   column,
   depo,
   setDataFilters,
-}: CaseFormFilterProps) {
-  const caseFormList = Array.from(
-    new Set(depo.data?.result?.map((item: any) => item.CaseForm) ?? []),
+}: CaseTypeFilterProps) {
+  const caseTypeList = Array.from(
+    new Set(depo.data?.result?.map((item: any) => item.CaseType) ?? []),
   ) as string[];
 
   return (
@@ -24,7 +24,7 @@ export function CaseFormFilter({
       {!depo.isLoading && depo.data ? (
         <SelectControlled
           withSelectAll
-          list={caseFormList}
+          list={caseTypeList}
           value={(column.getFilterValue() as string[]) ?? []}
           onChange={(selectedValues) => {
             column.setFilterValue(selectedValues);
