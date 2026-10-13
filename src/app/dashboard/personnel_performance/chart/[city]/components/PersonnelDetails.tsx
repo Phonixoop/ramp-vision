@@ -61,6 +61,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
         nationalCode: string,
         nameFamily: string,
         role: string,
+        cityName: string,
       ) => {
         if (!getAll?.data?.result) return null;
 
@@ -105,8 +106,11 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
           },
         ).find(
           (a: any) =>
-            a.key.NationalCode + a.key.NameFamily + a.Role ===
-            nationalCode + nameFamily + role,
+            a.key.NationalCode +
+              a.key.NameFamily +
+              a.Role +
+              a.key.CityName ===
+            nationalCode + nameFamily + role + cityName,
         );
       },
       [getAll?.data],
@@ -358,11 +362,18 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                     const userMetric = getPerformanceMetric(
                       userCalData?.TotalPerformance,
                     );
+                    const selectedCityName =
+                      String(
+                        (selectedPerson as any).CityName ||
+                          (selectedPerson as any).key?.CityName ||
+                          "",
+                      );
                     const dayOffRow = getAll.data?.result?.find(
                       (a: any) =>
                         a.Start_Date === dateString &&
                         String(a.NationalCode) ===
-                          String((selectedPerson as any).key.NationalCode),
+                          String((selectedPerson as any).key.NationalCode) &&
+                        String(a.CityName || "") === selectedCityName,
                     );
                     const hasTheDayOff =
                       dayOffRow != null &&
@@ -374,6 +385,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                         (selectedPerson as any).key.NationalCode,
                         (selectedPerson as any).key.NameFamily,
                         (selectedPerson as any).Role,
+                        selectedCityName,
                       );
 
                       console.log({ personnelDataForDate });

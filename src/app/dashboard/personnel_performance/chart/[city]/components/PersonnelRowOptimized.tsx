@@ -25,6 +25,7 @@ interface PersonnelRowOptimizedProps {
     nc?: string;
     name?: string;
     role?: string;
+    city?: string;
     id?: string | number;
   };
   getAllData: any[];
@@ -182,9 +183,12 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       prev.user.TotalPerformance === next.user.TotalPerformance &&
       prev.user.NameFamily === next.user.NameFamily &&
       prev.user.Role === next.user.Role &&
+      (prev.user.CityName || prev.user.key?.CityName) ===
+        (next.user.CityName || next.user.key?.CityName) &&
       prev.activeKey.nc === next.activeKey.nc &&
       prev.activeKey.name === next.activeKey.name &&
       prev.activeKey.role === next.activeKey.role &&
+      prev.activeKey.city === next.activeKey.city &&
       prev.activeKey.id === next.activeKey.id &&
       prev.getAllData === next.getAllData
     );

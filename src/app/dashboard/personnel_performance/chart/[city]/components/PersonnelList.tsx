@@ -157,14 +157,21 @@ export const PersonnelList = React.memo<PersonnelListProps>(
             isActive={
               selectedPerson?.NationalCode +
                 selectedPerson?.NameFamily +
-                selectedPerson?.Role ===
-              user.NationalCode + user.NameFamily + user.Role
+                selectedPerson?.Role +
+                (selectedPerson?.CityName ||
+                  selectedPerson?.key?.CityName) ===
+              user.NationalCode +
+                user.NameFamily +
+                user.Role +
+                (user.CityName || user.key?.CityName)
             }
             user={user}
             activeKey={{
               nc: selectedPerson?.NationalCode,
               name: selectedPerson?.NameFamily,
               role: selectedPerson?.Role,
+              city:
+                selectedPerson?.CityName || selectedPerson?.key?.CityName,
             }}
             getAllData={getAll?.data?.result ?? []}
             onSelect={(sparkData) =>
