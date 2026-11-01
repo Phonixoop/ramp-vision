@@ -39,7 +39,7 @@ export function DepoColumns({
     {
       header: "استان",
       accessorKey: "CityName",
-      filterFn: "arrIncludesSome",
+      filterFn: arrIncludeExcat,
       Filter: ({ column }) => (
         <CityNameFilter
           column={column}
