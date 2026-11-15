@@ -2,6 +2,9 @@
   "name": "ramp-vision",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "build": "next build",
     "db:push": "prisma db push",
@@ -120,5 +123,8 @@
   "ct3aMetadata": {
     "initVersion": "7.20.2"
   },
-  "packageManager": "npm@8.19.3"
+  "packageManager": "npm@8.19.3",
+  "overrides": {
+    "jwa": "^2.0.1"
+  }
 }

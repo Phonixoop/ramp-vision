@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 import moment, { Moment } from "jalali-moment";
 import BlurBackground from "~/ui/blur-backgrounds";
@@ -50,21 +50,73 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
       refetchOnWindowFocus: false,
     });
 
+  const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery(undefined, {
+    enabled: sessionData?.user !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  // Apply latest DateInfo once available
+  useEffect(() => {
+    if (!defualtDateInfo.data) return;
+    setFilters((prev) => {
+      if (prev.filter.DateInfo?.length) return prev;
+      return {
+        ...prev,
+        filter: {
+          ...prev.filter,
+          DateInfo: [defualtDateInfo.data],
+        },
+      };
+    });
+  }, [defualtDateInfo.data, setFilters]);
+
+  // Apply city names once available (only if none selected yet)
+  useEffect(() => {
+    if (
+      !getInitialCities.data?.CityNames?.length ||
+      filters?.filter?.CityName?.length
+    ) {
+      return;
+    }
+    setFilters((prev) => ({
+      ...prev,
+      filter: {
+        ...prev.filter,
+        CityName: getInitialCities.data.CityNames,
+      },
+    }));
+  }, [
+    getInitialCities.data?.CityNames,
+    filters?.filter?.CityName?.length,
+    setFilters,
+  ]);
+
+  const hasDateInfo = Boolean(filters?.filter?.DateInfo?.length);
+
   const getPersonnls = api.personnel.getAll.useQuery(
     {
       filter: {
-        ProjectType: filters?.filter?.ProjectType,
-        Role: filters?.filter?.Role,
-        ContractType: filters?.filter?.ContractType,
-        RoleType: filters?.filter?.RoleType,
+        ProjectType: filters?.filter?.ProjectType?.length
+          ? filters.filter.ProjectType
+          : defaultProjectTypes,
+        Role: filters?.filter?.Role?.length
+          ? filters.filter.Role
+          : defualtRoles,
+        ContractType: filters?.filter?.ContractType?.length
+          ? filters.filter.ContractType
+          : defualtContractTypes,
+        RoleType: filters?.filter?.RoleType?.length
+          ? filters.filter.RoleType
+          : undefined,
         DateInfo: filters?.filter?.DateInfo,
       },
     },
     {
+      enabled: sessionData?.user !== undefined && hasDateInfo,
       refetchOnWindowFocus: false,
     },
   );
-  console.log({ leeg: getPersonnls.data?.length });
+
   const columns = PersonnelsColumns({
     getPersonnls,
     filters,
@@ -74,12 +126,16 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
     setFiltersWithNoNetworkRequest,
   });
 
-  if (getInitialCities.isLoading) {
+  if (getInitialCities.isLoading || defualtDateInfo.isLoading) {
     return <TableFiltersContainerSkeleton />;
   }
 
+  const personnelRows = Array.isArray(getPersonnls.data)
+    ? getPersonnls.data
+    : [];
+
   // Add guard to prevent table rendering until data and columns are available
-  if (getPersonnls.isLoading || !getPersonnls.data) {
+  if (!hasDateInfo || getPersonnls.isLoading || getPersonnls.isError) {
     return (
       <div
         className="flex min-h-screen w-full flex-col gap-5 bg-secondary"
@@ -89,9 +145,11 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
           <div className="flex items-center justify-center p-8">
             <Loader2Icon className="h-12 w-12 animate-spin stroke-accent" />
             <span className="ml-3 text-primary">
-              {getPersonnls.isLoading
-                ? "در حال بارگذاری داده‌ها..."
-                : "در حال آماده‌سازی جدول..."}
+              {getPersonnls.isError
+                ? "خطا در بارگذاری داده‌ها"
+                : getPersonnls.isLoading || !hasDateInfo
+                  ? "در حال بارگذاری داده‌ها..."
+                  : "در حال آماده‌سازی جدول..."}
             </span>
           </div>
         </div>
@@ -119,7 +177,7 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
               });
             }}
             isLoading={getPersonnls.isLoading}
-            data={getPersonnls.data ?? []}
+            data={personnelRows}
             columns={columns}
             renderInFilterView={() => {
               return <PersonnelsFilters getInitialFilters={getInitialCities} />;

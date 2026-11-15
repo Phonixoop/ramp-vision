@@ -10,7 +10,9 @@ import {
 } from "react";
 import { PersonnelsContextType, FilterType } from "./types";
 import {
+  defaultProjectTypes,
   defualtContractTypes,
+  defualtRoles,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
 import moment from "jalali-moment";
@@ -31,14 +33,17 @@ interface PersonnelsProviderProps {
   children: React.ReactNode;
 }
 
+const defaultRoleTypes =
+  getDefaultRoleTypesBaseOnContractType(defualtContractTypes);
+
 export function PersonnelsProvider({ children }: PersonnelsProviderProps) {
   const [filters, setFilters] = useState<FilterType>({
     filter: {
       CityName: [],
-      ProjectType: [],
-      Role: [],
-      ContractType: [],
-      RoleType: [],
+      ProjectType: defaultProjectTypes,
+      Role: defualtRoles,
+      ContractType: defualtContractTypes,
+      RoleType: defaultRoleTypes,
       DateInfo: [],
     },
   });
@@ -47,7 +52,7 @@ export function PersonnelsProvider({ children }: PersonnelsProviderProps) {
     useState({
       filter: {
         ContractType: defualtContractTypes,
-        RoleType: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
+        RoleType: defaultRoleTypes,
       },
     });
 

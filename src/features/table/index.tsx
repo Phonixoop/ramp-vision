@@ -55,6 +55,18 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
+/** Checkbox multi-select: row value must be one of the selected filter values. */
+const arrIncludesSomeFilter: FilterFn<any> = (
+  row,
+  columnId,
+  filterValue: string[],
+) => {
+  if (!filterValue?.length) return true;
+  const value = row.getValue(columnId);
+  if (value == null) return false;
+  return filterValue.includes(String(value));
+};
+
 import { useVirtual } from "@tanstack/react-virtual";
 
 import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
@@ -116,6 +128,7 @@ export default function Table<TData>({
     },
     filterFns: {
       fuzzy: fuzzyFilter,
+      arrIncludesSome: arrIncludesSomeFilter,
     },
 
     onColumnFiltersChange: setColumnFilters,
@@ -129,6 +142,14 @@ export default function Table<TData>({
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: fuzzyFilter,
+    // Allow global search on data columns even if the first row value is nullish
+    getColumnCanGlobalFilter: (column) => {
+      if (column.columnDef.enableGlobalFilter === false) return false;
+      return Boolean(
+        (column.columnDef as { accessorKey?: string }).accessorKey ||
+          column.accessorFn,
+      );
+    },
     // debugTable: true,
     // debugHeaders: true,
     // debugColumns: false,
@@ -242,7 +263,7 @@ export default function Table<TData>({
           {!isLoading && (
             <div className="m-auto flex w-full justify-start p-2">
               <DebouncedInput
-                value={globalFilter ?? " "}
+                value={globalFilter ?? ""}
                 onChange={handleGlobalFilterChange}
                 label="جستجو..."
               />

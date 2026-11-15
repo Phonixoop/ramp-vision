@@ -3,18 +3,26 @@ import sql from "mssql";
 let pool: sql.ConnectionPool | null = null;
 let poolPromise: Promise<sql.ConnectionPool> | null = null;
 
+function isIpLiteral(host: string): boolean {
+  return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || host.includes(":");
+}
+
 function getMssqlConfig(): sql.config {
   const port = parseInt(process.env.SQL_PORT ?? "1433", 10);
+  const server = process.env.SQL_SERVERIP ?? "";
 
   return {
     user: process.env.SQL_USER,
     password: process.env.SQL_PASSWORD,
-    server: process.env.SQL_SERVERIP,
+    server,
     port: Number.isNaN(port) ? 1433 : port,
     database: "",
     options: {
       encrypt: true,
       trustServerCertificate: true,
+      // Node forbids IP literals as TLS SNI; use a placeholder hostname when
+      // connecting by IP (safe with trustServerCertificate: true).
+      ...(isIpLiteral(server) ? { serverName: "localhost" } : {}),
     },
   };
 }

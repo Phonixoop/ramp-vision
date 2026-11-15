@@ -53,6 +53,7 @@ export function PersonnelsColumns({
       {
         header: "ردیف",
         accessorFn: (row, index) => index + 1,
+        enableGlobalFilter: false,
         cell: ({ row }) => {
           return (
             <div className="w-full cursor-pointer rounded-full px-2 py-2 text-primary">
@@ -80,6 +81,7 @@ export function PersonnelsColumns({
               <SelectColumnFilterOptimized
                 column={column}
                 values={getPersonnls.data || []}
+                initialFilters={[]}
               />
             </div>
           );
@@ -88,6 +90,7 @@ export function PersonnelsColumns({
       {
         header: "کد ملی",
         accessorKey: "NationalCode",
+        accessorFn: (row) => String(row.NationalCode ?? ""),
         filterFn: "arrIncludesSome",
       },
       {
@@ -164,19 +167,27 @@ export function PersonnelsColumns({
         filterFn: "arrIncludesSome",
         Filter: ({ column }) => {
           const _DateInfos = [
-            ...new Set(getPersonnls?.data?.map((a: any) => a.DateInfo)),
+            ...new Set(
+              (Array.isArray(getPersonnls?.data) ? getPersonnls.data : []).map(
+                (a: any) => a.DateInfo,
+              ),
+            ),
           ];
 
           const DateInfos = sortDates({ dates: _DateInfos });
 
           if (DateInfos.length <= 0) return null;
+          const initialDateInfo =
+            filters?.filter?.DateInfo?.length > 0
+              ? filters.filter.DateInfo
+              : [DateInfos[DateInfos.length - 1] ?? ""];
           return (
             <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
               <span className="font-bold text-primary">تاریخ گزارش پرسنل</span>
               <SelectColumnFilterOptimized
                 column={column}
                 values={getPersonnls.data || []}
-                initialFilters={[DateInfos[DateInfos.length - 1] ?? ""]}
+                initialFilters={initialDateInfo}
                 singleSelect
               />
             </div>
@@ -184,7 +195,13 @@ export function PersonnelsColumns({
         },
       },
     ];
-  }, [getPersonnls.data, setFilters, cityNames]);
+  }, [
+    getPersonnls.data,
+    setFilters,
+    cityNames,
+    filters?.filter?.DateInfo,
+    filtersWithNoNetworkRequest?.filter?.RoleType,
+  ]);
 
   return columns;
 }

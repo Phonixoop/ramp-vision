@@ -302,8 +302,8 @@ const getString = (v: unknown): string => (v == null ? "" : String(v));
 export function SelectColumnFilter({
   column,
   data,
-  initialFilters = [""],
-  selectedValues = [""],
+  initialFilters = [],
+  selectedValues = [],
   onChange = (filter) => {},
   withSelectAll = true,
   singleSelect = false,
@@ -370,6 +370,7 @@ export function SelectColumnFilter({
   }, [data, column.id]);
 
   useIsomorphicLayoutEffect(() => {
+    if (!initialFilters?.length) return;
     setFilterValue(initialFilters);
     setLocalFilterValue(initialFilters);
   }, []);
@@ -616,7 +617,7 @@ type SelectColumnFilterOptimizedProps<T> = {
 export function SelectColumnFilterOptimized<T>({
   column,
   values,
-  initialFilters = [""],
+  initialFilters = [],
   onChange = (filter) => {},
   withSelectAll = true,
   singleSelect = false,
