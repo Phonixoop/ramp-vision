@@ -29,6 +29,8 @@ export default {
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
+        third: withOpacity("--third"),
+        fourth: withOpacity("--fourth"),
         accent: withOpacity("--accent"),
         // External component color mappings
         foreground: withOpacity("--primary"),
@@ -53,6 +55,8 @@ export default {
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
+        third: withOpacity("--third"),
+        fourth: withOpacity("--fourth"),
         accent: withOpacity("--accent"),
         // External component color mappings
         background: withOpacity("--secondary"),
@@ -79,6 +83,9 @@ export default {
         secondary: withOpacity("--secondary"),
         primbuttn: withOpacity("--primbuttn"),
         secbuttn: withOpacity("--secbuttn"),
+        third: withOpacity("--third"),
+        fourth: withOpacity("--fourth"),
+        "border-color": withOpacity("--border-color"),
         accent: withOpacity("--accent"),
         // External component color mappings
         border: withOpacity("--primary"),

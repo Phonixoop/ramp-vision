@@ -28,8 +28,13 @@ import { getUserPermissions } from "~/lib/user.util";
 import { sortDates } from "~/lib/utils";
 import { mssqlQuery } from "~/server/db/mssql-pool";
 
-const USERS_REAL_CITY_JOIN =
-  "JOIN RAMP_Daily.dbo.users as usr ON p.NationalCode = usr.NationalCode";
+/** One users row per NationalCode — prevents SUM fan-out from duplicate users rows. */
+const USERS_REAL_CITY_JOIN = `
+  CROSS APPLY (
+    SELECT TOP 1 usr.CityName, usr.NameFamily
+    FROM RAMP_Daily.dbo.users AS usr
+    WHERE usr.NationalCode = p.NationalCode
+  ) AS usr`;
 
 const TEHRAN_RELATED_CITIES_SQL = TEHRAN_RELATED_CITIES.map(
   (city) => `'${city}'`,

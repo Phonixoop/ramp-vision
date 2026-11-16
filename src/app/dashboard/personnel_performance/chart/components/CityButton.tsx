@@ -15,6 +15,8 @@ interface CityButtonProps {
   sparkChartData: any[];
   cityPerformances: number[];
   onNavigate: (cityName: string) => void;
+  /** Name-only narrow rail (v2 chart compact mode). */
+  compact?: boolean;
 }
 
 export const CityButton = React.memo<CityButtonProps>(
@@ -26,6 +28,7 @@ export const CityButton = React.memo<CityButtonProps>(
     sparkChartData,
     cityPerformances,
     onNavigate,
+    compact = false,
   }) => {
     return (
       <div
@@ -46,42 +49,51 @@ export const CityButton = React.memo<CityButtonProps>(
             isNavigating && "pointer-events-none animate-pulse bg-primary/20",
           )}
           onClick={() => onNavigate(item.CityName_En)}
+          title={item.CityName_Fa}
         >
-          <div className="relative flex w-full items-center justify-between gap-2 px-2 text-right text-inherit duration-1000">
-            <span className="w-full text-sm">{item.CityName_Fa}</span>
-            <div className="flex w-full items-center justify-center">
-              <SparkAreaChart
-                data={sparkChartData}
-                noDataText="بدون داده"
-                categories={[
-                  "TotalPerformance",
-                  "Benchmark",
-                  "Benchmark2",
-                  "Benchmark3",
-                ]}
-                index="Start_Date"
-                colors={["purple", "rose", "cyan"]}
-                className={cn(
-                  "dash-a pointer-events-none h-10 w-36",
-                  isActive
-                    ? "animate-path animate-[move_100s_linear_infinite]"
-                    : "",
-                )}
-              />
+          {compact ? (
+            <div className="relative flex w-full items-center justify-center px-1 py-0.5 text-inherit">
+              <span className="w-full break-words text-center text-xs leading-tight">
+                {item.CityName_Fa}
+              </span>
             </div>
-            <div className="flex flex-col items-center justify-center">
-              <TrendDecider values={cityPerformances} />
-              {Math.round(item.TotalPerformance)}%
-            </div>
+          ) : (
+            <div className="relative flex w-full items-center justify-between gap-2 px-2 text-right text-inherit duration-1000">
+              <span className="w-full text-sm">{item.CityName_Fa}</span>
+              <div className="flex w-full items-center justify-center">
+                <SparkAreaChart
+                  data={sparkChartData}
+                  noDataText="بدون داده"
+                  categories={[
+                    "TotalPerformance",
+                    "Benchmark",
+                    "Benchmark2",
+                    "Benchmark3",
+                  ]}
+                  index="Start_Date"
+                  colors={["purple", "rose", "cyan"]}
+                  className={cn(
+                    "dash-a pointer-events-none h-10 w-36",
+                    isActive
+                      ? "animate-path animate-[move_100s_linear_infinite]"
+                      : "",
+                  )}
+                />
+              </div>
+              <div className="flex flex-col items-center justify-center">
+                <TrendDecider values={cityPerformances} />
+                {Math.round(item.TotalPerformance)}%
+              </div>
 
-            <div className="w-10">
-              {isActive ? (
-                <BarChart3Loading />
-              ) : (
-                <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
-              )}
+              <div className="w-10">
+                {isActive ? (
+                  <BarChart3Loading />
+                ) : (
+                  <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
+                )}
+              </div>
             </div>
-          </div>
+          )}
           {isActive && (
             <div
               className="absolute inset-0 -z-20"

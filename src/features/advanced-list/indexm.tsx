@@ -22,7 +22,7 @@ function useDebounce<T>(value: T, delay = 300): T {
 
 export default function AdvancedList({
   className = "",
-  title = <></> || "",
+  title = null,
   list = () => [],
   filteredList = [], // external controlled list
   isLoading = false,
@@ -34,6 +34,26 @@ export default function AdvancedList({
   onChange = (action: any) => {},
   renderItem = (item: any, i: number) => <></>,
   renderUnderButtons = () => <></>,
+  /** Hide search/sort/download chrome for narrow sticky rails. */
+  compact = false,
+  /** Stretch to parent flex height instead of the fixed 580px panel. */
+  fillHeight = false,
+}: {
+  className?: string;
+  title?: React.ReactNode | null;
+  list?: any[] | (() => any[]);
+  filteredList?: any[];
+  isLoading?: boolean;
+  disabled?: boolean;
+  selectProperty?: string;
+  downloadFileName?: string;
+  headers?: { label: string; key: string }[];
+  dataToDownload?: any[];
+  onChange?: (action: any) => void;
+  renderItem?: (item: any, i: number) => React.ReactNode;
+  renderUnderButtons?: () => React.ReactNode;
+  compact?: boolean;
+  fillHeight?: boolean;
 }) {
   const correctList = useMemo(
     () => (typeof list === "function" ? list() : list),
@@ -103,11 +123,13 @@ export default function AdvancedList({
   return (
     <div
       className={twMerge(
-        "relative flex w-full max-w-sm flex-col items-center justify-start gap-1",
+        "relative flex w-full flex-col items-center justify-start gap-1",
+        compact ? "max-w-none" : "max-w-sm",
+        fillHeight && "min-h-0 flex-1 overflow-hidden",
         className,
       )}
     >
-      {title && (
+      {title && !compact && (
         <div className="w-full rounded-lg bg-secbuttn p-3 text-center text-lg font-bold text-primary">
           {title}
         </div>
@@ -116,53 +138,79 @@ export default function AdvancedList({
       <div
         className={twMerge(
           "flex w-full flex-col gap-1 overflow-hidden overflow-y-auto rounded-2xl p-1",
-          computedList.length > 0
-            ? "max-h-[580px] min-h-[580px] bg-secbuttn"
-            : "h-full min-h-[580px]",
+          fillHeight
+            ? "min-h-0 max-h-none flex-1 bg-transparent"
+            : twMerge(
+                computedList.length > 0
+                  ? "max-h-[580px] min-h-[580px] bg-secbuttn"
+                  : "h-full min-h-[580px]",
+                compact && "min-h-0 max-h-[min(580px,70vh)]",
+              ),
         )}
       >
-        <div
-          className={twMerge(
-            "sticky top-0 z-10 flex w-full flex-col items-center justify-center gap-1 py-2 drop-shadow-lg",
-            computedList.length > 0 ? "bg-secbuttn" : "",
-          )}
-        >
-          <input
-            type="text"
-            dir="rtl"
-            placeholder="جستجو..."
-            className="w-full rounded-md bg-secondary p-2 text-primary disabled:bg-primary/30 disabled:text-secondary"
-            onChange={(e) => setSearchQuery(e.target.value)}
-            disabled={disabled}
-            value={searchQuery}
-          />
+        {!compact && (
+          <div
+            className={twMerge(
+              "sticky top-0 z-10 flex w-full flex-col items-center justify-center gap-1 py-2 drop-shadow-lg",
+              fillHeight
+                ? "bg-fourth"
+                : computedList.length > 0
+                  ? "bg-secbuttn"
+                  : "",
+            )}
+          >
+            <input
+              type="text"
+              dir="rtl"
+              placeholder="جستجو..."
+              className={twMerge(
+                "w-full rounded-md p-2 text-primary disabled:bg-primary/30 disabled:text-secondary",
+                fillHeight
+                  ? "border border-border-color/10 bg-third text-xs"
+                  : "bg-secondary",
+              )}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              disabled={disabled}
+              value={searchQuery}
+            />
 
-          <div className="flex w-full items-center justify-stretch gap-2">
-            <div className="flex w-full items-center justify-around gap-2 rounded-lg bg-primary/10 p-2 text-primary">
-              <Tally5Icon />
-              <span>{computedList.length}</span>
+            <div className="flex w-full items-center justify-stretch gap-2">
+              <div
+                className={twMerge(
+                  "flex w-full items-center justify-around gap-2 rounded-lg p-2 text-primary",
+                  fillHeight ? "bg-third text-xs" : "bg-primary/10",
+                )}
+              >
+                <Tally5Icon className={fillHeight ? "size-3.5" : undefined} />
+                <span>{computedList.length}</span>
+              </div>
+
+              <Button
+                disabled={myDisabled}
+                onClick={toggleSortOrder}
+                className={twMerge(
+                  "flex w-full items-center justify-around gap-2 disabled:bg-primary/70 disabled:text-secondary",
+                  fillHeight
+                    ? "rounded-lg border border-border-color/10 bg-third text-xs text-primary/70"
+                    : "bg-secondary text-accent",
+                )}
+              >
+                <span>مرتب سازی</span>
+                {sortOrder === "original" ? (
+                  <ArrowUpDownIcon />
+                ) : sortOrder === "asc" ? (
+                  <ArrowDownAZIcon />
+                ) : (
+                  <ArrowUpAZIcon />
+                )}
+              </Button>
             </div>
 
-            <Button
-              disabled={myDisabled}
-              onClick={toggleSortOrder}
-              className="flex w-full items-center justify-around gap-2 bg-secondary text-accent disabled:bg-primary/70 disabled:text-secondary"
-            >
-              <span>مرتب سازی</span>
-              {sortOrder === "original" ? (
-                <ArrowUpDownIcon />
-              ) : sortOrder === "asc" ? (
-                <ArrowDownAZIcon />
-              ) : (
-                <ArrowUpAZIcon />
-              )}
-            </Button>
+            <div className="flex w-full items-center justify-stretch gap-2">
+              {renderUnderButtons()}
+            </div>
           </div>
-
-          <div className="flex w-full items-center justify-stretch gap-2">
-            {renderUnderButtons()}
-          </div>
-        </div>
+        )}
 
         {computedList.map((item, i) => renderItem(item, i))}
 
@@ -173,24 +221,31 @@ export default function AdvancedList({
         )}
       </div>
 
-      <Button className="sticky bottom-1 w-full bg-accent text-secondary">
-        {isClient ? (
-          <CSVLink
-            className="flex w-full justify-center gap-1"
-            headers={headers}
-            data={dataToDownload}
-            filename={`${downloadFileName}.csv`}
-          >
-            <DownloadCloudIcon />
-            دانلود لیست
-          </CSVLink>
-        ) : (
-          <div className="flex w-full justify-center gap-1">
-            <DownloadCloudIcon />
-            دانلود لیست
-          </div>
-        )}
-      </Button>
+      {!compact && (
+        <Button
+          className={twMerge(
+            "w-full shrink-0 bg-accent text-secondary",
+            fillHeight ? "sticky bottom-0 rounded-none rounded-b-2xl" : "sticky bottom-1",
+          )}
+        >
+          {isClient ? (
+            <CSVLink
+              className="flex w-full justify-center gap-1"
+              headers={headers}
+              data={dataToDownload}
+              filename={`${downloadFileName}.csv`}
+            >
+              <DownloadCloudIcon />
+              دانلود لیست
+            </CSVLink>
+          ) : (
+            <div className="flex w-full justify-center gap-1">
+              <DownloadCloudIcon />
+              دانلود لیست
+            </div>
+          )}
+        </Button>
+      )}
     </div>
   );
 }

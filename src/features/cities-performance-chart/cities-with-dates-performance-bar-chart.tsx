@@ -13,6 +13,7 @@ import {
 import { commify, getEnglishToPersianCity } from "~/utils/util";
 
 import CustomBarChart from "~/features/custom-charts/bar-chart";
+import { PerformanceBarChart } from "~/components/bklit";
 
 import { BarChartSkeletonLoading } from "~/features/loadings/bar-chart";
 import {
@@ -26,8 +27,11 @@ import PerformanceBadges from "~/components/main/performance-badges";
 
 export function CitiesWithDatesPerformanceBarChart({
   filters,
+  chartEngine = "recharts",
 }: {
   filters: FilterType;
+  /** `"bklit"` swaps the presentation layer for Bklit charts (v2 route). */
+  chartEngine?: "recharts" | "bklit";
 }) {
   const selectedCities = filters.filter.CityName ?? [];
   const hasSelectedCity = selectedCities.length > 0;
@@ -150,6 +154,35 @@ export function CitiesWithDatesPerformanceBarChart({
     .filter((item) => item.تاریخ && item.عملکرد > 0);
 
   const hasData = chartData.length > 0;
+
+  if (chartEngine === "bklit") {
+    return (
+      <div className="flex min-h-[520px] w-full flex-col items-center justify-center gap-3 rounded-xl bg-fourth/30 p-3">
+        <PerformanceBadges />
+        {getCitiesWithPerformance.isError && (
+          <p className="rounded-xl border border-border-color/15 bg-third p-3 text-sm text-primary">
+            خطا در دریافت داده‌ها: {getCitiesWithPerformance.error?.message}
+          </p>
+        )}
+        <div className="flex w-full flex-col gap-3 rounded-2xl border border-border-color/10 bg-third p-4">
+          <H2 className="text-center font-bold text-primary">
+            نمودار زمانی عملکرد شهر {chartCityLabel}
+          </H2>
+          <PerformanceBarChart
+            data={chartData.map((row) => ({
+              label: String(row.تاریخ ?? ""),
+              value: Number(row.عملکرد) || 0,
+            }))}
+            emptyMessage="هیچ داده‌ای برای نمایش وجود ندارد"
+            enableBrush
+            heightClassName="h-[420px]"
+            isLoading={getCitiesWithPerformance.isLoading}
+            xLabelMaxChars={12}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[700px] w-full flex-col items-center justify-center rounded-xl bg-secbuttn p-2">

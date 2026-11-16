@@ -1,6 +1,5 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import { ResponsiveContainer } from "recharts";
 import { cn } from "~/lib/utils";
 import moment from "jalali-moment";
 import PerformanceBadgesLazy from "~/components/main/performance-badges";
@@ -10,12 +9,10 @@ import {
   PersonnelPerformanceGroups,
   type PersonnelPerformanceGroup,
 } from "~/constants/personnel-performance";
-import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import ToolTipSimple from "~/features/tooltip-simple-use";
 import { ButtonWithModal } from "~/ui/button-with-modal";
 import H2 from "~/ui/heading/h2";
 import Button from "~/ui/buttons";
-import { commify } from "~/utils/util";
 import { uniqueArray } from "~/lib/utils";
 import {
   getMonthNamesFromJOINED_date_strings,
@@ -25,9 +22,10 @@ import {
   isPersonnelWorkingDay,
 } from "~/utils/personnel-performance";
 import { getMonthNumber } from "~/utils/date-utils";
+import { commify } from "~/utils/util";
 
 const Calendar = dynamic(() => import("~/features/calendar"), { ssr: false });
-const Gauge = dynamic(() => import("~/features/gauge"), { ssr: false });
+const DefaultGauge = dynamic(() => import("~/features/gauge"), { ssr: false });
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
@@ -37,12 +35,20 @@ type PersonRecord = Record<string, any> & {
   key?: { CityName: string; NameFamily: string; NationalCode: string };
 };
 
+type GaugeComponent = React.ComponentType<{
+  value?: number | null;
+  className?: string;
+  label?: string;
+}>;
+
 interface PersonnelDetailsProps {
   selectedPerson: PersonRecord | null;
   currentCity: string;
   filters: any;
   getAll: any;
   setSelectedPerson: (person: PersonRecord | null) => void;
+  /** Optional gauge override (v2 passes Bklit `PerformanceGauge`). */
+  GaugeComponent?: GaugeComponent;
 }
 
 export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
@@ -52,7 +58,9 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
     filters,
     getAll,
     setSelectedPerson,
+    GaugeComponent,
   }) => {
+    const Gauge = GaugeComponent ?? DefaultGauge;
     console.log({ selectedPerson });
     // Helper function to get personnel data for a specific date
     const getPersonnelDataForDate = React.useCallback(
@@ -472,21 +480,30 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
           <div className="flex flex-col items-center justify-center lg:flex-row">
             <div className="col-span-2 flex w-full flex-col items-center justify-center">
               <H2>عملکرد کلی</H2>
-              <Gauge value={(selectedPerson as any)?.TotalPerformance} />
+              <Gauge
+                label="کلی"
+                value={(selectedPerson as any)?.TotalPerformance}
+              />
               <p className="text-accent">
                 {/* Performance text will be handled by the gauge component */}
               </p>
             </div>
             <div className="col-span-2 flex w-full flex-col items-center justify-center">
               <H2>عملکرد مستقیم</H2>
-              <Gauge value={(selectedPerson as any)?.DirectPerFormance} />
+              <Gauge
+                label="مستقیم"
+                value={(selectedPerson as any)?.DirectPerFormance}
+              />
               <p className="text-accent">
                 {/* Performance text will be handled by the gauge component */}
               </p>
             </div>
             <div className="col-span-2 flex w-full flex-col items-center justify-center">
               <H2>عملکرد غیر مستقیم</H2>
-              <Gauge value={(selectedPerson as any)?.InDirectPerFormance} />
+              <Gauge
+                label="غیر مستقیم"
+                value={(selectedPerson as any)?.InDirectPerFormance}
+              />
               <p className="text-accent">
                 {/* Performance text will be handled by the gauge component */}
               </p>

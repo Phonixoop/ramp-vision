@@ -9,6 +9,10 @@ html[data-theme="light"] {
   /* --primbuttn: 61, 87, 71; */
   --primbuttn: 76, 170, 136;
   --secbuttn: 197, 188, 171;
+  /* Linear sheet chrome (dashboard2) */
+  --third: 214, 211, 198;
+  --fourth: 197, 188, 171;
+  --border-color: 8, 12, 10;
   /* --accent: 85, 119, 97; */
   --accent: 51, 113, 90;
 }
@@ -20,6 +24,10 @@ html[data-theme="dark"] {
   /* --primbuttn: 237, 33, 124; */
   --primbuttn: 34, 102, 102;
   --secbuttn: 23, 23, 23;
+  /* Linear sheet chrome (dashboard2) */
+  --third: 18, 18, 18;
+  --fourth: 28, 28, 28;
+  --border-color: 244, 246, 245;
   /* --accent: 76, 170, 136; */
   --accent: 51, 113, 90;
 }
@@ -311,6 +319,30 @@ input[type="number"] {
 }
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgb(var(--primary));
+}
+
+/* Scoped thin rail scrollbars (city / personnel list panels) */
+.rail-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border-color) / 0.22) transparent;
+}
+
+.rail-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.rail-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rail-scroll::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--border-color) / 0.22);
+  border-radius: 999px;
+}
+
+.rail-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--border-color) / 0.35);
 }
 /* time picker */
 

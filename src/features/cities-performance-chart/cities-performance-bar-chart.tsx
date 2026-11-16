@@ -20,6 +20,7 @@ import {
 } from "~/utils/util";
 
 import CustomBarChart from "~/features/custom-charts/bar-chart";
+import { PerformanceBarChart } from "~/components/bklit";
 import {
   Performance_Levels_Gauge,
   defaultProjectTypes,
@@ -34,10 +35,16 @@ import { useMemo } from "react";
 import { CitiesWithDatesPerformanceBarChart } from "~/features/cities-performance-chart/cities-with-dates-performance-bar-chart";
 import { groupBy, uniqueArrayWithCounts } from "~/lib/utils";
 import moment from "jalali-moment";
-import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+import { useWorkDaysToggleOptional } from "~/context/work-days-toggle.context";
 
-function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
-  const { useWorkDays } = useWorkDaysToggle();
+function CityPerformanceWithUsersChartContent({
+  filters,
+  cityName_En,
+  useWorkDays: useWorkDaysProp,
+  chartEngine = "recharts",
+}) {
+  const workDaysToggle = useWorkDaysToggleOptional();
+  const useWorkDays = useWorkDaysProp ?? workDaysToggle?.useWorkDays ?? false;
   const cityFilter = useMemo(
     () => expandTehranPerformanceCities([cityName_En]),
     [cityName_En],
@@ -45,22 +52,31 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   const defualtDateInfo = api.personnel.getDefualtDateInfo.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
+  const startDates = filters?.filter?.Start_Date;
+  const hasStartDates = Array.isArray(startDates) && startDates.length > 0;
+  const dateInfo =
+    filters?.filter?.DateInfo?.length
+      ? filters.filter.DateInfo
+      : defualtDateInfo.data
+        ? [defualtDateInfo.data]
+        : undefined;
+
   const getCitysUsersPerformance = api.personnelPerformance.getAll.useQuery(
     {
       filter: {
         CityName: cityFilter,
-        Start_Date: filters?.filter?.Start_Date,
+        Start_Date: startDates,
         ProjectType: filters?.filter?.ProjectType ?? defaultProjectTypes,
         Role: filters?.filter?.Role ?? defualtRoles,
         ContractType: filters?.filter?.ContractType ?? defualtContractTypes,
         RoleType: filters?.filter?.RoleType,
-        DateInfo: filters?.filter?.DateInfo ?? [defualtDateInfo.data],
+        DateInfo: dateInfo,
       },
       periodType: filters.periodType,
     },
 
     {
-      enabled: !!cityName_En,
+      enabled: Boolean(cityName_En) && hasStartDates,
       refetchOnWindowFocus: false,
     },
   );
@@ -230,6 +246,67 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
     totalWorkDays,
   ]);
 
+  const personnelBars = (distinctData ?? []).map((row) => {
+    const name = getPersonnelDisplayName(
+      row.NameFamily,
+      row.CityName,
+      row.RealCityName,
+    );
+    return {
+      label: name,
+      value: Math.round(row.TotalPerformance),
+      payload: { نام: name },
+    };
+  });
+
+  const selectedUserBars = (selectedUserData ?? []).map((row) => ({
+    label: String(row.Start_Date ?? ""),
+    value: Math.round(row.TotalPerformance),
+  }));
+
+  const selectedName = searchParams.get("NameFamily");
+
+  if (chartEngine === "bklit") {
+    return (
+      <>
+        <div className="flex min-h-[420px] w-full flex-col gap-3 rounded-2xl border border-border-color/10 bg-third p-4">
+          <H2 className="text-center font-bold text-primary">
+            نمودار عملکرد پرسنل شهر {getEnglishToPersianCity(cityName_En)}
+          </H2>
+          <PerformanceBarChart
+            data={personnelBars}
+            enableBrush
+            heightClassName="h-[420px]"
+            isLoading={getCitysUsersPerformance.isLoading}
+            onBarClick={(datum) => {
+              const name = String(datum.payload?.نام ?? datum.label ?? "");
+              if (!name) return;
+              const params = new URLSearchParams(searchParams);
+              params.set("NameFamily", name);
+              router.push(`?${params.toString()}`, { scroll: false });
+            }}
+            xLabelMaxChars={8}
+          />
+        </div>
+
+        {selectedName ? (
+          <div className="mt-4 flex min-h-[420px] w-full flex-col gap-3 rounded-2xl border border-border-color/10 bg-third p-4">
+            <H2 className="text-center font-bold text-primary">
+              نمودار زمانی عملکرد {selectedName}
+            </H2>
+            <PerformanceBarChart
+              data={selectedUserBars}
+              enableBrush
+              heightClassName="h-[420px]"
+              isLoading={getCitysUsersPerformance.isLoading}
+              xLabelMaxChars={12}
+            />
+          </div>
+        ) : null}
+      </>
+    );
+  }
+
   return (
     <>
       {!getCitysUsersPerformance.isLoading ? (
@@ -345,7 +422,12 @@ function CityPerformanceWithUsersChartContent({ filters, cityName_En }) {
   );
 }
 
-export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
+export function CityPerformanceWithUsersChart({
+  filters,
+  cityName_En,
+  useWorkDays,
+  chartEngine = "recharts",
+}) {
   return (
     <Suspense
       fallback={
@@ -355,8 +437,10 @@ export function CityPerformanceWithUsersChart({ filters, cityName_En }) {
       }
     >
       <CityPerformanceWithUsersChartContent
-        filters={filters}
+        chartEngine={chartEngine}
         cityName_En={cityName_En}
+        filters={filters}
+        useWorkDays={useWorkDays}
       />
     </Suspense>
   );

@@ -44,9 +44,21 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
     api.createClient({
       links: [
         loggerLink({
-          enabled: (op) =>
-            process.env.NODE_ENV === "development" ||
-            (op.direction === "down" && op.result instanceof Error),
+          enabled: (op) => {
+            if (op.direction === "down" && op.result instanceof Error) {
+              const err = op.result as Error & { cause?: { name?: string } };
+              const aborted =
+                err.name === "AbortError" ||
+                err.message === "Aborted" ||
+                err.cause?.name === "AbortError" ||
+                /aborted/i.test(err.message);
+              // Cancelled in-flight queries (filter/city changes, Strict Mode)
+              // must not surface as Next.js console errors.
+              if (aborted) return false;
+              return true;
+            }
+            return process.env.NODE_ENV === "development";
+          },
         }),
         httpBatchStreamLink({
           // AppRouter incorrectly infers transformer:false under strictNullChecks:false

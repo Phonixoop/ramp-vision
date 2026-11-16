@@ -92,18 +92,21 @@ export function MultiSelect({
     });
   }, []);
 
+  const selected =
+    values != null ? new Set(values) : selectedValues;
+
   return (
     <MultiSelectContext.Provider
       value={{
         open,
         setOpen,
-        selectedValues: values ? new Set(values) : selectedValues,
+        selectedValues: selected,
         toggleValue,
         items,
         onItemAdded,
       }}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
         {children}
       </Popover>
     </MultiSelectContext.Provider>
@@ -164,54 +167,66 @@ export function MultiSelectValue({
     overflowBehavior === "wrap" ||
     (overflowBehavior === "wrap-when-open" && open);
 
-  const checkOverflowRef = useRef(() => {
-    if (valueRef.current == null) return;
+  const measuringRef = useRef(false);
+  const overflowAmountRef = useRef(0);
 
+  const checkOverflowRef = useRef(() => {
+    if (valueRef.current == null || measuringRef.current) return;
+    if (shouldWrap) {
+      if (overflowAmountRef.current !== 0) {
+        overflowAmountRef.current = 0;
+        setOverflowAmount(0);
+      }
+      return;
+    }
+
+    measuringRef.current = true;
     const containerElement = valueRef.current;
     const overflowElement = overflowRef.current;
-    const items = containerElement.querySelectorAll<HTMLElement>(
+    const itemNodes = containerElement.querySelectorAll<HTMLElement>(
       "[data-selected-item]",
     );
 
     if (overflowElement != null) overflowElement.style.display = "none";
-    items.forEach((child) => child.style.removeProperty("display"));
+    itemNodes.forEach((child) => child.style.removeProperty("display"));
     let amount = 0;
-    for (let i = items.length - 1; i >= 0; i--) {
-      const child = items[i];
+    for (let i = itemNodes.length - 1; i >= 0; i--) {
+      const child = itemNodes[i];
+      if (!child) continue;
       if (containerElement.scrollWidth <= containerElement.clientWidth) {
         break;
       }
-      amount = items.length - i;
+      amount = itemNodes.length - i;
       child.style.display = "none";
       overflowElement?.style.removeProperty("display");
     }
-    setOverflowAmount(amount);
+
+    if (overflowAmountRef.current !== amount) {
+      overflowAmountRef.current = amount;
+      setOverflowAmount(amount);
+    }
+    // Defer unlock so ResizeObserver callbacks from our own style tweaks are ignored.
+    requestAnimationFrame(() => {
+      measuringRef.current = false;
+    });
   });
 
-  useEffect(() => {
-    // Use requestAnimationFrame to avoid layout thrashing
+  useLayoutEffect(() => {
     const rafId = requestAnimationFrame(() => checkOverflowRef.current());
     return () => cancelAnimationFrame(rafId);
-  }, [selectedValues, shouldWrap]);
+  }, [selectedValues, shouldWrap, items]);
 
-  const handleResize = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      valueRef.current = node;
-      const observer = new ResizeObserver(() => checkOverflowRef.current());
-      observer.observe(node);
-      // Store observer for cleanup
-      (node as any)._resizeObserver = observer;
-    }
-  }, []);
-
-  // Cleanup effect
   useEffect(() => {
-    return () => {
-      if (valueRef.current && (valueRef.current as any)._resizeObserver) {
-        (valueRef.current as any)._resizeObserver.disconnect();
-      }
-    };
-  }, []);
+    const node = valueRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(() => {
+      if (measuringRef.current) return;
+      checkOverflowRef.current();
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [selectedValues.size, shouldWrap]);
 
   if (selectedValues.size === 0 && placeholder) {
     return (
@@ -224,37 +239,35 @@ export function MultiSelectValue({
   return (
     <div
       {...props}
-      ref={handleResize}
+      ref={valueRef}
       className={cn(
         " flex max-h-48 w-full gap-1.5 overflow-hidden overflow-y-auto",
         shouldWrap && "h-full flex-wrap",
         className,
       )}
     >
-      {[...selectedValues]
-        .filter((value) => items.has(value))
-        .map((value) => (
-          <Badge
-            variant="outline"
-            data-selected-item
-            className=" group flex items-center gap-1"
-            key={value}
-            onClick={
-              clickToRemove
-                ? (e) => {
-                    e.stopPropagation();
-                    toggleValue(value);
-                  }
-                : undefined
-            }
-          >
-            {items.get(value)}
+      {[...selectedValues].map((value) => (
+        <Badge
+          variant="outline"
+          data-selected-item
+          className=" group flex items-center gap-1"
+          key={value}
+          onClick={
+            clickToRemove
+              ? (e) => {
+                  e.stopPropagation();
+                  toggleValue(value);
+                }
+              : undefined
+          }
+        >
+          {items.get(value) ?? value}
 
-            {clickToRemove && (
-              <XIcon className="size-2 text-primary/50 group-hover:text-accent" />
-            )}
-          </Badge>
-        ))}
+          {clickToRemove && (
+            <XIcon className="size-2 text-primary/50 group-hover:text-accent" />
+          )}
+        </Badge>
+      ))}
       <Badge
         style={{
           display: overflowAmount > 0 && !shouldWrap ? "block" : "none",
@@ -271,40 +284,39 @@ export function MultiSelectValue({
 export function MultiSelectContent({
   search = true,
   children,
-  maxItems = 100,
   ...props
 }: {
   search?: boolean | { placeholder?: string; emptyMessage?: string };
   children: ReactNode;
   maxItems?: number;
 } & Omit<ComponentPropsWithoutRef<typeof Command>, "children">) {
+  const { open } = useMultiSelectContext();
   const canSearch = typeof search === "object" ? true : search;
 
-  return (
-    <>
-      <div style={{ display: "none" }} dir="rtl">
-        <Command>
-          <CommandList>{children}</CommandList>
-        </Command>
-      </div>
-      <PopoverContent
-        dir="rlt"
-        className="min-w-[var(--radix-popover-trigger-width)] p-0"
-      >
-        <Command {...props}>
-          <CommandInput placeholder={"جستجو"} />
+  // Only mount option nodes while open. Mounting every item (esp. town/branch
+  // lists) while the parent filter popover opens caused UI freezes via
+  // per-item registration setState storms.
+  if (!open) return null;
 
-          <CommandList className="max-h-[300px] overflow-y-auto">
-            {canSearch && (
-              <CommandEmpty>
-                {typeof search === "object" ? search.emptyMessage : undefined}
-              </CommandEmpty>
-            )}
-            {children}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </>
+  return (
+    <PopoverContent
+      dir="rtl"
+      className="min-w-[var(--radix-popover-trigger-width)] p-0"
+      onOpenAutoFocus={(event) => event.preventDefault()}
+    >
+      <Command {...props}>
+        {canSearch ? <CommandInput placeholder={"جستجو"} /> : null}
+
+        <CommandList className="max-h-[300px] overflow-y-auto">
+          {canSearch && (
+            <CommandEmpty>
+              {typeof search === "object" ? search.emptyMessage : undefined}
+            </CommandEmpty>
+          )}
+          {children}
+        </CommandList>
+      </Command>
+    </PopoverContent>
   );
 }
 

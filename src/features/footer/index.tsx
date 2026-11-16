@@ -1,6 +1,15 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function Footer() {
+  const pathname = usePathname() ?? "";
+
+  if (pathname.startsWith("/v2")) {
+    return null;
+  }
+
   return (
     <footer
       dir="rtl"

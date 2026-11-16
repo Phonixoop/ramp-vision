@@ -1,5 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import React from "react";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { AuthShowcase } from "./components/AuthShowcase";
@@ -7,6 +8,12 @@ import { HeaderSkeleton } from "./components/HeaderSkeleton";
 
 export default function Header() {
   const session = useSession();
+  const pathname = usePathname() ?? "";
+
+  // Linear / dashboard2 chrome owns chrome on /v2 routes.
+  if (pathname.startsWith("/v2")) {
+    return null;
+  }
 
   if (session.status === "loading") {
     return <HeaderSkeleton />;

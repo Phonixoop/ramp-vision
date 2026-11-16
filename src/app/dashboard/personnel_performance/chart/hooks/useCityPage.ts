@@ -18,6 +18,8 @@ import { TEHRAN_SUB_CITIES } from "~/constants";
 import {
   distinctPersonnelPerformanceData,
   expandTehranPerformanceCities,
+  isSamePersonnelRecord,
+  isSingleDayPersonnelSelection,
   normalizeCityName,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
@@ -225,6 +227,34 @@ export const useCityPage = (
   useEffect(() => {
     defaultListRef.current = baseList;
     setUpdatedList(baseList);
+  }, [baseList]);
+
+  // Keep details panel in sync when work-days toggle / aggregation rebuilds the list
+  useEffect(() => {
+    setSelectedPerson((prev) => {
+      if (!prev) return null;
+      if (isSingleDayPersonnelSelection(prev)) return prev;
+
+      const match = baseList.find((row) => isSamePersonnelRecord(row, prev));
+      if (!match) return prev;
+      if (
+        match.TotalPerformance === prev.TotalPerformance &&
+        match.DirectPerFormance === prev.DirectPerFormance &&
+        match.InDirectPerFormance === prev.InDirectPerFormance &&
+        match.SabtAvalieAsnad === prev.SabtAvalieAsnad &&
+        match.WithScanCount === prev.WithScanCount &&
+        match.WithoutScanCount === prev.WithoutScanCount
+      ) {
+        return prev;
+      }
+
+      return {
+        ...match,
+        sparkData: (prev as any).sparkData,
+        Start_Date: prev.Start_Date,
+        periodType: prev.periodType,
+      };
+    });
   }, [baseList]);
 
   useEffect(() => {

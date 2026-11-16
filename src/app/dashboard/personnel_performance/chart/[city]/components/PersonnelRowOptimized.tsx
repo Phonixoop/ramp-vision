@@ -31,10 +31,12 @@ interface PersonnelRowOptimizedProps {
   getAllData: any[];
   onSelect: (sparkData: any[]) => void;
   isActive: boolean;
+  /** Name-only narrow rail (v2 chart compact mode). */
+  compact?: boolean;
 }
 
 export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
-  ({ user, activeKey, getAllData, onSelect, isActive }) => {
+  ({ user, activeKey, getAllData, onSelect, isActive, compact = false }) => {
     const userPerformances = React.useMemo(() => {
       return (getAllData || [])
         .filter((x: any) => x.NameFamily === user.NameFamily)
@@ -79,15 +81,34 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       onSelect(sparkData);
     }, [onSelect, sparkData]);
 
+    const displayName = getPersonnelDisplayName(
+      user.NameFamily ?? "",
+      user.CityName || user.key?.CityName,
+      user.RealCityName,
+    );
+
     if (!user?.NationalCode) {
       return (
-        <div className="flex w-full animate-pulse flex-row-reverse items-center justify-between gap-2 rounded-xl bg-secondary/60 p-3 text-right text-primary">
-          <span className="h-5 w-10 rounded-lg bg-secbuttn" />
-          <div className="flex w-full items-center justify-start px-2">
-            <span className="w-40 rounded-lg bg-secbuttn py-5" />
-          </div>
-          <span className="h-5 w-10 rounded-lg bg-secbuttn" />
-          <span className="h-4 w-4 rounded-lg bg-secbuttn" />
+        <div
+          className={cn(
+            "flex w-full animate-pulse items-center rounded-xl bg-secondary/60 text-primary",
+            compact
+              ? "justify-center px-1 py-2"
+              : "flex-row-reverse justify-between gap-2 p-3 text-right",
+          )}
+        >
+          {compact ? (
+            <span className="h-8 w-full rounded-lg bg-secbuttn" />
+          ) : (
+            <>
+              <span className="h-5 w-10 rounded-lg bg-secbuttn" />
+              <div className="flex w-full items-center justify-start px-2">
+                <span className="w-40 rounded-lg bg-secbuttn py-5" />
+              </div>
+              <span className="h-5 w-10 rounded-lg bg-secbuttn" />
+              <span className="h-4 w-4 rounded-lg bg-secbuttn" />
+            </>
+          )}
         </div>
       );
     }
@@ -109,52 +130,55 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
               : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
           )}
           onClick={handleClick}
+          title={displayName}
         >
-          <div className="flex w-full flex-row-reverse items-center justify-between gap-2 px-2 text-right text-inherit duration-1000">
-            {user.Start_Date && (
-              <div className="w-10">
-                {isActive ? (
-                  <BarChart3Loading />
-                ) : (
-                  <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
-                )}
-              </div>
-            )}
-
-            <div className="flex flex-col items-center justify-center">
-              <TrendDecider values={userPerformances} />
-              {Math.round(user.TotalPerformance || 0)}%
+          {compact ? (
+            <div className="flex w-full items-center justify-center px-1 py-0.5 text-inherit">
+              <span className="w-full break-words text-center text-xs leading-tight">
+                {displayName}
+              </span>
             </div>
-
-            <div className="flex w-full items-center justify-center">
-              <SparkAreaChart
-                data={sparkData}
-                categories={[
-                  "TotalPerformance",
-                  "Benchmark",
-                  "Benchmark2",
-                  "Benchmark3",
-                ]}
-                noDataText="بدون داده"
-                index="Start_Date"
-                colors={["purple", "rose", "cyan"]}
-                className={cn(
-                  "dash-a pointer-events-none h-10 w-36",
-                  isActive
-                    ? "animate-path animate-[move_100s_linear_infinite]"
-                    : "",
-                )}
-              />
-            </div>
-
-            <span className="w-full text-sm">
-              {getPersonnelDisplayName(
-                user.NameFamily ?? "",
-                user.CityName || user.key?.CityName,
-                user.RealCityName,
+          ) : (
+            <div className="flex w-full flex-row-reverse items-center justify-between gap-2 px-2 text-right text-inherit duration-1000">
+              {user.Start_Date && (
+                <div className="w-10">
+                  {isActive ? (
+                    <BarChart3Loading />
+                  ) : (
+                    <ChevronLeftIcon className="h-4 w-4 stroke-primary" />
+                  )}
+                </div>
               )}
-            </span>
-          </div>
+
+              <div className="flex flex-col items-center justify-center">
+                <TrendDecider values={userPerformances} />
+                {Math.round(user.TotalPerformance || 0)}%
+              </div>
+
+              <div className="flex w-full items-center justify-center">
+                <SparkAreaChart
+                  data={sparkData}
+                  categories={[
+                    "TotalPerformance",
+                    "Benchmark",
+                    "Benchmark2",
+                    "Benchmark3",
+                  ]}
+                  noDataText="بدون داده"
+                  index="Start_Date"
+                  colors={["purple", "rose", "cyan"]}
+                  className={cn(
+                    "dash-a pointer-events-none h-10 w-36",
+                    isActive
+                      ? "animate-path animate-[move_100s_linear_infinite]"
+                      : "",
+                  )}
+                />
+              </div>
+
+              <span className="w-full text-sm">{displayName}</span>
+            </div>
+          )}
           {isActive && (
             <div
               className="absolute inset-0 -z-20"
@@ -190,7 +214,9 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       prev.activeKey.role === next.activeKey.role &&
       prev.activeKey.city === next.activeKey.city &&
       prev.activeKey.id === next.activeKey.id &&
-      prev.getAllData === next.getAllData
+      prev.getAllData === next.getAllData &&
+      prev.isActive === next.isActive &&
+      prev.compact === next.compact
     );
   },
 );

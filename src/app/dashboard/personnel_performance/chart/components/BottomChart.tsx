@@ -17,6 +17,7 @@ export const BottomChart = React.memo<BottomChartProps>(
         <CityPerformanceWithUsersChart
           filters={filters}
           cityName_En={activeCity}
+          useWorkDays={useWorkDays}
         />
       </div>
     );

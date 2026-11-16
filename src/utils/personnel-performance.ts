@@ -163,40 +163,140 @@ function matchesPersonnelSparkFilter(
   return rowValue === value;
 }
 
+/** Direct activity fields used by C# CalculateDirectPerformance / Indicators. */
+export const DIRECT_PERFORMANCE_FIELDS = [
+  "SabtAvalieAsnad",
+  "PazireshVaSabtAvalieAsnad",
+  "ArzyabiAsanadBimarsetaniDirect",
+  "ArzyabiAsnadDandanVaParaDirect",
+  "ArzyabiAsnadDandanDirect",
+  "ArzyabiAsnadDaroDirect",
+  "WithScanCount",
+  "WithoutScanCount",
+] as const;
+
+/** Indirect activity fields used by C# CalculateInDirectPerformance / Indicators. */
+export const INDIRECT_PERFORMANCE_FIELDS = [
+  "ArzyabiAsnadBimarestaniIndirect",
+  "ArzyabiAsnadDandanVaParaIndirect",
+  "ArzyabiAsnadDandanIndirect",
+  "ArzyabiAsnadDaroIndirect",
+  "WithoutScanInDirectCount",
+] as const;
+
+function performanceContribution(
+  item: Record<string, unknown>,
+  field: keyof typeof Indicators,
+  dateLength: number,
+  divideBy: number,
+): number {
+  const count = Number(item[field]) || 0;
+  const indicator = Indicators[field];
+  if (!indicator || !dateLength) return 0;
+  return count / ((dateLength * indicator) / divideBy);
+}
+
+function sumPerformanceFields(
+  item: Record<string, unknown>,
+  fields: readonly (keyof typeof Indicators)[],
+  dateLength: number,
+  divideBy: number,
+): number {
+  const safeDateLength = dateLength > 0 ? dateLength : 1;
+  return (
+    fields.reduce(
+      (sum, field) =>
+        sum + performanceContribution(item, field, safeDateLength, divideBy),
+      0,
+    ) * 100
+  );
+}
+
+/** Matches C# CalculateDirectPerformance (Indicators; divideBy kept for legacy, default 1). */
+export function calculateDirectPerformance(
+  item: any,
+  dateLength: number,
+  divideBy: number = 1,
+): number {
+  return sumPerformanceFields(
+    item,
+    DIRECT_PERFORMANCE_FIELDS,
+    dateLength,
+    divideBy,
+  );
+}
+
+/** Matches C# CalculateInDirectPerformance (Indicators; divideBy kept for legacy, default 1). */
+export function calculateInDirectPerformance(
+  item: any,
+  dateLength: number,
+  divideBy: number = 1,
+): number {
+  return sumPerformanceFields(
+    item,
+    INDIRECT_PERFORMANCE_FIELDS,
+    dateLength,
+    divideBy,
+  );
+}
+
 export function calculatePerformance(
   item: any,
   dateLenght: number,
   devideBy: number = 1,
 ): number {
-  // console.log({ item, dateLenght });
-  const performance =
-    item.SabtAvalieAsnad /
-      ((dateLenght * Indicators.SabtAvalieAsnad) / devideBy) +
-    item.PazireshVaSabtAvalieAsnad /
-      ((dateLenght * Indicators.PazireshVaSabtAvalieAsnad) / devideBy) +
-    item.ArzyabiAsanadBimarsetaniDirect /
-      ((dateLenght * Indicators.ArzyabiAsanadBimarsetaniDirect) / devideBy) +
-    item.ArzyabiAsnadBimarestaniIndirect /
-      ((dateLenght * Indicators.ArzyabiAsnadBimarestaniIndirect) / devideBy) +
-    item.ArzyabiAsnadDandanVaParaDirect /
-      ((dateLenght * Indicators.ArzyabiAsnadDandanVaParaDirect) / devideBy) +
-    item.ArzyabiAsnadDandanDirect /
-      ((dateLenght * Indicators.ArzyabiAsnadDandanDirect) / devideBy) +
-    item.ArzyabiAsnadDandanIndirect /
-      ((dateLenght * Indicators.ArzyabiAsnadDandanIndirect) / devideBy) +
-    item.ArzyabiAsnadDandanVaParaIndirect /
-      ((dateLenght * Indicators.ArzyabiAsnadDandanVaParaIndirect) / devideBy) +
-    item.ArzyabiAsnadDaroDirect /
-      ((dateLenght * Indicators.ArzyabiAsnadDaroDirect) / devideBy) +
-    item.ArzyabiAsnadDaroIndirect /
-      ((dateLenght * Indicators.ArzyabiAsnadDaroIndirect) / devideBy) +
-    item.WithScanCount / ((dateLenght * Indicators.WithScanCount) / devideBy) +
-    item.WithoutScanCount /
-      ((dateLenght * Indicators.WithoutScanCount) / devideBy) +
-    item.WithoutScanInDirectCount /
-      ((dateLenght * Indicators.WithoutScanInDirectCount) / devideBy);
+  return (
+    calculateDirectPerformance(item, dateLenght, devideBy) +
+    calculateInDirectPerformance(item, dateLenght, devideBy)
+  );
+}
 
-  return performance * 100;
+/** Identity match for refreshing selectedPerson after list re-aggregation. */
+export function isSamePersonnelRecord(
+  a: {
+    NationalCode?: unknown;
+    NameFamily?: unknown;
+    CityName?: unknown;
+    Role?: unknown;
+    key?: {
+      NationalCode?: unknown;
+      NameFamily?: unknown;
+      CityName?: unknown;
+    };
+  } | null | undefined,
+  b: {
+    NationalCode?: unknown;
+    NameFamily?: unknown;
+    CityName?: unknown;
+    Role?: unknown;
+    key?: {
+      NationalCode?: unknown;
+      NameFamily?: unknown;
+      CityName?: unknown;
+    };
+  } | null | undefined,
+): boolean {
+  if (!a || !b) return false;
+  const codeA = String(a.NationalCode ?? a.key?.NationalCode ?? "");
+  const codeB = String(b.NationalCode ?? b.key?.NationalCode ?? "");
+  if (!codeA || codeA !== codeB) return false;
+
+  return (
+    String(a.NameFamily ?? a.key?.NameFamily ?? "") ===
+      String(b.NameFamily ?? b.key?.NameFamily ?? "") &&
+    String(a.CityName ?? a.key?.CityName ?? "") ===
+      String(b.CityName ?? b.key?.CityName ?? "") &&
+    String(a.Role ?? "") === String(b.Role ?? "")
+  );
+}
+
+/** True when details panel drilled into a single calendar day. */
+export function isSingleDayPersonnelSelection(
+  person: { periodType?: string; Start_Date?: string } | null | undefined,
+): boolean {
+  if (!person?.Start_Date) return false;
+  if (person.periodType && person.periodType !== "روزانه") return false;
+  return /^\d{4}\/\d{2}\/\d{2}$/.test(person.Start_Date);
 }
 
 export function distinctDataAndCalculatePerformance(
@@ -324,26 +424,23 @@ export function distinctPersonnelPerformanceData(
       dedupeBy: [...PERSONNEL_PERFORMANCE_DEDUPE_BY],
     },
   }).map((item) => {
-    // const city =
-    //   getPersianToEnglishCity(item.key.CityName) ?? item.key.CityName;
-
     // Work-days divisor applies only to period-level aggregation, not single-day views
     const divisor =
       workDays && !isDayLevelPerformanceQuery(groupBy, where)
         ? workDays
         : item.key.rowCount;
 
+    // Derive performance from visible aggregated counts so UI always matches formula(counts)
+    const dateLength = divisor > 0 ? divisor : 1;
+    const DirectPerFormance = calculateDirectPerformance(item, dateLength);
+    const InDirectPerFormance = calculateInDirectPerformance(item, dateLength);
+
     return {
       ...item,
       ...item.key, // groupBy identity (NationalCode, NameFamily, …) must win over aggregated values
-      TotalPerformance: item.TotalPerformance / divisor,
-      DirectPerFormance: item.DirectPerFormance / divisor,
-      InDirectPerFormance: item.InDirectPerFormance / divisor,
-
-      // (groupBy.includes("Start_Date")
-      //   ? item.key.COUNT
-      //   : data.dateLength[city]),
-      // (groupBy.includes("Start_Date") ? item.key.COUNT : data.dateLength)
+      DirectPerFormance,
+      InDirectPerFormance,
+      TotalPerformance: DirectPerFormance + InDirectPerFormance,
     };
   });
 }
@@ -415,10 +512,14 @@ export function sparkChartForPersonnel(
   const dedupedData = dedupePersonnelPerformanceRows(filtered);
 
   return dedupedData.map((item: any) => {
-    // const isThursday = moment(item.Start_Date, "jYYYY/jMM/jDD").jDay() === 5;
+    const DirectPerFormance = calculateDirectPerformance(item, 1);
+    const InDirectPerFormance = calculateInDirectPerformance(item, 1);
+    const TotalPerformance = DirectPerFormance + InDirectPerFormance;
 
     return {
-      TotalPerformance: item.TotalPerformance,
+      TotalPerformance,
+      DirectPerFormance,
+      InDirectPerFormance,
       Start_Date: item.Start_Date,
       Benchmark: 75,
       Benchmark2: 120,

@@ -40,6 +40,9 @@ interface PersonnelListProps {
     StartDate?: string,
     periodType?: string,
   ) => void;
+  /** Name-only narrow rail (v2 chart compact mode). */
+  compact?: boolean;
+  className?: string;
 }
 
 export const PersonnelList = React.memo<PersonnelListProps>(
@@ -57,6 +60,8 @@ export const PersonnelList = React.memo<PersonnelListProps>(
     onFilterByLevel,
     onTehranSubCityChange,
     onSelectPerson,
+    compact = false,
+    className,
   }) => {
     const tehranSubCityLabels: Record<Exclude<TehranSubCity, null>, string> = {
       "Tehran Jobran": "جبران",
@@ -66,6 +71,8 @@ export const PersonnelList = React.memo<PersonnelListProps>(
 
     return (
       <AdvancedList
+        className={className}
+        compact={compact}
         title={
           <span className="flex items-center justify-center gap-2 text-primary">
             پرسنل
@@ -174,6 +181,7 @@ export const PersonnelList = React.memo<PersonnelListProps>(
                 selectedPerson?.CityName || selectedPerson?.key?.CityName,
             }}
             getAllData={getAll?.data?.result ?? []}
+            compact={compact}
             onSelect={(sparkData) =>
               onSelectPerson(user, sparkData, "", getAll?.data?.periodType)
             }

@@ -36,3 +36,8 @@ export function useWorkDaysToggle() {
   }
   return context;
 }
+
+/** Safe when provider is absent (e.g. v2 chart uses URL-driven work-days state). */
+export function useWorkDaysToggleOptional() {
+  return useContext(WorkDaysToggleContext);
+}

@@ -20,7 +20,10 @@ import {
   type RefObject,
   type SetStateAction,
   useContext,
+  useEffect,
+  useLayoutEffect,
   useMemo,
+  useState,
 } from "react";
 import type { ChartPhase, ChartStatus } from "./chart-phase";
 import type { ReferenceAreaConfig } from "./reference-area-config";
@@ -227,8 +230,32 @@ export type ChartStableContextValue = Omit<
   keyof ChartHoverContextValue
 >;
 
+/** `useLayoutEffect` in the browser, `useEffect` on the server (no SSR warning). */
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 const ChartStableContext = createContext<ChartStableContextValue | null>(null);
 const ChartHoverContext = createContext<ChartHoverContextValue | null>(null);
+
+/**
+ * Resolves the chart portal host element from `containerRef`. Used by brush
+ * overlays, axes, and tooltips that render outside the SVG tree.
+ */
+export function useChartPortalContainer<T extends HTMLElement>(
+  containerRef: RefObject<T | null> | undefined
+): T | null {
+  const [container, setContainer] = useState<T | null>(
+    () => containerRef?.current ?? null
+  );
+  useIsomorphicLayoutEffect(() => {
+    setContainer(containerRef?.current ?? null);
+  }, [containerRef]);
+  useEffect(() => {
+    const element = containerRef?.current ?? null;
+    setContainer((previous) => (previous === element ? previous : element));
+  }, [containerRef]);
+  return container;
+}
 
 /**
  * Splits the merged `value` into a stable slice and a volatile hover slice,
