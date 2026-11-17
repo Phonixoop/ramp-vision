@@ -19,6 +19,7 @@ import {
   readSavedDefaults,
   systemSelectDefaults,
   writeSavedDefaults,
+  type ListSortOrder,
   type SelectDefaults,
 } from "~/app/v2/dashboard/personnel_performance/chart/model";
 
@@ -94,6 +95,12 @@ export function PersonnelPerformanceChartProvider({
   const [savedDefaults, setSavedDefaults] = useState<SelectDefaults | null>(
     null,
   );
+  const [citiesSort, setCitiesSort] = useState<ListSortOrder>(
+    () => systemSelectDefaults().cities_sort,
+  );
+  const [personnelSort, setPersonnelSort] = useState<ListSortOrder>(
+    () => systemSelectDefaults().personnel_sort,
+  );
 
   const [isFiltering, setIsFiltering] = useState(false);
   const [optimisticFilters, setOptimisticFilters] =
@@ -112,6 +119,8 @@ export function PersonnelPerformanceChartProvider({
 
     setReportPeriod(saved.period);
     setDataFilters((prev) => applySelectDefaultsToFilters(prev, saved));
+    setCitiesSort(saved.cities_sort);
+    setPersonnelSort(saved.personnel_sort);
   }, []);
 
   useEffect(() => {
@@ -134,24 +143,28 @@ export function PersonnelPerformanceChartProvider({
             ...(filters.filter.ContractType ?? defualtContractTypes),
           ]),
         work_days: workDays,
+        cities_sort: citiesSort,
+        personnel_sort: personnelSort,
       };
       writeSavedDefaults(next);
       setSavedDefaults(next);
       toast.success("پیش‌فرض فیلترها ذخیره شد");
     },
-    [filters, reportPeriod],
+    [citiesSort, filters, personnelSort, reportPeriod],
   );
 
   const resetToSystemDefaults = useCallback(
     (setWorkDays: (value: boolean) => void) => {
       clearSavedDefaults();
       setSavedDefaults(null);
-      const system = systemSelectDefaults();
-      setReportPeriod(system.period);
+      const nextSystem = systemSelectDefaults();
+      setReportPeriod(nextSystem.period);
       setDataFilters((prev) =>
-        applySelectDefaultsToFilters(prev, system, { clearExtra: true }),
+        applySelectDefaultsToFilters(prev, nextSystem, { clearExtra: true }),
       );
-      setWorkDays(system.work_days);
+      setWorkDays(nextSystem.work_days);
+      setCitiesSort(nextSystem.cities_sort);
+      setPersonnelSort(nextSystem.personnel_sort);
       toast.success("پیش‌فرض‌های سیستم اعمال شد");
     },
     [],
@@ -163,6 +176,8 @@ export function PersonnelPerformanceChartProvider({
       setReportPeriod(defaults.period);
       setDataFilters((prev) => applySelectDefaultsToFilters(prev, defaults));
       setWorkDays(defaults.work_days);
+      setCitiesSort(defaults.cities_sort);
+      setPersonnelSort(defaults.personnel_sort);
       toast.success("پیش‌فرض‌ها اعمال شد");
     },
     [savedDefaults],
@@ -199,6 +214,10 @@ export function PersonnelPerformanceChartProvider({
     saveCurrentAsDefaults,
     resetToSystemDefaults,
     applySavedOrSystemDefaults,
+    citiesSort,
+    setCitiesSort,
+    personnelSort,
+    setPersonnelSort,
   };
 
   return (

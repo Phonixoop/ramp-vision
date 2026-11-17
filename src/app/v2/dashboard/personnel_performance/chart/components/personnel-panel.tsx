@@ -28,6 +28,7 @@ import {
   type Rating,
   type TehranSubCity,
 } from "../city-session-context";
+import { useChartFilters } from "../filters-context";
 
 const TEHRAN_LABELS: Record<Exclude<TehranSubCity, null>, string> = {
   "Tehran Jobran": "جبران",
@@ -59,11 +60,12 @@ export function PersonnelPanel({ compact = false }: { compact?: boolean }) {
     setTehranSubCities,
     onSelectPerson,
   } = useCitySession();
+  const {
+    personnelSort: sortOrder,
+    setPersonnelSort: setSortOrder,
+  } = useChartFilters();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "original">(
-    "original",
-  );
 
   const filteredSorted = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -147,10 +149,10 @@ export function PersonnelPanel({ compact = false }: { compact?: boolean }) {
             <button
               type="button"
               onClick={() =>
-                setSortOrder((prev) =>
-                  prev === "original"
+                setSortOrder(
+                  sortOrder === "original"
                     ? "asc"
-                    : prev === "asc"
+                    : sortOrder === "asc"
                       ? "desc"
                       : "original",
                 )

@@ -8,6 +8,7 @@ import {
 
 export type PeriodType = "روزانه" | "هفتگی" | "ماهانه";
 export type CalendarPeriod = "daily" | "weekly" | "monthly";
+export type ListSortOrder = "asc" | "desc" | "original";
 
 export type ChartFilterValues = {
   period: PeriodType;
@@ -31,6 +32,8 @@ export type SelectDefaults = {
   role: string[];
   role_type: string[];
   work_days: boolean;
+  cities_sort: ListSortOrder;
+  personnel_sort: ListSortOrder;
 };
 
 export type ChartSearchParams = {
@@ -64,7 +67,16 @@ export const systemSelectDefaults = (): SelectDefaults => ({
   // Empty RoleType ⇒ generateWhereClause skips the column (no over-filter).
   role_type: getDefaultRoleTypesBaseOnContractType([...defualtContractTypes]),
   work_days: false,
+  cities_sort: "asc",
+  personnel_sort: "original",
 });
+
+export function parseListSort(value?: string | null): ListSortOrder {
+  if (value === "asc" || value === "desc" || value === "original") {
+    return value;
+  }
+  return "original";
+}
 
 export function defaultStartDates(): string[] {
   return [moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD")];
@@ -132,6 +144,16 @@ export function readSavedDefaults(): SelectDefaults | null {
         typeof parsed.work_days === "boolean"
           ? parsed.work_days
           : system.work_days,
+      cities_sort: parseListSort(
+        typeof parsed.cities_sort === "string"
+          ? parsed.cities_sort
+          : system.cities_sort,
+      ),
+      personnel_sort: parseListSort(
+        typeof parsed.personnel_sort === "string"
+          ? parsed.personnel_sort
+          : system.personnel_sort,
+      ),
     };
   } catch {
     return null;

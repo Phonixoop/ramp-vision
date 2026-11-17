@@ -32,6 +32,7 @@ import {
   type CalendarPeriod,
   type ChartFilterValues,
   type ChartSearchParams,
+  type ListSortOrder,
   type PeriodType,
   type SelectDefaults,
 } from "./model";
@@ -76,6 +77,10 @@ type FiltersContextValue = {
   resetToSystemDefaults: () => void;
   applySavedOrSystemDefaults: () => void;
   hasSavedDefaults: boolean;
+  citiesSort: ListSortOrder;
+  setCitiesSort: (order: ListSortOrder) => void;
+  personnelSort: ListSortOrder;
+  setPersonnelSort: (order: ListSortOrder) => void;
 };
 
 const FiltersContext = createContext<FiltersContextValue | null>(null);
@@ -112,6 +117,12 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
   const [savedDefaults, setSavedDefaults] = useState<SelectDefaults | null>(
     null,
   );
+  const [citiesSort, setCitiesSort] = useState<ListSortOrder>(
+    () => systemSelectDefaults().cities_sort,
+  );
+  const [personnelSort, setPersonnelSort] = useState<ListSortOrder>(
+    () => systemSelectDefaults().personnel_sort,
+  );
   const [hydratedDefaults, setHydratedDefaults] = useState(false);
   const appliedDateInfoDefault = useRef(false);
   const seededFromUrl = useRef(false);
@@ -122,7 +133,12 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    setSavedDefaults(readSavedDefaults());
+    const saved = readSavedDefaults();
+    setSavedDefaults(saved);
+    if (saved) {
+      setCitiesSort(saved.cities_sort);
+      setPersonnelSort(saved.personnel_sort);
+    }
     setHydratedDefaults(true);
   }, []);
 
@@ -366,18 +382,25 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
       role: params.role,
       role_type: params.role_type,
       work_days: params.work_days,
+      cities_sort: citiesSort,
+      personnel_sort: personnelSort,
     };
     writeSavedDefaults(next);
     setSavedDefaults(next);
     toast.success("پیش‌فرض فیلترها ذخیره شد");
-  }, [params]);
+  }, [citiesSort, params, personnelSort]);
 
   const resetToSystemDefaults = useCallback(() => {
     clearSavedDefaults();
     setSavedDefaults(null);
     const system = systemSelectDefaults();
     updateParams({
-      ...system,
+      period: system.period,
+      project: system.project,
+      contract: system.contract,
+      role: system.role,
+      role_type: system.role_type,
+      work_days: system.work_days,
       dates: params.dates,
       date_info: params.date_info,
       town: [],
@@ -385,16 +408,25 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
       branch_code: [],
       branch_type: [],
     });
+    setCitiesSort(system.cities_sort);
+    setPersonnelSort(system.personnel_sort);
     toast.success("پیش‌فرض‌های سیستم اعمال شد");
   }, [params.dates, params.date_info, updateParams]);
 
   const applySavedOrSystemDefaults = useCallback(() => {
     const defaults = savedDefaults ?? systemSelectDefaults();
     updateParams({
-      ...defaults,
+      period: defaults.period,
+      project: defaults.project,
+      contract: defaults.contract,
+      role: defaults.role,
+      role_type: defaults.role_type,
+      work_days: defaults.work_days,
       dates: params.dates,
       date_info: params.date_info,
     });
+    setCitiesSort(defaults.cities_sort);
+    setPersonnelSort(defaults.personnel_sort);
     toast.success("پیش‌فرض‌ها اعمال شد");
   }, [savedDefaults, params.dates, params.date_info, updateParams]);
 
@@ -420,6 +452,10 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
       resetToSystemDefaults,
       applySavedOrSystemDefaults,
       hasSavedDefaults: Boolean(savedDefaults),
+      citiesSort,
+      setCitiesSort,
+      personnelSort,
+      setPersonnelSort,
     }),
     [
       params,
@@ -437,6 +473,8 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
       resetToSystemDefaults,
       applySavedOrSystemDefaults,
       savedDefaults,
+      citiesSort,
+      personnelSort,
     ],
   );
 

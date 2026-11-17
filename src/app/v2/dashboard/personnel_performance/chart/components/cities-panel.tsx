@@ -30,12 +30,11 @@ export function CitiesPanel({ compact = false }: { compact?: boolean }) {
     canFetch,
     useWorkDays,
     totalWorkDays,
+    citiesSort: sortOrder,
+    setCitiesSort: setSortOrder,
   } = useChartFilters();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "original">(
-    "original",
-  );
   const [navigatingToCity, setNavigatingToCity] = useState<string | null>(null);
 
   const activeCity = useMemo(() => {
@@ -177,10 +176,10 @@ export function CitiesPanel({ compact = false }: { compact?: boolean }) {
             <button
               type="button"
               onClick={() =>
-                setSortOrder((prev) =>
-                  prev === "original"
+                setSortOrder(
+                  sortOrder === "original"
                     ? "asc"
-                    : prev === "asc"
+                    : sortOrder === "asc"
                       ? "desc"
                       : "original",
                 )

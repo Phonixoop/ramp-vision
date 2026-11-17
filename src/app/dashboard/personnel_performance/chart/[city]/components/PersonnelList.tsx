@@ -8,6 +8,7 @@ import { PersonnelRowOptimized } from "./PersonnelRowOptimized";
 import { performanceLevels } from "~/constants/personnel-performance";
 import { TEHRAN_SUB_CITIES } from "~/constants";
 import { getEnglishToPersianCity } from "~/utils/util";
+import { usePersonnelPerformanceChart } from "../../context";
 
 type Rating = "Weak" | "Average" | "Good" | "Excellent" | "NeedsReview" | "ALL";
 type TehranSubCity = (typeof TEHRAN_SUB_CITIES)[number];
@@ -63,6 +64,9 @@ export const PersonnelList = React.memo<PersonnelListProps>(
     compact = false,
     className,
   }) => {
+    const { personnelSort, setPersonnelSort } =
+      usePersonnelPerformanceChart();
+
     const tehranSubCityLabels: Record<Exclude<TehranSubCity, null>, string> = {
       "Tehran Jobran": "جبران",
       "Tehran Not Jobran": "غیر جبران",
@@ -92,6 +96,8 @@ export const PersonnelList = React.memo<PersonnelListProps>(
             : Array.from({ length: 10 }, () => undefined as any)
         }
         selectProperty={"NameFamily"}
+        sortOrder={personnelSort}
+        onSortOrderChange={setPersonnelSort}
         downloadFileName={`${getEnglishToPersianCity(
           currentCity,
         )} عملکرد پرسنل شهر ${

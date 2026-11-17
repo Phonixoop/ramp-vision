@@ -1,3 +1,5 @@
+import type { ListSortOrder } from "~/app/v2/dashboard/personnel_performance/chart/model";
+
 export type CityWithPerformanceData = {
   Id: number;
   CityName: string;
@@ -78,6 +80,11 @@ export interface PersonnelPerformanceChartContextType {
   saveCurrentAsDefaults: (workDays: boolean) => void;
   resetToSystemDefaults: (setWorkDays: (value: boolean) => void) => void;
   applySavedOrSystemDefaults: (setWorkDays: (value: boolean) => void) => void;
+  // List sort preferences (persisted with ذخیره پیش‌فرض)
+  citiesSort: ListSortOrder;
+  setCitiesSort: (order: ListSortOrder) => void;
+  personnelSort: ListSortOrder;
+  setPersonnelSort: (order: ListSortOrder) => void;
 }
 
 // Component Props Types

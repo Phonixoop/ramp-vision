@@ -38,6 +38,11 @@ export default function AdvancedList({
   compact = false,
   /** Stretch to parent flex height instead of the fixed 580px panel. */
   fillHeight = false,
+  /** Initial sort when uncontrolled: asc = A→Z, desc = Z→A, original = API order. */
+  defaultSortOrder = "original" as "asc" | "desc" | "original",
+  /** Controlled sort order. */
+  sortOrder: controlledSortOrder,
+  onSortOrderChange,
 }: {
   className?: string;
   title?: React.ReactNode | null;
@@ -54,15 +59,22 @@ export default function AdvancedList({
   renderUnderButtons?: () => React.ReactNode;
   compact?: boolean;
   fillHeight?: boolean;
+  defaultSortOrder?: "asc" | "desc" | "original";
+  sortOrder?: "asc" | "desc" | "original";
+  onSortOrderChange?: (order: "asc" | "desc" | "original") => void;
 }) {
   const correctList = useMemo(
     () => (typeof list === "function" ? list() : list),
     [list],
   );
 
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "original">(
-    "original",
-  );
+  const [uncontrolledSortOrder, setUncontrolledSortOrder] = useState<
+    "asc" | "desc" | "original"
+  >(defaultSortOrder);
+  const isSortControlled = controlledSortOrder !== undefined;
+  const sortOrder = isSortControlled
+    ? controlledSortOrder
+    : uncontrolledSortOrder;
   const [searchQuery, setSearchQuery] = useState("");
 
   const debouncedQuery = useDebounce(searchQuery, 250);
@@ -106,12 +118,17 @@ export default function AdvancedList({
 
   const toggleSortOrder = useCallback(() => {
     if (correctList.length <= 0) return;
-    setSortOrder((prev) => {
-      if (prev === "original") return "asc";
-      if (prev === "asc") return "desc";
-      return "original";
-    });
-  }, [correctList.length]);
+    const next =
+      sortOrder === "original"
+        ? "asc"
+        : sortOrder === "asc"
+          ? "desc"
+          : "original";
+    if (!isSortControlled) {
+      setUncontrolledSortOrder(next);
+    }
+    onSortOrderChange?.(next);
+  }, [correctList.length, isSortControlled, onSortOrderChange, sortOrder]);
 
   const myDisabled = correctList.length <= 0 || disabled;
   const [isClient, setIsClient] = useState(false);

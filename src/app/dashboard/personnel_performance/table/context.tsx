@@ -167,6 +167,7 @@ export function PersonnelPerformanceProvider({
 
   const saveCurrentAsDefaults = useCallback(
     (workDays: boolean) => {
+      const existing = savedDefaults ?? systemSelectDefaults();
       const next: SelectDefaults = {
         period: reportPeriod,
         project: filters.filter.ProjectType ?? [...defaultProjectTypes],
@@ -185,12 +186,15 @@ export function PersonnelPerformanceProvider({
             ...(filters.filter.ContractType ?? defualtContractTypes),
           ]),
         work_days: workDays,
+        // Table has no list sorts — keep previously saved chart list preferences.
+        cities_sort: existing.cities_sort,
+        personnel_sort: existing.personnel_sort,
       };
       writeSavedDefaults(next);
       setSavedDefaults(next);
       toast.success("پیش‌فرض فیلترها ذخیره شد");
     },
-    [filters, filtersWithNoNetworkRequest, reportPeriod],
+    [filters, filtersWithNoNetworkRequest, reportPeriod, savedDefaults],
   );
 
   const resetToSystemDefaults = useCallback(

@@ -7,6 +7,7 @@ import { CityWithPerformanceData } from "~/types";
 import { sparkChartForCity } from "~/utils/personnel-performance";
 import { TEHRAN_RELATED_CITIES } from "~/constants";
 import { getPersianToEnglishCity } from "~/utils/util";
+import { usePersonnelPerformanceChart } from "../context";
 
 interface CitiesListProps {
   distincedData: CityWithPerformanceData[];
@@ -36,6 +37,8 @@ export const CitiesList = React.memo<CitiesListProps>(
     onListViewChange,
     useWorkDays,
   }) => {
+    const { citiesSort, setCitiesSort } = usePersonnelPerformanceChart();
+
     return (
       <AdvancedList
         className="xl:h-fit"
@@ -49,6 +52,8 @@ export const CitiesList = React.memo<CitiesListProps>(
         disabled={!distincedData?.length && !isLoading}
         list={distincedData as any}
         selectProperty="CityName_Fa"
+        sortOrder={citiesSort}
+        onSortOrderChange={setCitiesSort}
         downloadFileName={`عملکرد استان ها ${
           reportPeriod === "ماهانه" &&
           (filters?.filter?.Start_Date?.length ?? 0) === 1
