@@ -14,6 +14,10 @@ const config = {
   reactStrictMode: true,
   allowedDevOrigins: ["192.168.0.211"],
 
+  // Keep native SQL drivers out of the Turbopack/webpack server bundle.
+  // Bundling them hits a Buffer.SlowBuffer polyfill crash at build time.
+  serverExternalPackages: ["mssql", "tedious", "tarn", "@azure/identity"],
+
   // Skip TypeScript checking during build
   typescript: {
     ignoreBuildErrors: true,
