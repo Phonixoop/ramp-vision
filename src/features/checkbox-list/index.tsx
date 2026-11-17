@@ -24,7 +24,6 @@ import {
 } from "~/components/shadcn/multi-select";
 import { Label } from "~/components/shadcn/label";
 import { cn } from "~/lib/utils";
-import { CommandInput } from "~/components/shadcn/command";
 import { useCallback, useRef } from "react";
 import { useTransition } from "react";
 
@@ -93,6 +92,7 @@ export function SelectControlled({
   const [isFiltering, setIsFiltering] = useState(false);
   const [optimisticValues, setOptimisticValues] = useState<string[]>(value);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Store onChange in a ref to prevent infinite loops
   const onChangeRef = useRef(onChange);
@@ -178,7 +178,9 @@ export function SelectControlled({
 
   // Filter and paginate items
   const filteredItems = uniqueValues.filter((item) =>
-    String(item || "").toLowerCase(),
+    String(item || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
@@ -188,10 +190,10 @@ export function SelectControlled({
   // Get the paginated items to display
   const paginatedItems = filteredItems.slice(startIndex, endIndex);
 
-  // const handleSearchChange = (value: string) => {
-  //   setSearchTerm(value);
-  //   setCurrentPage(1); // Reset to first page when searching
-  // };
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
 
   return (
     <div
@@ -215,7 +217,15 @@ export function SelectControlled({
             />
           </MultiSelectTrigger>
 
-          <MultiSelectContent search={false}>
+          <MultiSelectContent
+            shouldFilter={false}
+            search={{
+              emptyMessage: "موردی یافت نشد",
+              placeholder: "جستجو...",
+              value: searchTerm,
+              onValueChange: handleSearchChange,
+            }}
+          >
             <MultiSelectGroup>
               {isProcessing ? (
                 <div className="flex items-center justify-center p-4 text-sm text-primary/60">
@@ -433,11 +443,6 @@ export function SelectColumnFilter({
           }}
         >
           <MultiSelectGroup>
-            <input
-              type="text"
-              placeholder="جستجو..."
-              className="sticky top-0 w-full rounded-full bg-secbuttn"
-            />
             {isProcessing ? (
               <div className="flex items-center justify-center p-4 text-sm text-primary/60">
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary/20 border-t-primary"></div>
@@ -743,10 +748,10 @@ export function SelectColumnFilterOptimized<T>({
   const endIndex = startIndex + itemsPerPage;
   const currentItems = filteredItems.slice(startIndex, endIndex);
 
-  // const handleSearchChange = (value: string) => {
-  //   setSearchTerm(value);
-  //   setCurrentPage(1); // Reset to first page when searching
-  // };
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
 
   return (
     <div className="flex w-full max-w-full items-center justify-center gap-2 overflow-hidden px-2 text-center text-primary sm:px-0">
@@ -766,7 +771,15 @@ export function SelectColumnFilterOptimized<T>({
             />
           </MultiSelectTrigger>
 
-          <MultiSelectContent search={false}>
+          <MultiSelectContent
+            shouldFilter={false}
+            search={{
+              emptyMessage: "موردی یافت نشد",
+              placeholder: "جستجو...",
+              value: searchTerm,
+              onValueChange: handleSearchChange,
+            }}
+          >
             <MultiSelectGroup>
               {isProcessing ? (
                 <div className="flex items-center justify-center p-4 text-sm text-primary/60">

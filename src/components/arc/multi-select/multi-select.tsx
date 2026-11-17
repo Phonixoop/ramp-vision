@@ -257,7 +257,7 @@ export function MultiSelect({
   }, [options, searchTerm]);
 
   const needsPagination = options.length > itemsPerPage;
-  const showSearch = options.length > 8;
+  const showSearch = true;
   const totalPages = Math.max(
     1,
     Math.ceil(filteredOptions.length / itemsPerPage),

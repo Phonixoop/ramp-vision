@@ -286,12 +286,20 @@ export function MultiSelectContent({
   children,
   ...props
 }: {
-  search?: boolean | { placeholder?: string; emptyMessage?: string };
+  search?:
+    | boolean
+    | {
+        placeholder?: string;
+        emptyMessage?: string;
+        value?: string;
+        onValueChange?: (value: string) => void;
+      };
   children: ReactNode;
   maxItems?: number;
 } & Omit<ComponentPropsWithoutRef<typeof Command>, "children">) {
   const { open } = useMultiSelectContext();
   const canSearch = typeof search === "object" ? true : search;
+  const searchConfig = typeof search === "object" ? search : undefined;
 
   // Only mount option nodes while open. Mounting every item (esp. town/branch
   // lists) while the parent filter popover opens caused UI freezes via
@@ -305,13 +313,17 @@ export function MultiSelectContent({
       onOpenAutoFocus={(event) => event.preventDefault()}
     >
       <Command {...props}>
-        {canSearch ? <CommandInput placeholder={"جستجو"} /> : null}
+        {canSearch ? (
+          <CommandInput
+            placeholder={searchConfig?.placeholder ?? "جستجو"}
+            value={searchConfig?.value}
+            onValueChange={searchConfig?.onValueChange}
+          />
+        ) : null}
 
         <CommandList className="max-h-[300px] overflow-y-auto">
           {canSearch && (
-            <CommandEmpty>
-              {typeof search === "object" ? search.emptyMessage : undefined}
-            </CommandEmpty>
+            <CommandEmpty>{searchConfig?.emptyMessage}</CommandEmpty>
           )}
           {children}
         </CommandList>
