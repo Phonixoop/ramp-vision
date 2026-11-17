@@ -11,12 +11,6 @@ import {
   distinctPersonnelPerformanceData,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
-import {
-  defaultProjectTypes,
-  defualtContractTypes,
-  defualtRoles,
-  getDefaultRoleTypesBaseOnContractType,
-} from "~/constants/personnel-performance";
 import { getPersianToEnglishCity } from "~/utils/util";
 import { PersonnelPerformanceColumns } from "./PersonnelPerformanceColumns";
 import { PersonnelPerformanceFilters } from "./PersonnelPerformanceFilters";
@@ -29,6 +23,7 @@ import { TableFiltersContainerSkeleton } from "./TableFilterSkeleton";
 import { CustomColumnDef } from "~/types/table";
 import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
 import WorkDaysToggle from "~/features/work-days-toggle";
+import { readSavedDefaults } from "~/app/v2/dashboard/personnel_performance/chart/model";
 
 export function PersonnelPerformanceTable({
   sessionData,
@@ -44,6 +39,13 @@ export function PersonnelPerformanceTable({
   } = usePersonnelPerformance();
 
   const { useWorkDays, setUseWorkDays } = useWorkDaysToggle();
+
+  // Apply saved work-days preference once after mount (filters hydrate in context).
+  useEffect(() => {
+    const saved = readSavedDefaults();
+    if (saved) setUseWorkDays(saved.work_days);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // API Queries
   const getInitialCities =
@@ -121,54 +123,6 @@ export function PersonnelPerformanceTable({
     }
   }, [defualtDateInfo.data]);
 
-  // Update filters when default contract types are available
-  useEffect(() => {
-    if (defualtContractTypes.length > 0) {
-      setFiltersWithNoNetworkRequest((prev) => ({
-        ...prev,
-        filter: {
-          ...prev.filter,
-          ContractType: defualtContractTypes,
-          RoleTypes:
-            getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
-        },
-      }));
-    }
-  }, [defualtContractTypes]);
-
-  // Update filters when report period changes
-  useEffect(() => {
-    setDataFilters((prev) => ({
-      ...prev,
-      periodType: filters.periodType,
-    }));
-    setFiltersWithNoNetworkRequest((prev) => ({
-      ...prev,
-      periodType: filters.periodType,
-    }));
-  }, [filters.periodType]);
-
-  // Cleanup effect to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      // Cleanup any pending operations
-      setDataFilters({
-        periodType: "روزانه",
-        filter: {
-          CityName: [],
-          Start_Date: [],
-        },
-      });
-      setFiltersWithNoNetworkRequest({
-        periodType: "روزانه",
-        filter: {
-          ContractType: [],
-          RoleTypes: [],
-        },
-      });
-    };
-  }, []);
-
   // Initial filters query
   const initialFilters = api.personnelPerformance.getInitialFilters.useQuery(
     {
@@ -182,19 +136,6 @@ export function PersonnelPerformanceTable({
       refetchOnWindowFocus: false,
     },
   );
-
-  // Update filters when initial filters are available
-  useEffect(() => {
-    if (initialFilters.data) {
-      setDataFilters((prev) => ({
-        ...prev,
-        filter: {
-          ...prev.filter,
-          ProjectType: initialFilters.data.ProjectType,
-        },
-      }));
-    }
-  }, [initialFilters.data]);
 
   // Deferred filter for performance
   const deferredFilter = useDeferredValue(filters);
@@ -354,13 +295,14 @@ export function PersonnelPerformanceTable({
       personnelPerformance.data,
       initialFilters.data,
       getLastDate,
-      // Only depend on the actual values we care about, not the entire objects
+      setDataFilters,
+      setFiltersWithNoNetworkRequest,
       filters?.periodType,
       filters?.filter?.CityName?.length,
-      filters?.filter?.ProjectType?.length,
-      filtersWithNoNetworkRequest?.filter?.ContractType?.length,
-      filtersWithNoNetworkRequest?.filter?.Role?.length,
-      filtersWithNoNetworkRequest?.filter?.RoleType?.length,
+      filters?.filter?.ProjectType?.join(","),
+      filtersWithNoNetworkRequest?.filter?.ContractType?.join(","),
+      filtersWithNoNetworkRequest?.filter?.Role?.join(","),
+      filtersWithNoNetworkRequest?.filter?.RoleType?.join(","),
     ],
   );
 

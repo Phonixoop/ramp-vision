@@ -61,8 +61,6 @@ export interface PersonnelPerformanceChartContextType {
       | "Pure"
       | ((prev: "Distincted" | "Pure") => "Distincted" | "Pure"),
   ) => void;
-  // filtersWithNoNetworkRequest: any;
-  // setFiltersWithNoNetworkRequest: (filters: any) => void;
   // Optimistic filtering state
   isFiltering: boolean;
   setIsFiltering: (isFiltering: boolean) => void;
@@ -75,6 +73,11 @@ export interface PersonnelPerformanceChartContextType {
   setSelectedCity: (city: string | null) => void;
   chartView: "cities" | "city-detail";
   setChartView: (view: "cities" | "city-detail") => void;
+  // Saved filter defaults (shared with v2 chart storage)
+  hasSavedDefaults: boolean;
+  saveCurrentAsDefaults: (workDays: boolean) => void;
+  resetToSystemDefaults: (setWorkDays: (value: boolean) => void) => void;
+  applySavedOrSystemDefaults: (setWorkDays: (value: boolean) => void) => void;
 }
 
 // Component Props Types

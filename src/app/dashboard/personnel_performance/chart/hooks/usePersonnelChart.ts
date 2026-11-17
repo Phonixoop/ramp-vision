@@ -9,9 +9,9 @@ import {
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
-  getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
 import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+import { readSavedDefaults } from "~/app/v2/dashboard/personnel_performance/chart/model";
 import moment from "jalali-moment";
 
 export const usePersonnelChart = () => {
@@ -20,9 +20,20 @@ export const usePersonnelChart = () => {
     setDataFilters: setFilters,
     reportPeriod,
     setReportPeriod,
+    hasSavedDefaults,
+    saveCurrentAsDefaults: saveDefaults,
+    resetToSystemDefaults: resetDefaults,
+    applySavedOrSystemDefaults: applyDefaults,
   } = usePersonnelPerformanceChart();
 
-  const { useWorkDays } = useWorkDaysToggle();
+  const { useWorkDays, setUseWorkDays } = useWorkDaysToggle();
+
+  // Apply saved work-days preference once after mount (filters hydrate in context).
+  useEffect(() => {
+    const saved = readSavedDefaults();
+    if (saved) setUseWorkDays(saved.work_days);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const router = useRouter();
   const params = useParams<{ city?: string }>();
@@ -273,6 +284,10 @@ export const usePersonnelChart = () => {
     });
   };
 
+  const saveCurrentAsDefaults = () => saveDefaults(useWorkDays);
+  const resetToSystemDefaults = () => resetDefaults(setUseWorkDays);
+  const applySavedOrSystemDefaults = () => applyDefaults(setUseWorkDays);
+
   return {
     // Data
     filters,
@@ -284,6 +299,7 @@ export const usePersonnelChart = () => {
     getInitialFilters,
     getCitiesWithPerformance,
     totalWorkDays,
+    hasSavedDefaults,
 
     // Loading states
     isLoading: getCitiesWithPerformance.isLoading,
@@ -294,5 +310,8 @@ export const usePersonnelChart = () => {
     handleCityNavigation,
     setListView,
     getCalendarPeriodType,
+    saveCurrentAsDefaults,
+    resetToSystemDefaults,
+    applySavedOrSystemDefaults,
   };
 };

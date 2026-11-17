@@ -1,5 +1,5 @@
 import React from "react";
-import { FilterIcon } from "lucide-react";
+import { BookmarkIcon, FilterIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
 import H2 from "~/ui/heading/h2";
 import ResponsiveView from "~/features/responsive-view";
 import { SelectControlled } from "~/features/checkbox-list";
@@ -11,12 +11,15 @@ import {
   AccordionTrigger,
 } from "~/components/shadcn/accordion";
 import { FilterType, PeriodType } from "../types";
-import { cn, sortDates } from "~/lib/utils";
+import { sortDates } from "~/lib/utils";
 import {
   FilterSectionSkeleton,
   FilterSkeleton,
 } from "~/components/skeletons/FilterSkeleton";
 import { defualtRoles } from "~/constants/personnel-performance";
+
+const ACTION_BTN =
+  "inline-flex h-9 items-center gap-1.5 rounded-md border border-primary/20 bg-secondary px-3 text-xs text-primary transition-colors hover:bg-primary/5";
 
 interface FiltersSectionProps {
   filters: FilterType;
@@ -28,6 +31,10 @@ interface FiltersSectionProps {
   }) => void;
   onUpdateFilters: (patch: any) => void;
   getCalendarPeriodType: (period: PeriodType) => "daily" | "weekly" | "monthly";
+  hasSavedDefaults?: boolean;
+  onSaveDefaults?: () => void;
+  onApplyDefaults?: () => void;
+  onResetDefaults?: () => void;
 }
 
 export const FiltersSection = React.memo<FiltersSectionProps>(
@@ -38,6 +45,10 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
     onCalendarSubmit,
     onUpdateFilters,
     getCalendarPeriodType,
+    hasSavedDefaults = false,
+    onSaveDefaults,
+    onApplyDefaults,
+    onResetDefaults,
   }) => {
     const _DateInfos = React.useMemo(
       () =>
@@ -130,6 +141,43 @@ export const FiltersSection = React.memo<FiltersSectionProps>(
             </>
           }
         >
+          {(onSaveDefaults || onApplyDefaults || onResetDefaults) && (
+            <div className="mb-2 flex w-full flex-wrap items-center justify-center gap-2 px-2">
+              {onSaveDefaults ? (
+                <button
+                  type="button"
+                  className={ACTION_BTN}
+                  onClick={onSaveDefaults}
+                >
+                  <BookmarkIcon className="size-3.5" />
+                  ذخیره پیش‌فرض
+                </button>
+              ) : null}
+              {onApplyDefaults ? (
+                <button
+                  type="button"
+                  className={ACTION_BTN}
+                  onClick={onApplyDefaults}
+                >
+                  <SaveIcon className="size-3.5" />
+                  {hasSavedDefaults
+                    ? "اعمال پیش‌فرض"
+                    : "اعمال پیش‌فرض سیستم"}
+                </button>
+              ) : null}
+              {onResetDefaults ? (
+                <button
+                  type="button"
+                  className={ACTION_BTN}
+                  onClick={onResetDefaults}
+                >
+                  <RotateCcwIcon className="size-3.5" />
+                  بازنشانی
+                </button>
+              ) : null}
+            </div>
+          )}
+
           <div className="flex w-full flex-wrap">
             {/* Report period / date picker */}
             <div className="flex w-[15rem] max-w-sm flex-col items-center justify-around gap-3 p-2">

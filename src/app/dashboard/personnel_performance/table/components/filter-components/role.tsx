@@ -10,11 +10,14 @@ import { defualtRoles } from "~/constants/personnel-performance";
 export const RoleFilter = memo(function RoleFilter({
   column,
   personnelPerformance,
+  filtersWithNoNetworkRequest,
+  setFiltersWithNoNetworkRequest,
 }: {
   column: Column<any, unknown>;
   personnelPerformance: any;
+  filtersWithNoNetworkRequest?: any;
+  setFiltersWithNoNetworkRequest?: (f: any) => void;
 }) {
-  // Check if personnel data is loading (needed for role values)
   const isPersonnelDataLoading = !personnelPerformance?.result;
 
   return (
@@ -25,9 +28,20 @@ export const RoleFilter = memo(function RoleFilter({
         <TableFilterSkeleton />
       ) : (
         <SelectColumnFilterOptimized<Pick<PersonnelPerformanceData, "Role">>
-          initialFilters={defualtRoles}
+          initialFilters={
+            filtersWithNoNetworkRequest?.filter?.Role ?? defualtRoles
+          }
           column={column}
           values={personnelPerformance?.result}
+          onChange={(filter) => {
+            setFiltersWithNoNetworkRequest?.((prev: any) => ({
+              ...prev,
+              filter: {
+                ...prev.filter,
+                Role: filter.values,
+              },
+            }));
+          }}
         />
       )}
     </div>

@@ -8,6 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import moment from "jalali-moment";
+import { toast } from "sonner";
 import {
   PersonnelPerformanceContextType,
   FilterType,
@@ -16,8 +17,16 @@ import {
 import {
   defaultProjectTypes,
   defualtContractTypes,
+  defualtRoles,
   getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
+import {
+  clearSavedDefaults,
+  readSavedDefaults,
+  systemSelectDefaults,
+  writeSavedDefaults,
+  type SelectDefaults,
+} from "~/app/v2/dashboard/personnel_performance/chart/model";
 
 const PersonnelPerformanceContext = createContext<
   PersonnelPerformanceContextType | undefined
@@ -33,6 +42,49 @@ export function usePersonnelPerformance() {
   return context;
 }
 
+function buildSystemFilters(period: PeriodType = "روزانه"): FilterType {
+  const system = systemSelectDefaults();
+  return {
+    periodType: period,
+    filter: {
+      ProjectType: [...system.project],
+      Role: [...system.role],
+      ContractType: [...system.contract],
+      RoleType: [...system.role_type],
+      Start_Date: [
+        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
+      ],
+    },
+  };
+}
+
+function buildNoNetworkFilters(defaults: SelectDefaults, period: PeriodType) {
+  return {
+    periodType: period,
+    filter: {
+      ContractType: [...defaults.contract],
+      Role: [...defaults.role],
+      RoleType: [...defaults.role_type],
+    },
+  };
+}
+
+function applySelectDefaults(
+  prev: FilterType,
+  defaults: SelectDefaults,
+): FilterType {
+  return {
+    periodType: defaults.period,
+    filter: {
+      ...prev.filter,
+      ProjectType: [...defaults.project],
+      ContractType: [...defaults.contract],
+      Role: [...defaults.role],
+      RoleType: [...defaults.role_type],
+    },
+  };
+}
+
 interface PersonnelPerformanceProviderProps {
   children: React.ReactNode;
 }
@@ -40,41 +92,41 @@ interface PersonnelPerformanceProviderProps {
 export function PersonnelPerformanceProvider({
   children,
 }: PersonnelPerformanceProviderProps) {
-  // Report period state
   const [reportPeriod, setReportPeriod] = useState<PeriodType>("روزانه");
-
-  // Toggle state for distinct data
   const [toggleDistinctData, setToggleDistinctData] = useState<
     "Distincted" | "Pure"
   >("Distincted");
 
-  // Filters state
-  const [filters, setDataFilters] = useState<FilterType>({
-    periodType: reportPeriod,
-    filter: {
-      ProjectType: defaultProjectTypes,
-      Start_Date: [
-        moment().locale("fa").subtract(1, "days").format("YYYY/MM/DD"),
-      ],
-    },
-  });
+  const [filters, setDataFilters] = useState<FilterType>(() =>
+    buildSystemFilters("روزانه"),
+  );
 
-  // Filters without network request
   const [filtersWithNoNetworkRequest, setFiltersWithNoNetworkRequest] =
-    useState({
-      periodType: reportPeriod,
-      filter: {
-        ContractType: defualtContractTypes,
-        RoleTypes: getDefaultRoleTypesBaseOnContractType(defualtContractTypes),
-      },
-    });
+    useState(() =>
+      buildNoNetworkFilters(systemSelectDefaults(), "روزانه"),
+    );
 
-  // Optimistic filtering state
+  const [savedDefaults, setSavedDefaults] = useState<SelectDefaults | null>(
+    null,
+  );
+
   const [isFiltering, setIsFiltering] = useState(false);
   const [optimisticFilters, setOptimisticFilters] =
     useState<FilterType>(filters);
 
-  // Update report period in filters when it changes
+  // Hydrate saved defaults once on the client (same storage key as chart/v2).
+  useEffect(() => {
+    const saved = readSavedDefaults();
+    setSavedDefaults(saved);
+    if (!saved) return;
+
+    setReportPeriod(saved.period);
+    setDataFilters((prev) => applySelectDefaults(prev, saved));
+    setFiltersWithNoNetworkRequest(
+      buildNoNetworkFilters(saved, saved.period),
+    );
+  }, []);
+
   useEffect(() => {
     setDataFilters((prev) => ({
       ...prev,
@@ -113,6 +165,64 @@ export function PersonnelPerformanceProvider({
     [],
   );
 
+  const saveCurrentAsDefaults = useCallback(
+    (workDays: boolean) => {
+      const next: SelectDefaults = {
+        period: reportPeriod,
+        project: filters.filter.ProjectType ?? [...defaultProjectTypes],
+        contract:
+          filtersWithNoNetworkRequest?.filter?.ContractType ??
+          filters.filter.ContractType ??
+          [...defualtContractTypes],
+        role:
+          filtersWithNoNetworkRequest?.filter?.Role ??
+          filters.filter.Role ??
+          [...defualtRoles],
+        role_type:
+          filtersWithNoNetworkRequest?.filter?.RoleType ??
+          filters.filter.RoleType ??
+          getDefaultRoleTypesBaseOnContractType([
+            ...(filters.filter.ContractType ?? defualtContractTypes),
+          ]),
+        work_days: workDays,
+      };
+      writeSavedDefaults(next);
+      setSavedDefaults(next);
+      toast.success("پیش‌فرض فیلترها ذخیره شد");
+    },
+    [filters, filtersWithNoNetworkRequest, reportPeriod],
+  );
+
+  const resetToSystemDefaults = useCallback(
+    (setWorkDays: (value: boolean) => void) => {
+      clearSavedDefaults();
+      setSavedDefaults(null);
+      const system = systemSelectDefaults();
+      setReportPeriod(system.period);
+      setDataFilters((prev) => applySelectDefaults(prev, system));
+      setFiltersWithNoNetworkRequest(
+        buildNoNetworkFilters(system, system.period),
+      );
+      setWorkDays(system.work_days);
+      toast.success("پیش‌فرض‌های سیستم اعمال شد");
+    },
+    [],
+  );
+
+  const applySavedOrSystemDefaults = useCallback(
+    (setWorkDays: (value: boolean) => void) => {
+      const defaults = savedDefaults ?? systemSelectDefaults();
+      setReportPeriod(defaults.period);
+      setDataFilters((prev) => applySelectDefaults(prev, defaults));
+      setFiltersWithNoNetworkRequest(
+        buildNoNetworkFilters(defaults, defaults.period),
+      );
+      setWorkDays(defaults.work_days);
+      toast.success("پیش‌فرض‌ها اعمال شد");
+    },
+    [savedDefaults],
+  );
+
   const value: PersonnelPerformanceContextType = {
     reportPeriod,
     setReportPeriod,
@@ -122,11 +232,14 @@ export function PersonnelPerformanceProvider({
     setToggleDistinctData: memoizedSetToggleDistinctData,
     filtersWithNoNetworkRequest,
     setFiltersWithNoNetworkRequest: memoizedSetFiltersWithNoNetworkRequest,
-    // Optimistic filtering state
     isFiltering,
     setIsFiltering,
     optimisticFilters,
     setOptimisticFilters,
+    hasSavedDefaults: Boolean(savedDefaults),
+    saveCurrentAsDefaults,
+    resetToSystemDefaults,
+    applySavedOrSystemDefaults,
   };
 
   return (

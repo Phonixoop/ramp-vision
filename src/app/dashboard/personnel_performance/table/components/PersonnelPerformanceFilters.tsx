@@ -1,14 +1,15 @@
 "use client";
 import moment from "jalali-moment";
-import ThreeDotsWave from "~/ui/loadings/three-dots-wave";
-import { en } from "~/utils/util";
+import { BookmarkIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
 import { PeriodType } from "../types";
 import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
-import { useState, useEffect } from "react";
 import { usePersonnelPerformance } from "../context";
-import LoaderAnim from "~/components/main/loader-anim";
 import { TableFilterSkeleton } from "./TableFilterSkeleton";
 import { toast } from "sonner";
+import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+
+const ACTION_BTN =
+  "inline-flex h-9 items-center gap-1.5 rounded-md border border-primary/20 bg-secondary px-3 text-xs text-primary transition-colors hover:bg-primary/5";
 
 interface PersonnelPerformanceFiltersProps {
   getLastDate: any;
@@ -17,8 +18,17 @@ interface PersonnelPerformanceFiltersProps {
 export function PersonnelPerformanceFilters({
   getLastDate,
 }: PersonnelPerformanceFiltersProps) {
-  const { filters, setDataFilters, reportPeriod, setReportPeriod } =
-    usePersonnelPerformance();
+  const {
+    filters,
+    setDataFilters,
+    reportPeriod,
+    setReportPeriod,
+    hasSavedDefaults,
+    saveCurrentAsDefaults,
+    resetToSystemDefaults,
+    applySavedOrSystemDefaults,
+  } = usePersonnelPerformance();
+  const { useWorkDays, setUseWorkDays } = useWorkDaysToggle();
 
   // Safety check for filters and Start_Date
   if (
@@ -41,7 +51,7 @@ export function PersonnelPerformanceFilters({
     if (!date.isValid()) {
       date = moment(dateStr, "jYYYY/jMM/jDD");
     }
-    // Convert to YYYY-MM-DD format for the new API
+    // Convert to YYYY/MM/DD format for the new API
     return date.isValid() ? date.format("YYYY/MM/DD") : "";
   }).filter((date) => date !== "");
 
@@ -85,7 +95,6 @@ export function PersonnelPerformanceFilters({
     reportPeriod: "daily" | "weekly" | "monthly";
     selectedDates: string[];
   }) => {
-    console.log(reportPeriod + " " + filters.filter.CityName.length);
     if (
       (reportPeriod === "monthly" && filters.filter.CityName.length <= 0) ||
       filters.filter.CityName.length > 1
@@ -96,29 +105,49 @@ export function PersonnelPerformanceFilters({
       return;
     }
 
-    // Convert reportPeriod to PeriodType
     const newPeriodType = getPeriodType(reportPeriod);
     setReportPeriod(newPeriodType);
 
-    // Update filters with the selected dates array and period type
     if (selectedDates.length > 0) {
       setDataFilters({
         periodType: newPeriodType,
         filter: {
           ...filters.filter,
-          Start_Date: selectedDates, // Send the entire selectedDates array
+          Start_Date: selectedDates,
         },
       });
     }
   };
 
-  // Convert string dates back to moment for display
-  const getDisplayDates = () => {
-    return selectedDates.map((dateStr) => moment(dateStr, "YYYY-MM-DD"));
-  };
-
   return (
     <div className="flex w-full flex-col items-center justify-around gap-3 rounded-xl bg-secondary p-2">
+      <div className="flex w-full flex-wrap items-center justify-center gap-2">
+        <button
+          type="button"
+          className={ACTION_BTN}
+          onClick={() => saveCurrentAsDefaults(useWorkDays)}
+        >
+          <BookmarkIcon className="size-3.5" />
+          ذخیره پیش‌فرض
+        </button>
+        <button
+          type="button"
+          className={ACTION_BTN}
+          onClick={() => applySavedOrSystemDefaults(setUseWorkDays)}
+        >
+          <SaveIcon className="size-3.5" />
+          {hasSavedDefaults ? "اعمال پیش‌فرض" : "اعمال پیش‌فرض سیستم"}
+        </button>
+        <button
+          type="button"
+          className={ACTION_BTN}
+          onClick={() => resetToSystemDefaults(setUseWorkDays)}
+        >
+          <RotateCcwIcon className="size-3.5" />
+          بازنشانی
+        </button>
+      </div>
+
       <span className="font-bold text-primary">بازه گزارش</span>
 
       {!getLastDate || getLastDate.isLoading ? (
@@ -138,18 +167,11 @@ export function PersonnelPerformanceFilters({
       {!getLastDate || getLastDate.isLoading ? (
         <div className="mt-5 h-4 w-12 animate-pulse rounded-md bg-secbuttn"></div>
       ) : (
-        <>
-          <div className="flex w-full flex-col items-center justify-center gap-3">
-            <span className="font-bold text-primary">
-              {getPeriodType(getCalendarPeriodType(reportPeriod))}
-            </span>
-            {/* <p className="text-primary">
-              {getDisplayDates()
-                .map((date) => date.format("YYYY/MM/DD"))
-                .join(" - ")} 
-            </p> */}
-          </div>
-        </>
+        <div className="flex w-full flex-col items-center justify-center gap-3">
+          <span className="font-bold text-primary">
+            {getPeriodType(getCalendarPeriodType(reportPeriod))}
+          </span>
+        </div>
       )}
     </div>
   );

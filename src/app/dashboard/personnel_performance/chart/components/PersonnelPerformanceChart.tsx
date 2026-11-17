@@ -30,6 +30,10 @@ export const PersonnelPerformanceChart = React.memo<{
     handleCityNavigation,
     setListView,
     getCalendarPeriodType,
+    hasSavedDefaults,
+    saveCurrentAsDefaults,
+    resetToSystemDefaults,
+    applySavedOrSystemDefaults,
   } = usePersonnelChart();
 
   // Get work days toggle state from context
@@ -61,6 +65,10 @@ export const PersonnelPerformanceChart = React.memo<{
           onCalendarSubmit={handleCalendarSubmit}
           onUpdateFilters={updateFilters}
           getCalendarPeriodType={getCalendarPeriodType}
+          hasSavedDefaults={hasSavedDefaults}
+          onSaveDefaults={saveCurrentAsDefaults}
+          onApplyDefaults={applySavedOrSystemDefaults}
+          onResetDefaults={resetToSystemDefaults}
         />
 
         {/* Work Days Toggle */}

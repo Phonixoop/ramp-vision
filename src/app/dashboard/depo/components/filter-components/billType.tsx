@@ -1,5 +1,6 @@
 "use client";
 import { Column } from "@tanstack/react-table";
+import { useEffect, useMemo } from "react";
 import { SelectControlled } from "~/features/checkbox-list";
 import { DepoData } from "../../types";
 
@@ -9,14 +10,32 @@ interface BillTypeFilterProps {
   setDataFilters: (filters: any) => void;
 }
 
-export function BillTypeFilter({
-  column,
-  depo,
-  setDataFilters,
-}: BillTypeFilterProps) {
-  const billTypeList = Array.from(
-    new Set(depo.data?.result?.map((item: any) => item.BillType) ?? []),
-  ) as string[];
+function uniqueSorted(values: Iterable<unknown>) {
+  return Array.from(
+    new Set(
+      Array.from(values)
+        .map((v) => (v == null ? "" : String(v).trim()))
+        .filter(Boolean),
+    ),
+  ).toSorted();
+}
+
+export function BillTypeFilter({ column, depo }: BillTypeFilterProps) {
+  const billTypeList = useMemo(() => {
+    const faceted = uniqueSorted(column.getFacetedUniqueValues().keys());
+    if (faceted.length > 0) return faceted;
+    return uniqueSorted(
+      (depo?.data?.result ?? []).map((item: DepoData) => item.BillType),
+    );
+  }, [column.getFacetedUniqueValues(), depo?.data?.result]);
+
+  useEffect(() => {
+    if (depo?.isLoading || billTypeList.length === 0) return;
+    const current = (column.getFilterValue() as string[]) ?? [];
+    if (current.length === 0) return;
+    const next = current.filter((item) => billTypeList.includes(item));
+    if (next.length !== current.length) column.setFilterValue(next);
+  }, [billTypeList, depo?.isLoading, column]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">

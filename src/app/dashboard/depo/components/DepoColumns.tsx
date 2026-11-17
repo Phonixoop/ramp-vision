@@ -43,7 +43,8 @@ export function DepoColumns({
       Filter: ({ column }) => (
         <CityNameFilter
           column={column}
-          cityNames={
+          depo={depo}
+          fallbackCityNames={
             initialFilters?.data?.Cities?.map((a: any) => a.CityName) ?? []
           }
           setDataFilters={setDataFilters}

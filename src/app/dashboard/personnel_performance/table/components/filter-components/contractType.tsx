@@ -18,7 +18,6 @@ export const ContractTypeFilter = memo(function ContractTypeFilter({
   filtersWithNoNetworkRequest: any;
   setFiltersWithNoNetworkRequest: (f: any) => void;
 }) {
-  // Check if personnel data is loading (needed for contract type values)
   const isPersonnelDataLoading = !personnelPerformance?.result;
 
   return (
@@ -27,31 +26,24 @@ export const ContractTypeFilter = memo(function ContractTypeFilter({
       {isPersonnelDataLoading ? (
         <TableFilterSkeleton />
       ) : (
-        // <SelectColumnFilterOptimized<
-        //   Pick<PersonnelPerformanceData, "ContractType">
-        // >
-        //   initialFilters={
-        //     filtersWithNoNetworkRequest?.filter?.ContractType ??
-        //     defualtContractTypes
-        //   }
-        //   column={column}
-        //   values={personnelPerformance?.result ?? []}
-        //   onChange={(filter) => {
-        //     setFiltersWithNoNetworkRequest((prev: any) => ({
-        //       ...prev,
-        //       filter: {
-        //         ...prev.filter,
-        //         [filter.id]: filter.values,
-        //       },
-        //     }));
-        //   }}
-        // />
         <SelectColumnFilterOptimized<
           Pick<PersonnelPerformanceData, "ContractType">
         >
-          initialFilters={defualtContractTypes}
+          initialFilters={
+            filtersWithNoNetworkRequest?.filter?.ContractType ??
+            defualtContractTypes
+          }
           column={column}
           values={personnelPerformance?.result}
+          onChange={(filter) => {
+            setFiltersWithNoNetworkRequest((prev: any) => ({
+              ...prev,
+              filter: {
+                ...prev.filter,
+                ContractType: filter.values,
+              },
+            }));
+          }}
         />
       )}
     </div>

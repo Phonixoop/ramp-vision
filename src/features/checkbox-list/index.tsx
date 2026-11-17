@@ -687,19 +687,15 @@ export function SelectColumnFilterOptimized<T>({
     }
   }, [values, column.id]);
 
-  // Initialize filter value only once when component mounts
-  const hasInitialized = useRef(false);
-
+  // Keep column filter in sync with controlled defaults (e.g. save/apply defaults).
+  const lastAppliedInitial = useRef<string>("");
   useIsomorphicLayoutEffect(() => {
-    if (
-      !hasInitialized.current &&
-      stableInitialFilters &&
-      stableInitialFilters.length > 0
-    ) {
-      setFilterValue(stableInitialFilters);
-      hasInitialized.current = true;
-    }
-  }, [stableInitialFilters]);
+    const key = stableInitialFilters.join("\0");
+    if (!stableInitialFilters.length) return;
+    if (lastAppliedInitial.current === key) return;
+    lastAppliedInitial.current = key;
+    setFilterValue(stableInitialFilters);
+  }, [stableInitialFilters, setFilterValue]);
 
   if (!values || values.length === 0) return <></>;
 

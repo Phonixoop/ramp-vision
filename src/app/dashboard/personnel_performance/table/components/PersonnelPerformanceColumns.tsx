@@ -142,6 +142,8 @@ export function PersonnelPerformanceColumns({
         <RoleFilter
           column={column}
           personnelPerformance={personnelPerformance}
+          filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
+          setFiltersWithNoNetworkRequest={setFiltersWithNoNetworkRequest}
         />
       ),
     },
@@ -156,6 +158,7 @@ export function PersonnelPerformanceColumns({
           column={column}
           personnelPerformance={personnelPerformance}
           filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
+          setFiltersWithNoNetworkRequest={setFiltersWithNoNetworkRequest}
         />
       ),
     },

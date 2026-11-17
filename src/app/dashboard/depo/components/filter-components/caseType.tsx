@@ -1,5 +1,6 @@
 "use client";
 import { Column } from "@tanstack/react-table";
+import { useEffect, useMemo } from "react";
 import { SelectControlled } from "~/features/checkbox-list";
 import { DepoData } from "../../types";
 
@@ -9,14 +10,32 @@ interface CaseTypeFilterProps {
   setDataFilters: (filters: any) => void;
 }
 
-export function CaseTypeFilter({
-  column,
-  depo,
-  setDataFilters,
-}: CaseTypeFilterProps) {
-  const caseTypeList = Array.from(
-    new Set(depo.data?.result?.map((item: any) => item.CaseType) ?? []),
-  ) as string[];
+function uniqueSorted(values: Iterable<unknown>) {
+  return Array.from(
+    new Set(
+      Array.from(values)
+        .map((v) => (v == null ? "" : String(v).trim()))
+        .filter(Boolean),
+    ),
+  ).toSorted();
+}
+
+export function CaseTypeFilter({ column, depo }: CaseTypeFilterProps) {
+  const caseTypeList = useMemo(() => {
+    const faceted = uniqueSorted(column.getFacetedUniqueValues().keys());
+    if (faceted.length > 0) return faceted;
+    return uniqueSorted(
+      (depo?.data?.result ?? []).map((item: DepoData) => item.CaseType),
+    );
+  }, [column.getFacetedUniqueValues(), depo?.data?.result]);
+
+  useEffect(() => {
+    if (depo?.isLoading || caseTypeList.length === 0) return;
+    const current = (column.getFilterValue() as string[]) ?? [];
+    if (current.length === 0) return;
+    const next = current.filter((item) => caseTypeList.includes(item));
+    if (next.length !== current.length) column.setFilterValue(next);
+  }, [caseTypeList, depo?.isLoading, column]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">

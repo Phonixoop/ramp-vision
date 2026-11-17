@@ -14,12 +14,13 @@ export const RoleTypeFilter = memo(function RoleTypeFilter({
   column,
   personnelPerformance,
   filtersWithNoNetworkRequest,
+  setFiltersWithNoNetworkRequest,
 }: {
   column: Column<any, unknown>;
   personnelPerformance: any;
   filtersWithNoNetworkRequest: any;
+  setFiltersWithNoNetworkRequest?: (f: any) => void;
 }) {
-  // Check if personnel data is loading (needed for role type values)
   const isPersonnelDataLoading = !personnelPerformance?.result;
 
   return (
@@ -38,6 +39,15 @@ export const RoleTypeFilter = memo(function RoleTypeFilter({
           }
           column={column}
           values={personnelPerformance?.result ?? []}
+          onChange={(filter) => {
+            setFiltersWithNoNetworkRequest?.((prev: any) => ({
+              ...prev,
+              filter: {
+                ...prev.filter,
+                RoleType: filter.values,
+              },
+            }));
+          }}
         />
       )}
     </div>

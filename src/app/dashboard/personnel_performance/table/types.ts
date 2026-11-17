@@ -74,6 +74,11 @@ export interface PersonnelPerformanceContextType {
   setOptimisticFilters: (
     filters: FilterType | ((prev: FilterType) => FilterType),
   ) => void;
+  // Saved filter defaults (shared with chart/v2 storage)
+  hasSavedDefaults: boolean;
+  saveCurrentAsDefaults: (workDays: boolean) => void;
+  resetToSystemDefaults: (setWorkDays: (value: boolean) => void) => void;
+  applySavedOrSystemDefaults: (setWorkDays: (value: boolean) => void) => void;
 }
 
 // Component Props Types
