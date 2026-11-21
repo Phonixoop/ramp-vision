@@ -51,7 +51,6 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
         user.NameFamily,
         ["BranchName", "Role"],
         {
-          // Match aggregation grouping: filter by NationalCode and CityName to ensure consistency
           NationalCode: user.NationalCode,
           CityName: user.CityName || user.key?.CityName,
         },
@@ -64,20 +63,6 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       user.key?.CityName,
     ]);
 
-    // const isActive = React.useMemo(() => {
-    //   const userKey = user.NationalCode + user.NameFamily + user.Role;
-    //   const activeKeyCombined =
-    //     activeKey?.nc + activeKey?.name + activeKey?.role;
-    //   return userKey === activeKeyCombined;
-    // }, [
-    //   user.NationalCode,
-    //   user.NameFamily,
-    //   user.Role,
-    //   activeKey?.nc,
-    //   activeKey?.name,
-    //   activeKey?.role,
-    // ]);
-
     const handleClick = React.useCallback(() => {
       onSelect(sparkData);
     }, [onSelect, sparkData]);
@@ -87,12 +72,14 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       user.CityName || user.key?.CityName,
       user.RealCityName,
     );
-    const nationalCode = normalizeNationalCode(user.NationalCode);
+    const nationalCode = normalizeNationalCode(
+      user.NationalCode ?? user.key?.NationalCode,
+    );
     const nameTitle = nationalCode
       ? `${displayName} — ${nationalCode}`
       : displayName;
 
-    if (!user?.NationalCode) {
+    if (!user?.NationalCode && !user?.key?.NationalCode && !user?.NameFamily) {
       return (
         <div
           className={cn(
@@ -121,17 +108,17 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
     return (
       <div
         className={cn(
-          " w-full  rounded-xl",
+          "w-full rounded-xl",
           isActive
-            ? "sticky  top-36 z-20 "
+            ? "sticky top-36 z-20"
             : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
         )}
       >
         <Button
           className={cn(
-            "w-full cursor-pointer overflow-hidden rounded-xl py-2 transition-all duration-200 ease-out",
+            "h-auto w-full cursor-pointer rounded-xl py-2 transition-all duration-200 ease-out",
             isActive
-              ? "bg-primary/90   text-secondary"
+              ? "bg-primary/90 text-secondary"
               : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
           )}
           onClick={handleClick}
@@ -142,14 +129,19 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
               <span className="w-full break-words text-center text-xs leading-tight">
                 {displayName}
               </span>
-              <span className="w-full break-all text-center font-mono text-[10px] leading-tight opacity-70 tabular-nums">
-                {nationalCode}
-              </span>
+              {nationalCode ? (
+                <span
+                  dir="ltr"
+                  className="w-full break-all text-center font-mono text-[10px] leading-tight tabular-nums opacity-80"
+                >
+                  {nationalCode}
+                </span>
+              ) : null}
             </div>
           ) : (
-            <div className="flex w-full flex-row-reverse items-center justify-between gap-2 px-2 text-right text-inherit duration-1000">
+            <div className="flex w-full flex-row-reverse items-center gap-2 px-2 text-right text-inherit">
               {user.Start_Date && (
-                <div className="w-10">
+                <div className="w-8 shrink-0">
                   {isActive ? (
                     <BarChart3Loading />
                   ) : (
@@ -158,12 +150,14 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                 </div>
               )}
 
-              <div className="flex flex-col items-center justify-center">
+              <div className="flex w-12 shrink-0 flex-col items-center justify-center">
                 <TrendDecider values={userPerformances} />
-                {Math.round(user.TotalPerformance || 0)}%
+                <span className="text-xs tabular-nums">
+                  {Math.round(user.TotalPerformance || 0)}%
+                </span>
               </div>
 
-              <div className="flex w-full items-center justify-center">
+              <div className="flex w-28 shrink-0 items-center justify-center sm:w-36">
                 <SparkAreaChart
                   data={sparkData}
                   categories={[
@@ -176,7 +170,7 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                   index="Start_Date"
                   colors={["purple", "rose", "cyan"]}
                   className={cn(
-                    "dash-a pointer-events-none h-10 w-36",
+                    "dash-a pointer-events-none h-10 w-full",
                     isActive
                       ? "animate-path animate-[move_100s_linear_infinite]"
                       : "",
@@ -184,12 +178,23 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                 />
               </div>
 
-              <span className="flex w-full min-w-0 flex-col items-start gap-0.5 text-right">
-                <span className="w-full truncate text-sm">{displayName}</span>
-                <span className="w-full truncate font-mono text-[11px] opacity-70 tabular-nums">
-                  {nationalCode}
+              <div className="flex min-w-0 flex-1 flex-col items-stretch gap-0.5 text-right">
+                <span className="truncate text-sm font-medium leading-5">
+                  {displayName}
                 </span>
-              </span>
+                {nationalCode ? (
+                  <span
+                    dir="ltr"
+                    className="truncate font-mono text-xs leading-4 tabular-nums opacity-80"
+                  >
+                    {nationalCode}
+                  </span>
+                ) : (
+                  <span className="text-[11px] leading-4 opacity-50">
+                    بدون کد ملی
+                  </span>
+                )}
+              </div>
             </div>
           )}
           {isActive && (
@@ -201,11 +206,10 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                 backgroundImage:
                   "radial-gradient(transparent, rgba(var(--primary),0.9) 1px)",
                 backgroundSize: "3px 3px",
-                // backdropFilter: "blur(3px)",
                 maskImage:
                   "linear-gradient(rgb(0, 0, 0) 100%, rgba(0, 0, 0, 0) 100%)",
                 WebkitMaskImage:
-                  "linear-gradient(rgb(0, 0, 0) 100%, rgba(0, 0, 0, 0) 100%)", // For Safari compatibility
+                  "linear-gradient(rgb(0, 0, 0) 100%, rgba(0, 0, 0, 0) 100%)",
                 opacity: 1,
               }}
             />

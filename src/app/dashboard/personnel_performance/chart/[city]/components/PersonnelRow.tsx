@@ -120,18 +120,23 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
             />
           </div>
 
-          <span className="flex w-full min-w-0 flex-col items-start gap-0.5 text-right">
-            <span className="w-full truncate text-sm">
+          <div className="flex min-w-0 flex-1 flex-col items-stretch gap-0.5 text-right">
+            <span className="truncate text-sm font-medium">
               {getPersonnelDisplayName(
                 user.NameFamily ?? "",
                 user.CityName || user.key?.CityName,
                 user.RealCityName,
               )}
             </span>
-            <span className="w-full truncate font-mono text-[11px] opacity-70 tabular-nums">
-              {normalizeNationalCode(user.NationalCode)}
+            <span
+              dir="ltr"
+              className="truncate font-mono text-xs tabular-nums opacity-80"
+            >
+              {normalizeNationalCode(
+                user.NationalCode ?? user.key?.NationalCode,
+              )}
             </span>
-          </span>
+          </div>
         </div>
       </Button>
     );

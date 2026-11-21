@@ -20,6 +20,7 @@ import {
   getPerformanceMetric,
   getPersonnelDisplayName,
   isPersonnelWorkingDay,
+  normalizeNationalCode,
 } from "~/utils/personnel-performance";
 import { getMonthNumber } from "~/utils/date-utils";
 import { commify } from "~/utils/util";
@@ -310,27 +311,40 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                     );
                   }
 
+                  const label = PersonnelPerformanceTranslate[key] ?? key;
+                  const isNationalCode = key === "NationalCode";
+
                   return (
                     <ToolTipSimple
                       key={key}
                       childClassName="h-full flex justify-center items-center"
                       className="flex cursor-auto bg-secondary"
                       tooltip={
-                        <span className="text-base text-primary">
-                          {PersonnelPerformanceTranslate[key] ?? key}
-                        </span>
+                        <span className="text-base text-primary">{label}</span>
                       }
                     >
                       <div
                         className={cn(
-                          "flex min-w-[150px] cursor-auto items-center justify-center gap-2 bg-secondary p-2",
-                          isLastItem || index === 0
+                          "flex min-w-[150px] cursor-auto flex-col items-center justify-center gap-1 bg-secondary p-2",
+                          isLastItem || index === 0 || isNationalCode
                             ? "md:col-span-2"
                             : "col-span-1",
                         )}
                       >
-                        <span className="max-w-[250px] select-text break-words text-center font-bold text-accent">
-                          {displayValue}
+                        <span className="text-[11px] text-primary/60">
+                          {label}
+                        </span>
+                        <span
+                          dir={isNationalCode ? "ltr" : undefined}
+                          className={cn(
+                            "max-w-[250px] select-text break-words text-center font-bold text-accent",
+                            isNationalCode && "font-mono tabular-nums",
+                          )}
+                        >
+                          {isNationalCode
+                            ? normalizeNationalCode(displayValue) ||
+                              displayValue
+                            : displayValue}
                         </span>
                       </div>
                     </ToolTipSimple>
