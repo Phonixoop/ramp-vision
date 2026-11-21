@@ -2,23 +2,15 @@
 
 import { useMemo } from "react";
 import { ColumnDef, Column } from "@tanstack/react-table";
-import {
-  SelectColumnFilter,
-  SelectColumnFilterOptimized,
-} from "~/features/checkbox-list";
-import { getPersianToEnglishCity } from "~/utils/util";
+import { SelectColumnFilterOptimized } from "~/features/checkbox-list";
 import {
   defaultProjectTypes,
   defualtContractTypes,
   defualtRoles,
-  getDefaultRoleTypesBaseOnContractType,
 } from "~/constants/personnel-performance";
-import { sortDates } from "~/lib/utils";
-
 import { PersonnelsData } from "../types";
 import { CityNameFilterPersonnel } from "~/app/dashboard/personnels/components/filter-components/cityName";
-import { inferRouterOutputs } from "@trpc/server";
-import { AppRouter } from "~/server/api/root";
+import { DateInfoFilterPersonnel } from "~/app/dashboard/personnels/components/filter-components/dateInfo";
 
 // Extend ColumnDef to include custom properties used by the table component
 export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
@@ -38,6 +30,7 @@ export function PersonnelsColumns({
   filtersWithNoNetworkRequest,
   setFiltersWithNoNetworkRequest,
   cityNames,
+  dateInfos,
 }: {
   getPersonnls: any;
   filters: any;
@@ -45,6 +38,7 @@ export function PersonnelsColumns({
   filtersWithNoNetworkRequest: any;
   setFiltersWithNoNetworkRequest: any;
   cityNames: string[];
+  dateInfos: string[];
 }): CustomColumnDef<PersonnelsData, string | number | null>[] {
   const columns = useMemo<
     CustomColumnDef<PersonnelsData, string | number | null>[]
@@ -165,40 +159,21 @@ export function PersonnelsColumns({
         header: "تاریخ گزارش پرسنل",
         accessorKey: "DateInfo",
         filterFn: "arrIncludesSome",
-        Filter: ({ column }) => {
-          const _DateInfos = [
-            ...new Set(
-              (Array.isArray(getPersonnls?.data) ? getPersonnls.data : []).map(
-                (a: any) => a.DateInfo,
-              ),
-            ),
-          ];
-
-          const DateInfos = sortDates({ dates: _DateInfos });
-
-          if (DateInfos.length <= 0) return null;
-          const initialDateInfo =
-            filters?.filter?.DateInfo?.length > 0
-              ? filters.filter.DateInfo
-              : [DateInfos[DateInfos.length - 1] ?? ""];
-          return (
-            <div className="flex w-full max-w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-secondary p-2">
-              <span className="font-bold text-primary">تاریخ گزارش پرسنل</span>
-              <SelectColumnFilterOptimized
-                column={column}
-                values={getPersonnls.data || []}
-                initialFilters={initialDateInfo}
-                singleSelect
-              />
-            </div>
-          );
-        },
+        Filter: ({ column }) => (
+          <DateInfoFilterPersonnel
+            column={column}
+            dateInfos={dateInfos}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        ),
       },
     ];
   }, [
     getPersonnls.data,
     setFilters,
     cityNames,
+    dateInfos,
     filters?.filter?.DateInfo,
     filtersWithNoNetworkRequest?.filter?.RoleType,
   ]);

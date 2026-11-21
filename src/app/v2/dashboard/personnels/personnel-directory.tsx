@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -9,28 +8,23 @@ import {
   useRef,
   useState,
   type Dispatch,
-  type ReactNode,
   type RefObject,
   type SetStateAction,
 } from "react";
 import {
-  Briefcase,
   ChevronDown,
-  ChevronLeft,
   ChevronUp,
   ChevronsUpDown,
   Download,
   LayoutGrid,
   List,
-  MapPin,
   Search,
-  SlidersHorizontal,
   Table2,
-  Users,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { CopyButton } from "~/components/arc/copy-button/copy-button";
+import { MultiSelect } from "~/components/arc/multi-select/multi-select";
 import { SplitButton } from "~/components/arc/split-button/split-button";
 import SegmentedControl from "~/components/arc/segmented-control/segmented-control";
 import { Button } from "~/components/shadcn/button";
@@ -50,12 +44,11 @@ import {
   TableHeader,
 } from "~/components/shadcn/table";
 import {
-  MultiSelect,
-  MultiSelectContent,
-  MultiSelectItem,
-  MultiSelectTrigger,
-  MultiSelectValue,
-} from "~/components/shadcn/multi-select";
+  Layout,
+  ToolbarFilterField,
+  ToolbarFilterPopover,
+  ToolbarFilterSection,
+} from "~/components/linear-shell";
 import UseUserManager from "~/hooks/userManager";
 import { api } from "~/trpc/react";
 import { cn } from "~/lib/utils";
@@ -65,8 +58,6 @@ import {
   type PersonnelRecord,
   type SortKey,
   compareRows,
-  contractMix,
-  countValues,
   displayLabel,
   downloadCsv,
   emptyFilters,
@@ -77,12 +68,14 @@ import {
   readDateOptions,
   readRows,
   text,
-  toggleValue,
   uniqueValues,
 } from "./model";
 
 const PAGE_SIZE = 25;
 const GROUP_LIMIT = 8;
+const INLINE_TRIGGER = "min-w-[132px] max-w-[180px]";
+const PANEL_TRIGGER = "w-full";
+const DEFAULT_ITEMS_PER_PAGE = 50;
 const focusClass =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:[outline-color:rgb(var(--accent))]";
 
@@ -108,7 +101,6 @@ export function PersonnelDirectory() {
   const [page, setPage] = useState(0);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [selected, setSelected] = useState<PersonnelRecord | null>(null);
-  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const defaultDateQuery = api.personnel.getDefualtDateInfo.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -156,17 +148,26 @@ export function PersonnelDirectory() {
     safePage * PAGE_SIZE + PAGE_SIZE,
   );
 
-  const cityCounts = countValues(
-    rows.filter((row) => matchesFacets(row, filters, ["cities"])),
-    (row) => row.CityName,
+  const cityOptions = useMemo(
+    () => uniqueValues(rows, (row) => row.CityName),
+    [rows],
   );
-  const contractCounts = countValues(
-    rows.filter((row) => matchesFacets(row, filters, ["contracts"])),
-    (row) => row.ContractType,
+  const roleOptions = useMemo(
+    () => uniqueValues(rows, (row) => row.Role),
+    [rows],
   );
-  const allCount = rows.filter((row) =>
-    matchesFacets(row, filters, ["cities", "contracts"]),
-  ).length;
+  const contractOptions = useMemo(
+    () => uniqueValues(rows, (row) => row.ContractType),
+    [rows],
+  );
+  const projectOptions = useMemo(
+    () => uniqueValues(rows, (row) => row.ProjectType),
+    [rows],
+  );
+  const roleTypeOptions = useMemo(
+    () => uniqueValues(rows, (row) => row.RoleType),
+    [rows],
+  );
 
   const dateFailed =
     defaultDateQuery.isError ||
@@ -186,6 +187,13 @@ export function PersonnelDirectory() {
       : filtered.length === 0
         ? "نتیجه‌ای پیدا نشد"
         : `${formatNumber(filtered.length)} نفر`;
+
+  const overflowActiveCount = [
+    filters.contracts.length > 0,
+    filters.roles.length > 0,
+    filters.projects.length > 0,
+    filters.roleTypes.length > 0,
+  ].filter(Boolean).length;
 
   useEffect(() => {
     setPage(0);
@@ -252,70 +260,27 @@ export function PersonnelDirectory() {
     setSortDir("asc");
   }
 
-  function renderSidebar() {
-    return (
-      <DirectorySidebar
-        allCount={allCount}
-        cities={cityCounts}
-        contracts={contractCounts}
-        selectedCities={filters.cities}
-        selectedContracts={filters.contracts}
-        allPressed={filters.cities.length === 0 && filters.contracts.length === 0}
-        onAll={() =>
-          setFilters((current) => ({ ...current, cities: [], contracts: [] }))
-        }
-        onToggleCity={(value) =>
-          setFilters((current) => ({
-            ...current,
-            cities: toggleValue(current.cities, value),
-          }))
-        }
-        onToggleContract={(value) =>
-          setFilters((current) => ({
-            ...current,
-            contracts: toggleValue(current.contracts, value),
-          }))
-        }
-      />
-    );
+  function clearOverflowFilters() {
+    setFilters((current) => ({
+      ...current,
+      contracts: [],
+      roles: [],
+      projects: [],
+      roleTypes: [],
+    }));
   }
 
   return (
-    <div dir="rtl" className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 text-primary sm:px-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="flex flex-col gap-2">
-          <nav aria-label="مسیر">
-            <ol className="flex items-center gap-1 text-sm text-primary/70">
-              <li>
-                <Link
-                  href="/"
-                  className={cn(
-                    "inline-flex min-h-11 items-center rounded-md px-1",
-                    focusClass,
-                  )}
-                >
-                  خانه
-                </Link>
-              </li>
-              <li aria-hidden="true">
-                <ChevronLeft className="size-4" />
-              </li>
-              <li aria-current="page" className="font-medium text-primary">
-                پرسنل
-              </li>
-            </ol>
-          </nav>
-          <h1 className="text-2xl font-semibold">پرسنل</h1>
-          <p className="max-w-2xl text-sm leading-6 text-primary/75">
-            فهرست افراد در دسترس شما بر اساس تاریخ گزارش. جستجو و فیلترها روی همین صفحه اعمال می‌شوند.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-end gap-4">
-          <label className="flex min-w-44 flex-col gap-1 text-sm">
-            <span className="text-primary/70">تاریخ گزارش</span>
+    <div dir="rtl" className="flex min-h-0 flex-1 flex-col overflow-hidden text-primary">
+      <Layout.TopBar>
+        <Layout.TopBar.Title>پرسنل</Layout.TopBar.Title>
+        <Layout.TopBar.Filters>
+          <label className="flex shrink-0 items-center gap-1.5 text-xs text-primary/70">
+            <span className="sr-only">تاریخ گزارش</span>
             <select
+              aria-label="تاریخ گزارش"
               className={cn(
-                "min-h-11 rounded-xl border border-primary/15 bg-secondary px-3 text-primary",
+                "h-8 min-w-[140px] rounded-md border border-border-color/15 bg-third px-2 text-xs text-primary",
                 focusClass,
               )}
               value={activeDate ?? ""}
@@ -329,24 +294,101 @@ export function PersonnelDirectory() {
               ))}
             </select>
           </label>
-          <p className="min-h-11 text-sm leading-[44px]" aria-live="polite">
+          <CompactSelect
+            values={filters.cities}
+            options={cityOptions}
+            onChange={(cities) =>
+              setFilters((current) => ({ ...current, cities }))
+            }
+            placeholder="استان"
+            className={INLINE_TRIGGER}
+            loading={loading}
+          />
+          <ToolbarFilterPopover
+            activeFilterCount={overflowActiveCount}
+            onClear={clearOverflowFilters}
+            contentClassName="min-w-[520px]"
+          >
+            <ToolbarFilterSection title="فیلترهای بیشتر">
+              <ToolbarFilterField label="سمت">
+                <CompactSelect
+                  values={filters.roles}
+                  options={roleOptions}
+                  onChange={(roles) =>
+                    setFilters((current) => ({ ...current, roles }))
+                  }
+                  placeholder="سمت"
+                  className={PANEL_TRIGGER}
+                  loading={loading}
+                />
+              </ToolbarFilterField>
+              <ToolbarFilterField label="نوع قرارداد">
+                <CompactSelect
+                  values={filters.contracts}
+                  options={contractOptions}
+                  onChange={(contracts) =>
+                    setFilters((current) => ({ ...current, contracts }))
+                  }
+                  placeholder="نوع قرارداد"
+                  className={PANEL_TRIGGER}
+                  loading={loading}
+                />
+              </ToolbarFilterField>
+              <ToolbarFilterField label="نوع پروژه">
+                <CompactSelect
+                  values={filters.projects}
+                  options={projectOptions}
+                  onChange={(projects) =>
+                    setFilters((current) => ({ ...current, projects }))
+                  }
+                  placeholder="نوع پروژه"
+                  className={PANEL_TRIGGER}
+                  loading={loading}
+                />
+              </ToolbarFilterField>
+              <ToolbarFilterField label="نوع سمت">
+                <CompactSelect
+                  values={filters.roleTypes}
+                  options={roleTypeOptions}
+                  onChange={(roleTypes) =>
+                    setFilters((current) => ({ ...current, roleTypes }))
+                  }
+                  placeholder="نوع سمت"
+                  className={PANEL_TRIGGER}
+                  loading={loading}
+                />
+              </ToolbarFilterField>
+            </ToolbarFilterSection>
+          </ToolbarFilterPopover>
+          <span className="truncate text-[11px] text-primary/55" aria-live="polite">
             {liveText}
-          </p>
-        </div>
-      </header>
+          </span>
+        </Layout.TopBar.Filters>
+        <Layout.TopBar.Actions>
+          <SplitButton
+            label="خروجی CSV"
+            menuLabel="سایر اقدام‌های خروجی"
+            icon={<Download className="size-4" aria-hidden="true" />}
+            onClick={exportRows}
+            actions={[
+              {
+                label: "نسخه جدولی",
+                icon: <Table2 className="size-4" aria-hidden="true" />,
+                onSelect: () => router.push("/dashboard/personnels"),
+              },
+            ]}
+          />
+        </Layout.TopBar.Actions>
+      </Layout.TopBar>
 
-      {loading ? (
-        <DirectorySkeleton />
-      ) : failed ? (
-        <DirectoryError onRetry={retry} />
-      ) : (
-        <>
-          <MetricStrip rows={filtered} />
-          <div className="flex items-start gap-6">
-            <aside className="sticky top-4 hidden w-64 shrink-0 lg:block">
-              {renderSidebar()}
-            </aside>
-            <div className="flex min-w-0 flex-1 flex-col gap-4">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6">
+          {loading ? (
+            <DirectorySkeleton />
+          ) : failed ? (
+            <DirectoryError onRetry={retry} />
+          ) : (
+            <>
               <DirectoryToolbar
                 searchId={searchId}
                 searchRef={searchRef}
@@ -356,15 +398,8 @@ export function PersonnelDirectory() {
                 setView={setView}
                 groupBy={groupBy}
                 setGroupBy={setGroupBy}
-                rows={rows}
-                onExport={exportRows}
-                onOpenTable={() => router.push("/dashboard/personnels")}
-                onOpenFilters={() => setFiltersOpen(true)}
               />
-              <FilterChips
-                filters={filters}
-                onChange={setFilters}
-              />
+              <FilterChips filters={filters} onChange={setFilters} />
               {filtered.length === 0 ? (
                 <DirectoryEmpty
                   canClear={filtersAreActive(filters)}
@@ -396,24 +431,10 @@ export function PersonnelDirectory() {
                   onOpen={setSelected}
                 />
               )}
-            </div>
-          </div>
-        </>
-      )}
-
-      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-        <SheetContent
-          side="right"
-          dir="rtl"
-          className="w-full overflow-y-auto bg-secondary pr-12 text-primary sm:max-w-sm"
-        >
-          <SheetHeader className="text-right">
-            <SheetTitle className="text-primary">فیلترها</SheetTitle>
-            <SheetDescription>استان و نوع قرارداد</SheetDescription>
-          </SheetHeader>
-          <div className="mt-6">{renderSidebar()}</div>
-        </SheetContent>
-      </Sheet>
+            </>
+          )}
+        </div>
+      </div>
 
       <Sheet open={selected != null} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent
@@ -433,181 +454,55 @@ export function PersonnelDirectory() {
   );
 }
 
-function DirectorySidebar({
-  allCount,
-  cities,
-  contracts,
-  selectedCities,
-  selectedContracts,
-  allPressed,
-  onAll,
-  onToggleCity,
-  onToggleContract,
+function CompactSelect({
+  values,
+  options,
+  onChange,
+  placeholder,
+  singleSelect = false,
+  className,
+  loading,
+  itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
 }: {
-  allCount: number;
-  cities: { value: string; count: number }[];
-  contracts: { value: string; count: number }[];
-  selectedCities: string[];
-  selectedContracts: string[];
-  allPressed: boolean;
-  onAll: () => void;
-  onToggleCity: (value: string) => void;
-  onToggleContract: (value: string) => void;
+  values: string[];
+  options: string[];
+  onChange: (values: string[]) => void;
+  placeholder: string;
+  singleSelect?: boolean;
+  className?: string;
+  loading?: boolean;
+  itemsPerPage?: number;
 }) {
-  return (
-    <div className="flex flex-col gap-6 rounded-2xl border border-primary/10 bg-secondary p-3">
-      <FilterButton
-        pressed={allPressed}
-        count={allCount}
-        label="همه پرسنل"
-        onClick={onAll}
+  const mergedOptions = useMemo(() => {
+    const labels = Array.from(new Set([...values, ...options].filter(Boolean)));
+    return labels.map((label) => ({ value: label, label }));
+  }, [values, options]);
+
+  if (loading && mergedOptions.length === 0) {
+    return (
+      <div
+        className={cn(
+          "h-8 min-w-[132px] animate-pulse rounded-md border border-border-color/10 bg-third/60",
+          className,
+        )}
       />
-      <FilterGroup title="استان‌ها">
-        {cities.length === 0 ? (
-          <p className="px-2 text-sm text-primary/60">استانی ثبت نشده</p>
-        ) : (
-          cities.map((city) => (
-            <FilterButton
-              key={city.value || "empty-city"}
-              pressed={selectedCities.includes(city.value)}
-              count={city.count}
-              label={displayLabel(city.value, "بدون استان")}
-              onClick={() => onToggleCity(city.value)}
-            />
-          ))
-        )}
-      </FilterGroup>
-      <FilterGroup title="نوع قرارداد">
-        {contracts.length === 0 ? (
-          <p className="px-2 text-sm text-primary/60">قراردادی ثبت نشده</p>
-        ) : (
-          contracts.map((contract) => (
-            <FilterButton
-              key={contract.value || "empty-contract"}
-              pressed={selectedContracts.includes(contract.value)}
-              count={contract.count}
-              label={displayLabel(contract.value, "بدون قرارداد")}
-              onClick={() => onToggleContract(contract.value)}
-            />
-          ))
-        )}
-      </FilterGroup>
-    </div>
-  );
-}
+    );
+  }
 
-function FilterGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
   return (
-    <section className="flex flex-col gap-1">
-      <h2 className="px-2 text-xs font-medium text-primary/60">{title}</h2>
-      <div className="flex flex-col gap-1">{children}</div>
-    </section>
-  );
-}
-
-function FilterButton({
-  label,
-  count,
-  pressed,
-  onClick,
-}: {
-  label: string;
-  count: number;
-  pressed: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={pressed}
-      onClick={onClick}
-      className={cn(
-        "flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 text-sm",
-        pressed ? "bg-primbuttn/15 font-medium" : "hover:bg-primary/5",
-        focusClass,
-      )}
-    >
-      <span className="truncate">{label}</span>
-      <span className="shrink-0 text-primary/70">{formatNumber(count)}</span>
-    </button>
-  );
-}
-
-function MetricStrip({ rows }: { rows: PersonnelRecord[] }) {
-  const provinces = new Set(rows.map((row) => row.CityName).filter(Boolean)).size;
-  const roles = new Set(rows.map((row) => row.Role).filter(Boolean)).size;
-  const mix = contractMix(rows);
-  return (
-    <section className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-      <MetricCard icon={<Users className="size-4" aria-hidden="true" />} label="نفر" value={formatNumber(rows.length)} />
-      <MetricCard icon={<MapPin className="size-4" aria-hidden="true" />} label="استان" value={formatNumber(provinces)} />
-      <MetricCard icon={<Briefcase className="size-4" aria-hidden="true" />} label="سمت" value={formatNumber(roles)} />
-      <article className="rounded-2xl border border-primary/10 bg-secondary p-4 md:col-span-3">
-        <h2 className="text-sm text-primary/70">ترکیب قرارداد</h2>
-        {mix.length === 0 ? (
-          <p className="mt-3 text-sm text-primary/70">قراردادی ثبت نشده</p>
-        ) : (
-          <>
-            <div
-              className="mt-3 flex h-3 overflow-hidden rounded-full bg-primary/10"
-              role="img"
-              aria-label={mix
-                .map((item) => `${item.label} ${formatNumber(item.count)}`)
-                .join("، ")}
-            >
-              {mix.map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    width: `${item.percent}%`,
-                    background: item.color,
-                  }}
-                />
-              ))}
-            </div>
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
-              {mix.map((item) => (
-                <li key={item.label} className="flex items-center gap-2 text-sm">
-                  <span
-                    aria-hidden="true"
-                    className="size-2.5 rounded-sm"
-                    style={{ background: item.color }}
-                  />
-                  <span>{item.label}</span>
-                  <span className="text-primary/70">{formatNumber(item.count)}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </article>
-    </section>
-  );
-}
-
-function MetricCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <article className="rounded-2xl border border-primary/10 bg-secondary p-4">
-      <p className="flex items-center gap-2 text-sm text-primary/70">
-        {icon}
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-    </article>
+    <MultiSelect
+      label={placeholder}
+      hideLabel
+      size="sm"
+      value={values}
+      onValueChange={onChange}
+      options={mergedOptions}
+      placeholder={placeholder}
+      singleSelect={singleSelect}
+      itemsPerPage={itemsPerPage}
+      maxVisible={1}
+      className={cn(className)}
+    />
   );
 }
 
@@ -620,10 +515,6 @@ function DirectoryToolbar({
   setView,
   groupBy,
   setGroupBy,
-  rows,
-  onExport,
-  onOpenTable,
-  onOpenFilters,
 }: {
   searchId: string;
   searchRef: RefObject<HTMLInputElement | null>;
@@ -633,10 +524,6 @@ function DirectoryToolbar({
   setView: (value: "grid" | "list") => void;
   groupBy: "role" | "city";
   setGroupBy: (value: "role" | "city") => void;
-  rows: PersonnelRecord[];
-  onExport: () => void;
-  onOpenTable: () => void;
-  onOpenFilters: () => void;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -673,125 +560,33 @@ function DirectoryToolbar({
             ]}
           />
         ) : null}
-        <div className="ms-auto">
-          <SplitButton
-            label="خروجی CSV"
-            menuLabel="سایر اقدام‌های خروجی"
-            icon={<Download className="size-4" aria-hidden="true" />}
-            onClick={onExport}
-            actions={[
-              {
-                label: "نسخه جدولی",
-                icon: <Table2 className="size-4" aria-hidden="true" />,
-                onSelect: onOpenTable,
-              },
-            ]}
-          />
-        </div>
       </div>
-      <div className="flex flex-col gap-2 xl:flex-row">
-        <div className="flex items-center gap-2 xl:min-w-72 xl:flex-1">
-          <Button
-            type="button"
-            variant="outline"
-            className={cn("min-h-11 shrink-0 lg:hidden", focusClass)}
-            onClick={onOpenFilters}
-          >
-            <SlidersHorizontal className="size-4" aria-hidden="true" />
-            فیلترها
-          </Button>
-          <div className="relative min-w-0 flex-1">
-            <label htmlFor={searchId} className="sr-only">
-              جستجوی نام یا کد ملی
-            </label>
-            <Search
-              className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-primary/50"
-              aria-hidden="true"
-            />
-            <Input
-              id={searchId}
-              ref={searchRef}
-              value={filters.query}
-              onChange={(event) =>
-                setFilters((current) => ({
-                  ...current,
-                  query: event.target.value,
-                }))
-              }
-              placeholder="نام یا کد ملی"
-              className={cn("min-h-11 rounded-xl pe-12 ps-10", focusClass)}
-            />
-            <kbd className="pointer-events-none absolute end-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-primary/15 px-1.5 text-xs text-primary/60 sm:inline">
-              /
-            </kbd>
-          </div>
-        </div>
-        <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
-          <FacetSelect
-            label="سمت"
-            values={filters.roles}
-            options={uniqueValues(rows, (row) => row.Role)}
-            onChange={(roles) => setFilters((current) => ({ ...current, roles }))}
-          />
-          <FacetSelect
-            label="نوع قرارداد"
-            values={filters.contracts}
-            options={uniqueValues(rows, (row) => row.ContractType)}
-            onChange={(contracts) =>
-              setFilters((current) => ({ ...current, contracts }))
-            }
-          />
-          <FacetSelect
-            label="نوع پروژه"
-            values={filters.projects}
-            options={uniqueValues(rows, (row) => row.ProjectType)}
-            onChange={(projects) =>
-              setFilters((current) => ({ ...current, projects }))
-            }
-          />
-          <FacetSelect
-            label="نوع سمت"
-            values={filters.roleTypes}
-            options={uniqueValues(rows, (row) => row.RoleType)}
-            onChange={(roleTypes) =>
-              setFilters((current) => ({ ...current, roleTypes }))
-            }
-          />
-        </div>
+      <div className="relative min-w-0 max-w-xl">
+        <label htmlFor={searchId} className="sr-only">
+          جستجوی نام یا کد ملی
+        </label>
+        <Search
+          className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-primary/50"
+          aria-hidden="true"
+        />
+        <Input
+          id={searchId}
+          ref={searchRef}
+          value={filters.query}
+          onChange={(event) =>
+            setFilters((current) => ({
+              ...current,
+              query: event.target.value,
+            }))
+          }
+          placeholder="نام یا کد ملی"
+          className={cn("min-h-11 rounded-xl pe-12 ps-10", focusClass)}
+        />
+        <kbd className="pointer-events-none absolute end-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-primary/15 px-1.5 text-xs text-primary/60 sm:inline">
+          /
+        </kbd>
       </div>
     </div>
-  );
-}
-
-function FacetSelect({
-  label,
-  values,
-  options,
-  onChange,
-}: {
-  label: string;
-  values: string[];
-  options: string[];
-  onChange: (values: string[]) => void;
-}) {
-  return (
-    <MultiSelect values={values} onValuesChange={onChange}>
-      <MultiSelectTrigger
-        aria-label={label}
-        className={cn("min-h-11 bg-secondary", focusClass)}
-      >
-        <MultiSelectValue placeholder={label} />
-      </MultiSelectTrigger>
-      <MultiSelectContent
-        search={{ placeholder: "جستجو", emptyMessage: "موردی نیست" }}
-      >
-        {options.map((option) => (
-          <MultiSelectItem key={option} value={option}>
-            {option}
-          </MultiSelectItem>
-        ))}
-      </MultiSelectContent>
-    </MultiSelect>
   );
 }
 
@@ -846,7 +641,7 @@ function FilterChips({
           type="button"
           onClick={chip.remove}
           className={cn(
-            "inline-flex min-h-11 items-center gap-2 rounded-full border border-primary/15 bg-secbuttn/40 px-3 text-sm",
+            "inline-flex min-h-11 items-center gap-2 rounded-full border border-border-color/15 bg-fourth px-3 text-sm",
             focusClass,
           )}
         >
@@ -906,7 +701,7 @@ function PersonnelGrid({
   }, [rows, groupBy]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-8">
       {groups.map((group) => {
         const open = expanded[group.key] === true;
         const visible = open ? group.people : group.people.slice(0, GROUP_LIMIT);
@@ -960,7 +755,7 @@ function PersonCard({
       type="button"
       onClick={() => onOpen(person)}
       className={cn(
-        "flex min-h-11 w-full flex-col gap-3 rounded-2xl border border-primary/10 bg-secondary p-4 text-right hover:border-primary/25",
+        "flex min-h-11 w-full flex-col gap-3 rounded-2xl border border-border-color/10 bg-fourth p-4 text-right transition-colors hover:border-border-color/25",
         focusClass,
       )}
     >
@@ -984,7 +779,7 @@ function PersonCard({
         <span className="truncate text-primary/75">
           {displayLabel(person.CityName, "بدون استان")}
         </span>
-        <span className="shrink-0 rounded-full border border-primary/15 bg-secbuttn/50 px-2 py-1 text-xs">
+        <span className="shrink-0 rounded-md border border-border-color/15 bg-third px-2 py-1 text-xs">
           {displayLabel(person.ContractType, "بدون قرارداد")}
         </span>
       </span>
@@ -1014,11 +809,11 @@ function PersonnelTable({
   onOpen: (person: PersonnelRecord) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="overflow-hidden rounded-2xl border border-primary/10">
+    <div className="flex flex-col gap-3 pb-8">
+      <div className="overflow-hidden rounded-2xl border border-border-color/10 bg-fourth">
         <Table>
           <TableHeader>
-            <tr className="border-b border-primary/10">
+            <tr className="border-b border-border-color/10">
               {sortColumns.map((column) => {
                 const active = sortKey === column.key;
                 const ariaSort = active
@@ -1060,7 +855,7 @@ function PersonnelTable({
                 role="button"
                 aria-label={`پرونده ${person.NameFamily || "بدون نام"}`}
                 className={cn(
-                  "cursor-pointer border-b border-primary/10 hover:bg-primary/5",
+                  "cursor-pointer border-b border-border-color/10 hover:bg-primary/5",
                   focusClass,
                 )}
                 onClick={() => onOpen(person)}
@@ -1145,7 +940,7 @@ function ProfilePanel({
         </div>
       </SheetHeader>
       <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/10 p-3 sm:col-span-2">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border-color/10 p-3 sm:col-span-2">
           <div>
             <dt className="text-primary/70">کد ملی</dt>
             <dd className="mt-1 font-medium tabular-nums">{code || "ثبت نشده"}</dd>
@@ -1183,7 +978,7 @@ function ProfilePanel({
           </div>
         </section>
       ) : (
-        <p className="rounded-xl border border-primary/10 px-3 py-3 text-sm text-primary/75">
+        <p className="rounded-xl border border-border-color/10 px-3 py-3 text-sm text-primary/75">
           ثبت مرخصی فقط برای مدیران پرسنل فعال است.
         </p>
       )}
@@ -1193,7 +988,7 @@ function ProfilePanel({
 
 function ProfileFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-primary/10 p-3">
+    <div className="rounded-xl border border-border-color/10 p-3">
       <dt className="text-primary/70">{label}</dt>
       <dd className="mt-1 font-medium">{value}</dd>
     </div>
@@ -1204,14 +999,7 @@ function DirectorySkeleton() {
   return (
     <div aria-busy="true" className="flex flex-col gap-4">
       <p className="sr-only">در حال بارگذاری</p>
-      <div className="grid gap-3 md:grid-cols-3">
-        {Array.from({ length: 3 }, (_, index) => (
-          <div
-            key={index}
-            className="h-24 animate-pulse rounded-2xl bg-primary/10 motion-reduce:animate-none"
-          />
-        ))}
-      </div>
+      <div className="h-11 max-w-xl animate-pulse rounded-xl bg-primary/10 motion-reduce:animate-none" />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }, (_, index) => (
           <div
@@ -1228,7 +1016,7 @@ function DirectoryError({ onRetry }: { onRetry: () => void }) {
   return (
     <div
       role="alert"
-      className="flex flex-col items-start gap-3 rounded-2xl border border-primary/10 bg-secondary p-6"
+      className="flex flex-col items-start gap-3 rounded-2xl border border-border-color/10 bg-fourth p-6"
     >
       <h2 className="text-lg font-medium">بارگذاری ناموفق بود</h2>
       <p className="text-sm text-primary/75">
@@ -1251,7 +1039,7 @@ function DirectoryEmpty({
   return (
     <div
       role="status"
-      className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-primary/20 p-6"
+      className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-border-color/20 p-6"
     >
       <h2 className="text-lg font-medium">نتیجه‌ای پیدا نشد</h2>
       <p className="text-sm text-primary/75">

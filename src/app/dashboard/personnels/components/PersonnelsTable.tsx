@@ -55,6 +55,30 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
     refetchOnWindowFocus: false,
   });
 
+  const initialFilters = api.personnel.getInitialFilters.useQuery(undefined, {
+    enabled: sessionData?.user !== undefined,
+    refetchOnWindowFocus: false,
+  });
+
+  const dateInfos = useMemo(() => {
+    const usersInfo = initialFilters.data?.usersInfo;
+    if (!Array.isArray(usersInfo)) {
+      return defualtDateInfo.data ? [defualtDateInfo.data] : [];
+    }
+    const dates = [
+      ...new Set(
+        usersInfo
+          .map((row: { DateInfo?: string }) => row.DateInfo)
+          .filter((date): date is string => Boolean(date)),
+      ),
+    ];
+    const sorted = sortDates({ dates }).filter(
+      (date) => date && date !== "Invalid date",
+    );
+    if (sorted.length) return sorted;
+    return defualtDateInfo.data ? [defualtDateInfo.data] : [];
+  }, [initialFilters.data?.usersInfo, defualtDateInfo.data]);
+
   // Apply latest DateInfo once available
   useEffect(() => {
     if (!defualtDateInfo.data) return;
@@ -122,11 +146,16 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
     filters,
     setFilters,
     cityNames: getInitialCities?.data?.CityNames ?? [],
+    dateInfos,
     filtersWithNoNetworkRequest,
     setFiltersWithNoNetworkRequest,
   });
 
-  if (getInitialCities.isLoading || defualtDateInfo.isLoading) {
+  if (
+    getInitialCities.isLoading ||
+    defualtDateInfo.isLoading ||
+    initialFilters.isLoading
+  ) {
     return <TableFiltersContainerSkeleton />;
   }
 
