@@ -20,6 +20,7 @@ import {
   expandTehranPerformanceCities,
   isSamePersonnelRecord,
   isSingleDayPersonnelSelection,
+  mergeMissingPersonnelsIntoPerformance,
   normalizeCityName,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
@@ -271,39 +272,14 @@ export const useCityPage = (
     }
   }, [ready, getAll.isSuccess]);
 
-  const mergedList: PersonRecord[] = useMemo(() => {
-    if (!getPersonnels.data || !updatedList) return updatedList ?? [];
-
-    // Create a more unique identifier to avoid duplicates
-    // const presentIdentifiers = new Set(
-    //   updatedList.map(
-    //     (b: any) =>
-    //       `${b.NationalCode || "unknown"}-${b.NameFamily || "unknown"}-${
-    //         b.Role || "unknown"
-    //       }-${b.BranchName || "unknown"}`,
-    //   ),
-    // );
-
-    const presentIdentifiers = new Set(
-      updatedList.map((b: any) => b.NationalCode),
-    );
-
-    const missing = getPersonnels.data
-      .filter((a: any) => {
-        return !presentIdentifiers.has(a.NationalCode);
-      })
-      .map((a: any) => ({
-        ...a,
-        TotalPerformance: 0,
-        key: {
-          CityName: a.CityName,
-          NameFamily: a.NameFamily,
-          NationalCode: a.NationalCode,
-        },
-      }));
-
-    return [...updatedList, ...missing];
-  }, [getPersonnels.data, updatedList]);
+  const mergedList: PersonRecord[] = useMemo(
+    () =>
+      mergeMissingPersonnelsIntoPerformance(
+        updatedList,
+        getPersonnels.data,
+      ) as PersonRecord[],
+    [getPersonnels.data, updatedList],
+  );
 
   const displayedList: PersonRecord[] = useMemo(() => {
     let nextList = mergedList;

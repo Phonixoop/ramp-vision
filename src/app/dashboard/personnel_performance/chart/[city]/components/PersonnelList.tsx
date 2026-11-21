@@ -111,6 +111,7 @@ export const PersonnelList = React.memo<PersonnelListProps>(
         headers={[
           { label: "عملکرد", key: "TotalPerformance" },
           { label: "پرسنل", key: "NameFamily" },
+          { label: "کد ملی", key: "NationalCode" },
         ]}
         dataToDownload={displayedList}
         renderUnderButtons={() => (

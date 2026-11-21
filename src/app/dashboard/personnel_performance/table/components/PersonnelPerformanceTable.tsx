@@ -14,6 +14,7 @@ import {
   distinctPersonnelPerformanceData,
   expandCityFilterSelection,
   getPerformanceMetric,
+  mergeMissingPersonnelsIntoPerformance,
 } from "~/utils/personnel-performance";
 import { PersonnelPerformanceColumns } from "./PersonnelPerformanceColumns";
 import { PersonnelPerformanceFilters } from "./PersonnelPerformanceFilters";
@@ -152,6 +153,26 @@ export function PersonnelPerformanceTable({
       staleTime: 0, // Force refetch on every change
     },
   );
+
+  // Same as chart city page: users_info roster (no Role/Contract filters) so
+  // people without performance rows for the period remain searchable.
+  const hasDateInfo = Boolean(
+    filters?.filter?.DateInfo?.length || defualtDateInfo.data,
+  );
+  const getPersonnels = api.personnel.getAll.useQuery(
+    {
+      filter: {
+        CityName: filters?.filter?.CityName ?? [],
+        DateInfo: filters?.filter?.DateInfo ?? [
+          defualtDateInfo.data ?? "",
+        ],
+      },
+    },
+    {
+      enabled: sessionData?.user !== undefined && hasDateInfo,
+      refetchOnWindowFocus: false,
+    },
+  );
   // Debug logging
   console.log("🔍 Current filters:", filters);
   console.log("🔍 Deferred filter:", deferredFilter);
@@ -219,7 +240,7 @@ export function PersonnelPerformanceTable({
       dataResultLength: personnelPerformance.data?.result?.length,
     });
 
-    return distinctPersonnelPerformanceData(
+    const distinct = distinctPersonnelPerformanceData(
       personnelPerformance.data,
       ["NationalCode", "NameFamily", "CityName"],
       [
@@ -255,11 +276,40 @@ export function PersonnelPerformanceTable({
         "DateInfo",
         "HasTheDayOff",
         "RealCityName",
+        "NationalCode",
       ],
       { HasTheDayOff: false },
       useWorkDays ? totalWorkDays : null, // Pass work days if toggle is enabled
     );
-  }, [personnelPerformance.data, useWorkDays, totalWorkDays]);
+
+    return mergeMissingPersonnelsIntoPerformance(
+      distinct,
+      getPersonnels.data,
+    );
+  }, [
+    personnelPerformance.data,
+    getPersonnels.data,
+    useWorkDays,
+    totalWorkDays,
+  ]);
+
+  const pureMergedData = useMemo(
+    () =>
+      mergeMissingPersonnelsIntoPerformance(
+        personnelPerformance?.data?.result,
+        getPersonnels.data,
+      ),
+    [personnelPerformance?.data?.result, getPersonnels.data],
+  );
+
+  // Roster + performance rows for personnel filter / search (includes zero-perf people).
+  const personnelFilterSource = useMemo(
+    () => ({
+      ...(personnelPerformance.data ?? {}),
+      result: pureMergedData,
+    }),
+    [personnelPerformance.data, pureMergedData],
+  );
 
   // Debug the processed data
   console.log("🔍 Processed distinct data:", distincedData);
@@ -291,7 +341,7 @@ export function PersonnelPerformanceTable({
   const columns = useMemo<CustomColumnDef<PersonnelPerformanceData, any>[]>(
     () =>
       PersonnelPerformanceColumns({
-        personnelPerformance: personnelPerformance.data,
+        personnelPerformance: personnelFilterSource,
         initialFilters: initialFilters.data,
         filters,
         filtersWithNoNetworkRequest,
@@ -301,7 +351,7 @@ export function PersonnelPerformanceTable({
         getLastDate,
       }),
     [
-      personnelPerformance.data,
+      personnelFilterSource,
       initialFilters.data,
       getLastDate,
       setDataFilters,
@@ -338,9 +388,7 @@ export function PersonnelPerformanceTable({
   };
 
   const tableData =
-    toggleDistinctData === "Distincted"
-      ? distincedData
-      : personnelPerformance?.data?.result;
+    toggleDistinctData === "Distincted" ? distincedData : pureMergedData;
 
   // Debug table data
   console.log("🔍 Table data:", {

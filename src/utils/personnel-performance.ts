@@ -341,6 +341,101 @@ export function calculatePerformance(
   );
 }
 
+/** Iranian national codes are 10 digits; pad when SQL returns a numeric form. */
+const NATIONAL_CODE_LENGTH = 10;
+
+/** Normalize national-code values so number/string forms compare equal. */
+export function normalizeNationalCode(value: unknown): string {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+  if (/^\d+$/.test(raw) && raw.length < NATIONAL_CODE_LENGTH) {
+    return raw.padStart(NATIONAL_CODE_LENGTH, "0");
+  }
+  return raw;
+}
+
+/** Match search text against a national code (supports missing leading zeros). */
+export function nationalCodeMatchesQuery(
+  value: unknown,
+  query: string,
+): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const code = normalizeNationalCode(value).toLowerCase();
+  if (!code) return false;
+  if (code.includes(q)) return true;
+  const codeNorm = code.replace(/^0+/, "") || "0";
+  const qNorm = q.replace(/^0+/, "") || "0";
+  return codeNorm.includes(qNorm) || qNorm.includes(codeNorm);
+}
+
+/**
+ * Chart city pages merge users_info people who are missing from performance
+ * results (day-off, no activity for the period, etc.) so they remain searchable.
+ * Table uses the same merge for parity.
+ */
+export function mergeMissingPersonnelsIntoPerformance<
+  T extends { NationalCode?: unknown },
+  P extends {
+    NationalCode?: unknown;
+    NameFamily?: unknown;
+    CityName?: unknown;
+    Role?: unknown;
+    RoleType?: unknown;
+    ContractType?: unknown;
+    ProjectType?: unknown;
+    DateInfo?: unknown;
+  },
+>(performanceRows: T[] | undefined | null, personnelRows: P[] | undefined | null): T[] {
+  const base = Array.isArray(performanceRows) ? performanceRows : [];
+  if (!Array.isArray(personnelRows) || personnelRows.length === 0) return base;
+
+  const present = new Set(
+    base
+      .map((row) => normalizeNationalCode(row.NationalCode))
+      .filter(Boolean),
+  );
+
+  const missing = personnelRows
+    .filter((row) => {
+      const code = normalizeNationalCode(row.NationalCode);
+      return Boolean(code) && !present.has(code);
+    })
+    .map((row) => ({
+      ...row,
+      NationalCode: normalizeNationalCode(row.NationalCode),
+      TotalPerformance: 0,
+      DirectPerFormance: 0,
+      InDirectPerFormance: 0,
+      SabtAvalieAsnad: 0,
+      PazireshVaSabtAvalieAsnad: 0,
+      ArzyabiAsanadBimarsetaniDirect: 0,
+      ArzyabiAsnadBimarestaniIndirect: 0,
+      ArzyabiAsnadDandanVaParaDirect: 0,
+      ArzyabiAsnadDandanVaParaIndirect: 0,
+      ArzyabiAsnadDandanDirect: 0,
+      ArzyabiAsnadDandanIndirect: 0,
+      ArzyabiAsnadDaroDirect: 0,
+      ArzyabiAsnadDaroIndirect: 0,
+      WithScanCount: 0,
+      WithoutScanCount: 0,
+      WithoutScanInDirectCount: 0,
+      ArchiveDirectCount: 0,
+      ArchiveInDirectCount: 0,
+      ArzyabiVisitDirectCount: 0,
+      ArzyabiVisitInDirectCount: 0,
+      HasTheDayOff: false,
+      key: {
+        CityName: row.CityName,
+        NameFamily: row.NameFamily,
+        NationalCode: normalizeNationalCode(row.NationalCode),
+      },
+    })) as unknown as T[];
+
+  return [...base, ...missing];
+}
+
 /** Identity match for refreshing selectedPerson after list re-aggregation. */
 export function isSamePersonnelRecord(
   a: {

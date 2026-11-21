@@ -9,6 +9,7 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import Button from "~/ui/buttons";
 import { CSVLink } from "react-csv";
+import { nationalCodeMatchesQuery } from "~/utils/personnel-performance";
 
 // simple debounce hook
 function useDebounce<T>(value: T, delay = 300): T {
@@ -79,15 +80,17 @@ export default function AdvancedList({
 
   const debouncedQuery = useDebounce(searchQuery, 250);
 
-  // Filtered list computed based on search
+  // Filtered list computed based on search (name + national code when present)
   const filteredItems = useMemo(() => {
     if (!debouncedQuery) return correctList;
+    const q = debouncedQuery.toLowerCase();
     return correctList.filter((item) => {
       const selectItem = selectProperty ? item[selectProperty] : item;
-      return selectItem
-        ?.toString()
-        .toLowerCase()
-        .includes(debouncedQuery.toLowerCase());
+      if (selectItem?.toString().toLowerCase().includes(q)) return true;
+      return (
+        nationalCodeMatchesQuery(item?.NationalCode, q) ||
+        nationalCodeMatchesQuery(item?.key?.NationalCode, q)
+      );
     });
   }, [debouncedQuery, correctList, selectProperty]);
 
@@ -179,7 +182,7 @@ export default function AdvancedList({
             <input
               type="text"
               dir="rtl"
-              placeholder="جستجو..."
+              placeholder="جستجو نام یا کد ملی..."
               className={twMerge(
                 "w-full rounded-md p-2 text-primary disabled:bg-primary/30 disabled:text-secondary",
                 fillHeight

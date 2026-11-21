@@ -8,6 +8,7 @@ import { TrendDecider } from "~/features/trend-decider";
 import {
   sparkChartForPersonnel,
   getPersonnelDisplayName,
+  normalizeNationalCode,
 } from "~/utils/personnel-performance";
 
 type PersonRecord = Record<string, any> & {
@@ -86,6 +87,10 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       user.CityName || user.key?.CityName,
       user.RealCityName,
     );
+    const nationalCode = normalizeNationalCode(user.NationalCode);
+    const nameTitle = nationalCode
+      ? `${displayName} — ${nationalCode}`
+      : displayName;
 
     if (!user?.NationalCode) {
       return (
@@ -130,12 +135,15 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
               : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
           )}
           onClick={handleClick}
-          title={displayName}
+          title={nameTitle}
         >
           {compact ? (
-            <div className="flex w-full items-center justify-center px-1 py-0.5 text-inherit">
+            <div className="flex w-full flex-col items-center justify-center gap-0.5 px-1 py-0.5 text-inherit">
               <span className="w-full break-words text-center text-xs leading-tight">
                 {displayName}
+              </span>
+              <span className="w-full break-all text-center font-mono text-[10px] leading-tight opacity-70 tabular-nums">
+                {nationalCode}
               </span>
             </div>
           ) : (
@@ -176,7 +184,12 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                 />
               </div>
 
-              <span className="w-full text-sm">{displayName}</span>
+              <span className="flex w-full min-w-0 flex-col items-start gap-0.5 text-right">
+                <span className="w-full truncate text-sm">{displayName}</span>
+                <span className="w-full truncate font-mono text-[11px] opacity-70 tabular-nums">
+                  {nationalCode}
+                </span>
+              </span>
             </div>
           )}
           {isActive && (

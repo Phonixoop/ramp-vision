@@ -11,7 +11,12 @@ import {
   getEnglishToPersianCity,
   getPersianToEnglishCity,
 } from "~/utils/util";
-import { getMonthNamesFromJOINED_date_strings, getPersonnelDisplayName } from "~/utils/personnel-performance";
+import {
+  getMonthNamesFromJOINED_date_strings,
+  getPersonnelDisplayName,
+  nationalCodeMatchesQuery,
+  normalizeNationalCode,
+} from "~/utils/personnel-performance";
 import {
   defaultProjectTypes,
   defualtContractTypes,
@@ -94,12 +99,36 @@ export function PersonnelPerformanceColumns({
           )}
         </span>
       ),
-      filterFn: "arrIncludesSome",
+      // PersonnelFilter stores selected national codes (unique per person).
+      filterFn: (row, _columnId, filterValue: string[]) => {
+        if (!filterValue?.length) return true;
+        const code = normalizeNationalCode(row.original.NationalCode);
+        const name = String(row.getValue("NameFamily") ?? "");
+        return filterValue.some(
+          (value) =>
+            value === code ||
+            value === name ||
+            nationalCodeMatchesQuery(code, value),
+        );
+      },
       Filter: ({ column }) => (
         <PersonnelFilter
           column={column}
           personnelPerformance={personnelPerformance}
         />
+      ),
+    },
+    {
+      header: "کد ملی",
+      hSticky: true,
+      width: 140,
+      accessorKey: "NationalCode",
+      accessorFn: (row) => normalizeNationalCode(row.NationalCode),
+      filterFn: "arrIncludesSome",
+      cell: ({ row }) => (
+        <span className="font-mono text-sm tabular-nums">
+          {normalizeNationalCode(row.original.NationalCode)}
+        </span>
       ),
     },
     {
@@ -122,7 +151,8 @@ export function PersonnelPerformanceColumns({
       hSticky: true,
       width: 200,
       accessorKey: "ContractType",
-      filterFn: "arrIncludesSome",
+      // Network-only (chart parity): client filter would hide merged zero-perf rows.
+      filterFn: () => true,
       Filter: ({ column }) => (
         <ContractTypeFilter
           column={column}
@@ -138,7 +168,8 @@ export function PersonnelPerformanceColumns({
       hSticky: true,
       width: 250,
       accessorKey: "Role",
-      filterFn: "arrIncludesSome",
+      // Network-only (chart parity): client filter would hide merged zero-perf rows.
+      filterFn: () => true,
       Filter: ({ column }) => (
         <RoleFilter
           column={column}
@@ -154,7 +185,8 @@ export function PersonnelPerformanceColumns({
       enablePinning: true,
       hSticky: false,
       accessorKey: "RoleType",
-      filterFn: "arrIncludesSome",
+      // Network-only (chart parity): client filter would hide merged zero-perf rows.
+      filterFn: () => true,
       Filter: ({ column }) => (
         <RoleTypeFilter
           column={column}

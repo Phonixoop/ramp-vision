@@ -24,6 +24,7 @@ import {
   expandTehranPerformanceCities,
   isSamePersonnelRecord,
   isSingleDayPersonnelSelection,
+  mergeMissingPersonnelsIntoPerformance,
   normalizeCityName,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
@@ -238,22 +239,14 @@ export function CitySessionProvider({ children }: { children: ReactNode }) {
     });
   }, [baseList]);
 
-  const mergedList: PersonRecord[] = useMemo(() => {
-    if (!getPersonnels.data || !updatedList) return updatedList ?? [];
-    const present = new Set(updatedList.map((row) => row.NationalCode));
-    const missing = getPersonnels.data
-      .filter((row: any) => !present.has(row.NationalCode))
-      .map((row: any) => ({
-        ...row,
-        TotalPerformance: 0,
-        key: {
-          CityName: row.CityName,
-          NameFamily: row.NameFamily,
-          NationalCode: row.NationalCode,
-        },
-      }));
-    return [...updatedList, ...missing];
-  }, [getPersonnels.data, updatedList]);
+  const mergedList: PersonRecord[] = useMemo(
+    () =>
+      mergeMissingPersonnelsIntoPerformance(
+        updatedList,
+        getPersonnels.data,
+      ) as PersonRecord[],
+    [getPersonnels.data, updatedList],
+  );
 
   const displayedList = useMemo(() => {
     let next = mergedList;

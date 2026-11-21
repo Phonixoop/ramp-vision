@@ -143,6 +143,9 @@ export function PersonnelsTable({ sessionData }: PersonnelsTableProps) {
 
   const columns = PersonnelsColumns({
     getPersonnls,
+    usersInfo: Array.isArray(initialFilters.data?.usersInfo)
+      ? initialFilters.data.usersInfo
+      : [],
     filters,
     setFilters,
     cityNames: getInitialCities?.data?.CityNames ?? [],

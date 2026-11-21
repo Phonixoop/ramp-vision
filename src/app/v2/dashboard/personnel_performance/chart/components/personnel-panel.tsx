@@ -19,6 +19,8 @@ import { TrendDecider } from "~/features/trend-decider";
 import { cn } from "~/lib/utils";
 import {
   getPersonnelDisplayName,
+  nationalCodeMatchesQuery,
+  normalizeNationalCode,
   sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
@@ -71,9 +73,10 @@ export function PersonnelPanel({ compact = false }: { compact?: boolean }) {
     const q = searchQuery.trim().toLowerCase();
     let next = displayedList;
     if (q) {
-      next = next.filter((row) =>
-        (row.NameFamily ?? "").toString().toLowerCase().includes(q),
-      );
+      next = next.filter((row) => {
+        const name = (row.NameFamily ?? "").toString().toLowerCase();
+        return name.includes(q) || nationalCodeMatchesQuery(row.NationalCode, q);
+      });
     }
     if (sortOrder === "original") return next;
     const sorted = [...next];
@@ -139,7 +142,7 @@ export function PersonnelPanel({ compact = false }: { compact?: boolean }) {
               dir="rtl"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="جستجوی نام…"
+              placeholder="جستجوی نام یا کد ملی…"
               disabled={skeleton}
               className="h-8 w-full rounded-lg border border-border-color/10 bg-third pe-8 ps-2.5 text-xs text-primary outline-none transition-colors placeholder:text-primary/35 focus:border-border-color/25 disabled:opacity-50"
             />
@@ -339,6 +342,9 @@ function PersonnelRailRow({
           <span className="min-w-0 flex-1">
             <span className="block truncate text-xs font-medium leading-5">
               {displayName}
+            </span>
+            <span className="block truncate font-mono text-[10px] tabular-nums text-primary/45">
+              {normalizeNationalCode(user.NationalCode)}
             </span>
             <span className="block truncate text-[10px] text-primary/45">
               {user.Role || "—"}

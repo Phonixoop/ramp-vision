@@ -24,7 +24,7 @@ export type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
 
 export function PersonnelsColumns({
   getPersonnls,
-
+  usersInfo,
   filters,
   setFilters,
   filtersWithNoNetworkRequest,
@@ -33,6 +33,13 @@ export function PersonnelsColumns({
   dateInfos,
 }: {
   getPersonnls: any;
+  usersInfo: Array<{
+    Role?: string | null;
+    RoleType?: string | null;
+    ContractType?: string | null;
+    ProjectType?: string | null;
+    DateInfo?: string | null;
+  }>;
   filters: any;
   setFilters: any;
   filtersWithNoNetworkRequest: any;
@@ -43,6 +50,23 @@ export function PersonnelsColumns({
   const columns = useMemo<
     CustomColumnDef<PersonnelsData, string | number | null>[]
   >(() => {
+    const syncNetworkFilter = (id: string, values: string[]) => {
+      setFilters((prev: any) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          [id]: values,
+        },
+      }));
+      setFiltersWithNoNetworkRequest?.((prev: any) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          [id]: values,
+        },
+      }));
+    };
+
     return [
       {
         header: "ردیف",
@@ -97,8 +121,13 @@ export function PersonnelsColumns({
               <span className="font-bold text-primary">نوع پروژه</span>
               <SelectColumnFilterOptimized
                 column={column}
-                values={getPersonnls.data || []}
-                initialFilters={defaultProjectTypes}
+                values={usersInfo}
+                initialFilters={
+                  filters?.filter?.ProjectType ?? defaultProjectTypes
+                }
+                onChange={(filter) =>
+                  syncNetworkFilter(filter.id, filter.values)
+                }
               />
             </div>
           );
@@ -114,8 +143,11 @@ export function PersonnelsColumns({
               <span className="font-bold text-primary">سمت</span>
               <SelectColumnFilterOptimized
                 column={column}
-                values={getPersonnls.data || []}
-                initialFilters={defualtRoles}
+                values={usersInfo}
+                initialFilters={filters?.filter?.Role ?? defualtRoles}
+                onChange={(filter) =>
+                  syncNetworkFilter(filter.id, filter.values)
+                }
               />
             </div>
           );
@@ -131,8 +163,15 @@ export function PersonnelsColumns({
               <span className="font-bold text-primary">نوع قرارداد</span>
               <SelectColumnFilterOptimized
                 column={column}
-                values={getPersonnls.data || []}
-                initialFilters={defualtContractTypes}
+                values={usersInfo}
+                initialFilters={
+                  filtersWithNoNetworkRequest?.filter?.ContractType ??
+                  filters?.filter?.ContractType ??
+                  defualtContractTypes
+                }
+                onChange={(filter) =>
+                  syncNetworkFilter(filter.id, filter.values)
+                }
               />
             </div>
           );
@@ -148,8 +187,15 @@ export function PersonnelsColumns({
               <span className="font-bold text-primary">نوع سمت</span>
               <SelectColumnFilterOptimized
                 column={column}
-                values={getPersonnls.data || []}
-                initialFilters={filtersWithNoNetworkRequest?.filter?.RoleType}
+                values={usersInfo}
+                initialFilters={
+                  filtersWithNoNetworkRequest?.filter?.RoleType ??
+                  filters?.filter?.RoleType ??
+                  []
+                }
+                onChange={(filter) =>
+                  syncNetworkFilter(filter.id, filter.values)
+                }
               />
             </div>
           );
@@ -171,11 +217,18 @@ export function PersonnelsColumns({
     ];
   }, [
     getPersonnls.data,
+    usersInfo,
     setFilters,
+    setFiltersWithNoNetworkRequest,
     cityNames,
     dateInfos,
     filters?.filter?.DateInfo,
-    filtersWithNoNetworkRequest?.filter?.RoleType,
+    filters?.filter?.ProjectType?.join(","),
+    filters?.filter?.Role?.join(","),
+    filters?.filter?.ContractType?.join(","),
+    filters?.filter?.RoleType?.join(","),
+    filtersWithNoNetworkRequest?.filter?.ContractType?.join(","),
+    filtersWithNoNetworkRequest?.filter?.RoleType?.join(","),
   ]);
 
   return columns;
