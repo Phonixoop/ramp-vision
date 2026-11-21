@@ -6,10 +6,9 @@ import {
   coerceAggregateValue,
   humanizeDuration,
   processDataForChart,
-  sumColumnBasedOnRowValue,
 } from "~/utils/util";
 import { Reports_Period } from "~/constants";
-import { ServiceNames, ShortServiceNames } from "~/constants/depo";
+import { ShortServiceNames } from "~/constants/depo";
 import H2 from "~/ui/heading/h2";
 import EntryHandlingSkeletonLoading from "~/features/loadings/depo/entry-handling-box";
 import { Loading } from "~/features/loadings/loading";
@@ -22,6 +21,7 @@ import {
   DEPO_CHART_HANDLED,
 } from "~/constants/depo-chart-colors";
 import { cn } from "~/lib/utils";
+import { getSabtPieTotals } from "~/app/dashboard/depo/utils/sabt-pie-totals";
 
 function toChartNumber(value: unknown): number {
   const coerced = coerceAggregateValue(value);
@@ -44,7 +44,10 @@ function SummaryCard({
   return (
     <article
       className={cn(
-        "grid h-full min-w-0 max-w-full grid-rows-[auto_1fr_auto] gap-3 overflow-hidden rounded-2xl border border-primary/10 bg-secbuttn/80 p-3 shadow-sm transition-colors duration-200 hover:border-primary/20 sm:p-4",
+        // Content row must be `auto` (not `1fr`+min-h-0): with indefinite card
+        // height, 1fr collapses to 0 and overflow-hidden clips the charts.
+        // زمان اتمام دپو still looked fine because its footer sits outside that row.
+        "grid h-full min-w-0 max-w-full grid-rows-[auto_auto_auto] gap-3 rounded-2xl border border-primary/10 bg-secbuttn/80 p-3 shadow-sm transition-colors duration-200 hover:border-primary/20 sm:p-4",
         className,
       )}
     >
@@ -57,7 +60,7 @@ function SummaryCard({
           {subtitle ?? <span className="invisible select-none">.</span>}
         </div>
       </header>
-      <div className="flex min-h-0 min-w-0 flex-col">{children}</div>
+      <div className="flex min-w-0 flex-col">{children}</div>
       {/* Reserved footer band so charts stay aligned when only some cards have footers */}
       <footer className="flex min-h-[3rem] min-w-0 items-center">
         {footer ?? <span className="invisible block w-full" aria-hidden />}
@@ -127,64 +130,22 @@ export const DepoSummary = memo(function DepoSummary({
     );
   }, [chartData]);
 
-  const entryDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.BillType === "مستقیم"),
-    "EntryCount",
-    "ServiceName",
-    [
-      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
-    ],
-  );
-
-  const entryInDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.BillType === "غیر مستقیم"),
-    "EntryCount",
-    "ServiceName",
-    [
-      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
-    ],
-  );
-
-  const capacityDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.BillType === "مستقیم"),
-    "Capicity",
-    "ServiceName",
-    [
-      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
-    ],
-  );
-
-  const capacityInDirectBaseOnSabt = sumColumnBasedOnRowValue(
-    flatRows.filter((a) => a.BillType === "غیر مستقیم"),
-    "Capicity",
-    "ServiceName",
-    [
-      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"],
-    ],
-  );
+  const sabtTotals = getSabtPieTotals(flatRows);
 
   const entry_capacity_Direct = [
     {
       name: "ورودی",
-      value: entryDirectBaseOnSabt,
+      value: sabtTotals.entryDirect,
       fill: DEPO_CHART_COLORS.entry,
     },
     {
       name: "رسیدگی",
-      value: capacityDirectBaseOnSabt,
+      value: sabtTotals.capacityDirect,
       fill: DEPO_CHART_HANDLED,
     },
     {
       name: "مانده",
-      value: Math.max(0, entryDirectBaseOnSabt - capacityDirectBaseOnSabt),
+      value: Math.max(0, sabtTotals.entryDirect - sabtTotals.capacityDirect),
       fill: DEPO_CHART_COLORS.remaining,
     },
   ];
@@ -192,46 +153,33 @@ export const DepoSummary = memo(function DepoSummary({
   const entry_capacity_InDirect = [
     {
       name: "ورودی",
-      value: entryInDirectBaseOnSabt,
+      value: sabtTotals.entryIndirect,
       fill: DEPO_CHART_COLORS.entry,
     },
     {
       name: "رسیدگی",
-      value: capacityInDirectBaseOnSabt,
+      value: sabtTotals.capacityIndirect,
       fill: DEPO_CHART_HANDLED,
     },
     {
       name: "مانده",
-      value: Math.max(0, entryInDirectBaseOnSabt - capacityInDirectBaseOnSabt),
+      value: Math.max(
+        0,
+        sabtTotals.entryIndirect - sabtTotals.capacityIndirect,
+      ),
       fill: DEPO_CHART_COLORS.remaining,
     },
   ];
 
-  const depoBaseOnSabtDirect = sumColumnBasedOnRowValue(
-    flatRows,
-    "DepoCount",
-    "ServiceName",
-    [
-      ServiceNames["ثبت ارزیابی با اسکن مدارک"],
-      ServiceNames["ثبت ارزیابی بدون اسکن مدارک"],
-    ],
-  );
-  const depoBaseOnSabtInDirect = sumColumnBasedOnRowValue(
-    flatRows,
-    "DepoCount",
-    "ServiceName",
-    [ServiceNames["ثبت ارزیابی بدون اسکن مدارک (غیر مستقیم)"]],
-  );
-
   const depo_BaseOnSabt = [
     {
       name: "مستقیم",
-      value: depoBaseOnSabtDirect,
+      value: sabtTotals.depoDirect,
       fill: DEPO_CHART_COLORS.direct,
     },
     {
       name: "غیر مستقیم",
-      value: depoBaseOnSabtInDirect,
+      value: sabtTotals.depoIndirect,
       fill: DEPO_CHART_COLORS.indirect,
     },
   ];

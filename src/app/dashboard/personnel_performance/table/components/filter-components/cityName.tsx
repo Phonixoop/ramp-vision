@@ -1,12 +1,21 @@
 "use client";
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import type { Column } from "@tanstack/react-table";
 
 import { SelectControlled } from "~/features/checkbox-list";
-import { getPersianToEnglishCity } from "~/utils/util";
+import { getEnglishToPersianCity } from "~/utils/util";
 import { TableFilterSkeleton } from "~/app/dashboard/personnel_performance/table/components/TableFilterSkeleton";
 import { CityLevelTabs } from "~/features/city-level-tab";
 import { toast } from "sonner";
+import { TEHRAN_SUB_CITIES } from "~/constants";
+import { cn } from "~/lib/utils";
+import Button from "~/ui/buttons";
+import {
+  TEHRAN_SUB_CITY_LABELS,
+  collapseCitiesForFilterList,
+  expandCityFilterSelection,
+  type TehranSubCity,
+} from "~/utils/personnel-performance";
 
 const same = (a?: string[], b?: string[]) =>
   a === b ||
@@ -30,13 +39,51 @@ export const CityNameFilter = memo(function CityNameFilter({
   const get = column.getFilterValue as () => string[] | undefined;
   const set = column.setFilterValue;
 
-  const applyColumn = useCallback(
-    (vals: string[]) => {
-      const next = vals.filter(Boolean);
+  const [tehranSubCities, setTehranSubCities] = useState<TehranSubCity[]>([]);
+
+  const rawCityNames: string[] = initialFilters?.CityNames ?? [];
+  const collapsedCityList = useMemo(
+    () => collapseCitiesForFilterList(rawCityNames),
+    [rawCityNames],
+  );
+
+  const displayValue = collapseCitiesForFilterList(get() ?? []);
+
+  const isTehranSelected = displayValue.includes(
+    getEnglishToPersianCity("Tehran"),
+  );
+
+  const applyFilters = useCallback(
+    (displayCities: string[], subCities: TehranSubCity[]) => {
+      const englishCities = expandCityFilterSelection(displayCities, subCities);
+      const persianCities = englishCities.map(getEnglishToPersianCity);
+
       const current = get() ?? [];
-      if (!same(current, next)) set(next);
+      if (!same(current, persianCities)) set(persianCities);
+
+      setDataFilters((prev: any) => ({
+        ...prev,
+        filter: {
+          ...prev.filter,
+          CityName: englishCities,
+          Start_Date: prev.filter?.Start_Date ?? [],
+        },
+      }));
     },
-    [get, set],
+    [get, set, setDataFilters],
+  );
+
+  const onTehranSubCityChange = useCallback(
+    (city: TehranSubCity) => {
+      setTehranSubCities((prev) => {
+        const next = prev.includes(city)
+          ? prev.filter((c) => c !== city)
+          : [...prev, city];
+        applyFilters(displayValue, next);
+        return next;
+      });
+    },
+    [applyFilters, displayValue],
   );
 
   return (
@@ -50,20 +97,12 @@ export const CityNameFilter = memo(function CityNameFilter({
           {/* tabs only when NOT monthly */}
           {reportPeriod !== "ماهانه" && (
             <CityLevelTabs
-              initialCities={initialFilters?.CityNames ?? []}
+              initialCities={rawCityNames}
               column={column}
               onChange={(data) => {
-                // 1) instant table filter
-                applyColumn(data.values);
-                // 2) keep server-side mirror in sync (no heavy fetch needed for روزانه/هفتگی)
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    CityName: data.values.map(getPersianToEnglishCity),
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
+                const collapsed = collapseCitiesForFilterList(data.values);
+                setTehranSubCities([]);
+                applyFilters(collapsed, []);
               }}
             />
           )}
@@ -71,9 +110,8 @@ export const CityNameFilter = memo(function CityNameFilter({
           <SelectControlled
             singleSelect={reportPeriod === "ماهانه"}
             withSelectAll
-            list={initialFilters?.CityNames}
-            // pass a STABLE array (see section C)
-            value={get() ?? []}
+            list={collapsedCityList}
+            value={displayValue}
             onChange={(values) => {
               if (reportPeriod === "ماهانه") {
                 if (values.length <= 0) {
@@ -81,30 +119,50 @@ export const CityNameFilter = memo(function CityNameFilter({
                   return;
                 }
                 const single = values.slice(0, 1);
-                // Update both server-side filters and column filter for monthly period
-                applyColumn(single);
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    CityName: single.map(getPersianToEnglishCity),
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
+                const tehranSelected = single.includes(
+                  getEnglishToPersianCity("Tehran"),
+                );
+                const nextSubs = tehranSelected ? tehranSubCities : [];
+                if (!tehranSelected) setTehranSubCities([]);
+                applyFilters(single, nextSubs);
               } else {
-                // client-driven path
-                setDataFilters((prev: any) => ({
-                  ...prev,
-                  filter: {
-                    ...prev.filter,
-                    CityName: values.map(getPersianToEnglishCity),
-                    Start_Date: prev.filter?.Start_Date ?? [],
-                  },
-                }));
-                applyColumn(values);
+                const tehranSelected = values.includes(
+                  getEnglishToPersianCity("Tehran"),
+                );
+                const nextSubs = tehranSelected ? tehranSubCities : [];
+                if (!tehranSelected) setTehranSubCities([]);
+                applyFilters(values, nextSubs);
               }
             }}
           />
+
+          {isTehranSelected && (
+            <div
+              dir="rtl"
+              className="flex w-full flex-col items-center gap-2 pt-1"
+            >
+              <span className="text-xs text-primary/70">زیرمجموعه تهران</span>
+              <div className="flex w-full flex-wrap items-center justify-center gap-2">
+                {TEHRAN_SUB_CITIES.map((city) => {
+                  const isSelected = tehranSubCities.includes(city);
+                  return (
+                    <Button
+                      key={city}
+                      onClick={() => onTehranSubCityChange(city)}
+                      className={cn(
+                        "rounded-full border border-primary px-3 py-1 text-sm",
+                        isSelected
+                          ? "bg-primary text-secondary"
+                          : "bg-transparent text-primary",
+                      )}
+                    >
+                      {TEHRAN_SUB_CITY_LABELS[city]}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

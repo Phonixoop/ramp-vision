@@ -101,6 +101,96 @@ export function normalizeCityForCityList(
   return normalizeCityName(cityName);
 }
 
+export type TehranSubCity = (typeof TEHRAN_SUB_CITIES)[number];
+
+export const TEHRAN_SUB_CITY_LABELS: Record<TehranSubCity, string> = {
+  "Tehran Jobran": "جبران",
+  "Tehran Not Jobran": "غیر جبران",
+  "Tehran InDirect": "غیر مستقیم",
+};
+
+/** Collapse Tehran-related cities to a single "تهران" for city filter UI lists. */
+export function collapseCitiesForFilterList(cityNames: string[]): string[] {
+  const collapsed = new Set<string>();
+  let hasTehran = false;
+
+  for (const cityName of cityNames) {
+    if (isTehranRelatedCity(cityName)) {
+      hasTehran = true;
+      continue;
+    }
+    const normalized = normalizeCityName(cityName);
+    collapsed.add(getEnglishToPersianCity(normalized) || cityName);
+  }
+
+  if (hasTehran) {
+    collapsed.add(getEnglishToPersianCity("Tehran"));
+  }
+
+  return [...collapsed];
+}
+
+/**
+ * Expand a collapsed city-filter selection into English CityName values for the API.
+ * When Tehran is selected with no sub-cities, includes all TEHRAN_RELATED_CITIES.
+ */
+export function expandCityFilterSelection(
+  selectedDisplayCities: string[],
+  tehranSubCities: readonly string[] = [],
+): string[] {
+  const expanded = new Set<string>();
+
+  for (const cityName of selectedDisplayCities) {
+    const normalized = normalizeCityName(cityName);
+    if (normalized === "Tehran" || isTehranRelatedCity(normalized)) {
+      if (tehranSubCities.length > 0) {
+        for (const sub of tehranSubCities) {
+          expanded.add(normalizeCityName(sub));
+        }
+      } else {
+        for (const tehranCity of TEHRAN_RELATED_CITIES) {
+          expanded.add(tehranCity);
+        }
+      }
+      continue;
+    }
+    if (normalized) expanded.add(normalized);
+  }
+
+  return [...expanded];
+}
+
+/** Distinct city count after collapsing Tehran variants (monthly single-city rules). */
+export function countCollapsedCities(
+  cityNames: string[] | undefined | null,
+): number {
+  if (!cityNames?.length) return 0;
+  return collapseCitiesForFilterList(cityNames).length;
+}
+
+/** Active Tehran sub-city chips implied by an expanded CityName filter. */
+export function deriveTehranSubCitiesFromFilter(
+  cityNames: string[] | undefined | null,
+): TehranSubCity[] {
+  if (!cityNames?.length) return [];
+
+  const normalized = cityNames.map(normalizeCityName);
+  if (!normalized.some(isTehranRelatedCity)) return [];
+
+  const selectedSubs = TEHRAN_SUB_CITIES.filter((city) =>
+    normalized.includes(city),
+  );
+  const relatedSelected = TEHRAN_RELATED_CITIES.filter((city) =>
+    normalized.includes(city),
+  );
+
+  if (relatedSelected.length === TEHRAN_RELATED_CITIES.length) return [];
+  if (relatedSelected.length === 1 && relatedSelected[0] === "Tehran") return [];
+  if (selectedSubs.length === 0) return [];
+
+  return [...selectedSubs];
+}
+
 export function isPersonnelCityMismatch(
   performanceCity: string | null | undefined,
   realCity: string | null | undefined,

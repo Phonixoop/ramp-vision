@@ -7,6 +7,7 @@ import { usePersonnelPerformance } from "../context";
 import { TableFilterSkeleton } from "./TableFilterSkeleton";
 import { toast } from "sonner";
 import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+import { countCollapsedCities } from "~/utils/personnel-performance";
 
 const ACTION_BTN =
   "inline-flex h-9 items-center gap-1.5 rounded-md border border-primary/20 bg-secondary px-3 text-xs text-primary transition-colors hover:bg-primary/5";
@@ -95,9 +96,10 @@ export function PersonnelPerformanceFilters({
     reportPeriod: "daily" | "weekly" | "monthly";
     selectedDates: string[];
   }) => {
+    const selectedCityCount = countCollapsedCities(filters.filter.CityName);
     if (
-      (reportPeriod === "monthly" && filters.filter.CityName.length <= 0) ||
-      filters.filter.CityName.length > 1
+      (reportPeriod === "monthly" && selectedCityCount <= 0) ||
+      selectedCityCount > 1
     ) {
       toast(
         "لطفا یک شهر انتخاب کنید و سپس مجدد تاریخ گزارش را به ماهانه تغییر دهید",

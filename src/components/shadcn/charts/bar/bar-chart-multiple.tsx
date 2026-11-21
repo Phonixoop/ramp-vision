@@ -92,7 +92,7 @@ export function ChartBarMultiple({
     <div className={cn("flex w-full min-w-0 flex-col gap-3", className)}>
       <div
         aria-label="نمودار میله‌ای به تفکیک فعالیت"
-        className="w-full min-w-0"
+        className="w-full min-w-0 min-h-[12rem]"
         dir="ltr"
         role="img"
       >

@@ -8,10 +8,13 @@ import { toast } from "sonner";
 import Table from "~/features/table";
 import { PersonnelPerformanceTableProps } from "../types";
 import {
+  collapseCitiesForFilterList,
+  countCollapsedCities,
+  deriveTehranSubCitiesFromFilter,
   distinctPersonnelPerformanceData,
+  expandCityFilterSelection,
   getPerformanceMetric,
 } from "~/utils/personnel-performance";
-import { getPersianToEnglishCity } from "~/utils/util";
 import { PersonnelPerformanceColumns } from "./PersonnelPerformanceColumns";
 import { PersonnelPerformanceFilters } from "./PersonnelPerformanceFilters";
 import { PersonnelPerformanceSummary } from "./PersonnelPerformanceSummary";
@@ -262,12 +265,18 @@ export function PersonnelPerformanceTable({
   console.log("🔍 Processed distinct data:", distincedData);
 
   useEffect(() => {
-    // if reportPeriod is monthly, set only one cityname to the SelectColumnFilterOptimized CityName filter if there is more than 1 already
+    // Monthly allows a single logical city; Tehran variants count as one (expand under the hood).
     if (
       filters?.periodType === "ماهانه" &&
-      filters?.filter?.CityName?.length > 1
+      countCollapsedCities(filters?.filter?.CityName) > 1
     ) {
-      const cityNames = filters.filter.CityName.slice(0, 1);
+      const collapsed = collapseCitiesForFilterList(
+        filters.filter.CityName ?? [],
+      ).slice(0, 1);
+      const tehranSubs = deriveTehranSubCitiesFromFilter(
+        filters.filter.CityName,
+      );
+      const cityNames = expandCityFilterSelection(collapsed, tehranSubs);
       setDataFilters?.((prev: any) => ({
         ...prev,
         filter: {

@@ -8,6 +8,15 @@ import { ServiceNameFilter } from "~/app/dashboard/depo/components/filter-compon
 import { BillTypeFilter } from "~/app/dashboard/depo/components/filter-components/billType";
 import { CaseTypeFilter } from "~/app/dashboard/depo/components/filter-components/caseType";
 import { CustomColumnDef } from "~/types/table";
+import { getSabtPieTotals } from "~/app/dashboard/depo/utils/sabt-pie-totals";
+
+function sabtFooterTotal(
+  table: { getFilteredRowModel: () => { rows: { original: DepoData }[] } },
+  key: "entry" | "capacity" | "depo",
+) {
+  const rows = table.getFilteredRowModel().rows.map((row) => row.original);
+  return commify(getSabtPieTotals(rows)[key]);
+}
 
 interface DepoColumnsProps {
   initialFilters: any;
@@ -91,46 +100,19 @@ export function DepoColumns({
       header: "تعداد دپو",
       accessorKey: "DepoCount",
       cell: ({ row }) => <span>{commify(row.original.DepoCount)}</span>,
-      footer: ({ table }) =>
-        commify(
-          table
-            .getFilteredRowModel()
-            .rows.reduce(
-              (total, row) =>
-                (total as number) + (row.getValue("DepoCount") as number),
-              0,
-            ),
-        ),
+      footer: ({ table }) => sabtFooterTotal(table, "depo"),
     },
     {
       header: "تعداد ورودی",
       accessorKey: "EntryCount",
       cell: ({ row }) => <span>{commify(row.original.EntryCount)}</span>,
-      footer: ({ table }) =>
-        commify(
-          table
-            .getFilteredRowModel()
-            .rows.reduce(
-              (total, row) =>
-                (total as number) + (row.getValue("EntryCount") as number),
-              0,
-            ),
-        ),
+      footer: ({ table }) => sabtFooterTotal(table, "entry"),
     },
     {
       header: "تعداد رسیدگی شده",
       accessorKey: "Capicity",
       cell: ({ row }) => <span>{commify(row.original.Capicity)}</span>,
-      footer: ({ table }) =>
-        commify(
-          table
-            .getFilteredRowModel()
-            .rows.reduce(
-              (total, row) =>
-                (total as number) + (row.getValue("Capicity") as number),
-              0,
-            ),
-        ),
+      footer: ({ table }) => sabtFooterTotal(table, "capacity"),
     },
     {
       header: "مدت زمان اتمام دپو",

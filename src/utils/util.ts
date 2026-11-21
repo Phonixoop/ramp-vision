@@ -518,10 +518,10 @@ export function sumColumnBasedOnRowValue(
   for (let i = 0; i < table.length; i++) {
     const row = table[i];
     const targetValue = row[targetColumn];
-    const value = row[valueColumn];
+    const coerced = coerceAggregateValue(row[valueColumn]);
 
-    if (targetValues.includes(targetValue)) {
-      totalSum += value;
+    if (targetValues.includes(targetValue) && isNumericAggregateValue(coerced)) {
+      totalSum += coerced;
     }
   }
 
