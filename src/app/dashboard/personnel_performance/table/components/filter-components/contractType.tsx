@@ -9,21 +9,24 @@ import { defualtContractTypes } from "~/constants/personnel-performance";
 
 export const ContractTypeFilter = memo(function ContractTypeFilter({
   column,
-  personnelPerformance,
+  initialFilters,
   filtersWithNoNetworkRequest,
   setFiltersWithNoNetworkRequest,
+  setDataFilters,
 }: {
   column: Column<any, unknown>;
-  personnelPerformance: any;
+  initialFilters: any;
   filtersWithNoNetworkRequest: any;
   setFiltersWithNoNetworkRequest: (f: any) => void;
+  setDataFilters?: (f: any) => void;
 }) {
-  const isPersonnelDataLoading = !personnelPerformance?.result;
+  // Same source as chart: full ContractType list from users_info.
+  const isUsersInfoLoading = !initialFilters?.usersInfo;
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
       <span className="font-bold text-primary">نوع قرارداد</span>
-      {isPersonnelDataLoading ? (
+      {isUsersInfoLoading ? (
         <TableFilterSkeleton />
       ) : (
         <SelectColumnFilterOptimized<
@@ -34,9 +37,16 @@ export const ContractTypeFilter = memo(function ContractTypeFilter({
             defualtContractTypes
           }
           column={column}
-          values={personnelPerformance?.result}
+          values={initialFilters?.usersInfo ?? []}
           onChange={(filter) => {
             setFiltersWithNoNetworkRequest((prev: any) => ({
+              ...prev,
+              filter: {
+                ...prev.filter,
+                ContractType: filter.values,
+              },
+            }));
+            setDataFilters?.((prev: any) => ({
               ...prev,
               filter: {
                 ...prev.filter,

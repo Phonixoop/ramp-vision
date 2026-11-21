@@ -12,21 +12,24 @@ import {
 
 export const RoleTypeFilter = memo(function RoleTypeFilter({
   column,
-  personnelPerformance,
+  initialFilters,
   filtersWithNoNetworkRequest,
   setFiltersWithNoNetworkRequest,
+  setDataFilters,
 }: {
   column: Column<any, unknown>;
-  personnelPerformance: any;
+  initialFilters: any;
   filtersWithNoNetworkRequest: any;
   setFiltersWithNoNetworkRequest?: (f: any) => void;
+  setDataFilters?: (f: any) => void;
 }) {
-  const isPersonnelDataLoading = !personnelPerformance?.result;
+  // Same source as chart: full RoleType list from users_info.
+  const isUsersInfoLoading = !initialFilters?.usersInfo;
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
       <span className="font-bold text-primary">نوع سمت</span>
-      {isPersonnelDataLoading ? (
+      {isUsersInfoLoading ? (
         <TableFilterSkeleton />
       ) : (
         <SelectColumnFilterOptimized<PersonnelPerformanceData>
@@ -38,9 +41,16 @@ export const RoleTypeFilter = memo(function RoleTypeFilter({
             )
           }
           column={column}
-          values={personnelPerformance?.result ?? []}
+          values={initialFilters?.usersInfo ?? []}
           onChange={(filter) => {
             setFiltersWithNoNetworkRequest?.((prev: any) => ({
+              ...prev,
+              filter: {
+                ...prev.filter,
+                RoleType: filter.values,
+              },
+            }));
+            setDataFilters?.((prev: any) => ({
               ...prev,
               filter: {
                 ...prev.filter,

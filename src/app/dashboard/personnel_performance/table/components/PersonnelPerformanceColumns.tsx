@@ -126,9 +126,10 @@ export function PersonnelPerformanceColumns({
       Filter: ({ column }) => (
         <ContractTypeFilter
           column={column}
-          personnelPerformance={personnelPerformance}
+          initialFilters={initialFilters}
           filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
           setFiltersWithNoNetworkRequest={setFiltersWithNoNetworkRequest}
+          setDataFilters={setDataFilters}
         />
       ),
     },
@@ -141,9 +142,10 @@ export function PersonnelPerformanceColumns({
       Filter: ({ column }) => (
         <RoleFilter
           column={column}
-          personnelPerformance={personnelPerformance}
+          initialFilters={initialFilters}
           filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
           setFiltersWithNoNetworkRequest={setFiltersWithNoNetworkRequest}
+          setDataFilters={setDataFilters}
         />
       ),
     },
@@ -156,9 +158,10 @@ export function PersonnelPerformanceColumns({
       Filter: ({ column }) => (
         <RoleTypeFilter
           column={column}
-          personnelPerformance={personnelPerformance}
+          initialFilters={initialFilters}
           filtersWithNoNetworkRequest={filtersWithNoNetworkRequest}
           setFiltersWithNoNetworkRequest={setFiltersWithNoNetworkRequest}
+          setDataFilters={setDataFilters}
         />
       ),
     },
