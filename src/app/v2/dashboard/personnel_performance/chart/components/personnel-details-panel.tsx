@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { XIcon } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
 import { Badge } from "~/components/arc/badge/badge";
 import { MetricCard } from "~/components/arc/metric-card/metric-card";
 import { rampArcStyle } from "~/components/arc/ramp-tokens";
@@ -32,19 +32,18 @@ const SUMMARY_KEYS = new Set([
   "InDirectPerFormance",
 ]);
 
-const META_BADGE_KEYS = [
-  "Role",
-  "RoleType",
-  "ContractType",
-  "ProjectType",
-] as const;
+const META_BADGE_BASE_KEYS = ["Role", "ContractType"] as const;
+const META_BADGE_EXTRA_KEYS = ["RoleType", "ProjectType"] as const;
 
-const META_CELL_KEYS = [
+const META_CELL_BASE_KEYS = [
   "PersonnelCode",
   "NationalCode",
   "CityName",
   "TownName",
   "BranchName",
+] as const;
+
+const META_CELL_EXTRA_KEYS = [
   "BranchCode",
   "BranchType",
   "DateInfo",
@@ -87,6 +86,7 @@ export function PersonnelDetailsPanel() {
     setSelectedPerson,
     getAll,
   } = useCitySession();
+  const [showExtraDetails, setShowExtraDetails] = useState(false);
 
   const getAllData = getAll?.data as
     | {
@@ -95,6 +95,13 @@ export function PersonnelDetailsPanel() {
         result?: any[];
       }
     | undefined;
+
+  const metaBadgeKeys = showExtraDetails
+    ? [...META_BADGE_BASE_KEYS, ...META_BADGE_EXTRA_KEYS]
+    : [...META_BADGE_BASE_KEYS];
+  const metaCellKeys = showExtraDetails
+    ? [...META_CELL_BASE_KEYS, ...META_CELL_EXTRA_KEYS]
+    : [...META_CELL_BASE_KEYS];
 
   const numericItemsMap = useMemo(() => {
     if (!selectedPerson) return new Map<string, number | null>();
@@ -213,7 +220,7 @@ export function PersonnelDetailsPanel() {
             ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
-            {META_BADGE_KEYS.map((key, index) => {
+            {metaBadgeKeys.map((key, index) => {
               const value = personField(selectedPerson, key);
               if (value == null) return null;
               return (
@@ -306,11 +313,25 @@ export function PersonnelDetailsPanel() {
       {/* Meta */}
       <aside className="flex min-w-0 flex-col gap-3">
         <section className="space-y-2">
-          <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
-            مشخصات
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
+              مشخصات
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowExtraDetails((prev) => !prev)}
+              className="inline-flex items-center gap-1 rounded-lg border border-border-color/10 bg-fourth px-2 py-1 text-[10px] text-primary/65 transition-colors hover:bg-primary/5 hover:text-primary"
+            >
+              {showExtraDetails ? (
+                <ChevronUpIcon className="size-3" />
+              ) : (
+                <ChevronDownIcon className="size-3" />
+              )}
+              {showExtraDetails ? "مخفی کردن اطلاعات بیشتر" : "نمایش اطلاعات بیشتر"}
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-2">
-            {META_CELL_KEYS.map((key) => {
+            {metaCellKeys.map((key) => {
               let value = personField(selectedPerson, key);
               if (value == null) return null;
               if (key === "Start_Date") {

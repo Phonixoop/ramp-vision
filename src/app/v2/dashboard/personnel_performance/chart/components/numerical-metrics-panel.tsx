@@ -18,7 +18,7 @@ import { commify } from "~/utils/util";
 
 /** Full ring = hitting Indicator ok-max (100%). Values above stay full, color shifts. */
 const TARGET_PERCENT = 100;
-/** Design radii — chart scales to the 50% column; keep hole large enough for % + caption. */
+/** Design radii — chart scales into leftover space beside the list; keep hole large enough for % + caption. */
 const RING_BASE_INNER_RADIUS = 72;
 const AT_RISK_RATIO = 0.85;
 
@@ -212,9 +212,10 @@ export function NumericalMetricsPanel({
         ) : null}
       </header>
 
-      <div className="grid items-center gap-4 p-4 lg:grid-cols-2">
+      {/* Ring takes leftover width; شاخص list is content-sized so names never truncate. */}
+      <div className="grid items-center gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_max-content]">
         {ringData.length > 0 ? (
-          <div className="mx-auto flex w-full min-w-0 max-w-md flex-col items-center justify-center self-center">
+          <div className="mx-auto flex w-full min-w-0 flex-col items-center justify-center self-center">
             <RingChart
               data={ringData}
               strokeWidth={ringData.length > 6 ? 6 : 10}
@@ -281,7 +282,7 @@ export function NumericalMetricsPanel({
           </div>
         )}
 
-        <div className="min-w-0 space-y-3">
+        <div className="w-full min-w-0 space-y-3 lg:w-auto lg:min-w-max lg:max-w-none">
           <div className="space-y-2 rounded-xl border border-border-color/10 bg-third/50 p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-[11px] font-medium text-primary/55">
@@ -340,7 +341,7 @@ export function NumericalMetricsPanel({
           </div>
 
           <div className="overflow-hidden rounded-xl border border-border-color/10">
-            <div className="grid grid-cols-[minmax(0,1fr)_4.5rem_4.5rem_1.25rem] gap-2 border-b border-border-color/10 bg-third/40 px-3 py-2 text-[10px] font-medium tracking-wide text-primary/40">
+            <div className="grid grid-cols-[max-content_4.5rem_4.5rem_1.25rem] gap-2 border-b border-border-color/10 bg-third/40 px-3 py-2 text-[10px] font-medium tracking-wide text-primary/40">
               <span>شاخص</span>
               <span className="text-end">مصرف</span>
               <span className="text-end">عملکرد</span>
@@ -369,19 +370,19 @@ export function NumericalMetricsPanel({
                         onSelectMetric?.(row.id);
                       }}
                       className={cn(
-                        "grid w-full grid-cols-[minmax(0,1fr)_4.5rem_4.5rem_1.25rem] items-center gap-2 px-3 py-2.5 text-start transition-colors",
+                        "grid w-full grid-cols-[max-content_4.5rem_4.5rem_1.25rem] items-center gap-2 px-3 py-2.5 text-start transition-colors",
                         focused || selected
                           ? "bg-primary/8"
                           : "hover:bg-primary/5",
                       )}
                     >
-                      <span className="flex min-w-0 items-center gap-2">
+                      <span className="flex items-center gap-2 whitespace-nowrap">
                         <span
                           aria-hidden
                           className="size-2 shrink-0 rounded-full"
                           style={{ backgroundColor: row.color }}
                         />
-                        <span className="min-w-0 truncate text-xs font-medium text-primary">
+                        <span className="shrink-0 text-xs font-medium text-primary">
                           {row.name}
                         </span>
                         {row.status === "over" ? (

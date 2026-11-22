@@ -627,8 +627,27 @@ export function distinctPersonnelPerformanceData(
         ? workDays
         : item.key.rowCount;
 
-    // Derive performance from visible aggregated counts so UI always matches formula(counts)
+    // Derive performance from visible aggregated counts so UI always matches formula(counts).
+    // City-timeline callers pass only TotalPerformance/COUNT (no activity fields) — fall back
+    // to the pre-aggregated TotalPerformance instead of recalculating to 0.
+    const hasAggregatedActivityFields = [
+      ...DIRECT_PERFORMANCE_FIELDS,
+      ...INDIRECT_PERFORMANCE_FIELDS,
+    ].some((field) => {
+      const value = item[field];
+      return value != null && value !== "";
+    });
+
     const dateLength = divisor > 0 ? divisor : 1;
+    if (!hasAggregatedActivityFields) {
+      const safeDivisor = dateLength > 0 ? dateLength : 1;
+      return {
+        ...item,
+        ...item.key,
+        TotalPerformance: (Number(item.TotalPerformance) || 0) / safeDivisor,
+      };
+    }
+
     const DirectPerFormance = calculateDirectPerformance(item, dateLength);
     const InDirectPerFormance = calculateInDirectPerformance(item, dateLength);
 

@@ -1,5 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import moment from "jalali-moment";
 import PerformanceBadgesLazy from "~/components/main/performance-badges";
@@ -24,6 +25,26 @@ import {
 } from "~/utils/personnel-performance";
 import { getMonthNumber } from "~/utils/date-utils";
 import { commify } from "~/utils/util";
+
+const PERSON_DETAIL_BASE_KEYS = [
+  "PersonnelCode",
+  "NationalCode",
+  "NameFamily",
+  "CityName",
+  "Role",
+  "ContractType",
+  "TownName",
+  "BranchName",
+] as const;
+
+const PERSON_DETAIL_EXTRA_KEYS = [
+  "RoleType",
+  "ProjectType",
+  "BranchCode",
+  "BranchType",
+  "DateInfo",
+  "Start_Date",
+] as const;
 
 const Calendar = dynamic(() => import("~/features/calendar"), { ssr: false });
 const DefaultGauge = dynamic(
@@ -68,6 +89,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
     GaugeComponent,
   }) => {
     const Gauge = GaugeComponent ?? DefaultGauge;
+    const [showExtraDetails, setShowExtraDetails] = React.useState(false);
     console.log({ selectedPerson });
     // Helper function to get personnel data for a specific date
     const getPersonnelDataForDate = React.useCallback(
@@ -167,22 +189,9 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
     const personDetailItems = React.useMemo(() => {
       if (!selectedPerson) return [] as [string, string][];
       const person = selectedPerson as Record<string, unknown>;
-      const detailKeys = [
-        "PersonnelCode",
-        "NationalCode",
-        "NameFamily",
-        "CityName",
-        "Role",
-        "RoleType",
-        "ContractType",
-        "ProjectType",
-        "TownName",
-        "BranchName",
-        "BranchCode",
-        "BranchType",
-        "DateInfo",
-        "Start_Date",
-      ] as const;
+      const detailKeys = showExtraDetails
+        ? [...PERSON_DETAIL_BASE_KEYS, ...PERSON_DETAIL_EXTRA_KEYS]
+        : [...PERSON_DETAIL_BASE_KEYS];
 
       return detailKeys
         .map((key) => {
@@ -203,7 +212,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
           return [key, String(raw)] as [string, string];
         })
         .filter((entry): entry is [string, string] => entry != null);
-    }, [selectedPerson]);
+    }, [selectedPerson, showExtraDetails]);
 
     if (!selectedPerson) {
       return null;
@@ -306,6 +315,17 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             className="flex w-2/6 flex-col items-center justify-center gap-4"
             dir="rtl"
           >
+            <Button
+              onClick={() => setShowExtraDetails((prev) => !prev)}
+              className="w-full gap-1.5 border border-dashed border-primbuttn bg-secondary px-3 py-1.5 text-xs text-primary/80 hover:bg-secbuttn"
+            >
+              {showExtraDetails ? (
+                <ChevronUpIcon className="size-3.5" />
+              ) : (
+                <ChevronDownIcon className="size-3.5" />
+              )}
+              {showExtraDetails ? "مخفی کردن اطلاعات بیشتر" : "نمایش اطلاعات بیشتر"}
+            </Button>
             <div className="overflow-hidden rounded-xl border-[1px] border-dashed border-primbuttn bg-secondary">
               <div className="grid grid-cols-1 items-stretch justify-center divide-x-[1px] divide-y-[1px] divide-dashed divide-primbuttn lg:grid-cols-2">
                 {personDetailItems.map(([key, value], index) => {

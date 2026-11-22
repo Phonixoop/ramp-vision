@@ -1,12 +1,11 @@
 // @ts-nocheck - Disable TypeScript checking for recharts type conflicts
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Cell } from "recharts";
 import { FilterType } from "~/context/personnel-filter.context";
 import H2 from "~/ui/heading/h2";
 import { api } from "~/trpc/react";
 import {
   distinctDataAndCalculatePerformance,
-  distinctPersonnelPerformanceData,
   getPerformanceMetric,
   isTehranRelatedCity,
 } from "~/utils/personnel-performance";
@@ -22,7 +21,7 @@ import {
   defualtRoles,
 } from "~/constants/personnel-performance";
 import moment from "jalali-moment";
-import { groupBy, uniqueArray, uniqueArrayWithCounts } from "~/lib/utils";
+import { groupBy, uniqueArrayWithCounts } from "~/lib/utils";
 import PerformanceBadges from "~/components/main/performance-badges";
 
 export function CitiesWithDatesPerformanceBarChart({
@@ -43,6 +42,12 @@ export function CitiesWithDatesPerformanceBarChart({
     ? "تهران"
     : getEnglishToPersianCity(selectedCities[0]);
 
+  // getCitiesWithPerformance normalizes Tehran-related cities to "Tehran" in SQL.
+  // Client-side where must match that label, not the expanded/sub-city filter list.
+  const selectCityWhere = isTehranSelection
+    ? ["Tehran"]
+    : selectedCities;
+
   const getCitiesWithPerformance =
     api.personnelPerformance.getCitiesWithPerformance.useQuery(
       {
@@ -58,21 +63,40 @@ export function CitiesWithDatesPerformanceBarChart({
         periodType: filters.periodType,
       },
       {
+        enabled: !shouldBlockChart,
         select: (data) => {
-          const dates = uniqueArrayWithCounts(
-            data?.result.map((a) => a.Start_Date.slice(0, 7)),
-          );
-          if (dates.result.length === 1) {
-            return distinctPersonnelPerformanceData(
-              data,
+          const rows = data?.result ?? [];
+          if (!rows.length) return [];
 
-              ["Start_Date", "CityName"],
-              ["TotalPerformance", "COUNT"],
-              { CityName: filters.filter.CityName },
-            );
+          const dates = uniqueArrayWithCounts(
+            rows
+              .map((a) =>
+                typeof a?.Start_Date === "string"
+                  ? a.Start_Date.slice(0, 7)
+                  : null,
+              )
+              .filter(Boolean),
+          );
+
+          // Single month: keep SQL TotalPerformance/COUNT. chartData divides by COUNT.
+          // Do not use distinctPersonnelPerformanceData here — it recalculates from
+          // activity fields that are omitted from this values list.
+          if (dates.result.length <= 1) {
+            return rows
+              .filter(
+                (row) =>
+                  !selectCityWhere.length ||
+                  selectCityWhere.includes(row.CityName),
+              )
+              .map((row) => ({
+                Start_Date: row.Start_Date,
+                CityName: row.CityName,
+                TotalPerformance: Number(row.TotalPerformance) || 0,
+                COUNT: Number(row.COUNT) > 0 ? Number(row.COUNT) : 1,
+              }));
           }
 
-          const result: any = data.result.map((a) => {
+          const result: any = rows.map((a) => {
             return {
               ...a,
               Start_Date: moment(a.Start_Date, "jYYYY/jMM/jDD")
@@ -92,10 +116,11 @@ export function CitiesWithDatesPerformanceBarChart({
                 { ...data, result: value },
                 ["Start_Date", "CityName"],
                 ["TotalPerformance", "COUNT"],
-                { CityName: filters.filter.CityName },
+                { CityName: selectCityWhere },
               );
               return {
                 key: { Start_Date: key },
+                Start_Date: key,
                 COUNT: 1,
                 ...vv[0],
               };
@@ -103,8 +128,6 @@ export function CitiesWithDatesPerformanceBarChart({
           );
 
           return rrr;
-
-          // console.log({ d });
         },
         refetchOnWindowFocus: false,
       },
