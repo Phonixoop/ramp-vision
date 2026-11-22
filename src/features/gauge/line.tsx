@@ -4,36 +4,28 @@ import { Performance_Levels_Gauge } from "~/constants/personnel-performance";
 
 const subs = [
   {
-    limit: 80,
+    limit: 70,
     color: "#B12B1D",
     tooltip: {
       text: "ضعیف",
     },
   },
-
   {
     limit: 100,
-    color: "#7BB11B",
-    tooltip: {
-      text: "متوسط",
-    },
-  },
-  {
-    limit: 150,
     color: "#7BB11B",
     tooltip: {
       text: "خوب",
     },
   },
   {
-    limit: 200,
+    limit: 130,
     color: "#16B13D",
     tooltip: {
       text: "عالی",
     },
   },
   {
-    limit: 500,
+    limit: 160,
     color: "#B1671E",
     tooltip: {
       text: "نیاز به بررسی",

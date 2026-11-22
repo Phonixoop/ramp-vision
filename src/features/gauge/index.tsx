@@ -11,31 +11,29 @@ const GaugeChart = dynamic(() => import("react-gauge-component"), {
   ssr: false,
 });
 
-// const GaugeChart = dynamic(() => import("react-gauge-chart"), {
-//   loading: () => <p>Loading...</p>,
-// });
-
 ChartJS.register(ArcElement, Tooltip, Legend);
+
+/** Ceiling for the legacy grafana gauge (NeedsReview band beyond 130%). */
+const GAUGE_MAX = 160;
+
 export default function Gauge({ value }) {
   if (value == undefined || value == null) return <></>;
+  const safe = Number.isNaN(value) ? 0 : Number(value);
   return (
     <div className="text-center">
       <GaugeChart
-        // className="xl:scale-125"
         //@ts-ignore
         type="grafana"
         minValue={0}
-        maxValue={500}
+        maxValue={GAUGE_MAX}
         arc={{
-          // colorArray: ["#FF2121", "#00FF15"],
-
           padding: 0.02,
           subArcs: Performance_Levels_Gauge,
         }}
         pointer={{ type: "blob", animationDelay: 1 }}
         labels={{
           valueLabel: {
-            formatTextValue: (value) => `${value}%`,
+            formatTextValue: (v) => `${v}%`,
             matchColorWithArc: true,
             style: {
               textShadow: "none",
@@ -43,20 +41,12 @@ export default function Gauge({ value }) {
           },
           tickLabels: {
             type: "outer",
-            ticks: [
-              { value: 75 },
-              { value: 90 },
-              { value: 120 },
-              { value: 180 },
-              { value: 500 },
-            ],
+            ticks: [{ value: 70 }, { value: 100 }, { value: 130 }],
           },
         }}
-        value={Math.round(Number.isNaN(value) ? 0 : value)}
+        value={Math.round(Math.min(Math.max(safe, 0), GAUGE_MAX))}
       />
-      <span className="text-primary">
-        {(Number.isNaN(value) ? 0 : value).toFixed(2)}
-      </span>
+      <span className="text-primary">{safe.toFixed(2)}</span>
     </div>
   );
 }

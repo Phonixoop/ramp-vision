@@ -1,16 +1,20 @@
 "use client";
 
-import { useMemo } from "react";
-import { PieCenter } from "~/components/charts/pie-center";
-import { PieChart } from "~/components/charts/pie-chart";
-import { PieSlice } from "~/components/charts/pie-slice";
+import { useMemo, useState } from "react";
+import {
+  DonutChart,
+  DonutChartCenter,
+  DonutChartPlot,
+  type DonutSegment,
+} from "~/components/beui/donut-chart";
+import { AnimatedNumber } from "~/components/beui";
 import { performanceLevels } from "~/constants/personnel-performance";
 import { getPerformanceMetric } from "~/utils/personnel-performance";
 import { cn } from "~/lib/utils";
 
-const MAX_VALUE = 500;
-const SIZE = 160;
-const INNER_RADIUS = 52;
+/** Full ring = hitting ok-max (100%). Values above 100% stay full and change color. */
+const TARGET_PERCENT = 100;
+const TRACK_ID = "track";
 
 type PerformanceGaugeProps = {
   value?: number | null;
@@ -19,8 +23,9 @@ type PerformanceGaugeProps = {
 };
 
 /**
- * Bklit donut gauge for personnel performance (replaces react-gauge-component on v2).
- * Value arc is colored by performance band; remainder uses muted track.
+ * Partial progress ring for personnel % performance.
+ * Background muted track only — no labeled باقیمانده segment.
+ * Center always shows the performance % in its goodness color.
  */
 export function PerformanceGauge({
   value,
@@ -31,78 +36,102 @@ export function PerformanceGauge({
   const numeric =
     numericRaw == null || Number.isNaN(numericRaw)
       ? null
-      : Math.max(0, Math.min(MAX_VALUE, numericRaw));
+      : Math.max(0, numericRaw);
 
   const metric = useMemo(
     () => (numeric == null ? null : getPerformanceMetric(numeric)),
     [numeric],
   );
 
-  const data = useMemo(() => {
+  const segments = useMemo<DonutSegment[]>(() => {
     if (numeric == null || !metric) return [];
-    const remaining = Math.max(0, MAX_VALUE - numeric);
-    return [
-      {
-        label: metric.tooltip?.text ?? "عملکرد",
-        value: numeric > 0 ? numeric : 0.0001,
+
+    // Arc length caps at 100%; >100% keeps a full ring in excellent/review color.
+    const fill = Math.min(numeric, TARGET_PERCENT);
+    const track = Math.max(0, TARGET_PERCENT - fill);
+    const next: DonutSegment[] = [];
+
+    if (fill > 0) {
+      next.push({
+        id: "performance",
+        name: metric.tooltip?.text ?? "عملکرد",
+        value: fill,
         color: metric.color,
-      },
-      {
-        label: "باقیمانده",
-        value: remaining > 0 ? remaining : 0.0001,
-        color: "rgba(var(--primary), 0.12)",
-      },
-    ];
+      });
+    }
+
+    // Unlabeled muted remainder so buildDonut can draw a partial arc.
+    // Never expose as باقیمانده in UI / hover / legend.
+    if (track > 0) {
+      next.push({
+        id: TRACK_ID,
+        name: "",
+        value: track,
+        color: "transparent",
+      });
+    }
+
+    return next;
   }, [metric, numeric]);
 
-  if (numeric == null || !metric) {
+  // Ignore hover on the transparent track so center never flips to remainder.
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  if (numeric == null || !metric || segments.length === 0) {
     return null;
   }
 
+  const display = Math.round(numeric);
+  const statusLabel =
+    metric.tooltip?.text ??
+    performanceLevels.find((level) => level.color === metric.color)?.text;
+
   return (
-    <div className={cn("flex flex-col items-center gap-1 text-center", className)}>
-      <PieChart
-        className="text-primary"
-        cornerRadius={6}
-        data={data}
-        hoverOffset={0}
-        innerRadius={INNER_RADIUS}
-        padAngle={0.02}
-        size={SIZE}
+    <div
+      className={cn(
+        "flex min-w-0 max-w-full flex-col items-center gap-1 text-center",
+        className,
+      )}
+    >
+      <DonutChart
+        segments={segments}
+        thickness={14}
+        gap={0}
+        activeId={activeId}
+        onActiveChange={(id) => {
+          setActiveId(id === TRACK_ID ? null : id);
+        }}
+        label={label ?? "عملکرد"}
+        labels={{ total: label ?? "عملکرد", label: label ?? "عملکرد" }}
+        formatValue={(v) => `${Math.round(v)}%`}
+        className="mx-auto w-full min-w-0 max-w-[9rem]"
       >
-        {data.map((item, index) => (
-          <PieSlice
-            key={item.label}
-            animate
-            hoverEffect="none"
-            index={index}
-            showGlow={false}
-          />
-        ))}
-        <PieCenter>
-          {() => (
-            <div className="flex flex-col items-center leading-tight">
-              <span
-                className="text-lg font-semibold tabular-nums"
-                style={{ color: metric.color }}
-              >
-                {Math.round(numeric)}%
-              </span>
-              {label ? (
-                <span className="text-[10px] text-primary/50">{label}</span>
-              ) : null}
-            </div>
-          )}
-        </PieCenter>
-      </PieChart>
+        <DonutChartPlot className="max-w-[9rem]">
+          <DonutChartCenter totalLabel={label}>
+            {() => (
+              <div className="flex items-center justify-center leading-none">
+                <span
+                  className="text-base font-semibold tabular-nums sm:text-lg"
+                  style={{ color: metric.color }}
+                >
+                  <AnimatedNumber
+                    value={display}
+                    format={(n) => `${Math.round(n)}%`}
+                    duration={0.6}
+                  />
+                </span>
+              </div>
+            )}
+          </DonutChartCenter>
+        </DonutChartPlot>
+      </DonutChart>
+      {label ? (
+        <span className="text-[11px] text-primary/55">{label}</span>
+      ) : null}
       <span className="text-sm tabular-nums text-primary">
         {numeric.toFixed(2)}
       </span>
-      <span className="text-[11px] text-primary/45">
-        {metric.tooltip?.text ??
-          performanceLevels.find((level) => level.color === metric.color)
-            ?.text}
-      </span>
+      <span className="text-[11px] text-primary/45">{statusLabel}</span>
     </div>
   );
 }

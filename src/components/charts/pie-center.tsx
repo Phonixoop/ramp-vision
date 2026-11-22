@@ -76,8 +76,16 @@ export function PieCenter({
     return null;
   }
 
-  // If custom render function is provided, use it
-  if (children && hoveredData) {
+  // If custom render function is provided, use it (idle + hover).
+  // Previously this only ran while hovered, so idle fell through to
+  // `totalValue` (often value + remainder = max scale, e.g. 500).
+  if (children) {
+    const activeData =
+      hoveredData ??
+      data[0] ?? {
+        label: displayLabel,
+        value: displayValue,
+      };
     return (
       <div
         className={cn(
@@ -91,7 +99,7 @@ export function PieCenter({
           value: displayValue,
           label: displayLabel,
           isHovered: effectiveHoveredIndex !== null,
-          data: hoveredData,
+          data: activeData,
         })}
       </div>
     );

@@ -225,13 +225,18 @@ export const Indicators = {
   ArzyabiAsnadDandanIndirect: 300, // ارزیابی اسناد دندان مستقیم
 };
 
+/**
+ * % performance bands relative to Indicators (ok-max = 100%).
+ * Bands: [0,70) ضعیف · [70,100] خوب · (100,130] عالی · >130 نیاز به بررسی
+ * `limit` is the inclusive upper bound of each band (Weak is exclusive at 70 —
+ * see getPerformanceMetric). NeedsReview limit is the display/gauge ceiling.
+ */
 export const performanceLevels = [
-  { limit: 75, color: "#B12B1D", text: "ضعیف", enText: "Weak" },
-  { limit: 90, color: "#7BB11B", text: "متوسط", enText: "Average" },
-  { limit: 120, color: "#7BB11B", text: "خوب", enText: "Good" },
-  { limit: 180, color: "#16B13D", text: "عالی", enText: "Excellent" },
+  { limit: 70, color: "#B12B1D", text: "ضعیف", enText: "Weak" },
+  { limit: 100, color: "#7BB11B", text: "خوب", enText: "Good" },
+  { limit: 130, color: "#16B13D", text: "عالی", enText: "Excellent" },
   {
-    limit: 500,
+    limit: 160,
     color: "#B1671E",
     text: "نیاز به بررسی",
     enText: "NeedsReview",

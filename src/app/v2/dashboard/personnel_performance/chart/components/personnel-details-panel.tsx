@@ -6,14 +6,11 @@ import moment from "jalali-moment";
 import { XIcon } from "lucide-react";
 import { Badge } from "~/components/arc/badge/badge";
 import { MetricCard } from "~/components/arc/metric-card/metric-card";
-import { AnimatedCounter } from "~/components/arc/animated-counter/animated-counter";
 import { rampArcStyle } from "~/components/arc/ramp-tokens";
-import { AnimatedNumber } from "~/components/beui";
 import { PerformanceGauge, PerformanceSpark } from "~/components/bklit";
 import PerformanceBadgesLazy from "~/components/main/performance-badges";
 import {
   PersonnelPerformanceGroups,
-  PersonnelPerformanceIcons,
   PersonnelPerformanceTranslate,
   performanceLevels,
   type PersonnelPerformanceGroup,
@@ -31,11 +28,12 @@ import {
   getPersonnelDisplayName,
   isPersonnelWorkingDay,
 } from "~/utils/personnel-performance";
-import { commify, getPerformanceTextEn } from "~/utils/util";
+import { getPerformanceTextEn } from "~/utils/util";
 import {
   useCitySession,
   type PersonRecord,
 } from "../city-session-context";
+import { NumericalMetricsPanel } from "./numerical-metrics-panel";
 
 const Calendar = dynamic(() => import("~/features/calendar"), { ssr: false });
 
@@ -213,6 +211,26 @@ export function PersonnelDetailsPanel() {
     [groupedMetrics],
   );
 
+  const numericalItems = useMemo(
+    () =>
+      flatMetrics
+        .filter(([key]) => key !== "Empty")
+        .map(([key, value]) => ({
+          key,
+          value: formatMetricValue(value),
+        })),
+    [flatMetrics],
+  );
+
+  const dateLength = useMemo(() => {
+    const fromKey = Number(
+      (selectedPerson as { key?: { rowCount?: number } } | null)?.key
+        ?.rowCount,
+    );
+    if (Number.isFinite(fromKey) && fromKey > 0) return fromKey;
+    return 1;
+  }, [selectedPerson]);
+
   const displayName = useMemo(() => {
     if (!selectedPerson) return "";
     return getPersonnelDisplayName(
@@ -309,6 +327,14 @@ export function PersonnelDetailsPanel() {
         </div>
       </header>
 
+      {/* Numerical metrics (Cloud Spend–style) — prominent at top */}
+      <NumericalMetricsPanel
+        items={numericalItems}
+        dateLength={dateLength}
+        totalPerformance={selectedPerson.TotalPerformance}
+        className="min-w-0"
+      />
+
       {/* Summary KPI metric cards */}
       <section className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <MetricCard
@@ -335,242 +361,189 @@ export function PersonnelDetailsPanel() {
       {/* Gauges */}
       <section className="rounded-2xl border border-border-color/10 bg-fourth/60 p-3">
         <PerformanceBadgesLazy />
-        <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <PerformanceGauge label="کلی" value={selectedPerson.TotalPerformance} />
+        <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-start">
           <PerformanceGauge
+            className="min-w-0"
+            label="کلی"
+            value={selectedPerson.TotalPerformance}
+          />
+          <PerformanceGauge
+            className="min-w-0"
             label="مستقیم"
             value={selectedPerson.DirectPerFormance}
           />
           <PerformanceGauge
+            className="min-w-0"
             label="غیر مستقیم"
             value={selectedPerson.InDirectPerFormance}
           />
         </div>
       </section>
 
-      {/* Metrics grid + meta / calendar */}
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
-        <section className="min-w-0 space-y-2">
+      {/* Meta / calendar */}
+      <aside className="flex min-w-0 flex-col gap-3">
+        <section className="space-y-2">
           <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
-            شاخص‌های عددی
+            مشخصات
           </h3>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {flatMetrics.map(([key, value]) => {
-              if (!PersonnelPerformanceIcons[key]) return null;
-              const isZero = (value as number) <= 0;
-              const numeric = formatMetricValue(value);
-              const decimals = Number.isInteger(numeric) ? 0 : 2;
+          <div className="grid grid-cols-2 gap-2">
+            {META_CELL_KEYS.map((key) => {
+              let value = personField(selectedPerson, key);
+              if (value == null) return null;
+              if (key === "Start_Date") {
+                value = getMonthNamesFromJOINED_date_strings(
+                  String(value),
+                  getAllData?.periodType as PeriodType | undefined,
+                );
+              }
               return (
-                <article
+                <div
                   key={key}
-                  className={cn(
-                    "flex min-w-0 flex-col gap-1.5 rounded-xl border border-border-color/10 bg-fourth p-2.5",
-                    isZero && "opacity-45",
-                  )}
+                  className="rounded-xl border border-border-color/10 bg-fourth px-2.5 py-2"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="line-clamp-2 text-[10px] leading-snug text-primary/55">
-                      {PersonnelPerformanceTranslate[key] ?? key}
-                    </span>
-                    <span className="shrink-0 scale-90 opacity-80">
-                      {PersonnelPerformanceIcons[key]}
-                    </span>
+                  <div className="text-[10px] text-primary/45">
+                    {PersonnelPerformanceTranslate[key] ?? key}
                   </div>
-                  <div
-                    className="text-base font-semibold text-primary [&_.counter]:text-[1.15rem]"
-                    style={
-                      {
-                        "--text-3xl": "1.15rem",
-                        "--font-display": "inherit",
-                        "--tracking-display": "-0.02em",
-                      } as React.CSSProperties
-                    }
-                  >
-                    {decimals === 0 ? (
-                      <AnimatedNumber
-                        value={numeric}
-                        startOnView={false}
-                        format={(n) => commify(Math.round(n))}
-                        className="text-base font-semibold text-primary"
-                      />
-                    ) : (
-                      <AnimatedCounter
-                        value={numeric}
-                        decimals={decimals}
-                        animateOnView
-                      />
-                    )}
+                  <div className="mt-0.5 break-words text-xs font-medium text-primary">
+                    {String(value)}
                   </div>
-                </article>
+                </div>
               );
             })}
           </div>
+          <RolesByBranchModal selectedPerson={selectedPerson} />
         </section>
 
-        <aside className="flex min-w-0 flex-col gap-3">
-          <section className="space-y-2">
-            <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
-              مشخصات
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              {META_CELL_KEYS.map((key) => {
-                let value = personField(selectedPerson, key);
-                if (value == null) return null;
-                if (key === "Start_Date") {
-                  value = getMonthNamesFromJOINED_date_strings(
-                    String(value),
-                    getAllData?.periodType as PeriodType | undefined,
+        <section className="space-y-2">
+          <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
+            تقویم عملکرد
+          </h3>
+          <div className="relative overflow-hidden rounded-2xl border border-border-color/10 bg-fourth p-2">
+            {sparkData && sparkData.length > 0 ? (
+              <Calendar
+                withMonthMenu
+                collapsedUi
+                listOfDates={uniqueArray(
+                  sparkData.map((a: any) =>
+                    moment(a.Start_Date, "jYYYY/jMM/jDD")
+                      .format("jYYYY/jMM")
+                      .slice(0, 7),
+                  ),
+                ).map((a) => moment(a, "jYYYY/jMM "))}
+                year={Number.parseInt(sparkData[0].Start_Date.split("/")[0])}
+                defaultMonth={getMonthNumber(sparkData[0].Start_Date)}
+                onDate={(date, monthNumber) => {
+                  const dateString = date.format("jYYYY/jMM/jDD");
+                  const userCalData = sparkData.find(
+                    (d: any) => d.Start_Date === dateString,
                   );
-                }
-                return (
-                  <div
-                    key={key}
-                    className="rounded-xl border border-border-color/10 bg-fourth px-2.5 py-2"
-                  >
-                    <div className="text-[10px] text-primary/45">
-                      {PersonnelPerformanceTranslate[key] ?? key}
+                  const userMetric = getPerformanceMetric(
+                    userCalData?.TotalPerformance,
+                  );
+                  const selectedCityName = String(
+                    selectedPerson.CityName ||
+                      selectedPerson.key?.CityName ||
+                      "",
+                  );
+                  const dayOffRow = getAllData?.result?.find(
+                    (a: any) =>
+                      a.Start_Date === dateString &&
+                      String(a.NationalCode) ===
+                        String(selectedPerson.key?.NationalCode) &&
+                      String(a.CityName || "") === selectedCityName,
+                  );
+                  const hasTheDayOff =
+                    dayOffRow != null &&
+                    !isPersonnelWorkingDay(dayOffRow.HasTheDayOff);
+
+                  const handleDateClick = () => {
+                    const personnelDataForDate = getPersonnelDataForDate(
+                      dateString,
+                      selectedPerson.key?.NationalCode,
+                      selectedPerson.key?.NameFamily,
+                      selectedPerson.Role ?? "",
+                      selectedCityName,
+                    );
+                    if (personnelDataForDate) {
+                      setSelectedPerson({
+                        ...selectedPerson,
+                        ...personnelDataForDate,
+                        Start_Date: dateString,
+                        periodType: "روزانه",
+                      });
+                    }
+                  };
+
+                  return Number.parseInt(date.format("M")) !==
+                    monthNumber + 1 ? (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <span
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-primary/50"
+                        style={{
+                          backgroundColor: userCalData
+                            ? userMetric.color
+                            : undefined,
+                        }}
+                      >
+                        {date.format("D")}
+                      </span>
                     </div>
-                    <div className="mt-0.5 break-words text-xs font-medium text-primary">
-                      {String(value)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <RolesByBranchModal selectedPerson={selectedPerson} />
-          </section>
-
-          <section className="space-y-2">
-            <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
-              تقویم عملکرد
-            </h3>
-            <div className="relative overflow-hidden rounded-2xl border border-border-color/10 bg-fourth p-2">
-              {sparkData && sparkData.length > 0 ? (
-                <Calendar
-                  withMonthMenu
-                  collapsedUi
-                  listOfDates={uniqueArray(
-                    sparkData.map((a: any) =>
-                      moment(a.Start_Date, "jYYYY/jMM/jDD")
-                        .format("jYYYY/jMM")
-                        .slice(0, 7),
-                    ),
-                  ).map((a) => moment(a, "jYYYY/jMM "))}
-                  year={Number.parseInt(sparkData[0].Start_Date.split("/")[0])}
-                  defaultMonth={getMonthNumber(sparkData[0].Start_Date)}
-                  onDate={(date, monthNumber) => {
-                    const dateString = date.format("jYYYY/jMM/jDD");
-                    const userCalData = sparkData.find(
-                      (d: any) => d.Start_Date === dateString,
-                    );
-                    const userMetric = getPerformanceMetric(
-                      userCalData?.TotalPerformance,
-                    );
-                    const selectedCityName = String(
-                      selectedPerson.CityName ||
-                        selectedPerson.key?.CityName ||
-                        "",
-                    );
-                    const dayOffRow = getAllData?.result?.find(
-                      (a: any) =>
-                        a.Start_Date === dateString &&
-                        String(a.NationalCode) ===
-                          String(selectedPerson.key?.NationalCode) &&
-                        String(a.CityName || "") === selectedCityName,
-                    );
-                    const hasTheDayOff =
-                      dayOffRow != null &&
-                      !isPersonnelWorkingDay(dayOffRow.HasTheDayOff);
-
-                    const handleDateClick = () => {
-                      const personnelDataForDate = getPersonnelDataForDate(
-                        dateString,
-                        selectedPerson.key?.NationalCode,
-                        selectedPerson.key?.NameFamily,
-                        selectedPerson.Role ?? "",
-                        selectedCityName,
-                      );
-                      if (personnelDataForDate) {
-                        setSelectedPerson({
-                          ...selectedPerson,
-                          ...personnelDataForDate,
-                          Start_Date: dateString,
-                          periodType: "روزانه",
-                        });
-                      }
-                    };
-
-                    return Number.parseInt(date.format("M")) !==
-                      monthNumber + 1 ? (
-                      <div className="flex h-full w-full items-center justify-center">
+                  ) : (
+                    <ToolTipSimple
+                      className={cn(
+                        !hasTheDayOff &&
+                          !userCalData?.TotalPerformance &&
+                          "hidden",
+                      )}
+                      tooltip={
                         <span
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-primary/50"
                           style={{
-                            backgroundColor: userCalData
+                            color: userCalData
                               ? userMetric.color
                               : undefined,
                           }}
+                          className="text-base text-primary"
                         >
+                          {hasTheDayOff
+                            ? "مرخصی"
+                            : userCalData?.TotalPerformance?.toFixed(2)}
+                        </span>
+                      }
+                    >
+                      <Button
+                        className={cn(
+                          "flex w-max cursor-pointer items-center justify-center rounded-xl p-2 hover:opacity-80",
+                          hasTheDayOff === true
+                            ? "bg-primary text-secondary"
+                            : "bg-primary-muted/10 text-primary-muted",
+                          dateString === selectedPerson.Start_Date &&
+                            selectedPerson.periodType === "روزانه"
+                            ? "rounded-full ring-2 ring-primary"
+                            : "",
+                        )}
+                        style={{
+                          backgroundColor: userCalData
+                            ? userMetric.color
+                            : undefined,
+                        }}
+                        onClick={handleDateClick}
+                      >
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-black">
                           {date.format("D")}
                         </span>
-                      </div>
-                    ) : (
-                      <ToolTipSimple
-                        className={cn(
-                          !hasTheDayOff &&
-                            !userCalData?.TotalPerformance &&
-                            "hidden",
-                        )}
-                        tooltip={
-                          <span
-                            style={{
-                              color: userCalData
-                                ? userMetric.color
-                                : undefined,
-                            }}
-                            className="text-base text-primary"
-                          >
-                            {hasTheDayOff
-                              ? "مرخصی"
-                              : userCalData?.TotalPerformance?.toFixed(2)}
-                          </span>
-                        }
-                      >
-                        <Button
-                          className={cn(
-                            "flex w-max cursor-pointer items-center justify-center rounded-xl p-2 hover:opacity-80",
-                            hasTheDayOff === true
-                              ? "bg-primary text-secondary"
-                              : "bg-primary-muted/10 text-primary-muted",
-                            dateString === selectedPerson.Start_Date &&
-                              selectedPerson.periodType === "روزانه"
-                              ? "rounded-full ring-2 ring-primary"
-                              : "",
-                          )}
-                          style={{
-                            backgroundColor: userCalData
-                              ? userMetric.color
-                              : undefined,
-                          }}
-                          onClick={handleDateClick}
-                        >
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-black">
-                            {date.format("D")}
-                          </span>
-                        </Button>
-                      </ToolTipSimple>
-                    );
-                  }}
-                />
-              ) : (
-                <div className="py-6 text-center text-xs text-primary/45">
-                  بدون داده تقویم
-                </div>
-              )}
-            </div>
-          </section>
-        </aside>
-      </div>
+                      </Button>
+                    </ToolTipSimple>
+                  );
+                }}
+              />
+            ) : (
+              <div className="py-6 text-center text-xs text-primary/45">
+                بدون داده تقویم
+              </div>
+            )}
+          </div>
+        </section>
+      </aside>
     </div>
   );
 }

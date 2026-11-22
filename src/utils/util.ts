@@ -652,37 +652,37 @@ export function humanizeDuration(value, tag) {
   return timeComponents.join(" ، ");
 }
 
+/** % bands: [0,70) ضعیف · [70,100] خوب · (100,130] عالی · >130 نیاز به بررسی */
 const performance_ranges = [
-  { min: 0, max: 75, result: "ضعیف", enText: "Weak" },
-  { min: 76, max: 90, result: "متوسط", enText: "Average" },
-  { min: 91, max: 120, result: "خوب", enText: "Good" },
-  { min: 121, max: 180, result: "عالی", enText: "Excellent" },
+  { min: 0, max: 70, exclusiveMax: true, result: "ضعیف", enText: "Weak" },
+  { min: 70, max: 100, result: "خوب", enText: "Good" },
+  { min: 100, max: 130, exclusiveMin: true, result: "عالی", enText: "Excellent" },
 ];
 
 export function getPerformanceText(value: number) {
   if (!value && value != 0) return "";
-  let result = "نیاز به بررسی"; // Default result
+  if (!Number.isFinite(value)) return "نیاز به بررسی";
 
-  performance_ranges.forEach((range) => {
-    if (value >= range.min && value <= range.max) {
-      result = range.result;
-    }
-  });
+  for (const range of performance_ranges) {
+    const aboveMin = range.exclusiveMin ? value > range.min : value >= range.min;
+    const belowMax = range.exclusiveMax ? value < range.max : value <= range.max;
+    if (aboveMin && belowMax) return range.result;
+  }
 
-  return result;
+  return "نیاز به بررسی";
 }
 
 export function getPerformanceTextEn(value: number) {
   if (!value && value != 0) return "";
-  let result = "NeedsReview"; // Default result
+  if (!Number.isFinite(value)) return "NeedsReview";
 
-  performance_ranges.forEach((range) => {
-    if (value >= range.min && value <= range.max) {
-      result = range.enText;
-    }
-  });
+  for (const range of performance_ranges) {
+    const aboveMin = range.exclusiveMin ? value > range.min : value >= range.min;
+    const belowMax = range.exclusiveMax ? value < range.max : value <= range.max;
+    if (aboveMin && belowMax) return range.enText;
+  }
 
-  return result;
+  return "NeedsReview";
 }
 export function updateDynamicPermissions(
   staticPermissions: Permission[],

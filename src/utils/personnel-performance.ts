@@ -834,17 +834,19 @@ export function debugTotalPerformanceMismatch(selectedPerson: any) {
   };
 }
 
-export const getPerformanceMetric = (limit) => {
-  // Find the first metric that matches the condition
-  const selectedMetric = Performance_Levels_Gauge.find(
-    (metric) => limit <= metric.limit,
-  );
+/**
+ * Map a % performance value to its goodness band.
+ * [0,70) ضعیف · [70,100] خوب · (100,130] عالی · >130 نیاز به بررسی
+ */
+export const getPerformanceMetric = (value: number) => {
+  const levels = Performance_Levels_Gauge;
+  const fallback = levels[levels.length - 1];
+  if (!Number.isFinite(value)) return fallback;
 
-  // If nothing is found, return the last metric
-  return (
-    selectedMetric ||
-    Performance_Levels_Gauge[Performance_Levels_Gauge.length - 1]
-  );
+  if (value < 70) return levels[0] ?? fallback;
+  if (value <= 100) return levels[1] ?? fallback;
+  if (value <= 130) return levels[2] ?? fallback;
+  return fallback;
 };
 
 export function getMonthNamesFromJOINED_date_strings(
