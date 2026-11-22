@@ -275,6 +275,20 @@ export const INDIRECT_PERFORMANCE_FIELDS = [
   "WithoutScanInDirectCount",
 ] as const;
 
+/**
+ * True when any Indicator-backed count is positive.
+ * SQL SUM returns 0 (not null) for missing activity — treat 0 as "no activity"
+ * so Archive/Visit-only rows can fall back to SQL TotalPerformance instead of
+ * recalculating to 0% (Archive/Visit are not in Indicators yet).
+ */
+export function hasIndicatorPerformanceActivity(
+  item: Record<string, unknown>,
+): boolean {
+  return [...DIRECT_PERFORMANCE_FIELDS, ...INDIRECT_PERFORMANCE_FIELDS].some(
+    (field) => Number(item[field]) > 0,
+  );
+}
+
 function performanceContribution(
   item: Record<string, unknown>,
   field: keyof typeof Indicators,
@@ -627,23 +641,21 @@ export function distinctPersonnelPerformanceData(
         ? workDays
         : item.key.rowCount;
 
-    // Derive performance from visible aggregated counts so UI always matches formula(counts).
-    // City-timeline callers pass only TotalPerformance/COUNT (no activity fields) — fall back
-    // to the pre-aggregated TotalPerformance instead of recalculating to 0.
-    const hasAggregatedActivityFields = [
-      ...DIRECT_PERFORMANCE_FIELDS,
-      ...INDIRECT_PERFORMANCE_FIELDS,
-    ].some((field) => {
-      const value = item[field];
-      return value != null && value !== "";
-    });
-
+    // Prefer Indicator formula when those counts exist so UI matches formula(counts).
+    // Fall back to SQL TotalPerformance when:
+    // - caller only aggregated TotalPerformance/COUNT (city timeline), or
+    // - only Archive/Visit activity exists (not in Indicators yet) — otherwise we
+    //   would overwrite a real SQL % (e.g. 49) with 0.
     const dateLength = divisor > 0 ? divisor : 1;
-    if (!hasAggregatedActivityFields) {
-      const safeDivisor = dateLength > 0 ? dateLength : 1;
+    const safeDivisor = dateLength > 0 ? dateLength : 1;
+    if (!hasIndicatorPerformanceActivity(item)) {
       return {
         ...item,
         ...item.key,
+        DirectPerFormance:
+          (Number(item.DirectPerFormance) || 0) / safeDivisor,
+        InDirectPerFormance:
+          (Number(item.InDirectPerFormance) || 0) / safeDivisor,
         TotalPerformance: (Number(item.TotalPerformance) || 0) / safeDivisor,
       };
     }
@@ -728,6 +740,22 @@ export function sparkChartForPersonnel(
   const dedupedData = dedupePersonnelPerformanceRows(filtered);
 
   return dedupedData.map((item: any) => {
+    // Same Archive/Visit fallback as distinctPersonnelPerformanceData.
+    if (!hasIndicatorPerformanceActivity(item)) {
+      return {
+        TotalPerformance: Number(item.TotalPerformance) || 0,
+        DirectPerFormance: Number(item.DirectPerFormance) || 0,
+        InDirectPerFormance: Number(item.InDirectPerFormance) || 0,
+        Start_Date: item.Start_Date,
+        Benchmark: 75,
+        Benchmark2: 120,
+        ...selectExtraProperty.reduce((acc: any, curr) => {
+          acc[curr] = item[curr];
+          return acc;
+        }, {}),
+      };
+    }
+
     const DirectPerFormance = calculateDirectPerformance(item, 1);
     const InDirectPerFormance = calculateInDirectPerformance(item, 1);
     const TotalPerformance = DirectPerFormance + InDirectPerFormance;

@@ -343,8 +343,10 @@ function PersonnelRailRow({
       title={displayName}
       onClick={() => onSelect(sparkData)}
       className={cn(
-        "group flex w-full items-center rounded-xl border text-right transition-colors",
-        compact ? "justify-center px-1 py-2" : "gap-2 px-2.5 py-2",
+        "group flex w-full rounded-xl border text-right transition-colors",
+        compact
+          ? "items-center justify-center px-1 py-2"
+          : "items-start gap-2 px-2.5 py-2",
         isActive
           ? "border-accent/35 bg-accent/10 text-primary"
           : "border-transparent bg-third/70 text-primary hover:border-border-color/15 hover:bg-third",
@@ -357,7 +359,7 @@ function PersonnelRailRow({
       ) : (
         <>
           <span
-            className="mt-0.5 size-1.5 shrink-0 rounded-full"
+            className="mt-1.5 size-1.5 shrink-0 rounded-full"
             style={{
               backgroundColor:
                 levelColor ?? "rgb(var(--primary) / 0.25)",
@@ -365,14 +367,14 @@ function PersonnelRailRow({
             aria-hidden
           />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-xs font-medium leading-5">
+            <span className="block break-words text-xs font-medium leading-5">
               {displayName}
             </span>
-            <span className="block truncate text-[10px] text-primary/45">
+            <span className="mt-0.5 block break-words text-[10px] leading-4 text-primary/45">
               {user.Role || "—"}
             </span>
           </span>
-          <span className="hidden w-16 shrink-0 sm:block xl:block">
+          <span className="hidden w-16 shrink-0 self-center sm:block xl:block">
             <PerformanceSpark
               className="pointer-events-none h-7 w-16 opacity-80"
               data={sparkData}
@@ -380,7 +382,7 @@ function PersonnelRailRow({
               interactive={false}
             />
           </span>
-          <span className="flex shrink-0 flex-col items-center gap-0.5 text-[11px] tabular-nums text-primary/70">
+          <span className="flex shrink-0 flex-col items-center gap-0.5 self-center text-[11px] tabular-nums text-primary/70">
             <TrendDecider values={userPerformances} />
             {Math.round(user.TotalPerformance || 0)}%
           </span>
