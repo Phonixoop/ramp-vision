@@ -13,6 +13,7 @@ import {
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;
+  PersonnelCode?: string;
   NameFamily?: string;
   Role?: string;
   TotalPerformance?: number;
@@ -72,11 +73,13 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       user.CityName || user.key?.CityName,
       user.RealCityName,
     );
+    const personnelCode = String(user.PersonnelCode ?? "").trim();
     const nationalCode = normalizeNationalCode(
       user.NationalCode ?? user.key?.NationalCode,
     );
-    const nameTitle = nationalCode
-      ? `${displayName} — ${nationalCode}`
+    const codeLine = personnelCode || nationalCode;
+    const nameTitle = codeLine
+      ? `${displayName} — ${codeLine}`
       : displayName;
 
     if (!user?.NationalCode && !user?.key?.NationalCode && !user?.NameFamily) {
@@ -129,12 +132,12 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
               <span className="w-full break-words text-center text-xs leading-tight">
                 {displayName}
               </span>
-              {nationalCode ? (
+              {codeLine ? (
                 <span
                   dir="ltr"
                   className="w-full break-all text-center font-mono text-[10px] leading-tight tabular-nums opacity-80"
                 >
-                  {nationalCode}
+                  {codeLine}
                 </span>
               ) : null}
             </div>
@@ -182,16 +185,16 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                 <span className="truncate text-sm font-medium leading-5">
                   {displayName}
                 </span>
-                {nationalCode ? (
+                {codeLine ? (
                   <span
                     dir="ltr"
                     className="truncate font-mono text-xs leading-4 tabular-nums opacity-80"
                   >
-                    {nationalCode}
+                    {codeLine}
                   </span>
                 ) : (
                   <span className="text-[11px] leading-4 opacity-50">
-                    بدون کد ملی
+                    بدون کد پرسنلی
                   </span>
                 )}
               </div>
@@ -221,6 +224,7 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
   (prev, next) => {
     return (
       prev.user.NationalCode === next.user.NationalCode &&
+      prev.user.PersonnelCode === next.user.PersonnelCode &&
       prev.user.TotalPerformance === next.user.TotalPerformance &&
       prev.user.NameFamily === next.user.NameFamily &&
       prev.user.Role === next.user.Role &&

@@ -103,6 +103,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
             "RoleType",
             "ContractType",
             "ProjectType",
+            "PersonnelCode",
             "TotalPerformance",
             "DirectPerFormance",
             "InDirectPerFormance",
@@ -161,6 +162,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
       if (!selectedPerson) return [] as [string, string][];
       const person = selectedPerson as Record<string, unknown>;
       const detailKeys = [
+        "PersonnelCode",
         "NationalCode",
         "NameFamily",
         "CityName",
@@ -312,7 +314,8 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                   }
 
                   const label = PersonnelPerformanceTranslate[key] ?? key;
-                  const isNationalCode = key === "NationalCode";
+                  const isCodeField =
+                    key === "PersonnelCode" || key === "NationalCode";
 
                   return (
                     <ToolTipSimple
@@ -326,7 +329,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                       <div
                         className={cn(
                           "flex min-w-[150px] cursor-auto flex-col items-center justify-center gap-1 bg-secondary p-2",
-                          isLastItem || index === 0 || isNationalCode
+                          isLastItem || index === 0 || isCodeField
                             ? "md:col-span-2"
                             : "col-span-1",
                         )}
@@ -335,13 +338,13 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                           {label}
                         </span>
                         <span
-                          dir={isNationalCode ? "ltr" : undefined}
+                          dir={isCodeField ? "ltr" : undefined}
                           className={cn(
                             "max-w-[250px] select-text break-words text-center font-bold text-accent",
-                            isNationalCode && "font-mono tabular-nums",
+                            isCodeField && "font-mono tabular-nums",
                           )}
                         >
-                          {isNationalCode
+                          {key === "NationalCode"
                             ? normalizeNationalCode(displayValue) ||
                               displayValue
                             : displayValue}

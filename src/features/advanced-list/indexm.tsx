@@ -87,6 +87,10 @@ export default function AdvancedList({
     return correctList.filter((item) => {
       const selectItem = selectProperty ? item[selectProperty] : item;
       if (selectItem?.toString().toLowerCase().includes(q)) return true;
+      const personnelCode = String(item?.PersonnelCode ?? "")
+        .trim()
+        .toLowerCase();
+      if (personnelCode && personnelCode.includes(q)) return true;
       return (
         nationalCodeMatchesQuery(item?.NationalCode, q) ||
         nationalCodeMatchesQuery(item?.key?.NationalCode, q)

@@ -53,6 +53,7 @@ const META_BADGE_KEYS = [
 ] as const;
 
 const META_CELL_KEYS = [
+  "PersonnelCode",
   "NationalCode",
   "CityName",
   "TownName",
@@ -151,6 +152,7 @@ export function PersonnelDetailsPanel() {
           "RoleType",
           "ContractType",
           "ProjectType",
+          "PersonnelCode",
           "TotalPerformance",
           "DirectPerFormance",
           "InDirectPerFormance",

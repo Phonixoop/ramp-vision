@@ -211,6 +211,7 @@ export const useCityPage = (
         "RoleType",
         "ContractType",
         "ProjectType",
+        "PersonnelCode",
         "TotalPerformance",
         "DirectPerFormance",
         "InDirectPerFormance",

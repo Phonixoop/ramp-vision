@@ -75,7 +75,14 @@ export function PersonnelPanel({ compact = false }: { compact?: boolean }) {
     if (q) {
       next = next.filter((row) => {
         const name = (row.NameFamily ?? "").toString().toLowerCase();
-        return name.includes(q) || nationalCodeMatchesQuery(row.NationalCode, q);
+        const personnelCode = String(row.PersonnelCode ?? "")
+          .trim()
+          .toLowerCase();
+        return (
+          name.includes(q) ||
+          (personnelCode && personnelCode.includes(q)) ||
+          nationalCodeMatchesQuery(row.NationalCode, q)
+        );
       });
     }
     if (sortOrder === "original") return next;
@@ -344,7 +351,8 @@ function PersonnelRailRow({
               {displayName}
             </span>
             <span className="block truncate font-mono text-[10px] tabular-nums text-primary/45">
-              {normalizeNationalCode(user.NationalCode)}
+              {String(user.PersonnelCode ?? "").trim() ||
+                normalizeNationalCode(user.NationalCode)}
             </span>
             <span className="block truncate text-[10px] text-primary/45">
               {user.Role || "—"}

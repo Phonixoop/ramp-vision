@@ -74,6 +74,7 @@ const PERFORMANCE_KEYS = [
   "RoleType",
   "ContractType",
   "ProjectType",
+  "PersonnelCode",
   "TotalPerformance",
   "DirectPerFormance",
   "InDirectPerFormance",

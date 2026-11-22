@@ -20,6 +20,7 @@ import {
 /** Fields sourced from users_info that differ per role row after the SQL join. */
 export const USERS_INFO_FIELDS = [
   "NameFamily",
+  "PersonnelCode",
   "Role",
   "RoleType",
   "ContractType",

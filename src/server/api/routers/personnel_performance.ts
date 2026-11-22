@@ -212,7 +212,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
         console.log({ inputCityName: input.filter.CityName });
         console.log({ filter: filter.CityName });
         let queryStart = `
-        SELECT p.CityName, usr.CityName as RealCityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, p.HasTheDayOff,
+        SELECT p.CityName, usr.CityName as RealCityName, usr.NameFamily, u.NationalCode, u.PersonnelCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, p.HasTheDayOff,
 
         p.TownName,
         p.BranchCode,
@@ -256,7 +256,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           dbName2 = "RAMP_Daily.dbo.users_info";
           whereClause = generateWhereClause(filter);
           whereClause = prefixPersonnelPerformanceWhere(whereClause);
-          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
+          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.PersonnelCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
           p.BranchCode,
           p.BranchName,
           p.BranchType
@@ -272,14 +272,14 @@ export const personnelPerformanceRouter = createTRPCRouter({
 
           whereClause = generateWhereClause(filter);
           whereClause = prefixPersonnelPerformanceWhere(whereClause);
-          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
+          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.PersonnelCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
           p.BranchCode,
           p.BranchName,
           p.BranchType
 
           Order By p.CityName, usr.NameFamily `;
         } else if (input.periodType === "ماهانه") {
-          queryStart = `SELECT p.CityName, usr.CityName as RealCityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, p.HasTheDayOff,
+          queryStart = `SELECT p.CityName, usr.CityName as RealCityName, usr.NameFamily, u.NationalCode, u.PersonnelCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, p.HasTheDayOff,
           p.TownName,
           p.BranchCode,
           p.BranchName,
@@ -341,7 +341,7 @@ export const personnelPerformanceRouter = createTRPCRouter({
           );
           whereClause = prefixPersonnelPerformanceWhere(whereClause);
 
-          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
+          whereClause += ` Group By p.CityName, usr.CityName, usr.NameFamily, u.NationalCode, u.PersonnelCode, u.ProjectType, u.ContractType, u.Role, u.RoleType, u.DateInfo, p.Start_Date, p.HasTheDayOff, p.TownName,
           p.BranchCode,
           p.BranchName,
           p.BranchType

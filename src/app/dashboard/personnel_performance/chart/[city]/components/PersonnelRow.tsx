@@ -132,9 +132,10 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
               dir="ltr"
               className="truncate font-mono text-xs tabular-nums opacity-80"
             >
-              {normalizeNationalCode(
-                user.NationalCode ?? user.key?.NationalCode,
-              )}
+              {String(user.PersonnelCode ?? "").trim() ||
+                normalizeNationalCode(
+                  user.NationalCode ?? user.key?.NationalCode,
+                )}
             </span>
           </div>
         </div>

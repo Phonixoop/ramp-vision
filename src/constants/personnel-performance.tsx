@@ -39,6 +39,7 @@ export const PersonnelPerformanceTranslate = {
   BranchCode: "کد شعبه",
   BranchName: "نام شعبه",
   NationalCode: "کد ملی",
+  PersonnelCode: "کد پرسنلی",
   NameFamily: "نام و نام خانوادگی",
   CityName: "استان",
   Role: "سمت",

@@ -269,6 +269,7 @@ export function PersonnelPerformanceTable({
         "RoleType",
         "ContractType",
         "ProjectType",
+        "PersonnelCode",
         "TotalPerformance",
         "DirectPerFormance",
         "InDirectPerFormance",
