@@ -108,10 +108,7 @@ function PerformanceBars({
           stroke="rgb(var(--accent))"
         />
         <YAxis formatValue={(value) => commify(value)} numTicks={5} />
-        <BarXAxis
-          maxLabels={14}
-          showAllLabels={chartData.length <= 18}
-        />
+        <BarXAxis maxLabels={12} />
         <ChartTooltip
           content={({ point }) => (
             <div className="flex flex-col gap-1 text-sm">

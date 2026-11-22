@@ -40,11 +40,11 @@ const META_CELL_BASE_KEYS = [
   "NationalCode",
   "CityName",
   "TownName",
-  "BranchName",
 ] as const;
 
 const META_CELL_EXTRA_KEYS = [
   "BranchCode",
+  "BranchName",
   "BranchType",
   "DateInfo",
   "Start_Date",

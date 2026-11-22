@@ -341,9 +341,9 @@ export function NumericalMetricsPanel({
           </div>
 
           <div className="overflow-hidden rounded-xl border border-border-color/10">
-            <div className="grid grid-cols-[max-content_4.5rem_4.5rem_1.25rem] gap-2 border-b border-border-color/10 bg-third/40 px-3 py-2 text-[10px] font-medium tracking-wide text-primary/40">
+            <div className="grid w-full grid-cols-[minmax(max-content,1fr)_4.5rem_4.5rem_1.25rem] items-center gap-2 border-b border-border-color/10 bg-third/40 px-3 py-2 text-[10px] font-medium tracking-wide text-primary/40">
               <span>شاخص</span>
-              <span className="text-end">مصرف</span>
+              <span className="text-end">تعداد</span>
               <span className="text-end">عملکرد</span>
               <span />
             </div>
@@ -370,7 +370,7 @@ export function NumericalMetricsPanel({
                         onSelectMetric?.(row.id);
                       }}
                       className={cn(
-                        "grid w-full grid-cols-[max-content_4.5rem_4.5rem_1.25rem] items-center gap-2 px-3 py-2.5 text-start transition-colors",
+                        "grid w-full grid-cols-[minmax(max-content,1fr)_4.5rem_4.5rem_1.25rem] items-center gap-2 px-3 py-2.5 text-start transition-colors",
                         focused || selected
                           ? "bg-primary/8"
                           : "hover:bg-primary/5",

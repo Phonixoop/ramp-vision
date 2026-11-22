@@ -17,6 +17,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { resolveDefaultBrushIndices } from "~/components/charts/filter-data-by-x-domain";
 import { cn } from "~/lib/utils";
 import { coerceAggregateValue } from "~/utils/util";
 
@@ -136,6 +137,8 @@ export default function CustomBarChart({
   customBars = undefined,
   onBarClick = (data, index) => {},
 }: CustomBarChartOptions) {
+  const brushIndices = resolveDefaultBrushIndices(data.length);
+
   return (
     <div dir="ltr" className="h-full w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -226,7 +229,14 @@ export default function CustomBarChart({
           content={<CustomTooltip key={"tooltip"} bars={bars} />}
           labelFormatter={(value, index) => formatter(value)}
         />
-        {brushKey && <Brush dataKey={brushKey} height={30} />}
+        {brushKey && (
+          <Brush
+            dataKey={brushKey}
+            endIndex={brushIndices.endIndex}
+            height={30}
+            startIndex={brushIndices.startIndex}
+          />
+        )}
       </BarChart>
     </ResponsiveContainer>
     </div>

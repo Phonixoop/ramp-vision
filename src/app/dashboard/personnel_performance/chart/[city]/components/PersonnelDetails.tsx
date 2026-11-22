@@ -34,13 +34,13 @@ const PERSON_DETAIL_BASE_KEYS = [
   "Role",
   "ContractType",
   "TownName",
-  "BranchName",
 ] as const;
 
 const PERSON_DETAIL_EXTRA_KEYS = [
   "RoleType",
   "ProjectType",
   "BranchCode",
+  "BranchName",
   "BranchType",
   "DateInfo",
   "Start_Date",

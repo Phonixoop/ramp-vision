@@ -10,7 +10,11 @@ import {
 } from "react";
 import { cn } from "~/lib/utils";
 import type { ChartBrushSelection } from "./chart-brush";
-import { resolveBrushTrackXExtent } from "./filter-data-by-x-domain";
+import {
+  DEFAULT_BRUSH_VISIBLE_POINTS,
+  resolveBrushTrackXExtent,
+  resolveDefaultBrushSelection,
+} from "./filter-data-by-x-domain";
 
 export interface ChartBrushLayoutState {
   xDomain: [Date, Date] | undefined;
@@ -29,6 +33,11 @@ export interface ChartBrushLayoutProps {
   enabled: boolean;
   /** Fixed height of the brush strip in pixels. */
   height: number;
+  /**
+   * Max points in the default brush window so x-axis labels do not overlap.
+   * Defaults to `DEFAULT_BRUSH_VISIBLE_POINTS` (12). Shows the trailing window.
+   */
+  defaultVisibleCount?: number;
   /** When true, the main chart area hugs content instead of growing to fill space. */
   fitMainContent?: boolean;
   className?: string;
@@ -50,6 +59,7 @@ export const ChartBrushLayout = memo(function ChartBrushLayout({
   xExtentMax,
   enabled,
   height,
+  defaultVisibleCount = DEFAULT_BRUSH_VISIBLE_POINTS,
   fitMainContent = false,
   className,
   children,
@@ -63,25 +73,32 @@ export const ChartBrushLayout = memo(function ChartBrushLayout({
   const [brushSelection, setBrushSelection] =
     useState<ChartBrushSelection | null>(null);
 
+  const defaultSelection = useMemo(
+    () =>
+      resolveDefaultBrushSelection(
+        data,
+        xAccessor,
+        fullExtent,
+        defaultVisibleCount
+      ),
+    [data, xAccessor, fullExtent, defaultVisibleCount]
+  );
+
   useEffect(() => {
-    if (!fullExtent) {
-      setBrushSelection(null);
-      return;
-    }
-    setBrushSelection({ start: fullExtent[0], end: fullExtent[1] });
-  }, [fullExtent]);
+    setBrushSelection(defaultSelection);
+  }, [defaultSelection]);
 
   const handleBrushSelectionChange = useCallback(
     (selection: ChartBrushSelection | null) => {
       if (!selection) {
-        if (fullExtent) {
-          setBrushSelection({ start: fullExtent[0], end: fullExtent[1] });
+        if (defaultSelection) {
+          setBrushSelection(defaultSelection);
         }
         return;
       }
       setBrushSelection(selection);
     },
-    [fullExtent]
+    [defaultSelection]
   );
 
   const layoutState = useMemo<ChartBrushLayoutState>(

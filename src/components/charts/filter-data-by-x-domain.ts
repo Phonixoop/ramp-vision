@@ -1,3 +1,49 @@
+/**
+ * Default brush window size so x-axis category/date labels stay readable
+ * without overlapping. Matches `BarXAxis` default `maxLabels`.
+ */
+export const DEFAULT_BRUSH_VISIBLE_POINTS = 12;
+
+/** Inclusive start/end indices for a Recharts-style brush default window. */
+export function resolveDefaultBrushIndices(
+  dataLength: number,
+  maxVisiblePoints: number = DEFAULT_BRUSH_VISIBLE_POINTS
+): { startIndex: number; endIndex: number } {
+  if (dataLength <= 0) {
+    return { startIndex: 0, endIndex: 0 };
+  }
+  const endIndex = dataLength - 1;
+  const startIndex = Math.max(0, dataLength - maxVisiblePoints);
+  return { startIndex, endIndex };
+}
+
+/**
+ * Default brush selection favoring the trailing (most recent) window when
+ * there are more points than can be labeled without overlap.
+ */
+export function resolveDefaultBrushSelection(
+  data: Record<string, unknown>[],
+  xAccessor: (d: Record<string, unknown>) => Date,
+  fullExtent: [Date, Date] | null,
+  maxVisiblePoints: number = DEFAULT_BRUSH_VISIBLE_POINTS
+): { start: Date; end: Date } | null {
+  if (!fullExtent || data.length === 0) {
+    return null;
+  }
+  if (data.length <= maxVisiblePoints) {
+    return { start: fullExtent[0], end: fullExtent[1] };
+  }
+  const { startIndex } = resolveDefaultBrushIndices(
+    data.length,
+    maxVisiblePoints
+  );
+  const startRow = data[startIndex];
+  if (!startRow) {
+    return { start: fullExtent[0], end: fullExtent[1] };
+  }
+  return { start: xAccessor(startRow), end: fullExtent[1] };
+}
+
 export function filterDataByXDomain(
   data: Record<string, unknown>[],
   xDomain: [Date, Date],
