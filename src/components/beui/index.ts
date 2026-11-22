@@ -1,6 +1,26 @@
 export { AnimatedNumber } from "./animated-number";
 export type { AnimatedNumberProps } from "./animated-number";
 
+export {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  breadcrumbMessages,
+} from "./breadcrumb";
+export type {
+  BreadcrumbEllipsisProps,
+  BreadcrumbLinkProps,
+  BreadcrumbListProps,
+  BreadcrumbMessages,
+  BreadcrumbPageProps,
+  BreadcrumbProps,
+  BreadcrumbSeparatorProps,
+} from "./breadcrumb";
+
 export { DigitSwap } from "./digit-swap";
 export type { DigitSwapProps } from "./digit-swap";
 

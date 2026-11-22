@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MapPinnedIcon } from "lucide-react";
-import SegmentedControl from "~/components/arc/segmented-control/segmented-control";
-import { rampArcStyle } from "~/components/arc/ramp-tokens";
 import { Layout, LinearEmptyState } from "~/components/linear-shell";
+import { SwitchControl } from "~/components/shadcn/switch-control";
 import { cn } from "~/lib/utils";
-import { getEnglishToPersianCity } from "~/utils/util";
+import { ChartBreadcrumb } from "./components/chart-breadcrumb";
 import { ChartTopToolbar } from "./components/top-toolbar";
 import { CitiesPanel } from "./components/cities-panel";
 import { CityDetailPane } from "./components/city-detail-pane";
@@ -30,8 +29,12 @@ export function ChartClient() {
     updateFilter,
   } = useChartFilters();
 
-  const detailScrollRef = useRef<HTMLDivElement>(null);
   const [listsCompact, setListsCompact] = useState(false);
+  // Callback-ref node so the scroll listener re-binds when the detail pane mounts
+  // (a plain useRef + [activeCity] effect can miss the element or go stale).
+  const [detailScrollEl, setDetailScrollEl] = useState<HTMLDivElement | null>(
+    null,
+  );
 
   const activeCity = useMemo(() => {
     if (typeof params?.city !== "string") return "";
@@ -44,17 +47,30 @@ export function ChartClient() {
 
   useEffect(() => {
     setListsCompact(false);
-    const el = detailScrollRef.current;
+  }, [activeCity]);
+
+  useEffect(() => {
+    const el = detailScrollEl;
     if (!el || !activeCity) return;
 
     const onScroll = () => {
-      setListsCompact(el.scrollTop > LIST_COMPACT_SCROLL_THRESHOLD);
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      setListsCompact((prev) => {
+        // Shrinking the rails widens the detail pane; content can reflow so
+        // overflow disappears and scrollTop clamps to 0. Stay compact then;
+        // only expand when the pane can scroll and the user is back at top.
+        if (prev) {
+          const canScroll = scrollHeight > clientHeight + 1;
+          return canScroll ? scrollTop > 0 : true;
+        }
+        return scrollTop > LIST_COMPACT_SCROLL_THRESHOLD;
+      });
     };
 
     onScroll();
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
-  }, [activeCity]);
+  }, [detailScrollEl, activeCity]);
 
   const statusText = !canFetch
     ? "در انتظار فیلترهای لازم…"
@@ -72,25 +88,30 @@ export function ChartClient() {
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <Layout.InnerTopBar>
-          <Layout.InnerTopBar.Title>
-            {activeCity
-              ? getEnglishToPersianCity(activeCity)
-              : "انتخاب استان"}
-          </Layout.InnerTopBar.Title>
+          <Layout.InnerTopBar.Leading className="min-w-0 max-w-[min(100%,32rem)] shrink">
+            <ChartBreadcrumb />
+          </Layout.InnerTopBar.Leading>
           <Layout.InnerTopBar.Filters>
-            <div className="flex items-center gap-2" style={rampArcStyle}>
-              <span className="text-[11px] text-primary/55">روز کاری</span>
-              <SegmentedControl
-                value={filters.work_days ? "on" : "off"}
-                onValueChange={(value) =>
-                  updateFilter("work_days", value === "on")
+            <label className="inline-flex h-8 items-center gap-2 rounded-md px-1 text-[11px] text-primary/55">
+              <span className="whitespace-nowrap">روز کاری</span>
+              <SwitchControl
+                checked={!!filters.work_days}
+                onCheckedChange={(checked) =>
+                  updateFilter("work_days", checked)
                 }
-                options={[
-                  { value: "off", label: "خاموش" },
-                  { value: "on", label: "روشن" },
-                ]}
+                disabled={!totalWorkDays}
+                aria-label="محاسبه بر اساس روز کاری"
               />
-            </div>
+              {totalWorkDays ? (
+                <span className="tabular-nums text-primary/45">
+                  ({totalWorkDays})
+                </span>
+              ) : (
+                <span className="hidden text-primary/40 sm:inline">
+                  فقط ماهانه
+                </span>
+              )}
+            </label>
           </Layout.InnerTopBar.Filters>
           <Layout.InnerTopBar.Actions>
             <span className="text-[11px] text-primary/50" aria-live="polite">
@@ -153,7 +174,7 @@ export function ChartClient() {
 
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border-color/10 bg-fourth">
                   <div
-                    ref={detailScrollRef}
+                    ref={setDetailScrollEl}
                     className="min-h-0 flex-1 overflow-y-auto p-3 md:p-4"
                   >
                     <CityDetailPane />

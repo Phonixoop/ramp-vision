@@ -18,6 +18,7 @@ import type { PeriodType } from "~/context/personnel-filter.context";
 import {
   getMonthNamesFromJOINED_date_strings,
   getPersonnelDisplayName,
+  normalizeNationalCode,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
 import {
@@ -35,12 +36,7 @@ const SUMMARY_KEYS = new Set([
 const META_BADGE_BASE_KEYS = ["Role", "ContractType"] as const;
 const META_BADGE_EXTRA_KEYS = ["RoleType", "ProjectType"] as const;
 
-const META_CELL_BASE_KEYS = [
-  "PersonnelCode",
-  "NationalCode",
-  "CityName",
-  "TownName",
-] as const;
+const META_CELL_BASE_KEYS = ["CityName", "TownName"] as const;
 
 const META_CELL_EXTRA_KEYS = [
   "BranchCode",
@@ -187,6 +183,12 @@ export function PersonnelDetailsPanel() {
   const indirect = formatMetricValue(selectedPerson.InDirectPerFormance);
   const periodLabel =
     (selectedPerson as any).periodType || getAllData?.periodType || "بازه";
+  const personnelCode = personField(selectedPerson, "PersonnelCode");
+  const nationalCodeRaw = personField(selectedPerson, "NationalCode");
+  const nationalCode =
+    nationalCodeRaw != null
+      ? normalizeNationalCode(nationalCodeRaw) || String(nationalCodeRaw)
+      : null;
 
   return (
     <div
@@ -201,6 +203,34 @@ export function PersonnelDetailsPanel() {
             <h2 className="truncate text-sm font-semibold tracking-tight text-primary">
               {displayName}
             </h2>
+            {personnelCode != null || nationalCode != null ? (
+              <div
+                className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-primary/50"
+                dir="ltr"
+              >
+                {personnelCode != null ? (
+                  <span
+                    className="font-mono tabular-nums"
+                    title={PersonnelPerformanceTranslate.PersonnelCode}
+                  >
+                    {String(personnelCode)}
+                  </span>
+                ) : null}
+                {personnelCode != null && nationalCode != null ? (
+                  <span className="text-primary/25" aria-hidden>
+                    ·
+                  </span>
+                ) : null}
+                {nationalCode != null ? (
+                  <span
+                    className="font-mono tabular-nums"
+                    title={PersonnelPerformanceTranslate.NationalCode}
+                  >
+                    {nationalCode}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
             {level ? (
               <Badge
                 size="sm"
