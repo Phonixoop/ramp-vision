@@ -367,7 +367,7 @@ export const PersonnelDetails = React.memo<PersonnelDetailsProps>(
                           dir={isCodeField ? "ltr" : undefined}
                           className={cn(
                             "max-w-[250px] select-text break-words text-center font-bold text-accent",
-                            isCodeField && "font-mono tabular-nums",
+                            isCodeField && "font-iransans tabular-nums",
                           )}
                         >
                           {key === "NationalCode"

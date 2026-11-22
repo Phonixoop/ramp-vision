@@ -136,7 +136,7 @@ export const PersonnelFilter = memo(function PersonnelFilter({
                   <MultiSelectItem key={option.code} value={option.code}>
                     <p className="px-2 text-right text-primary hover:text-accent">
                       <span className="block">{option.name}</span>
-                      <span className="block font-mono text-[11px] opacity-70 tabular-nums">
+                      <span className="block font-iransans text-[11px] opacity-70 tabular-nums">
                         {option.code}
                       </span>
                     </p>

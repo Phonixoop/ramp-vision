@@ -181,12 +181,15 @@ export default function CustomBarChart({
 
               {bar.labelClassName && (
                 <LabelList
-                  style={{ pointerEvents: "none" }}
+                  style={{
+                    pointerEvents: "none",
+                    fontFamily: "var(--font-iransans)",
+                  }}
                   formatter={(label) => formatter(label)}
                   dataKey={bar.name}
                   className={cn(
                     bar?.labelClassName ?? "fill-cyan-400 text-sm",
-                    "text-sm",
+                    "font-iransans text-sm",
                   )}
                   position={bar?.position ?? "centerTop"}
                   angle={bar?.angle ?? -90}
@@ -313,9 +316,10 @@ function CustomizedXAxisTick({
         x={customXTick ? 0 : -50}
         y={labelOffsetY}
         dy={0}
-        className={className}
+        className={cn("font-iransans", className)}
         textAnchor={customXTick ? "start" : "end"}
         transform={customXTick ? "rotate(90 0 12)" : ""}
+        style={{ fontFamily: "var(--font-iransans)" }}
       >
         {payload.value}
       </text>
@@ -332,8 +336,9 @@ function CustomizedYAxisTick({ formatter, ...rest }) {
         x={0}
         y={0}
         dy={0}
-        className="fill-primary text-sm"
+        className="fill-primary font-iransans text-sm"
         textAnchor="end"
+        style={{ fontFamily: "var(--font-iransans)" }}
       >
         {formatter ? formatter(payload.value) : payload.value}
       </text>

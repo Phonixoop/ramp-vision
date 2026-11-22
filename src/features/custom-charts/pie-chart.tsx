@@ -78,6 +78,7 @@ const renderActiveShape = (props) => {
         y={ey}
         textAnchor={textAnchor}
         fill={fill}
+        style={{ fontFamily: "var(--font-iransans)" }}
       >{`${commify(value)}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
@@ -85,6 +86,7 @@ const renderActiveShape = (props) => {
         dy={18}
         textAnchor={textAnchor}
         fill={fill}
+        style={{ fontFamily: "var(--font-iransans)" }}
       >
         {`(${(percent * 100).toFixed(2)}%)`}
       </text>

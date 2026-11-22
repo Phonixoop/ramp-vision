@@ -1,10 +1,13 @@
 "use client";
 import { DownloadCloudIcon, FileBarChart2 } from "lucide-react";
-import { CSVLink } from "react-csv";
-import { ColumnDef } from "@tanstack/react-table";
+import * as XLSX from "xlsx";
 import Button from "~/ui/buttons";
-import { getMonthNamesFromJOINED_date_strings } from "~/utils/personnel-performance";
+import {
+  getMonthNamesFromJOINED_date_strings,
+  normalizeNationalCode,
+} from "~/utils/personnel-performance";
 import { CustomColumnDef } from "~/types/table";
+
 interface PersonnelPerformanceExportProps {
   flatRows: any[];
   columns: CustomColumnDef<any, any>[];
@@ -12,6 +15,53 @@ interface PersonnelPerformanceExportProps {
   filters: any;
   toggleDistinctData: "Distincted" | "Pure";
   distincedData: any[];
+}
+
+type ExportHeader = { label: string; key: string };
+
+function downloadXlsx(
+  filename: string,
+  headers: ExportHeader[],
+  rows: Record<string, unknown>[],
+) {
+  const labels = headers.map((h) => h.label);
+  const keys = headers.map((h) => h.key);
+  const nationalCodeCol = keys.indexOf("NationalCode");
+
+  const aoa: (string | number | boolean | null | undefined)[][] = [
+    labels,
+    ...rows.map((row) =>
+      keys.map((key) => {
+        const value = row[key];
+        if (key === "NationalCode") {
+          return normalizeNationalCode(value);
+        }
+        if (value == null) return "";
+        return value as string | number | boolean;
+      }),
+    ),
+  ];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
+
+  // Force national-code cells to Excel text so leading zeros are kept.
+  if (nationalCodeCol >= 0) {
+    const col = XLSX.utils.encode_col(nationalCodeCol);
+    for (let rowIndex = 1; rowIndex < aoa.length; rowIndex++) {
+      const cellRef = `${col}${rowIndex + 1}`;
+      const cell = worksheet[cellRef];
+      if (!cell) continue;
+      const text = normalizeNationalCode(cell.v);
+      cell.t = "s";
+      cell.v = text;
+      cell.w = text;
+      cell.z = "@";
+    }
+  }
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "عملکرد پرسنل");
+  XLSX.writeFile(workbook, filename);
 }
 
 export function PersonnelPerformanceExport({
@@ -55,12 +105,12 @@ export function PersonnelPerformanceExport({
     return "";
   };
 
-  const csvHeaders = columns
+  const exportHeaders: ExportHeader[] = columns
     .map((item) => ({
-      label: item.header,
-      key: item.accessorKey,
+      label: String(item.header ?? ""),
+      key: String(item.accessorKey ?? ""),
     }))
-    .filter((f) => f.key != "Id");
+    .filter((f) => f.key && f.key !== "Id");
 
   const completeData = (
     toggleDistinctData === "Distincted"
@@ -68,13 +118,13 @@ export function PersonnelPerformanceExport({
       : personnelPerformance.result
   ).map((row: any) => ({
     ...row,
+    NationalCode: normalizeNationalCode(row.NationalCode),
     Start_Date: getFormattedStartDate(row),
   }));
 
-  //remove key and rowCount from completeData
-
   const filteredData = flatRows.map((row: any) => ({
     ...row,
+    NationalCode: normalizeNationalCode(row.NationalCode),
     Start_Date: getFormattedStartDate(row),
   }));
 
@@ -82,26 +132,32 @@ export function PersonnelPerformanceExport({
     <div className="flex w-full flex-col items-center justify-center gap-5 rounded-2xl bg-secbuttn p-5 xl:flex-row">
       <FileBarChart2 className="stroke-accent" />
 
-      <Button className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-xs font-semibold text-emerald-900">
+      <Button
+        className="flex justify-center gap-1 rounded-3xl bg-emerald-300 text-xs font-semibold text-emerald-900"
+        onClick={() =>
+          downloadXlsx(
+            "جزئیات عملکرد پرسنل.xlsx",
+            exportHeaders,
+            completeData,
+          )
+        }
+      >
         <DownloadCloudIcon />
-        <CSVLink
-          filename="جزئیات عملکرد پرسنل.csv"
-          headers={csvHeaders}
-          data={completeData}
-        >
-          دانلود دیتای کامل
-        </CSVLink>
+        دانلود دیتای کامل
       </Button>
 
-      <Button className="font-bo font flex justify-center gap-1 rounded-3xl bg-amber-300 text-xs font-semibold text-amber-900">
+      <Button
+        className="font-bo font flex justify-center gap-1 rounded-3xl bg-amber-300 text-xs font-semibold text-amber-900"
+        onClick={() =>
+          downloadXlsx(
+            "جزئیات عملکرد پرسنل (فیلتر شده).xlsx",
+            exportHeaders,
+            filteredData,
+          )
+        }
+      >
         <DownloadCloudIcon />
-        <CSVLink
-          filename="جزئیات عملکرد پرسنل (فیلتر شده).csv"
-          headers={csvHeaders}
-          data={filteredData}
-        >
-          دانلود دیتای فیلتر شده
-        </CSVLink>
+        دانلود دیتای فیلتر شده
       </Button>
     </div>
   );

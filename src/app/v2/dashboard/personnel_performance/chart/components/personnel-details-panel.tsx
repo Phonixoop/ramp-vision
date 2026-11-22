@@ -210,7 +210,7 @@ export function PersonnelDetailsPanel() {
               >
                 {personnelCode != null ? (
                   <span
-                    className="font-mono tabular-nums"
+                    className="font-iransans tabular-nums"
                     title={PersonnelPerformanceTranslate.PersonnelCode}
                   >
                     {String(personnelCode)}
@@ -223,7 +223,7 @@ export function PersonnelDetailsPanel() {
                 ) : null}
                 {nationalCode != null ? (
                   <span
-                    className="font-mono tabular-nums"
+                    className="font-iransans tabular-nums"
                     title={PersonnelPerformanceTranslate.NationalCode}
                   >
                     {nationalCode}

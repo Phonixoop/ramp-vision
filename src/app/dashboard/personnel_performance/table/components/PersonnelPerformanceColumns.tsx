@@ -126,7 +126,7 @@ export function PersonnelPerformanceColumns({
       accessorFn: (row) => normalizeNationalCode(row.NationalCode),
       filterFn: "arrIncludesSome",
       cell: ({ row }) => (
-        <span className="font-mono text-sm tabular-nums">
+        <span className="font-iransans text-sm tabular-nums">
           {normalizeNationalCode(row.original.NationalCode)}
         </span>
       ),

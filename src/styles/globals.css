@@ -236,7 +236,7 @@ input,
 button,
 li,
 div {
-  font-family: "Iransans";
+  font-family: var(--font-iransans), "Iransans", sans-serif;
 }
 
 .rtl {

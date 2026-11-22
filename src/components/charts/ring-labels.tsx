@@ -122,7 +122,12 @@ export const RingLabels = memo(function RingLabels({
   );
 
   return (
-    <g className="font-mono" fontSize={fontSize} pointerEvents="none">
+    <g
+      className="font-iransans"
+      fontSize={fontSize}
+      pointerEvents="none"
+      style={{ fontFamily: "var(--font-iransans)" }}
+    >
       {data.map((ring, index) => {
         const { innerRadius, outerRadius } = getRingRadii(index);
         const { x, y, transform } = layout.position(
