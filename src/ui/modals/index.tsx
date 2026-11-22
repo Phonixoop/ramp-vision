@@ -140,12 +140,10 @@ export default function Modal({
     };
   }, [isOpen, incrementOpenModals, decrementOpenModals]);
 
-  // Add safety check for portal element
   useLayoutEffect(() => {
-    const el = document.querySelector<HTMLElement>("#portal");
-    if (el) {
-      setPortalEl(el);
-    }
+    const el =
+      document.querySelector<HTMLElement>("#portal") ?? document.body;
+    setPortalEl(el);
   }, []);
 
   useKeyPress(() => {
@@ -156,11 +154,10 @@ export default function Modal({
     onClose?.();
   }
 
-  // If closed or portal target not ready, render nothing
-  if (!isOpen || !portalEl) {
-    console.warn("Portal element not found, modal cannot render");
-    return null;
-  }
+  if (!isOpen) return null;
+
+  // Wait one layout pass for the portal host; avoid warning on closed modals.
+  if (!portalEl) return null;
 
   try {
     return ReactDOM.createPortal(
