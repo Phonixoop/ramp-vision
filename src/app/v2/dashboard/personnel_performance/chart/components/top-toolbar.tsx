@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { BookmarkIcon, RotateCcwIcon, SaveIcon } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import {
+  BookmarkIcon,
+  HistoryIcon,
+  RotateCcwIcon,
+  SaveIcon,
+} from "lucide-react";
 import CalendarButton from "~/features/persian-calendar-picker/calendar-button";
 import {
   Layout,
@@ -9,7 +16,7 @@ import {
   ToolbarFilterPopover,
   ToolbarFilterSection,
 } from "~/components/linear-shell";
-import { MultiSelect } from "~/components/arc/multi-select/multi-select";
+import { SelectControlled } from "~/features/checkbox-list";
 import { cn } from "~/lib/utils";
 import { useChartFilters } from "../filters-context";
 import { systemSelectDefaults } from "../model";
@@ -19,7 +26,7 @@ const PANEL_TRIGGER = "w-full";
 const ACTION_BTN =
   "inline-flex h-8 items-center gap-1.5 rounded-md border border-border-color/15 px-2.5 text-xs text-primary/70 transition-colors hover:bg-primary/5 hover:text-primary";
 
-/** Same page size as SelectControlled / SelectColumnFilterOptimized. */
+/** Same page size as v1 FiltersSection / SelectControlled. */
 const DEFAULT_ITEMS_PER_PAGE = 50;
 
 function CompactSelect({
@@ -28,6 +35,7 @@ function CompactSelect({
   onChange,
   placeholder,
   singleSelect = false,
+  withSelectAll = true,
   className,
   loading,
   itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
@@ -37,16 +45,18 @@ function CompactSelect({
   onChange: (values: string[]) => void;
   placeholder: string;
   singleSelect?: boolean;
+  withSelectAll?: boolean;
   className?: string;
   loading?: boolean;
   itemsPerPage?: number;
 }) {
-  const mergedOptions = useMemo(() => {
-    const labels = Array.from(new Set([...values, ...options].filter(Boolean)));
-    return labels.map((label) => ({ value: label, label }));
-  }, [values, options]);
+  // Keep URL/default selections visible even before option lists finish loading.
+  const list = useMemo(
+    () => Array.from(new Set([...values, ...options].filter(Boolean))),
+    [values, options],
+  );
 
-  if (loading && mergedOptions.length === 0) {
+  if (loading && list.length === 0) {
     return (
       <div
         className={cn(
@@ -58,23 +68,21 @@ function CompactSelect({
   }
 
   return (
-    <MultiSelect
-      label={placeholder}
-      hideLabel
-      size="sm"
+    <SelectControlled
+      title={placeholder}
+      list={list}
       value={values}
-      onValueChange={onChange}
-      options={mergedOptions}
-      placeholder={placeholder}
+      onChange={onChange}
+      withSelectAll={withSelectAll && !singleSelect}
       singleSelect={singleSelect}
       itemsPerPage={itemsPerPage}
-      maxVisible={1}
       className={cn(className)}
     />
   );
 }
 
 export function ChartTopToolbar() {
+  const params = useParams<{ city?: string }>();
   const {
     filters,
     calendarPeriod,
@@ -89,6 +97,19 @@ export function ChartTopToolbar() {
     applySavedOrSystemDefaults,
     hasSavedDefaults,
   } = useChartFilters();
+
+  const activeCity = useMemo(() => {
+    if (typeof params?.city !== "string") return "";
+    try {
+      return decodeURIComponent(params.city);
+    } catch {
+      return params.city;
+    }
+  }, [params?.city]);
+
+  const v1Href = activeCity
+    ? `/dashboard/personnel_performance/chart/${encodeURIComponent(activeCity)}`
+    : "/dashboard/personnel_performance/chart";
 
   const overflowActiveCount = [
     filters.role.length > 0,
@@ -229,6 +250,10 @@ export function ChartTopToolbar() {
         ) : null}
       </Layout.TopBar.Filters>
       <Layout.TopBar.Actions>
+        <Link href={v1Href} className={ACTION_BTN}>
+          <HistoryIcon className="size-3.5" />
+          <span className="hidden xl:inline">نسخه قبلی</span>
+        </Link>
         <button
           type="button"
           className={ACTION_BTN}

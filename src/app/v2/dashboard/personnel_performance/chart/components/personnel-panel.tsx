@@ -20,7 +20,6 @@ import { cn } from "~/lib/utils";
 import {
   getPersonnelDisplayName,
   nationalCodeMatchesQuery,
-  normalizeNationalCode,
   sparkChartForPersonnel,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
@@ -368,10 +367,6 @@ function PersonnelRailRow({
           <span className="min-w-0 flex-1">
             <span className="block truncate text-xs font-medium leading-5">
               {displayName}
-            </span>
-            <span className="block truncate font-mono text-[10px] tabular-nums text-primary/45">
-              {String(user.PersonnelCode ?? "").trim() ||
-                normalizeNationalCode(user.NationalCode)}
             </span>
             <span className="block truncate text-[10px] text-primary/45">
               {user.Role || "—"}

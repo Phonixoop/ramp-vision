@@ -178,6 +178,8 @@ type ProcessDataForChartOptions = {
     max?: string[];
     uniqueCountFields?: string[];
     dedupeBy?: string[];
+    /** Identity / metadata fields — keep first non-empty value; never sum (e.g. PersonnelCode). */
+    keepFirst?: string[];
   };
 };
 
@@ -219,6 +221,7 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
   const { rawData, groupBy, values, where, options } = input;
   const uniqueCountFields = options?.uniqueCountFields;
   const dedupeBy = options?.dedupeBy;
+  const keepFirstFields = new Set(options?.keepFirst ?? []);
   const dataToProcess =
     dedupeBy?.length && rawData
       ? dedupeRowsByFields(rawData, dedupeBy)
@@ -291,6 +294,19 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
       }
 
       for (const value of values) {
+        // Codes / metadata (PersonnelCode, Role, …) must not be summed as numbers
+        if (keepFirstFields.has(value)) {
+          const stored = acc[existingGroupIndex][value];
+          if (
+            (stored == null || stored === "") &&
+            current[value] != null &&
+            current[value] !== ""
+          ) {
+            acc[existingGroupIndex][value] = current[value];
+          }
+          continue;
+        }
+
         const currentCoerced = coerceAggregateValue(current[value]);
         const storedCoerced = coerceAggregateValue(
           acc[existingGroupIndex][value],
@@ -359,6 +375,10 @@ export function processDataForChart(input: ProcessDataForChartOptions) {
       }
 
       for (const value of values) {
+        if (keepFirstFields.has(value)) {
+          group[value] = current[value] ?? "";
+          continue;
+        }
         const coerced = coerceAggregateValue(current[value]);
         group[value] =
           coerced ??

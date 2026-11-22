@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { SparklesIcon } from "lucide-react";
 import { usePersonnelChart } from "../hooks/usePersonnelChart";
 import { FiltersSection } from "./FiltersSection";
 import { ChartHeader } from "./ChartHeader";
@@ -9,6 +11,9 @@ import { RightPane } from "./RightPane";
 import { BottomChart } from "./BottomChart";
 import WorkDaysToggle from "~/features/work-days-toggle";
 import { useWorkDaysToggle } from "~/context/work-days-toggle.context";
+
+const VERSION_BTN =
+  "inline-flex h-9 items-center gap-1.5 rounded-md border border-primary/20 bg-secondary px-3 text-xs text-primary transition-colors hover:bg-primary/5";
 
 export const PersonnelPerformanceChart = React.memo<{
   sessionData: any;
@@ -50,11 +55,21 @@ export const PersonnelPerformanceChart = React.memo<{
   //   );
   // }
 
+  const v2Href = activeCity
+    ? `/v2/dashboard/personnel_performance/chart/${encodeURIComponent(activeCity)}`
+    : "/v2/dashboard/personnel_performance/chart";
+
   return (
     <>
-      <h1 className="w-full py-5 text-center text-2xl text-primary underline underline-offset-[12px]">
-        (نمودار) جزئیات عملکرد پرسنل شعب
-      </h1>
+      <div className="flex w-full flex-wrap items-center justify-center gap-3 px-4 py-5">
+        <h1 className="text-center text-2xl text-primary underline underline-offset-[12px]">
+          (نمودار) جزئیات عملکرد پرسنل شعب
+        </h1>
+        <Link href={v2Href} className={VERSION_BTN}>
+          <SparklesIcon className="size-3.5" />
+          نسخه جدید
+        </Link>
+      </div>
 
       <div className="flex min-h-screen w-full flex-col items-center justify-center divide-y-2 divide-secbuttn py-2">
         {/* Filters */}

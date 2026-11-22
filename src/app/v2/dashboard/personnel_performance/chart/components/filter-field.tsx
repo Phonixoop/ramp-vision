@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
+import { SelectControlled } from "~/features/checkbox-list";
 import { cn } from "~/lib/utils";
-import { MultiSelect } from "~/components/arc/multi-select/multi-select";
 
-/** Same page size as SelectControlled / SelectColumnFilterOptimized. */
+/** Same page size as v1 FiltersSection / SelectControlled. */
 const DEFAULT_ITEMS_PER_PAGE = 50;
 
 type FilterFieldProps = {
@@ -33,14 +33,14 @@ export function FilterField({
   itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
 }: FilterFieldProps) {
   // Keep URL/default selections visible even before option lists finish loading.
-  const mergedOptions = useMemo(() => {
-    const labels = Array.from(new Set([...values, ...options].filter(Boolean)));
-    return labels.map((item) => ({ value: item, label: item }));
-  }, [values, options]);
+  const list = useMemo(
+    () => Array.from(new Set([...values, ...options].filter(Boolean))),
+    [values, options],
+  );
 
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5 text-sm", className)}>
-      {loading && mergedOptions.length === 0 ? (
+      {loading && list.length === 0 ? (
         <>
           <span className="text-primary/70">{label}</span>
           <div
@@ -49,18 +49,15 @@ export function FilterField({
           />
         </>
       ) : (
-        <MultiSelect
-          label={label}
+        <SelectControlled
+          title={label || placeholder}
+          list={list}
           value={values}
-          onValueChange={onChange}
-          options={mergedOptions}
-          placeholder={
-            values.length > 0 ? `${values.length} مورد` : placeholder
-          }
+          onChange={onChange}
+          withSelectAll={!singleSelect}
           singleSelect={singleSelect}
-          disabled={disabled}
           itemsPerPage={itemsPerPage}
-          maxVisible={2}
+          className={cn(disabled && "pointer-events-none opacity-50")}
         />
       )}
     </div>

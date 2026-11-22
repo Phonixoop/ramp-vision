@@ -2,36 +2,24 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeftIcon, TrendingUpIcon } from "lucide-react";
-import {
-  AnimatedNumber,
-  DonutChart,
-  DonutChartCenter,
-  DonutChartPlot,
-  type DonutSegment,
-} from "~/components/beui";
+import { AnimatedNumber } from "~/components/beui";
 import { Badge } from "~/components/arc/badge/badge";
+import { RingChart } from "~/components/charts/ring-chart";
+import { RingCenter } from "~/components/charts/ring-center";
+import type { RingData } from "~/components/charts/ring-context";
+import { Ring } from "~/components/charts/ring";
 import {
   Indicators,
   PersonnelPerformanceTranslate,
 } from "~/constants/personnel-performance";
 import { cn } from "~/lib/utils";
+import { getPerformanceMetric } from "~/utils/personnel-performance";
 import { commify } from "~/utils/util";
 
-const SEGMENT_COLORS = [
-  "#8b5cf6",
-  "#3b82f6",
-  "#22d3ee",
-  "#14b8a6",
-  "#f97316",
-  "#ec4899",
-  "#a78bfa",
-  "#38bdf8",
-  "#2dd4bf",
-  "#fb923c",
-  "#f472b6",
-  "#818cf8",
-] as const;
-
+/** Full ring = hitting Indicator ok-max (100%). Values above stay full, color shifts. */
+const TARGET_PERCENT = 100;
+/** Design radii — chart scales to the 50% column; keep hole large enough for % + caption. */
+const RING_BASE_INNER_RADIUS = 72;
 const AT_RISK_RATIO = 0.85;
 
 type MetricStatus = "over" | "at_risk" | null;
@@ -47,10 +35,9 @@ type RowModel = {
   color: string;
   spent: number;
   budget: number | null;
-  left: number | null;
-  contribution: number;
+  /** (spent / Indicator×days) × 100 — replaces former باقی semantics. */
+  performance: number | null;
   status: MetricStatus;
-  segmentValue: number;
 };
 
 function formatMetricValue(value: number) {
@@ -70,7 +57,6 @@ function buildRows(
   dateLength: number,
 ): RowModel[] {
   const safeDays = dateLength > 0 ? dateLength : 1;
-  let colorIndex = 0;
 
   const rows: RowModel[] = [];
   for (const item of items) {
@@ -83,24 +69,21 @@ function buildRows(
         : null;
     const budget =
       indicator != null && indicator > 0 ? indicator * safeDays : null;
-    const left = budget != null ? budget - spent : null;
-    const contribution =
-      budget != null && budget > 0 ? (spent / budget) * 100 : 0;
-    // Prefer contribution weight so different activity types share the ring fairly;
-    // fall back to raw count when no indicator exists.
-    const segmentValue =
-      budget != null && budget > 0 ? Math.max(contribution, 0.01) : spent;
+    const performance =
+      budget != null && budget > 0 ? (spent / budget) * 100 : null;
+    const metricColor =
+      performance != null
+        ? getPerformanceMetric(performance).color
+        : "rgb(var(--primary) / 0.35)";
 
     rows.push({
       id: item.key,
       name: PersonnelPerformanceTranslate[item.key] ?? item.key,
-      color: SEGMENT_COLORS[colorIndex++ % SEGMENT_COLORS.length]!,
+      color: metricColor,
       spent,
       budget,
-      left,
-      contribution,
+      performance,
       status: resolveStatus(spent, budget),
-      segmentValue,
     });
   }
   return rows;
@@ -110,15 +93,15 @@ export type NumericalMetricsPanelProps = {
   items: NumericalMetricItem[];
   /** Period day count used with Indicators for capacity (budget). */
   dateLength?: number;
-  /** Overall performance % for the summary progress bar. */
+  /** Overall performance % for the summary + ring center idle state. */
   totalPerformance?: number | null;
   className?: string;
   onSelectMetric?: (key: string) => void;
 };
 
 /**
- * Cloud Spend–style numerical panel: beUI donut + category list with
- * capacity (Indicators × days), remaining, and Over / At Risk badges.
+ * Numerical metrics panel: bklit RingChart + category list.
+ * Each ring / row shows performance % vs Indicator ok-max (not باقیمانده).
  */
 export function NumericalMetricsPanel({
   items,
@@ -135,37 +118,57 @@ export function NumericalMetricsPanel({
     [items, dateLength],
   );
 
-  const segments: DonutSegment[] = useMemo(
-    () =>
-      rows.map((row) => ({
-        id: row.id,
-        name: row.name,
-        color: row.color,
-        value: row.segmentValue,
-      })),
+  const ringRows = useMemo(
+    () => rows.filter((row) => row.performance != null),
     [rows],
   );
 
+  const ringData = useMemo<RingData[]>(
+    () =>
+      ringRows.map((row) => ({
+        label: row.name,
+        value: Math.min(Math.max(row.performance ?? 0, 0), TARGET_PERCENT),
+        maxValue: TARGET_PERCENT,
+        color: row.color,
+      })),
+    [ringRows],
+  );
+
+  const hoveredIndex = useMemo(() => {
+    if (!activeId) return null;
+    const idx = ringRows.findIndex((row) => row.id === activeId);
+    return idx >= 0 ? idx : null;
+  }, [activeId, ringRows]);
+
   const totals = useMemo(() => {
     const spent = rows.reduce((sum, row) => sum + row.spent, 0);
-    const budget = rows.reduce(
-      (sum, row) => sum + (row.budget ?? 0),
-      0,
-    );
+    const budget = rows.reduce((sum, row) => sum + (row.budget ?? 0), 0);
     const hasBudget = rows.some((row) => row.budget != null);
-    const left = hasBudget ? budget - spent : null;
+    const withPerf = rows.filter((row) => row.performance != null);
+    const avgPerformance =
+      withPerf.length > 0
+        ? withPerf.reduce((sum, row) => sum + (row.performance ?? 0), 0) /
+          withPerf.length
+        : null;
     const usedRatio =
       hasBudget && budget > 0
         ? Math.min(1, spent / budget)
         : totalPerformance != null
           ? Math.min(1, Math.max(0, totalPerformance / 100))
           : 0;
-    return { spent, budget, left, hasBudget, usedRatio };
+    return { spent, budget, hasBudget, usedRatio, avgPerformance };
   }, [rows, totalPerformance]);
 
   const performanceLabel =
     totalPerformance != null && Number.isFinite(totalPerformance)
       ? formatMetricValue(totalPerformance)
+      : totals.avgPerformance != null
+        ? formatMetricValue(totals.avgPerformance)
+        : null;
+
+  const overallMetric =
+    performanceLabel != null
+      ? getPerformanceMetric(Number(performanceLabel))
       : null;
 
   if (rows.length === 0) {
@@ -195,76 +198,88 @@ export function NumericalMetricsPanel({
             شاخص‌های عددی
           </h3>
           <p className="text-[11px] text-primary/45">
-            سهم حلقه بر اساس وزن عملکرد؛ ظرفیت از شاخص استاندارد دوره است
+            حلقه بر اساس عملکرد نسبت به شاخص استاندارد (ok-max) دوره
           </p>
         </div>
         {performanceLabel != null ? (
-          <div className="flex items-center gap-1.5 rounded-lg border border-border-color/10 bg-third px-2.5 py-1 text-[11px] tabular-nums text-primary/70">
-            <TrendingUpIcon className="size-3.5 text-primary/45" />
+          <div
+            className="flex items-center gap-1.5 rounded-lg border border-border-color/10 bg-third px-2.5 py-1 text-[11px] tabular-nums"
+            style={{ color: overallMetric?.color }}
+          >
+            <TrendingUpIcon className="size-3.5 opacity-70" />
             عملکرد کلی {performanceLabel}%
           </div>
         ) : null}
       </header>
 
-      <div className="grid items-start gap-4 p-4 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
-        <DonutChart
-          segments={segments}
-          activeId={activeId}
-          onActiveChange={setActiveId}
-          selectedId={selectedId}
-          onSelect={(id) => {
-            setSelectedId((current) => (current === id ? null : id));
-            onSelectMetric?.(id);
-          }}
-          formatValue={(value) =>
-            `${formatMetricValue(value).toLocaleString("fa-IR")}`
-          }
-          label="توزیع شاخص‌های عددی"
-          labels={{ total: "مجموع", label: "شاخص‌های عددی" }}
-          className="min-w-0"
-        >
-          <DonutChartPlot className="max-w-[14rem]">
-            <DonutChartCenter totalLabel="سهم کل">
-              {(segment, total) => {
-                const row = segment
-                  ? rows.find((r) => r.id === segment.id)
-                  : null;
-                const centerValue = row
-                  ? Math.round(row.contribution || segment.share * 100)
-                  : performanceLabel != null
-                    ? Math.round(Number(performanceLabel))
-                    : Math.round(
-                        totals.usedRatio * 100 ||
-                          (total > 0 ? 100 : 0),
-                      );
-                const caption = row
-                  ? row.name
-                  : totals.hasBudget && totals.left != null
-                    ? `${commify(Math.round(Math.max(0, totals.left)))} باقی‌مانده`
-                    : "استفاده از ظرفیت";
-
-                return (
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-[10px] text-primary/45">
-                      {row ? "مصرف ظرفیت" : "عملکرد"}
-                    </span>
-                    <span className="text-2xl font-semibold tracking-tight tabular-nums text-primary">
-                      <AnimatedNumber
-                        value={centerValue}
-                        startOnView={false}
-                        format={(n) => `${Math.round(n)}%`}
-                        className="text-2xl font-semibold text-primary"
-                      />
-                    </span>
-                    <span className="line-clamp-2 max-w-[9rem] text-[10px] leading-snug text-primary/50">
-                      {caption}
-                    </span>
-                  </div>
+      <div className="grid items-center gap-4 p-4 lg:grid-cols-2">
+        {ringData.length > 0 ? (
+          <div className="mx-auto flex w-full min-w-0 max-w-md flex-col items-center justify-center self-center">
+            <RingChart
+              data={ringData}
+              strokeWidth={ringData.length > 6 ? 6 : 10}
+              ringGap={ringData.length > 6 ? 2 : 4}
+              baseInnerRadius={RING_BASE_INNER_RADIUS}
+              padding={8}
+              hoveredIndex={hoveredIndex}
+              onHoverChange={(index) => {
+                setActiveId(
+                  index == null ? null : (ringRows[index]?.id ?? null),
                 );
               }}
-            </DonutChartCenter>
-          </DonutChartPlot>
-        </DonutChart>
+              className="mx-auto w-full"
+            >
+              {ringData.map((item, index) => (
+                <Ring
+                  key={item.label}
+                  index={index}
+                  showGlow={false}
+                />
+              ))}
+              <RingCenter defaultLabel="عملکرد">
+                {({ isHovered, data }) => {
+                  const row = isHovered
+                    ? ringRows.find((r) => r.name === data.label)
+                    : null;
+                  const rawPct = row
+                    ? (row.performance ?? 0)
+                    : performanceLabel != null
+                      ? Number(performanceLabel)
+                      : 0;
+                  const display = Math.round(rawPct);
+                  const metric = getPerformanceMetric(rawPct);
+                  const caption = row ? row.name : "عملکرد کلی";
+
+                  return (
+                    <div className="flex max-w-full flex-col items-center gap-0.5 px-1">
+                      <span className="text-[clamp(0.5625rem,8cqw,0.625rem)] text-primary/45">
+                        عملکرد
+                      </span>
+                      <span
+                        className="text-[clamp(1.25rem,28cqw,1.75rem)] font-semibold leading-none tracking-tight tabular-nums"
+                        style={{ color: metric.color }}
+                      >
+                        <AnimatedNumber
+                          value={display}
+                          startOnView={false}
+                          format={(n) => `${Math.round(n)}%`}
+                          className="text-[clamp(1.25rem,28cqw,1.75rem)] font-semibold leading-none"
+                        />
+                      </span>
+                      <span className="line-clamp-2 max-w-full text-[clamp(0.5625rem,8cqw,0.625rem)] leading-snug text-primary/50">
+                        {caption}
+                      </span>
+                    </div>
+                  );
+                }}
+              </RingCenter>
+            </RingChart>
+          </div>
+        ) : (
+          <div className="flex min-h-[12rem] items-center justify-center text-xs text-primary/45">
+            شاخص استاندارد برای حلقه موجود نیست
+          </div>
+        )}
 
         <div className="min-w-0 space-y-3">
           <div className="space-y-2 rounded-xl border border-border-color/10 bg-third/50 p-3">
@@ -274,14 +289,8 @@ export function NumericalMetricsPanel({
               </span>
               {performanceLabel != null ? (
                 <span
-                  className={cn(
-                    "inline-flex items-center gap-1 text-[11px] tabular-nums",
-                    Number(performanceLabel) >= 100
-                      ? "text-rose-400"
-                      : Number(performanceLabel) >= 85
-                        ? "text-amber-400"
-                        : "text-emerald-400",
-                  )}
+                  className="inline-flex items-center gap-1 text-[11px] tabular-nums"
+                  style={{ color: overallMetric?.color }}
                 >
                   <TrendingUpIcon className="size-3" />
                   {performanceLabel}%
@@ -306,30 +315,24 @@ export function NumericalMetricsPanel({
             <div className="space-y-1.5">
               <div className="relative h-1.5 overflow-hidden rounded-full bg-primary/10">
                 <div
-                  className="absolute inset-y-0 start-0 rounded-full bg-primary/45"
+                  className="absolute inset-y-0 start-0 rounded-full"
                   style={{
-                    width: `${Math.max(2, totals.usedRatio * 100)}%`,
-                  }}
-                />
-                <div
-                  className="absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-primary shadow"
-                  style={{
-                    insetInlineStart: `calc(${Math.min(100, totals.usedRatio * 100)}% - 4px)`,
+                    width: `${Math.max(2, Math.min(100, Number(performanceLabel) || totals.usedRatio * 100))}%`,
+                    backgroundColor:
+                      overallMetric?.color ?? "rgb(var(--primary) / 0.45)",
                   }}
                 />
               </div>
               <div className="flex items-center justify-between text-[10px] tabular-nums text-primary/45">
                 <span>
-                  {Math.round(totals.usedRatio * 100)}% مصرف
+                  {Math.round(
+                    Number(performanceLabel) || totals.usedRatio * 100,
+                  )}
+                  % عملکرد
                 </span>
-                {totals.left != null ? (
-                  <span
-                    className={cn(
-                      totals.left < 0 && "text-rose-400",
-                    )}
-                  >
-                    {totals.left < 0 ? "−" : ""}
-                    {commify(Math.round(Math.abs(totals.left)))} باقی
+                {performanceLabel != null ? (
+                  <span style={{ color: overallMetric?.color }}>
+                    {formatMetricValue(Number(performanceLabel))}%
                   </span>
                 ) : null}
               </div>
@@ -340,13 +343,17 @@ export function NumericalMetricsPanel({
             <div className="grid grid-cols-[minmax(0,1fr)_4.5rem_4.5rem_1.25rem] gap-2 border-b border-border-color/10 bg-third/40 px-3 py-2 text-[10px] font-medium tracking-wide text-primary/40">
               <span>شاخص</span>
               <span className="text-end">مصرف</span>
-              <span className="text-end">باقی</span>
+              <span className="text-end">عملکرد</span>
               <span />
             </div>
             <ul className="divide-y divide-border-color/10">
               {rows.map((row) => {
                 const focused = activeId === row.id;
                 const selected = selectedId === row.id;
+                const perfDisplay =
+                  row.performance != null
+                    ? formatMetricValue(row.performance)
+                    : null;
                 return (
                   <li key={row.id}>
                     <button
@@ -396,18 +403,15 @@ export function NumericalMetricsPanel({
                         {commify(row.spent)}
                       </span>
                       <span
-                        className={cn(
-                          "text-end text-xs tabular-nums",
-                          row.left != null && row.left < 0
-                            ? "text-rose-400"
-                            : "text-primary/45",
-                        )}
+                        className="text-end text-xs font-semibold tabular-nums"
+                        style={{
+                          color:
+                            perfDisplay != null
+                              ? row.color
+                              : "rgb(var(--primary) / 0.35)",
+                        }}
                       >
-                        {row.left == null
-                          ? "—"
-                          : row.left < 0
-                            ? `−${commify(Math.round(Math.abs(row.left)))}`
-                            : commify(Math.round(row.left))}
+                        {perfDisplay == null ? "—" : `${perfDisplay}%`}
                       </span>
                       <ChevronLeftIcon className="size-3.5 justify-self-end text-primary/30" />
                     </button>
@@ -423,7 +427,7 @@ export function NumericalMetricsPanel({
                 aria-hidden
                 className="h-px w-4 border-t border-dashed border-primary/40"
               />
-              ظرفیت
+              ظرفیت (ok-max)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span

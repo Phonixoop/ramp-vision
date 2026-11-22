@@ -1,7 +1,6 @@
 "use client";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import type { Column } from "@tanstack/react-table";
-import { ListChecksIcon, ListXIcon } from "lucide-react";
 
 import {
   MultiSelect,
@@ -109,7 +108,7 @@ export const PersonnelFilter = memo(function PersonnelFilter({
     <div className="flex w-full flex-col items-center justify-center gap-3 rounded-xl bg-secondary p-2">
       <span className="font-bold text-primary">پرسنل</span>
       <div className="flex w-full max-w-full items-center justify-center gap-2 overflow-hidden px-2 text-center text-primary sm:px-0">
-        <div className="relative flex w-full min-w-0 max-w-[300px] items-center gap-2">
+        <div className="flex w-full min-w-0 max-w-[300px] items-center gap-2">
           <MultiSelect
             values={selectedCodes}
             onValuesChange={(values) => applySelection(values as string[])}
@@ -169,22 +168,6 @@ export const PersonnelFilter = memo(function PersonnelFilter({
               )}
             </MultiSelectContent>
           </MultiSelect>
-          <div className="absolute -top-2 left-2 flex items-center justify-center gap-2">
-            <Button
-              onClick={() => applySelection(options.map((o) => o.code))}
-              className="relative h-6 rounded-full bg-primary px-1 text-secondary"
-              title="انتخاب همه"
-            >
-              <ListChecksIcon className="h-4 w-4 stroke-secondary" />
-            </Button>
-            <Button
-              onClick={() => applySelection([])}
-              className="relative h-6 rounded-full bg-primary px-1 text-secondary"
-              title="حذف انتخاب"
-            >
-              <ListXIcon className="h-4 w-4 stroke-secondary" />
-            </Button>
-          </div>
         </div>
       </div>
     </div>

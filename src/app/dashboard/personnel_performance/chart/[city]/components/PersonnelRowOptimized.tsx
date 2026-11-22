@@ -8,7 +8,6 @@ import { TrendDecider } from "~/features/trend-decider";
 import {
   sparkChartForPersonnel,
   getPersonnelDisplayName,
-  normalizeNationalCode,
 } from "~/utils/personnel-performance";
 
 type PersonRecord = Record<string, any> & {
@@ -73,14 +72,6 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
       user.CityName || user.key?.CityName,
       user.RealCityName,
     );
-    const personnelCode = String(user.PersonnelCode ?? "").trim();
-    const nationalCode = normalizeNationalCode(
-      user.NationalCode ?? user.key?.NationalCode,
-    );
-    const codeLine = personnelCode || nationalCode;
-    const nameTitle = codeLine
-      ? `${displayName} — ${codeLine}`
-      : displayName;
 
     if (!user?.NationalCode && !user?.key?.NationalCode && !user?.NameFamily) {
       return (
@@ -125,21 +116,13 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
               : "bg-secondary hover:scale-[0.98] active:scale-[0.96]",
           )}
           onClick={handleClick}
-          title={nameTitle}
+          title={displayName}
         >
           {compact ? (
             <div className="flex w-full flex-col items-center justify-center gap-0.5 px-1 py-0.5 text-inherit">
               <span className="w-full break-words text-center text-xs leading-tight">
                 {displayName}
               </span>
-              {codeLine ? (
-                <span
-                  dir="ltr"
-                  className="w-full break-all text-center font-mono text-[10px] leading-tight tabular-nums opacity-80"
-                >
-                  {codeLine}
-                </span>
-              ) : null}
             </div>
           ) : (
             <div className="flex w-full flex-row-reverse items-center gap-2 px-2 text-right text-inherit">
@@ -185,18 +168,6 @@ export const PersonnelRowOptimized = React.memo<PersonnelRowOptimizedProps>(
                 <span className="truncate text-sm font-medium leading-5">
                   {displayName}
                 </span>
-                {codeLine ? (
-                  <span
-                    dir="ltr"
-                    className="truncate font-mono text-xs leading-4 tabular-nums opacity-80"
-                  >
-                    {codeLine}
-                  </span>
-                ) : (
-                  <span className="text-[11px] leading-4 opacity-50">
-                    بدون کد پرسنلی
-                  </span>
-                )}
               </div>
             </div>
           )}

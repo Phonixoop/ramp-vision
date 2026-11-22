@@ -74,10 +74,10 @@ export function PerformanceGauge({
       <RingChart
         data={ringData}
         size={GAUGE_SIZE}
-        strokeWidth={14}
+        strokeWidth={12}
         ringGap={0}
-        baseInnerRadius={48}
-        padding={8}
+        baseInnerRadius={54}
+        padding={6}
         className="mx-auto"
       >
         <Ring index={0} showGlow={false} />

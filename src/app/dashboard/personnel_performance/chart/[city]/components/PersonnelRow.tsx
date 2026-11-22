@@ -8,7 +8,6 @@ import { TrendDecider } from "~/features/trend-decider";
 import {
   sparkChartForPersonnel,
   getPersonnelDisplayName,
-  normalizeNationalCode,
 } from "~/utils/personnel-performance";
 import { cn } from "~/lib/utils";
 
@@ -127,15 +126,6 @@ export const PersonnelRow = React.memo<PersonnelRowProps>(
                 user.CityName || user.key?.CityName,
                 user.RealCityName,
               )}
-            </span>
-            <span
-              dir="ltr"
-              className="truncate font-mono text-xs tabular-nums opacity-80"
-            >
-              {String(user.PersonnelCode ?? "").trim() ||
-                normalizeNationalCode(
-                  user.NationalCode ?? user.key?.NationalCode,
-                )}
             </span>
           </div>
         </div>

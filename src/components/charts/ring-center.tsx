@@ -65,9 +65,8 @@ export function RingCenter({
   const displayValue = hoveredData ? hoveredData.value : totalValue;
   const displayLabel = hoveredData ? hoveredData.label : defaultLabel;
 
-  // Calculate center area size based on scaled baseInnerRadius
-  // Leave some padding so text doesn't touch the inner ring
-  const centerSize = baseInnerRadius * 2 - 16;
+  // Diameter from scaled hole; modest inset so % + caption stay clear of the stroke
+  const centerSize = Math.max(0, baseInnerRadius * 2 - 10);
 
   // Custom center always (idle + hover). Idle used to fall through and show
   // `totalValue` (sum of ring values), which is wrong for single progress gauges.
@@ -83,7 +82,7 @@ export function RingCenter({
       <div
         className={cn(
           chartCenterContainerClassName,
-          "flex items-center justify-center",
+          "flex items-center justify-center overflow-hidden text-center",
           className
         )}
         style={{ width: centerSize, height: centerSize }}
@@ -104,7 +103,7 @@ export function RingCenter({
     <div
       className={cn(
         chartCenterContainerClassName,
-        "flex flex-col items-center justify-center text-center",
+        "flex flex-col items-center justify-center overflow-hidden text-center",
         className
       )}
       style={{ width: centerSize, height: centerSize }}

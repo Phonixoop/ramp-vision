@@ -608,6 +608,17 @@ export function distinctPersonnelPerformanceData(
     where,
     options: {
       dedupeBy: [...PERSONNEL_PERFORMANCE_DEDUPE_BY],
+      // PersonnelCode etc. are IDs/metadata — summing numeric codes across days is wrong
+      keepFirst: [
+        ...USERS_INFO_FIELDS,
+        "NationalCode",
+        "Start_Date",
+        "HasTheDayOff",
+        "TownName",
+        "BranchCode",
+        "BranchName",
+        "BranchType",
+      ],
     },
   }).map((item) => {
     // Work-days divisor applies only to period-level aggregation, not single-day views
