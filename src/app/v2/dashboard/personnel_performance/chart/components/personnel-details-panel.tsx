@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
-import dynamic from "next/dynamic";
-import moment from "jalali-moment";
+import React, { useMemo } from "react";
 import { XIcon } from "lucide-react";
 import { Badge } from "~/components/arc/badge/badge";
 import { MetricCard } from "~/components/arc/metric-card/metric-card";
@@ -15,18 +13,11 @@ import {
   performanceLevels,
   type PersonnelPerformanceGroup,
 } from "~/constants/personnel-performance";
-import ToolTipSimple from "~/features/tooltip-simple-use";
 import { ButtonWithModal } from "~/ui/button-with-modal";
-import Button from "~/ui/buttons";
-import { cn, uniqueArray } from "~/lib/utils";
-import { getMonthNumber } from "~/utils/date-utils";
 import type { PeriodType } from "~/context/personnel-filter.context";
 import {
-  distinctPersonnelPerformanceData,
   getMonthNamesFromJOINED_date_strings,
-  getPerformanceMetric,
   getPersonnelDisplayName,
-  isPersonnelWorkingDay,
 } from "~/utils/personnel-performance";
 import { getPerformanceTextEn } from "~/utils/util";
 import {
@@ -34,8 +25,6 @@ import {
   type PersonRecord,
 } from "../city-session-context";
 import { NumericalMetricsPanel } from "./numerical-metrics-panel";
-
-const Calendar = dynamic(() => import("~/features/calendar"), { ssr: false });
 
 const SUMMARY_KEYS = new Set([
   "TotalPerformance",
@@ -106,72 +95,6 @@ export function PersonnelDetailsPanel() {
         result?: any[];
       }
     | undefined;
-
-  const getPersonnelDataForDate = useCallback(
-    (
-      date: string,
-      nationalCode: string,
-      nameFamily: string,
-      role: string,
-      cityName: string,
-    ) => {
-      if (!getAllData?.result) return null;
-
-      return distinctPersonnelPerformanceData(
-        getAllData as {
-          periodType: string;
-          dateLength: {};
-          result: any[];
-        },
-        ["NationalCode", "NameFamily", "CityName"],
-        [
-          "TownName",
-          "BranchCode",
-          "BranchName",
-          "BranchType",
-          "SabtAvalieAsnad",
-          "PazireshVaSabtAvalieAsnad",
-          "ArzyabiAsanadBimarsetaniDirect",
-          "ArzyabiAsnadBimarestaniIndirect",
-          "ArzyabiAsnadDandanVaParaDirect",
-          "ArzyabiAsnadDandanVaParaIndirect",
-          "ArzyabiAsnadDandanDirect",
-          "ArzyabiAsnadDandanIndirect",
-          "ArzyabiAsnadDaroDirect",
-          "ArzyabiAsnadDaroIndirect",
-          "WithScanCount",
-          "WithoutScanCount",
-          "WithoutScanInDirectCount",
-          "ArchiveDirectCount",
-          "ArchiveInDirectCount",
-          "ArzyabiVisitDirectCount",
-          "ArzyabiVisitInDirectCount",
-          "Role",
-          "RoleType",
-          "ContractType",
-          "ProjectType",
-          "PersonnelCode",
-          "TotalPerformance",
-          "DirectPerFormance",
-          "InDirectPerFormance",
-          "Start_Date",
-          "HasTheDayOff",
-        ],
-        {
-          HasTheDayOff: false,
-          Start_Date: date,
-        },
-      ).find(
-        (a: any) =>
-          a.key.NationalCode +
-            a.key.NameFamily +
-            a.Role +
-            a.key.CityName ===
-          nationalCode + nameFamily + role + cityName,
-      );
-    },
-    [getAllData],
-  );
 
   const numericItemsMap = useMemo(() => {
     if (!selectedPerson) return new Map<string, number | null>();
@@ -380,7 +303,7 @@ export function PersonnelDetailsPanel() {
         </div>
       </section>
 
-      {/* Meta / calendar */}
+      {/* Meta */}
       <aside className="flex min-w-0 flex-col gap-3">
         <section className="space-y-2">
           <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
@@ -412,136 +335,6 @@ export function PersonnelDetailsPanel() {
             })}
           </div>
           <RolesByBranchModal selectedPerson={selectedPerson} />
-        </section>
-
-        <section className="space-y-2">
-          <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
-            تقویم عملکرد
-          </h3>
-          <div className="relative overflow-hidden rounded-2xl border border-border-color/10 bg-fourth p-2">
-            {sparkData && sparkData.length > 0 ? (
-              <Calendar
-                withMonthMenu
-                collapsedUi
-                listOfDates={uniqueArray(
-                  sparkData.map((a: any) =>
-                    moment(a.Start_Date, "jYYYY/jMM/jDD")
-                      .format("jYYYY/jMM")
-                      .slice(0, 7),
-                  ),
-                ).map((a) => moment(a, "jYYYY/jMM "))}
-                year={Number.parseInt(sparkData[0].Start_Date.split("/")[0])}
-                defaultMonth={getMonthNumber(sparkData[0].Start_Date)}
-                onDate={(date, monthNumber) => {
-                  const dateString = date.format("jYYYY/jMM/jDD");
-                  const userCalData = sparkData.find(
-                    (d: any) => d.Start_Date === dateString,
-                  );
-                  const userMetric = getPerformanceMetric(
-                    userCalData?.TotalPerformance,
-                  );
-                  const selectedCityName = String(
-                    selectedPerson.CityName ||
-                      selectedPerson.key?.CityName ||
-                      "",
-                  );
-                  const dayOffRow = getAllData?.result?.find(
-                    (a: any) =>
-                      a.Start_Date === dateString &&
-                      String(a.NationalCode) ===
-                        String(selectedPerson.key?.NationalCode) &&
-                      String(a.CityName || "") === selectedCityName,
-                  );
-                  const hasTheDayOff =
-                    dayOffRow != null &&
-                    !isPersonnelWorkingDay(dayOffRow.HasTheDayOff);
-
-                  const handleDateClick = () => {
-                    const personnelDataForDate = getPersonnelDataForDate(
-                      dateString,
-                      selectedPerson.key?.NationalCode,
-                      selectedPerson.key?.NameFamily,
-                      selectedPerson.Role ?? "",
-                      selectedCityName,
-                    );
-                    if (personnelDataForDate) {
-                      setSelectedPerson({
-                        ...selectedPerson,
-                        ...personnelDataForDate,
-                        Start_Date: dateString,
-                        periodType: "روزانه",
-                      });
-                    }
-                  };
-
-                  return Number.parseInt(date.format("M")) !==
-                    monthNumber + 1 ? (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <span
-                        className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-primary/50"
-                        style={{
-                          backgroundColor: userCalData
-                            ? userMetric.color
-                            : undefined,
-                        }}
-                      >
-                        {date.format("D")}
-                      </span>
-                    </div>
-                  ) : (
-                    <ToolTipSimple
-                      className={cn(
-                        !hasTheDayOff &&
-                          !userCalData?.TotalPerformance &&
-                          "hidden",
-                      )}
-                      tooltip={
-                        <span
-                          style={{
-                            color: userCalData
-                              ? userMetric.color
-                              : undefined,
-                          }}
-                          className="text-base text-primary"
-                        >
-                          {hasTheDayOff
-                            ? "مرخصی"
-                            : userCalData?.TotalPerformance?.toFixed(2)}
-                        </span>
-                      }
-                    >
-                      <Button
-                        className={cn(
-                          "flex w-max cursor-pointer items-center justify-center rounded-xl p-2 hover:opacity-80",
-                          hasTheDayOff === true
-                            ? "bg-primary text-secondary"
-                            : "bg-primary-muted/10 text-primary-muted",
-                          dateString === selectedPerson.Start_Date &&
-                            selectedPerson.periodType === "روزانه"
-                            ? "rounded-full ring-2 ring-primary"
-                            : "",
-                        )}
-                        style={{
-                          backgroundColor: userCalData
-                            ? userMetric.color
-                            : undefined,
-                        }}
-                        onClick={handleDateClick}
-                      >
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs text-black">
-                          {date.format("D")}
-                        </span>
-                      </Button>
-                    </ToolTipSimple>
-                  );
-                }}
-              />
-            ) : (
-              <div className="py-6 text-center text-xs text-primary/45">
-                بدون داده تقویم
-              </div>
-            )}
-          </div>
         </section>
       </aside>
     </div>

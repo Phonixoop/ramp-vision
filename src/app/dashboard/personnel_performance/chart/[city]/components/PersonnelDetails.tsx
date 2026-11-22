@@ -26,7 +26,13 @@ import { getMonthNumber } from "~/utils/date-utils";
 import { commify } from "~/utils/util";
 
 const Calendar = dynamic(() => import("~/features/calendar"), { ssr: false });
-const DefaultGauge = dynamic(() => import("~/features/gauge"), { ssr: false });
+const DefaultGauge = dynamic(
+  () =>
+    import("~/components/bklit/performance-gauge").then((mod) => ({
+      default: mod.PerformanceGauge,
+    })),
+  { ssr: false },
+);
 
 type PersonRecord = Record<string, any> & {
   NationalCode?: string;

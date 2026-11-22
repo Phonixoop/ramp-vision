@@ -8,9 +8,9 @@ import {
   ArrowDownAZIcon,
   ArrowUpAZIcon,
 } from "lucide-react";
-import SegmentedControl from "~/components/arc/segmented-control/segmented-control";
 import { MultiSelect } from "~/components/arc/multi-select/multi-select";
 import { rampArcStyle } from "~/components/arc/ramp-tokens";
+import { Tabs, TabsList, TabsTrigger } from "~/components/beui";
 import { PerformanceSpark } from "~/components/bklit";
 import { LinearEmptyState } from "~/components/linear-shell";
 import { TEHRAN_SUB_CITIES } from "~/constants";
@@ -194,13 +194,32 @@ export function PersonnelPanel({ compact = false }: { compact?: boolean }) {
                 }
               />
             ) : null}
-            <SegmentedControl
-              label="سطح عملکرد"
-              fullWidth
+            <Tabs
               value={levelFilter}
               onValueChange={(value) => setLevelFilter(value as Rating)}
-              options={levelOptions}
-            />
+              variant="segment"
+              className="w-full"
+              labels={{
+                scrollLeft: "اسکرول به چپ",
+                scrollRight: "اسکرول به راست",
+              }}
+            >
+              <TabsList
+                aria-label="سطح عملکرد"
+                className="!w-full bg-third [&>div]:!flex-1 [&>div]:!basis-0 [&>div]:!min-w-0"
+              >
+                {levelOptions.map((option) => (
+                  <TabsTrigger
+                    key={option.value}
+                    value={option.value}
+                    className="w-full px-1.5 py-1.5 text-[11px]"
+                    indicatorClassName="bg-primary"
+                  >
+                    {option.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
           </div>
         </div>
       ) : (

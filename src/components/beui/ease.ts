@@ -9,6 +9,14 @@ export const EASE_DRAWER = [0.32, 0.72, 0, 1] as const;
 /** CSS string form of EASE_OUT for inline style transitions. */
 export const EASE_OUT_CSS = "cubic-bezier(0.16, 1, 0.3, 1)";
 
+/** Content swaps — label/icon slots trading places inside a control. */
+export const SPRING_SWAP = {
+  type: "spring",
+  stiffness: 460,
+  damping: 30,
+  mass: 0.55,
+} as const;
+
 /** Shared-layout glides — pills, indicators and panels morphing between positions. */
 export const SPRING_LAYOUT = {
   type: "spring",

@@ -1,20 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import {
-  DonutChart,
-  DonutChartCenter,
-  DonutChartPlot,
-  type DonutSegment,
-} from "~/components/beui/donut-chart";
+import { useMemo } from "react";
 import { AnimatedNumber } from "~/components/beui";
+import { RingChart } from "~/components/charts/ring-chart";
+import { RingCenter } from "~/components/charts/ring-center";
+import type { RingData } from "~/components/charts/ring-context";
+import { Ring } from "~/components/charts/ring";
 import { performanceLevels } from "~/constants/personnel-performance";
 import { getPerformanceMetric } from "~/utils/personnel-performance";
 import { cn } from "~/lib/utils";
 
 /** Full ring = hitting ok-max (100%). Values above 100% stay full and change color. */
 const TARGET_PERCENT = 100;
-const TRACK_ID = "track";
+const GAUGE_SIZE = 144;
 
 type PerformanceGaugeProps = {
   value?: number | null;
@@ -23,9 +21,9 @@ type PerformanceGaugeProps = {
 };
 
 /**
- * Partial progress ring for personnel % performance.
- * Background muted track only — no labeled باقیمانده segment.
- * Center always shows the performance % in its goodness color.
+ * Single progress ring for personnel % performance (bklit RingChart).
+ * Arc fill = min(performance, 100) / maxValue 100; color from goodness band.
+ * Center always shows the real performance % — no باقیمانده series.
  */
 export function PerformanceGauge({
   value,
@@ -43,41 +41,21 @@ export function PerformanceGauge({
     [numeric],
   );
 
-  const segments = useMemo<DonutSegment[]>(() => {
+  const ringData = useMemo<RingData[]>(() => {
     if (numeric == null || !metric) return [];
 
-    // Arc length caps at 100%; >100% keeps a full ring in excellent/review color.
-    const fill = Math.min(numeric, TARGET_PERCENT);
-    const track = Math.max(0, TARGET_PERCENT - fill);
-    const next: DonutSegment[] = [];
-
-    if (fill > 0) {
-      next.push({
-        id: "performance",
-        name: metric.tooltip?.text ?? "عملکرد",
-        value: fill,
+    return [
+      {
+        label: label ?? metric.tooltip?.text ?? "عملکرد",
+        // Cap arc at ok-max; >100% keeps a full ring in excellent/review color.
+        value: Math.min(numeric, TARGET_PERCENT),
+        maxValue: TARGET_PERCENT,
         color: metric.color,
-      });
-    }
+      },
+    ];
+  }, [label, metric, numeric]);
 
-    // Unlabeled muted remainder so buildDonut can draw a partial arc.
-    // Never expose as باقیمانده in UI / hover / legend.
-    if (track > 0) {
-      next.push({
-        id: TRACK_ID,
-        name: "",
-        value: track,
-        color: "transparent",
-      });
-    }
-
-    return next;
-  }, [metric, numeric]);
-
-  // Ignore hover on the transparent track so center never flips to remainder.
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  if (numeric == null || !metric || segments.length === 0) {
+  if (numeric == null || !metric || ringData.length === 0) {
     return null;
   }
 
@@ -93,38 +71,33 @@ export function PerformanceGauge({
         className,
       )}
     >
-      <DonutChart
-        segments={segments}
-        thickness={14}
-        gap={0}
-        activeId={activeId}
-        onActiveChange={(id) => {
-          setActiveId(id === TRACK_ID ? null : id);
-        }}
-        label={label ?? "عملکرد"}
-        labels={{ total: label ?? "عملکرد", label: label ?? "عملکرد" }}
-        formatValue={(v) => `${Math.round(v)}%`}
-        className="mx-auto w-full min-w-0 max-w-[9rem]"
+      <RingChart
+        data={ringData}
+        size={GAUGE_SIZE}
+        strokeWidth={14}
+        ringGap={0}
+        baseInnerRadius={48}
+        padding={8}
+        className="mx-auto"
       >
-        <DonutChartPlot className="max-w-[9rem]">
-          <DonutChartCenter totalLabel={label}>
-            {() => (
-              <div className="flex items-center justify-center leading-none">
-                <span
-                  className="text-base font-semibold tabular-nums sm:text-lg"
-                  style={{ color: metric.color }}
-                >
-                  <AnimatedNumber
-                    value={display}
-                    format={(n) => `${Math.round(n)}%`}
-                    duration={0.6}
-                  />
-                </span>
-              </div>
-            )}
-          </DonutChartCenter>
-        </DonutChartPlot>
-      </DonutChart>
+        <Ring index={0} showGlow={false} />
+        <RingCenter defaultLabel={label ?? "عملکرد"}>
+          {() => (
+            <div className="flex items-center justify-center leading-none">
+              <span
+                className="text-base font-semibold tabular-nums sm:text-lg"
+                style={{ color: metric.color }}
+              >
+                <AnimatedNumber
+                  value={display}
+                  format={(n) => `${Math.round(n)}%`}
+                  duration={0.6}
+                />
+              </span>
+            </div>
+          )}
+        </RingCenter>
+      </RingChart>
       {label ? (
         <span className="text-[11px] text-primary/55">{label}</span>
       ) : null}
