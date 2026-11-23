@@ -21,7 +21,7 @@ ARG NODE_VERSION=24
 # -----------------------------------------------------------------------------
 # base
 # -----------------------------------------------------------------------------
-FROM node:${NODE_VERSION}-bookworm-slim AS base
+FROM hub.megan.ir/node:${NODE_VERSION}-bookworm-slim AS base
 
 # openssl   -> Prisma engine/platform detection (libssl3)
 # ca-certs  -> outbound TLS (NextAuth, API calls)
