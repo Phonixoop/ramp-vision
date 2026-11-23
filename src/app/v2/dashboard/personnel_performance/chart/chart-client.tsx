@@ -25,11 +25,30 @@ export function ChartClient() {
   const {
     filters,
     totalWorkDays,
+    workDaysSupported,
+    isWorkDaysFetching,
     useWorkDays,
     canFetch,
     isCitiesLoading,
     updateFilter,
   } = useChartFilters();
+
+  /*
+   * The switch's *availability* and its *value* are different things.
+   *
+   * `totalWorkDays` is fetched data, so it is `null` while the count request is
+   * in flight, whenever that request is disabled, and it can legitimately be
+   * `0` for months with no configured work days. Using it as `disabled` meant
+   * the switch became disabled on every refetch — and because the user had just
+   * turned it ON, that locked them ON with no way back off until the request
+   * settled.
+   *
+   * Availability now comes from the filters alone (the divisor only applies to
+   * monthly, parsed-date ranges). `&& !filters.work_days` guarantees an
+   * already-ON switch stays clickable even if the filters later become
+   * non-monthly (e.g. shared URL), so it can always be turned off.
+   */
+  const workDaysToggleDisabled = !workDaysSupported && !filters.work_days;
 
   // Scroll-shrink: keep panels expanded. Restore listsCompact + detailScrollEl + effects below to re-enable.
   const listsCompact = false;
@@ -104,12 +123,32 @@ export function ChartClient() {
                 onCheckedChange={(checked) =>
                   updateFilter("work_days", checked)
                 }
-                disabled={!totalWorkDays}
+                disabled={workDaysToggleDisabled}
                 aria-label="محاسبه بر اساس روز کاری"
               />
               {totalWorkDays ? (
                 <span className="tabular-nums text-primary/45">
                   ({totalWorkDays})
+                </span>
+              ) : workDaysSupported && isWorkDaysFetching ? (
+                // Monthly and the count is in flight: show a placeholder
+                // instead of claiming the option is unavailable.
+                <span
+                  className="tabular-nums text-primary/30"
+                  aria-hidden
+                  title="در حال محاسبه روزهای کاری"
+                >
+                  (…)
+                </span>
+              ) : workDaysSupported ? (
+                // Monthly and settled, but no count available (nothing configured
+                // for these months, or the request failed). "—" rather than "0":
+                // unavailable is not the same as zero.
+                <span
+                  className="hidden text-primary/35 sm:inline"
+                  title="برای این ماه روز کاری ثبت نشده است"
+                >
+                  (—)
                 </span>
               ) : (
                 <span className="hidden text-primary/40 sm:inline">

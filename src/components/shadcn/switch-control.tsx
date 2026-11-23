@@ -24,10 +24,25 @@ export const SwitchControl = React.forwardRef<
       )}
       {...props}
     >
+      {/*
+        Direction-aware thumb travel.
+
+        `translate-x-4` is a *physical* offset: under `dir="rtl"` it moves the
+        thumb left, i.e. out of the `w-9` track (and `-translate-x-4` would be
+        needed). A logical offset has no such failure mode — `margin-inline-start`
+        resolves against the thumb's computed direction, so it pushes toward the
+        track's inline end in both LTR and RTL.
+
+        The distance is exact: track `w-9` (36px) minus `border-2` on both sides
+        leaves a 32px content box; the `size-4` (16px) thumb can therefore travel
+        32 - 16 = 16px = `ms-4`, keeping it flush inside the rounded track.
+        `transition-[margin-inline-start]` keeps the slide smooth both ways.
+      */}
       <SwitchPrimitives.Thumb
         className={cn(
-          "pointer-events-none block size-4 rounded-full bg-primary shadow-sm ring-0 transition-transform",
-          "data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0",
+          "pointer-events-none block size-4 rounded-full bg-primary shadow-sm ring-0",
+          "transition-[margin-inline-start] duration-200 ease-out",
+          "data-[state=checked]:ms-4 data-[state=unchecked]:ms-0",
         )}
       />
     </SwitchPrimitives.Root>

@@ -343,7 +343,7 @@ function PersonnelRailRow({
       title={displayName}
       onClick={() => onSelect(sparkData)}
       className={cn(
-        "group flex w-full rounded-xl border text-right transition-colors",
+        "group flex w-full rounded-xl border text-start transition-colors",
         compact
           ? "items-center justify-center px-1 py-2"
           : "items-start gap-2 px-2.5 py-2",
@@ -362,7 +362,7 @@ function PersonnelRailRow({
             className="mt-1.5 size-1.5 shrink-0 rounded-full"
             style={{
               backgroundColor:
-                levelColor ?? "rgb(var(--primary) / 0.25)",
+                levelColor ?? "rgba(var(--primary), 0.25)",
             }}
             aria-hidden
           />
@@ -370,7 +370,7 @@ function PersonnelRailRow({
             <span className="block break-words text-xs font-medium leading-5">
               {displayName}
             </span>
-            <span className="mt-0.5 block break-words text-[10px] leading-4 text-primary/45">
+            <span className="mt-0.5 block break-words text-[11px] leading-4 text-primary/70">
               {user.Role || "—"}
             </span>
           </span>

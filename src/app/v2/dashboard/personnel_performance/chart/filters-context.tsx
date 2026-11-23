@@ -45,6 +45,20 @@ type FiltersContextValue = {
   calendarPeriod: CalendarPeriod;
   useWorkDays: boolean;
   totalWorkDays: number | null;
+  /**
+   * Whether the work-days divisor can apply *at all* for the current filters.
+   *
+   * Deliberately derived from the filters only (monthly period + parsed months),
+   * never from query state: `totalWorkDays` is `null` while the count request is
+   * in flight, has errored, or is disabled, and using that as an availability
+   * signal disabled the toggle (and trapped it ON) during every refetch.
+   */
+  workDaysSupported: boolean;
+  /**
+   * True while the work-days count is in flight. Used only to pick a label
+   * ("…" vs "unconfigured"), never to gate the toggle.
+   */
+  isWorkDaysFetching: boolean;
   optionLists: {
     projectTypes: string[];
     roles: string[];
@@ -325,12 +339,24 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
     return months;
   }, [params.period, params.dates]);
 
+  /**
+   * Filter-derived availability of the work-days divisor — the thing the toggle
+   * must be gated on. `params.period === "ماهانه"` with at least one parsed date
+   * is the whole condition; the fetched count is *data*, not permission.
+   */
+  const workDaysSupported = monthsArray.length > 0;
+
   const workDaysQuery = api.monthWorkDays.getTotalWorkDays.useQuery(
     { months: monthsArray },
     {
       enabled: monthsArray.length > 0,
       staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
+      // Keep the last count visible while the request is in flight. Without it a
+      // refetch (or a change of the query key) drops `data` to `undefined`, the
+      // divisor collapses to the raw row count, and every percentage on the page
+      // jumps for a frame.
+      placeholderData: keepPreviousData,
     },
   );
 
@@ -439,6 +465,8 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
       calendarPeriod: periodToCalendar(params.period),
       useWorkDays: params.work_days,
       totalWorkDays: workDaysQuery.data?.totalWorkDays ?? null,
+      workDaysSupported,
+      isWorkDaysFetching: workDaysQuery.isFetching,
       optionLists,
       isOptionsLoading: optionsQuery.isLoading && !optionsQuery.data,
       isCitiesLoading:
@@ -461,7 +489,9 @@ export function ChartFiltersProvider({ children }: { children: ReactNode }) {
       params,
       apiFilters,
       canFetch,
+      workDaysSupported,
       workDaysQuery.data?.totalWorkDays,
+      workDaysQuery.isFetching,
       optionLists,
       optionsQuery.isLoading,
       optionsQuery.data,

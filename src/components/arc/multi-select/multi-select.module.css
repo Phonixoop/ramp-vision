@@ -69,14 +69,14 @@
 
 @media (hover: hover) and (pointer: fine) {
   .trigger:hover:not(:disabled) {
-    border-color: rgb(var(--border-color) / 0.4);
+    border-color: rgba(var(--border-color), 0.4);
     background: var(--surface-muted);
   }
 }
 
 .trigger:active:not(:disabled),
 .trigger[aria-expanded="true"] {
-  border-color: rgb(var(--border-color) / 0.4);
+  border-color: rgba(var(--border-color), 0.4);
   background: var(--surface-muted);
 }
 

@@ -13,7 +13,7 @@ interface BottomChartProps {
 export const BottomChart = React.memo<BottomChartProps>(
   ({ filters, activeCity, useWorkDays }) => {
     return (
-      <div className="w-full">
+      <div className="flex min-h-[420px] w-full flex-col p-3">
         <CityPerformanceWithUsersChart
           chartEngine="bklit"
           cityName_En={activeCity}

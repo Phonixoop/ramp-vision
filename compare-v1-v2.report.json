@@ -1,0 +1,34 @@
+[
+  {
+    "case": "day / single city",
+    "v1Ms": 618,
+    "v2Ms": 1112,
+    "worstDelta": 0,
+    "problems": 0,
+    "speedup": 0.6
+  },
+  {
+    "case": "day / multi city",
+    "v1Ms": 605,
+    "v2Ms": 1163,
+    "worstDelta": 0,
+    "problems": 0,
+    "speedup": 0.5
+  },
+  {
+    "case": "week / multi city",
+    "v1Ms": 1029,
+    "v2Ms": 1115,
+    "worstDelta": 0,
+    "problems": 0,
+    "speedup": 0.9
+  },
+  {
+    "case": "month / multi city (the v1 blocker)",
+    "v1Ms": 1129,
+    "v2Ms": 1459,
+    "worstDelta": 0,
+    "problems": 0,
+    "speedup": 0.8
+  }
+]

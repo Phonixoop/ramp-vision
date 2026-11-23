@@ -3,10 +3,8 @@
 import React, { useMemo, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
 import { Badge } from "~/components/arc/badge/badge";
-import { MetricCard } from "~/components/arc/metric-card/metric-card";
 import { rampArcStyle } from "~/components/arc/ramp-tokens";
-import { PerformanceGauge, PerformanceSpark } from "~/components/bklit";
-import PerformanceBadgesLazy from "~/components/main/performance-badges";
+import { PerformanceSpark } from "~/components/bklit";
 import {
   PersonnelPerformanceGroups,
   PersonnelPerformanceTranslate,
@@ -26,6 +24,7 @@ import {
   type PersonRecord,
 } from "../city-session-context";
 import { NumericalMetricsPanel } from "./numerical-metrics-panel";
+import { PersonMetricsCard } from "./person-metrics-card";
 
 const SUMMARY_KEYS = new Set([
   "TotalPerformance",
@@ -178,9 +177,6 @@ export function PersonnelDetailsPanel() {
     return null;
   }
 
-  const total = formatMetricValue(selectedPerson.TotalPerformance);
-  const direct = formatMetricValue(selectedPerson.DirectPerFormance);
-  const indirect = formatMetricValue(selectedPerson.InDirectPerFormance);
   const periodLabel =
     (selectedPerson as any).periodType || getAllData?.periodType || "بازه";
   const personnelCode = personField(selectedPerson, "PersonnelCode");
@@ -205,7 +201,7 @@ export function PersonnelDetailsPanel() {
             </h2>
             {personnelCode != null || nationalCode != null ? (
               <div
-                className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-primary/50"
+                className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] tabular-nums text-primary/70"
                 dir="ltr"
               >
                 {personnelCode != null ? (
@@ -279,7 +275,7 @@ export function PersonnelDetailsPanel() {
           <button
             type="button"
             onClick={() => setSelectedPerson(null)}
-            className="inline-flex size-8 items-center justify-center rounded-lg border border-border-color/10 bg-fourth text-primary/55 transition-colors hover:bg-primary/5 hover:text-primary"
+            className="inline-flex size-8 items-center justify-center rounded-lg border border-border-color/10 bg-fourth text-primary/70 transition-colors hover:bg-primary/5 hover:text-primary"
             aria-label="بستن جزئیات پرسنل"
           >
             <XIcon className="size-3.5" />
@@ -295,62 +291,31 @@ export function PersonnelDetailsPanel() {
         className="min-w-0"
       />
 
-      {/* Summary KPI metric cards */}
-      <section className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <MetricCard
-          label={PersonnelPerformanceTranslate.TotalPerformance}
-          value={total}
-          suffix="%"
-          context={periodLabel}
-          change={level?.text}
-        />
-        <MetricCard
-          label={PersonnelPerformanceTranslate.DirectPerFormance}
-          value={direct}
-          suffix="%"
-          context="مستقیم"
-        />
-        <MetricCard
-          label={PersonnelPerformanceTranslate.InDirectPerFormance}
-          value={indirect}
-          suffix="%"
-          context="غیر مستقیم"
-        />
-      </section>
-
-      {/* Gauges */}
-      <section className="rounded-2xl border border-border-color/10 bg-fourth/60 p-3">
-        <PerformanceBadgesLazy />
-        <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-start">
-          <PerformanceGauge
-            className="min-w-0"
-            label="کلی"
-            value={selectedPerson.TotalPerformance}
-          />
-          <PerformanceGauge
-            className="min-w-0"
-            label="مستقیم"
-            value={selectedPerson.DirectPerFormance}
-          />
-          <PerformanceGauge
-            className="min-w-0"
-            label="غیر مستقیم"
-            value={selectedPerson.InDirectPerFormance}
-          />
-        </div>
-      </section>
+      {/*
+       * KPI tiles + direct/indirect split + daily trend + gauges, all in one
+       * card. Values, targets and band thresholds are written as text next to
+       * the colour, per the gauge/KPI guidance — colour only reinforces.
+       */}
+      <PersonMetricsCard
+        direct={selectedPerson.DirectPerFormance}
+        indirect={selectedPerson.InDirectPerFormance}
+        levelText={level?.text ?? null}
+        periodLabel={periodLabel}
+        sparkData={sparkData as Array<Record<string, unknown>> | undefined}
+        total={selectedPerson.TotalPerformance}
+      />
 
       {/* Meta */}
       <aside className="flex min-w-0 flex-col gap-3">
         <section className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[11px] font-medium tracking-wide text-primary/45">
+            <h3 className="text-xs font-medium tracking-wide text-primary/70">
               مشخصات
             </h3>
             <button
               type="button"
               onClick={() => setShowExtraDetails((prev) => !prev)}
-              className="inline-flex items-center gap-1 rounded-lg border border-border-color/10 bg-fourth px-2 py-1 text-[10px] text-primary/65 transition-colors hover:bg-primary/5 hover:text-primary"
+              className="inline-flex items-center gap-1 rounded-lg border border-border-color/10 bg-fourth px-2 py-1 text-[11px] text-primary/80 transition-colors hover:bg-primary/5 hover:text-primary"
             >
               {showExtraDetails ? (
                 <ChevronUpIcon className="size-3" />
@@ -375,7 +340,7 @@ export function PersonnelDetailsPanel() {
                   key={key}
                   className="rounded-xl border border-border-color/10 bg-fourth px-2.5 py-2"
                 >
-                  <div className="text-[10px] text-primary/45">
+                  <div className="text-[11px] text-primary/70">
                     {PersonnelPerformanceTranslate[key] ?? key}
                   </div>
                   <div className="mt-0.5 break-words text-xs font-medium text-primary">
@@ -441,13 +406,13 @@ function RolesByBranchModal({
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-border-color/15">
-                <th className="p-2 text-right font-medium text-primary/70">
+                <th className="p-2 text-start font-medium text-primary/70">
                   شعبه
                 </th>
-                <th className="p-2 text-right font-medium text-primary/70">
+                <th className="p-2 text-start font-medium text-primary/70">
                   نقش
                 </th>
-                <th className="p-2 text-right font-medium text-primary/70">
+                <th className="p-2 text-start font-medium text-primary/70">
                   تاریخ
                 </th>
               </tr>

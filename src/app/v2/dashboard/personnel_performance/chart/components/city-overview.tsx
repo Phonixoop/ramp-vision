@@ -29,7 +29,7 @@ export const CityOverview = React.memo<CityOverviewProps>(
     return (
       <div
         className={twMerge(
-          "flex min-h-[520px] w-full flex-col items-center justify-center gap-2 rounded-xl bg-fourth/20 p-3",
+          "flex min-h-[520px] w-full flex-col gap-2 p-3",
           selectedPerson ? "" : "",
         )}
         dir="rtl"

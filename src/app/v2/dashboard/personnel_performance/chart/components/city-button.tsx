@@ -45,7 +45,7 @@ export const CityRailRow = React.memo<CityRailRowProps>(
         disabled={isNavigating}
         onClick={() => onNavigate(item.CityName_En)}
         className={cn(
-          "group flex w-full items-center rounded-xl border text-right transition-colors",
+          "group flex w-full items-center rounded-xl border text-start transition-colors",
           compact ? "justify-center px-1 py-2" : "gap-2 px-2.5 py-2",
           isActive
             ? "border-accent/35 bg-accent/10 text-primary"
@@ -63,7 +63,7 @@ export const CityRailRow = React.memo<CityRailRowProps>(
               className="mt-0.5 size-1.5 shrink-0 rounded-full"
               style={{
                 backgroundColor:
-                  levelColor ?? "rgb(var(--primary) / 0.25)",
+                  levelColor ?? "rgba(var(--primary), 0.25)",
               }}
               aria-hidden
             />
@@ -71,7 +71,7 @@ export const CityRailRow = React.memo<CityRailRowProps>(
               <span className="block truncate text-xs font-medium leading-5">
                 {item.CityName_Fa}
               </span>
-              <span className="block truncate text-[10px] text-primary/45">
+              <span className="block truncate text-[11px] text-primary/70">
                 {Math.round(item.DirectPerFormance || 0)}% مستقیم ·{" "}
                 {Math.round(item.InDirectPerFormance || 0)}% غیرمستقیم
               </span>

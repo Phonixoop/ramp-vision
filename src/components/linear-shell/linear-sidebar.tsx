@@ -5,8 +5,10 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3Icon,
   ChevronLeftIcon,
+  PackageIcon,
   PanelRightCloseIcon,
   PanelRightOpenIcon,
+  TableIcon,
   UsersIcon,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
@@ -30,7 +32,20 @@ const DEFAULT_LINKS: LinearNavLink[] = [
     label: "نمودار عملکرد",
     icon: BarChart3Icon,
     match: (pathname) =>
-      pathname.startsWith("/v2/dashboard/personnel_performance"),
+      pathname.startsWith("/v2/dashboard/personnel_performance/chart"),
+  },
+  {
+    href: "/v2/dashboard/personnel_performance/table",
+    label: "جدول عملکرد",
+    icon: TableIcon,
+    match: (pathname) =>
+      pathname.startsWith("/v2/dashboard/personnel_performance/table"),
+  },
+  {
+    href: "/v2/dashboard/depo",
+    label: "دپو",
+    icon: PackageIcon,
+    match: (pathname) => pathname.startsWith("/v2/dashboard/depo"),
   },
 ];
 

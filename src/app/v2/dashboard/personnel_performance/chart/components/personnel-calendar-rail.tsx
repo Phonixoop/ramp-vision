@@ -435,7 +435,7 @@ export function PersonnelCalendarRail() {
                 {WEEKDAYS.map((day) => (
                   <span
                     key={day}
-                    className="pb-1 text-[10px] font-medium text-primary/40"
+                    className="pb-1 text-[11px] font-medium text-primary/70"
                   >
                     {day}
                   </span>
@@ -548,7 +548,7 @@ export function PersonnelCalendarRail() {
               </Tabs>
             </div>
 
-            <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[10px] text-primary/50">
+            <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] text-primary/70">
               <span className="inline-flex items-center gap-1">
                 <span
                   className="size-1.5 rounded-full"

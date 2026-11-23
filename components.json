@@ -21,6 +21,7 @@
   "registries": {
     "@bklit": "https://ui.bklit.com/r/{name}.json",
     "@uiarc": "https://uiarc.dev/r/{name}.json",
-    "@beui": "https://beui.dev/r/{name}"
+    "@beui": "https://beui.dev/r/{name}",
+    "@reui": "https://reui.io/r/{name}.json"
   }
 }

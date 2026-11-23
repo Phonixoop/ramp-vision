@@ -3,15 +3,22 @@ import type { CSSProperties } from "react";
 export const rampArcStyle = {
   "--foreground": "rgb(var(--primary))",
   "--background": "rgb(var(--third))",
-  "--border": "rgb(var(--primary) / 0.12)",
-  "--border-subtle": "rgb(var(--primary) / 0.08)",
-  "--border-strong": "rgb(var(--primary) / 0.22)",
+  // Alpha variants must use the legacy comma form: `--primary` is a
+  // comma-separated channel triplet (`244, 246, 245`), so the modern
+  // `rgb(var(--primary) / 0.12)` expanded to `rgb(244, 246, 245 / 0.12)` and was
+  // rejected as invalid — every `var(--border)` consumer silently fell back to
+  // the initial paint value, which is why RingChart tracks (and Arc borders)
+  // rendered solid black instead of a muted line. `rgba(var(--primary), 0.12)`
+  // expands to valid CSS in both themes.
+  "--border": "rgba(var(--primary), 0.12)",
+  "--border-subtle": "rgba(var(--primary), 0.08)",
+  "--border-strong": "rgba(var(--primary), 0.22)",
   "--surface": "rgb(var(--fourth))",
   "--surface-muted": "rgb(var(--third))",
   "--surface-raised": "rgb(var(--secbuttn))",
   "--leading-body": "1.45",
-  "--text-muted": "rgb(var(--primary) / 0.55)",
-  "--text-secondary": "rgb(var(--primary) / 0.72)",
+  "--text-muted": "rgba(var(--primary), 0.55)",
+  "--text-secondary": "rgba(var(--primary), 0.72)",
   "--success": "rgb(var(--accent))",
   "--danger": "rgb(220 38 38)",
   "--warning": "rgb(217 119 6)",
@@ -37,7 +44,7 @@ export const rampArcStyle = {
   "--text-xs": "0.6875rem",
   "--font-body": "inherit",
   "--shadow-resting": "none",
-  "--shadow-floating": "0 12px 32px rgb(var(--primary) / 0.12)",
+  "--shadow-floating": "0 12px 32px rgba(var(--primary), 0.12)",
   "--duration-fast": "150ms",
   "--duration-instant": "80ms",
   "--duration-standard": "200ms",

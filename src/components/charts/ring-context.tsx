@@ -15,7 +15,9 @@ export const ringCssVars = {
   foreground: "var(--chart-foreground)",
   foregroundMuted: "var(--chart-foreground-muted)",
   label: "var(--chart-label)",
-  ringBackground: "var(--border, rgb(var(--primary) / 0.12))",
+  // `--primary` is a comma-separated channel triplet, so the modern
+  // `rgb(... / alpha)` form is invalid CSS here; use the legacy comma form.
+  ringBackground: "var(--border, rgba(var(--primary), 0.12))",
   // Default ring colors from chart palette
   ring1: "var(--chart-1)",
   ring2: "var(--chart-2)",
