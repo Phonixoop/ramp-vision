@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+// import { useEffect, useMemo, useState } from "react"; // scroll-shrink needs useEffect + useState
 import { useParams, useRouter } from "next/navigation";
 import { MapPinnedIcon } from "lucide-react";
 import { Layout, LinearEmptyState } from "~/components/linear-shell";
@@ -15,7 +16,8 @@ import { PersonnelPanel } from "./components/personnel-panel";
 import { CitySessionProvider } from "./city-session-context";
 import { useChartFilters } from "./filters-context";
 
-const LIST_COMPACT_SCROLL_THRESHOLD = 24;
+// --- Scroll-shrink side panels (disabled; uncomment to restore) ---
+// const LIST_COMPACT_SCROLL_THRESHOLD = 24;
 
 export function ChartClient() {
   const params = useParams<{ city?: string }>();
@@ -29,12 +31,14 @@ export function ChartClient() {
     updateFilter,
   } = useChartFilters();
 
-  const [listsCompact, setListsCompact] = useState(false);
-  // Callback-ref node so the scroll listener re-binds when the detail pane mounts
-  // (a plain useRef + [activeCity] effect can miss the element or go stale).
-  const [detailScrollEl, setDetailScrollEl] = useState<HTMLDivElement | null>(
-    null,
-  );
+  // Scroll-shrink: keep panels expanded. Restore listsCompact + detailScrollEl + effects below to re-enable.
+  const listsCompact = false;
+  // const [listsCompact, setListsCompact] = useState(false);
+  // // Callback-ref node so the scroll listener re-binds when the detail pane mounts
+  // // (a plain useRef + [activeCity] effect can miss the element or go stale).
+  // const [detailScrollEl, setDetailScrollEl] = useState<HTMLDivElement | null>(
+  //   null,
+  // );
 
   const activeCity = useMemo(() => {
     if (typeof params?.city !== "string") return "";
@@ -45,32 +49,32 @@ export function ChartClient() {
     }
   }, [params?.city]);
 
-  useEffect(() => {
-    setListsCompact(false);
-  }, [activeCity]);
+  // useEffect(() => {
+  //   setListsCompact(false);
+  // }, [activeCity]);
 
-  useEffect(() => {
-    const el = detailScrollEl;
-    if (!el || !activeCity) return;
+  // useEffect(() => {
+  //   const el = detailScrollEl;
+  //   if (!el || !activeCity) return;
 
-    const onScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = el;
-      setListsCompact((prev) => {
-        // Shrinking the rails widens the detail pane; content can reflow so
-        // overflow disappears and scrollTop clamps to 0. Stay compact then;
-        // only expand when the pane can scroll and the user is back at top.
-        if (prev) {
-          const canScroll = scrollHeight > clientHeight + 1;
-          return canScroll ? scrollTop > 0 : true;
-        }
-        return scrollTop > LIST_COMPACT_SCROLL_THRESHOLD;
-      });
-    };
+  //   const onScroll = () => {
+  //     const { scrollTop, scrollHeight, clientHeight } = el;
+  //     setListsCompact((prev) => {
+  //       // Shrinking the rails widens the detail pane; content can reflow so
+  //       // overflow disappears and scrollTop clamps to 0. Stay compact then;
+  //       // only expand when the pane can scroll and the user is back at top.
+  //       if (prev) {
+  //         const canScroll = scrollHeight > clientHeight + 1;
+  //         return canScroll ? scrollTop > 0 : true;
+  //       }
+  //       return scrollTop > LIST_COMPACT_SCROLL_THRESHOLD;
+  //     });
+  //   };
 
-    onScroll();
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
-  }, [detailScrollEl, activeCity]);
+  //   onScroll();
+  //   el.addEventListener("scroll", onScroll, { passive: true });
+  //   return () => el.removeEventListener("scroll", onScroll);
+  // }, [detailScrollEl, activeCity]);
 
   const statusText = !canFetch
     ? "در انتظار فیلترهای لازم…"
@@ -80,7 +84,8 @@ export function ChartClient() {
         ? `روز کاری: ${totalWorkDays}`
         : "آماده";
 
-  const railWidth = listsCompact ? "lg:w-[5.25rem]" : "lg:w-[300px]";
+  const railWidth = "lg:w-[300px]";
+  // const railWidth = listsCompact ? "lg:w-[5.25rem]" : "lg:w-[300px]";
 
   return (
     <div dir="rtl" className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -174,7 +179,7 @@ export function ChartClient() {
 
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border-color/10 bg-fourth">
                   <div
-                    ref={setDetailScrollEl}
+                    // ref={setDetailScrollEl} // scroll-shrink
                     className="min-h-0 flex-1 overflow-y-auto p-3 md:p-4"
                   >
                     <CityDetailPane />
@@ -188,7 +193,8 @@ export function ChartClient() {
                 className={cn(
                   "flex min-h-0 w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-border-color/10 bg-fourth transition-[width] duration-300 ease-out",
                   "lg:sticky lg:top-0 lg:self-stretch",
-                  listsCompact ? "lg:w-[5.25rem]" : "lg:w-[340px]",
+                  "lg:w-[340px]",
+                  // listsCompact ? "lg:w-[5.25rem]" : "lg:w-[340px]", // scroll-shrink
                 )}
               >
                 <CitiesPanel compact={listsCompact} />
