@@ -13,6 +13,7 @@ import {
   deriveTehranSubCitiesFromFilter,
   distinctPersonnelPerformanceData,
   expandCityFilterSelection,
+  filterOutZeroPerformanceRows,
   getPerformanceMetric,
   mergeMissingPersonnelsIntoPerformance,
 } from "~/utils/personnel-performance";
@@ -388,8 +389,12 @@ export function PersonnelPerformanceTable({
     );
   };
 
-  const tableData =
-    toggleDistinctData === "Distincted" ? distincedData : pureMergedData;
+  // Rows with no measurable performance for the period are merged in from the
+  // users_info roster (day off / no activity). The table page should not list
+  // them, so drop them from the rendered data set (both Distincted and Pure).
+  const tableData = filterOutZeroPerformanceRows(
+    toggleDistinctData === "Distincted" ? distincedData : pureMergedData,
+  );
 
   // Debug table data
   console.log("🔍 Table data:", {

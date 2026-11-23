@@ -451,6 +451,25 @@ export function mergeMissingPersonnelsIntoPerformance<
   return [...base, ...missing];
 }
 
+/**
+ * Table view hides people with no measurable performance for the period
+ * (day-off / no-activity rows merged in from the users_info roster, which carry
+ * TotalPerformance = 0). Comparison uses the two-decimal value the table shows,
+ * so floating-point noise (e.g. 0.001) does not leave a row reading "0.00".
+ */
+export function filterOutZeroPerformanceRows<T>(
+  rows: T[] | undefined | null,
+): T[] {
+  if (!Array.isArray(rows)) return [];
+  return rows.filter((row) => {
+    const value = Number(
+      (row as { TotalPerformance?: unknown })?.TotalPerformance,
+    );
+    if (!Number.isFinite(value)) return false;
+    return Number(value.toFixed(2)) !== 0;
+  });
+}
+
 /** Identity match for refreshing selectedPerson after list re-aggregation. */
 export function isSamePersonnelRecord(
   a: {
