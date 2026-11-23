@@ -3,25 +3,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-      args:
-        - DATABASE_URL=sqlserver://5.202.179.158:5090;database=RAMP_Vision;user=admin;password=Mohammad@2525;trustServerCertificate=true;encrypt=true
-        - NEXTAUTH_SECRET=your_actual_secret_here
-        - NEXTAUTH_URL=https://ramp.atie-sazan.ir
-        - SQL_USER=admin
-        - SQL_PASSWORD=Mohammad@2525
-        - SQL_SERVERIP=5.202.179.158
-        - SQL_PORT=5090
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=sqlserver://5.202.179.158:5090;database=RAMP_Vision;user=admin;password=Mohammad@2525;trustServerCertificate=true;encrypt=true
-      - NEXTAUTH_SECRET=your_actual_secret_here
-      - NEXTAUTH_URL=https://ramp.atie-sazan.ir
-      - SQL_USER=admin
-      - SQL_PASSWORD=Mohammad@2525
-      - SQL_SERVERIP=5.202.179.158
-      - SQL_PORT=5090
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - SQL_USER=${SQL_USER}
+      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_SERVERIP=${SQL_SERVERIP}
+      - SQL_PORT=${SQL_PORT}
     restart: unless-stopped
     networks:
       - ramp-network
