@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=hub.megan.ir/docker/dockerfile:1
 # =============================================================================
 # ramp-vision — production image
 #
