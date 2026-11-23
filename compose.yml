@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Single source of truth for configuration. Everything the app needs is
+    # read from .env at run time — no values are duplicated here or baked into
+    # the image.
+    env_file:
+      - .env
+    ports:
+      # host:container — both resolved from .env so this file stays config-free
+      - "${APP_PORT:-3002}:${PORT:-3000}"
+    restart: unless-stopped
+    networks:
+      - ramp-network
+
+networks:
+  ramp-network:
+    driver: bridge

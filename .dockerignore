@@ -8,12 +8,17 @@ yarn-error.log*
 .next
 out
 
+# TypeScript incremental build artifacts
+*.tsbuildinfo
+tmp-bklit-tsconfig.tsbuildinfo
+
 # Environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.example
 docker.env
 
 # IDE files
@@ -21,6 +26,24 @@ docker.env
 .idea
 *.swp
 *.swo
+
+# AI agent / editor tooling (not part of the app)
+.agents
+.agents - Copy
+.cursor
+.cursorignore
+.kombai
+skills-lock.json
+
+# Project docs, dev scripts and orchestration files
+docs
+DOCKER.md
+docker-server-setup.md
+README.md
+docker-scripts.sh
+docker-scripts.bat
+ramp.sh
+env.example
 
 # OS files
 .DS_Store

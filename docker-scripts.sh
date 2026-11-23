@@ -40,7 +40,7 @@ check_docker() {
 # Function to check if ports are available
 check_ports() {
     # Load ports from environment file
-    source docker.env 2>/dev/null || true
+    source .env 2>/dev/null || true
     local ports=("${APP_PORT:-6555}" "${DB_PORT:-1433}" "${PRISMA_STUDIO_PORT:-5555}")
     for port in "${ports[@]}"; do
         if netstat -ano | grep ":$port " > /dev/null 2>&1; then
@@ -57,10 +57,10 @@ start_production() {
     check_docker
     check_ports
     
-    docker-compose -f docker-compose.prod.yml --env-file docker.env up --build -d
+    docker-compose -f docker-compose.prod.yml --env-file .env up --build -d
     print_success "Production environment started"
     # Load URL from environment file
-    source docker.env 2>/dev/null || true
+    source .env 2>/dev/null || true
     print_status "Access the application at: ${PROD_URL:-http://localhost:3000}"
 }
 
@@ -70,10 +70,10 @@ start_development() {
     check_docker
     check_ports
     
-    docker-compose -f docker-compose.dev.yml --env-file docker.env up --build -d
+    docker-compose -f docker-compose.dev.yml --env-file .env up --build -d
     print_success "Development environment started"
     # Load URL from environment file
-    source docker.env 2>/dev/null || true
+    source .env 2>/dev/null || true
     print_status "Access the application at: ${DEV_URL:-http://localhost:3000}"
 }
 

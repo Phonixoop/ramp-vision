@@ -55,7 +55,7 @@ call :check_docker
 if errorlevel 1 exit /b 1
 call :check_ports
 
-docker-compose -f docker-compose.prod.yml --env-file docker.env up --build -d
+docker-compose -f docker-compose.prod.yml --env-file .env up --build -d
 call :print_success "Production environment started"
 call :print_status "Access the application at: http://localhost:3000"
 goto :eof
@@ -67,7 +67,7 @@ call :check_docker
 if errorlevel 1 exit /b 1
 call :check_ports
 
-docker-compose -f docker-compose.dev.yml --env-file docker.env up --build -d
+docker-compose -f docker-compose.dev.yml --env-file .env up --build -d
 call :print_success "Development environment started"
 call :print_status "Access the application at: http://localhost:3000"
 goto :eof

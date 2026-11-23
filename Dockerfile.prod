@@ -1,4 +1,4 @@
-FROM node:24.7.0-alpine AS builder
+FROM node:26-alpine AS builder
 
 # Install OpenSSL and other required dependencies
 RUN apk add --no-cache openssl libc6-compat
@@ -22,7 +22,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:24.7.0-alpine AS runner
+FROM node:26-alpine AS runner
 
 # Install OpenSSL
 RUN apk add --no-cache openssl libc6-compat
@@ -43,7 +43,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3002
 
 # Start production server
 CMD ["npm", "start"]
